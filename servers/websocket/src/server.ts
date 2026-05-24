@@ -27,7 +27,11 @@ export async function createWebSocketServer (
         return
       }
 
-      broadcastJson(server, result.message)
+      if (isExtensionKeepalive(result.message.payload)) {
+        return
+      }
+
+      forwardJson(server, socket, result.message)
     })
   })
 
@@ -39,14 +43,28 @@ export async function createWebSocketServer (
   }
 }
 
-function broadcastJson (server: WebSocketServer, message: unknown): void {
+function forwardJson (
+  server: WebSocketServer,
+  sender: WebSocket,
+  message: unknown
+): void {
   const serialized = JSON.stringify(message)
 
   for (const client of server.clients) {
-    if (client.readyState === client.OPEN) {
+    if (client !== sender && client.readyState === client.OPEN) {
       client.send(serialized)
     }
   }
+}
+
+function isExtensionKeepalive (payload: unknown): boolean {
+  return (
+    typeof payload === 'object' &&
+    payload !== null &&
+    !Array.isArray(payload) &&
+    'type' in payload &&
+    payload.type === 'extension_keepalive'
+  )
 }
 
 function sendJson (socket: WebSocket, message: unknown): void {
