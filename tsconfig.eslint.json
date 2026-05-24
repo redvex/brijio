@@ -1,0 +1,8 @@
+{
+  "extends": "./servers/websocket/tsconfig.json",
+  "include": [
+    "clients/**/*.ts",
+    "packages/**/*.ts",
+    "servers/**/*.ts"
+  ]
+}

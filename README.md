@@ -12,8 +12,8 @@ cloud deployment.
 
 ## Status
 
-This project is at the initial skeleton stage. The first implementation
-milestone is:
+This project has the initial skeleton in place and a first local WebSocket
+transport milestone. The next product milestone remains:
 
 1. A local Chrome extension manually connects to the WebSocket server.
 2. The MCP server requests browser status through the WebSocket server.
@@ -187,8 +187,42 @@ Docker-based local development should start the server components together:
 docker compose --profile runtime up --build
 ```
 
-At the current skeleton stage, the server Dockerfiles are placeholders. They
-reserve the service boundaries but do not run BrowserBridge behavior yet.
+The WebSocket server currently runs a temporary no-auth, single-channel echo and
+pub/sub protocol. MCP routing and browser extension integration are not
+implemented yet.
+
+### Testing The WebSocket Server With A CLI
+
+Start the WebSocket server:
+
+```sh
+pnpm --filter @browserbridge/websocket dev
+```
+
+In another terminal, connect with `wscat`:
+
+```sh
+pnpm dlx wscat -c ws://127.0.0.1:8787
+```
+
+Send a valid message:
+
+```json
+{ "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
+```
+
+The server should echo the same JSON envelope back to that terminal. To test
+pub/sub fan-out, open a second `wscat` terminal connected to the same URL, then
+send the message from either terminal. Both connected clients should receive the
+message.
+
+To test structured error handling, send invalid JSON:
+
+```text
+{not valid json
+```
+
+The server should respond with an `invalid_json` error envelope.
 
 The Chrome extension should then be loaded from
 `clients/extensions/chrome/dist` or the documented build output path.
@@ -205,8 +239,8 @@ BROWSERBRIDGE_TOKEN=local-dev-token
 MCP_SESSION_ID=local
 ```
 
-Names may change during implementation, but environment variables should stay
-small, explicit, and documented.
+`BROWSERBRIDGE_TOKEN` is reserved for the later authenticated routing milestone;
+the current WebSocket echo/pub-sub server does not require authentication.
 
 ## Security Model
 

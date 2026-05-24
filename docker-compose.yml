@@ -6,7 +6,6 @@ services:
     environment:
       WEBSOCKET_HOST: ${WEBSOCKET_HOST:-0.0.0.0}
       WEBSOCKET_PORT: ${WEBSOCKET_PORT:-8787}
-      BROWSERBRIDGE_TOKEN: ${BROWSERBRIDGE_TOKEN:-local-dev-token}
     ports:
       - "${WEBSOCKET_PORT:-8787}:8787"
     profiles:
