@@ -1,0 +1,17 @@
+{
+  "name": "@browserbridge/mcp",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BrowserBridge MCP server for AI agent browser tools.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"MCP server build is not implemented yet\"",
+    "check": "echo \"MCP server checks are not implemented yet\"",
+    "dev": "echo \"MCP server dev workflow is not implemented yet\"",
+    "test": "echo \"No tests defined for @browserbridge/mcp yet\""
+  },
+  "dependencies": {
+    "@browserbridge/shared": "workspace:*"
+  }
+}
