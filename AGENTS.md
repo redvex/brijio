@@ -36,6 +36,14 @@ When asked to implement a feature or behavioral change:
 When creating a PR:
 
 - Use atomic commits.
+- Keep commits small and reviewable; each commit should represent one coherent
+  step such as an ADR, test coverage, implementation, documentation, or
+  tooling update.
+- Stage files explicitly for each commit. Avoid broad `git add .` or
+  `git add -A` unless the whole working tree has been reviewed and confirmed as
+  PR scope.
+- Do not mix unrelated cleanup, formatting, dependency changes, or documentation
+  rewrites into a behavior commit.
 - Write meaningful commit messages.
 - Use a PR title and description that match the actual goal and scope.
 - Keep unrelated refactors out of the PR.
