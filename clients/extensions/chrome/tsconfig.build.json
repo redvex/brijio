@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "noEmit": false
+  },
+  "include": [
+    "src/background.ts",
+    "src/background-controller.ts",
+    "src/protocol.ts",
+    "src/setup.ts",
+    "src/timers.ts"
+  ]
+}

@@ -2,9 +2,14 @@
   "manifest_version": 3,
   "name": "BrowserBridge",
   "version": "0.0.0",
+  "minimum_chrome_version": "116",
   "description": "User-controlled bridge between Chrome and AI agents.",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
   "action": {
     "default_title": "BrowserBridge"
   },
-  "permissions": []
+  "permissions": ["storage", "tabs"]
 }

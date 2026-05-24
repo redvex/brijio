@@ -6,12 +6,17 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "build": "echo \"Chrome extension build is not implemented yet\"",
-    "check": "echo \"Chrome extension checks are not implemented yet\"",
+    "build": "tsc -p tsconfig.build.json && cp manifest.json dist/manifest.json && cp src/setup.html dist/setup.html",
+    "check": "tsc --noEmit",
     "dev": "echo \"Chrome extension dev workflow is not implemented yet\"",
-    "test": "echo \"No tests defined for @browserbridge/chrome-extension yet\""
+    "test": "node --import tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "@browserbridge/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BrowserBridge Setup</title>
+    <style>
+      body {
+        color: #202124;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        margin: 0;
+        padding: 32px;
+      }
+
+      main {
+        max-width: 520px;
+      }
+
+      label,
+      input,
+      button {
+        display: block;
+      }
+
+      label {
+        font-weight: 600;
+        margin-block-end: 8px;
+      }
+
+      input {
+        border: 1px solid #9aa0a6;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font: inherit;
+        margin-block-end: 16px;
+        padding: 10px 12px;
+        width: 100%;
+      }
+
+      button {
+        background: #1a73e8;
+        border: 0;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        font: inherit;
+        font-weight: 600;
+        padding: 10px 14px;
+      }
+
+      p {
+        line-height: 1.5;
+      }
+
+      #status {
+        min-height: 1.5em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>BrowserBridge Setup</h1>
+      <p>Enter the local WebSocket URL for this browser bridge.</p>
+      <form id="settings-form">
+        <label for="websocket-url">WebSocket URL</label>
+        <input
+          id="websocket-url"
+          name="websocketUrl"
+          placeholder="ws://127.0.0.1:8787"
+          required
+          type="url"
+        />
+        <button type="submit">Save</button>
+      </form>
+      <p id="status" role="status"></p>
+    </main>
+    <script type="module" src="setup.js"></script>
+  </body>
+</html>
