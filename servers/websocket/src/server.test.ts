@@ -11,16 +11,16 @@ afterEach(async () => {
   await Promise.all(servers.splice(0).map(async (server) => await server.close()))
 })
 
-void describe('WebSocket single-channel echo and pub/sub', () => {
-  void it('echoes a valid message back to the sender', async () => {
+void describe('WebSocket single-channel peer forwarding', () => {
+  void it('does not echo a valid message back to the sender', async () => {
     const server = await startTestServer()
     const client = await connect(server.url)
     const message = { type: 'message', id: 'msg-1', payload: { text: 'hello' } }
 
-    const received = waitForJsonMessage(client)
+    const received = waitForNoMessage(client)
     client.send(JSON.stringify(message))
 
-    assert.deepEqual(await received, message)
+    await received
     client.close()
   })
 
@@ -30,14 +30,32 @@ void describe('WebSocket single-channel echo and pub/sub', () => {
     const subscriber = await connect(server.url)
     const message = { type: 'message', id: 'msg-2', payload: { text: 'fanout' } }
 
-    const senderReceived = waitForJsonMessage(sender)
+    const senderReceived = waitForNoMessage(sender)
     const subscriberReceived = waitForJsonMessage(subscriber)
     sender.send(JSON.stringify(message))
 
-    assert.deepEqual(await senderReceived, message)
+    await senderReceived
     assert.deepEqual(await subscriberReceived, message)
     sender.close()
     subscriber.close()
+  })
+
+  void it('does not forward extension keepalive messages to peers', async () => {
+    const server = await startTestServer()
+    const extension = await connect(server.url)
+    const client = await connect(server.url)
+    const keepalive = {
+      type: 'message',
+      id: 'keepalive-1',
+      payload: { type: 'extension_keepalive' }
+    }
+
+    const received = waitForNoMessage(client)
+    extension.send(JSON.stringify(keepalive))
+
+    await received
+    extension.close()
+    client.close()
   })
 
   void it('returns a structured error for invalid JSON', async () => {
@@ -102,6 +120,21 @@ async function waitForJsonMessage (client: WebSocket): Promise<JsonObject> {
       }
     })
     client.once('error', reject)
+  })
+}
+
+async function waitForNoMessage (client: WebSocket): Promise<void> {
+  return await new Promise((resolve, reject) => {
+    const timeout = setTimeout(resolve, 25)
+
+    client.once('message', (data) => {
+      clearTimeout(timeout)
+      reject(new Error(`Expected no message, received ${rawDataToString(data)}`))
+    })
+    client.once('error', (error) => {
+      clearTimeout(timeout)
+      reject(error)
+    })
   })
 }
 

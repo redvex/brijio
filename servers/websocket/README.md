@@ -9,8 +9,9 @@ The current implementation is the first approved WebSocket milestone from ADR 00
 - No authentication.
 - One implicit in-memory channel.
 - Every connected client is subscribed automatically.
-- Valid messages are echoed to the sender and broadcast to other connected
-  clients.
+- Valid messages are forwarded only to other connected clients.
+- `extension_keepalive` messages are accepted and suppressed so clients do not
+  receive keepalive noise.
 - Invalid JSON and unsupported message envelopes return structured errors to
   the sender.
 
@@ -96,11 +97,11 @@ Send a valid message:
 { "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
 ```
 
-The server should echo the same JSON envelope back to that terminal.
+The sending terminal should not receive its own message.
 
 To test publish/subscribe behavior, open a second `wscat` terminal connected to
-the same URL. Send a valid message from either terminal; both connected clients
-should receive it.
+the same URL. Send a valid message from either terminal; the other connected
+client should receive it.
 
 To test invalid JSON handling, send:
 
