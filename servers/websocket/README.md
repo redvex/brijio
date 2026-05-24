@@ -4,8 +4,7 @@ The WebSocket server is the local message transport for BrowserBridge.
 
 ## Current Scope
 
-The current implementation is the first approved WebSocket milestone from ADR
-0002. It is intentionally small:
+The current implementation is the first approved WebSocket milestone from ADR 0002. It is intentionally small:
 
 - No authentication.
 - One implicit in-memory channel.
@@ -94,7 +93,7 @@ pnpm dlx wscat -c ws://127.0.0.1:8787
 Send a valid message:
 
 ```json
-{"type":"message","id":"cli-1","payload":{"text":"hello from cli"}}
+{ "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
 ```
 
 The server should echo the same JSON envelope back to that terminal.

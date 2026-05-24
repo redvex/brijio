@@ -13,6 +13,7 @@
 ### Task 1: Test Harness And Failing Server Tests
 
 **Files:**
+
 - Modify: `servers/websocket/package.json`
 - Create: `servers/websocket/tsconfig.json`
 - Create: `servers/websocket/src/server.test.ts`
@@ -39,6 +40,7 @@ Expected: failure because `createWebSocketServer` and protocol code do not exist
 ### Task 2: Minimal Protocol And Server Implementation
 
 **Files:**
+
 - Create: `servers/websocket/src/protocol.ts`
 - Create: `servers/websocket/src/server.ts`
 - Create: `servers/websocket/src/index.ts`
@@ -61,6 +63,7 @@ Expected: all websocket tests pass.
 ### Task 3: Documentation And Package Verification
 
 **Files:**
+
 - Modify: `servers/websocket/README.md`
 - Modify: `docs/architecture/decisions/0002-websocket-single-channel-echo-pubsub.md`
 

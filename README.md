@@ -208,7 +208,7 @@ pnpm dlx wscat -c ws://127.0.0.1:8787
 Send a valid message:
 
 ```json
-{"type":"message","id":"cli-1","payload":{"text":"hello from cli"}}
+{ "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
 ```
 
 The server should echo the same JSON envelope back to that terminal. To test

@@ -9,7 +9,16 @@
     "build": "pnpm -r build",
     "check": "pnpm -r check",
     "dev": "pnpm -r --parallel dev",
-    "test": "pnpm -r test"
+    "format:md": "prettier --write \"**/*.md\"",
+    "lint": "pnpm lint:ts && pnpm lint:md",
+    "lint:md": "prettier --check \"**/*.md\"",
+    "lint:ts": "XDG_CACHE_HOME=.cache ts-standard \"**/*.ts\"",
+    "precommit": "scripts/pre-commit",
+    "test": "pnpm -r test && node --test scripts/*.test.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "ts-standard": "^12.0.2"
   },
   "engines": {
     "node": ">=22.0.0",
