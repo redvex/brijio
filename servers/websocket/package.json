@@ -1,0 +1,17 @@
+{
+  "name": "@browserbridge/websocket",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BrowserBridge WebSocket session router.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"WebSocket server build is not implemented yet\"",
+    "check": "echo \"WebSocket server checks are not implemented yet\"",
+    "dev": "echo \"WebSocket server dev workflow is not implemented yet\"",
+    "test": "echo \"No tests defined for @browserbridge/websocket yet\""
+  },
+  "dependencies": {
+    "@browserbridge/shared": "workspace:*"
+  }
+}

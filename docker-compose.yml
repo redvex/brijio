@@ -1,0 +1,26 @@
+services:
+  websocket:
+    build:
+      context: .
+      dockerfile: servers/websocket/Dockerfile
+    environment:
+      WEBSOCKET_HOST: ${WEBSOCKET_HOST:-0.0.0.0}
+      WEBSOCKET_PORT: ${WEBSOCKET_PORT:-8787}
+      BROWSERBRIDGE_TOKEN: ${BROWSERBRIDGE_TOKEN:-local-dev-token}
+    ports:
+      - "${WEBSOCKET_PORT:-8787}:8787"
+    profiles:
+      - runtime
+
+  mcp:
+    build:
+      context: .
+      dockerfile: servers/mcp/Dockerfile
+    environment:
+      WEBSOCKET_URL: ${WEBSOCKET_URL:-ws://websocket:8787}
+      BROWSERBRIDGE_TOKEN: ${BROWSERBRIDGE_TOKEN:-local-dev-token}
+      MCP_SESSION_ID: ${MCP_SESSION_ID:-local}
+    depends_on:
+      - websocket
+    profiles:
+      - runtime

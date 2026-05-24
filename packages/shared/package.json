@@ -1,0 +1,17 @@
+{
+  "name": "@browserbridge/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared BrowserBridge protocol types and message schemas.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "echo \"Shared package build is not implemented yet\"",
+    "check": "echo \"Shared package checks are not implemented yet\"",
+    "dev": "echo \"Shared package dev workflow is not implemented yet\"",
+    "test": "echo \"No tests defined for @browserbridge/shared yet\""
+  }
+}

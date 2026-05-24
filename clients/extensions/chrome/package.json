@@ -1,0 +1,17 @@
+{
+  "name": "@browserbridge/chrome-extension",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BrowserBridge Chrome extension.",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"Chrome extension build is not implemented yet\"",
+    "check": "echo \"Chrome extension checks are not implemented yet\"",
+    "dev": "echo \"Chrome extension dev workflow is not implemented yet\"",
+    "test": "echo \"No tests defined for @browserbridge/chrome-extension yet\""
+  },
+  "dependencies": {
+    "@browserbridge/shared": "workspace:*"
+  }
+}
