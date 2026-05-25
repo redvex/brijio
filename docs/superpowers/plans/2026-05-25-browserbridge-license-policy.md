@@ -27,7 +27,7 @@
 - Modify: `README.md`
   - Updates positioning, contribution, and license language.
 - Modify: `package.json`
-  - Changes `license` from `AGPL-3.0-only` to `SEE LICENSE IN LICENSE`.
+  - Changes `license` from `AGPL-3.0-only` to `PolyForm-Noncommercial-1.0.0`.
 - Modify: `packages/shared/package.json`
   - Same package metadata change.
 - Modify: `servers/websocket/package.json`
@@ -128,8 +128,10 @@ receive automatic commercial relicensing rights for contributor-owned work.
 Commercial BrowserBridge packages can include contributor-owned work only when
 the contributor separately grants commercial permission.
 
-Package metadata should use `SEE LICENSE IN LICENSE` because the selected code
-license is not represented by the previous AGPL SPDX identifier.
+Package metadata should use the SPDX license identifier
+`PolyForm-Noncommercial-1.0.0` for code packages. Repository documentation
+should separately document the CC BY-NC 4.0 terms for documentation and
+non-code written materials.
 
 ## Non-Goals
 
@@ -211,8 +213,8 @@ it("uses source-available package license metadata", async () => {
 
     assert.equal(
       packageJson.license,
-      "SEE LICENSE IN LICENSE",
-      `${path} should point readers to the repository license policy`,
+      "PolyForm-Noncommercial-1.0.0",
+      `${path} should use the PolyForm Noncommercial SPDX identifier`,
     );
   }
 });
@@ -414,7 +416,7 @@ In each listed `package.json`, change:
 to:
 
 ```json
-"license": "SEE LICENSE IN LICENSE"
+"license": "PolyForm-Noncommercial-1.0.0"
 ```
 
 - [ ] **Step 2: Run policy test to verify remaining README failure**
@@ -589,7 +591,7 @@ Placeholder scan:
 
 Type and naming consistency:
 
-- Package metadata consistently uses `SEE LICENSE IN LICENSE`.
+- Package metadata consistently uses `PolyForm-Noncommercial-1.0.0`.
 - Documentation consistently uses `Creative Commons Attribution-NonCommercial
 4.0 International`.
 - Contribution model consistently uses `inbound-equals-outbound`.

@@ -77,8 +77,10 @@ receive automatic commercial relicensing rights for contributor-owned work.
 Commercial BrowserBridge packages can include contributor-owned work only when
 the contributor separately grants commercial permission.
 
-Package metadata should use `SEE LICENSE IN LICENSE` because the selected code
-license is not represented by the previous AGPL SPDX identifier.
+Package metadata should use the SPDX license identifier
+`PolyForm-Noncommercial-1.0.0` for code packages. Repository documentation
+should separately document the CC BY-NC 4.0 terms for documentation and
+non-code written materials.
 
 ## Non-Goals
 
