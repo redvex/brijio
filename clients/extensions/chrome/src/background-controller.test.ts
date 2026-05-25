@@ -4,10 +4,16 @@ import {
   BrowserBridgeBackgroundController,
   type ActionAdapter,
   type BrowserBridgeSocket,
+  type PageReadResult,
+  type PageReaderAdapter,
   type SetupAdapter,
-  type StorageAdapter,
-  type TabsAdapter
+  type StorageAdapter
 } from './background-controller.js'
+import type {
+  PageContent,
+  PageContentErrorCode,
+  PageContext
+} from './protocol.js'
 
 void describe('BrowserBridge background controller', () => {
   void it('opens setup when action is clicked without a stored WebSocket URL', async () => {
@@ -52,13 +58,10 @@ void describe('BrowserBridge background controller', () => {
     assert.equal(harness.action.title, 'BrowserBridge stopped')
   })
 
-  void it('responds to get_page_context with the active tab URL and title', async () => {
+  void it('responds to get_page_context with rich active tab context', async () => {
     const harness = createHarness({
       websocketUrl: 'ws://127.0.0.1:8787',
-      activeTab: {
-        url: 'https://example.com/',
-        title: 'Example Domain'
-      }
+      pageContext: createPageContext()
     })
 
     await harness.controller.handleActionClicked()
@@ -66,7 +69,7 @@ void describe('BrowserBridge background controller', () => {
     await harness.sockets.created[0].receive(
       JSON.stringify({
         type: 'message',
-        id: 'request-1',
+        id: 'context-1',
         payload: {
           type: 'get_page_context'
         }
@@ -75,20 +78,23 @@ void describe('BrowserBridge background controller', () => {
 
     assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
       type: 'message',
-      id: 'request-1',
+      id: 'context-1',
       payload: {
         type: 'page_context_response',
         ok: true,
-        data: {
-          url: 'https://example.com/',
-          title: 'Example Domain'
-        }
+        data: createPageContext()
       }
     })
   })
 
   void it('returns no_active_tab when no active tab with a URL exists', async () => {
-    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pageReaderError: {
+        code: 'no_active_tab',
+        message: 'No active tab with a URL is available.'
+      }
+    })
 
     await harness.controller.handleActionClicked()
     harness.sockets.created[0].open()
@@ -111,6 +117,88 @@ void describe('BrowserBridge background controller', () => {
         error: {
           code: 'no_active_tab',
           message: 'No active tab with a URL is available.'
+        }
+      }
+    })
+  })
+
+  void it('responds to get_page_content with the requested chunk', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pageContent: {
+        url: 'https://example.com/',
+        title: 'Example Domain',
+        timestamp: '2026-05-25T10:01:00.000Z',
+        index: 2,
+        content: 'Second chunk',
+        truncated: false,
+        maxPayloadBytes: 131072
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'content-1',
+        payload: {
+          type: 'get_page_content',
+          index: 2
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'content-1',
+      payload: {
+        type: 'page_content_response',
+        ok: true,
+        data: {
+          url: 'https://example.com/',
+          title: 'Example Domain',
+          timestamp: '2026-05-25T10:01:00.000Z',
+          index: 2,
+          content: 'Second chunk',
+          truncated: false,
+          maxPayloadBytes: 131072
+        }
+      }
+    })
+  })
+
+  void it('returns content_script_unavailable when active tab extraction fails', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pageReaderError: {
+        code: 'content_script_unavailable',
+        message: 'Unable to reach the page content script.'
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'content-2',
+        payload: {
+          type: 'get_page_content',
+          index: 1
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'content-2',
+      payload: {
+        type: 'page_content_response',
+        ok: false,
+        error: {
+          code: 'content_script_unavailable',
+          message: 'Unable to reach the page content script.'
         }
       }
     })
@@ -160,12 +248,12 @@ void describe('BrowserBridge background controller', () => {
 
 interface HarnessOptions {
   websocketUrl?: string
-  activeTab?: ActiveTabContext
-}
-
-interface ActiveTabContext {
-  url: string
-  title: string
+  pageContext?: PageContext
+  pageContent?: PageContent
+  pageReaderError?: {
+    code: PageContentErrorCode
+    message: string
+  }
 }
 
 interface Harness {
@@ -180,7 +268,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const storage = new FakeStorageAdapter(options.websocketUrl)
   const setup = new FakeSetupAdapter()
   const action = new FakeActionAdapter()
-  const tabs = new FakeTabsAdapter(options.activeTab)
+  const pageReader = new FakePageReaderAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
   const controller = new BrowserBridgeBackgroundController({
@@ -188,7 +276,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
     createWebSocket: sockets.create,
     setup,
     storage,
-    tabs,
+    pageReader,
     timers
   })
 
@@ -238,11 +326,83 @@ class FakeActionAdapter implements ActionAdapter {
   }
 }
 
-class FakeTabsAdapter implements TabsAdapter {
-  constructor (private readonly activeTab: ActiveTabContext | undefined) {}
+class FakePageReaderAdapter implements PageReaderAdapter {
+  constructor (private readonly options: HarnessOptions) {}
 
-  async getActiveTabContext (): Promise<{ url: string, title: string } | undefined> {
-    return this.activeTab
+  async getPageContext (): Promise<PageReadResult<PageContext>> {
+    if (this.options.pageReaderError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageReaderError
+      }
+    }
+
+    if (this.options.pageContext === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'no_active_tab',
+          message: 'No active tab with a URL is available.'
+        }
+      }
+    }
+
+    return {
+      ok: true,
+      data: this.options.pageContext
+    }
+  }
+
+  async getPageContent (_index: number): Promise<PageReadResult<PageContent>> {
+    if (this.options.pageReaderError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageReaderError
+      }
+    }
+
+    if (this.options.pageContent === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'invalid_index',
+          message: 'Page content chunk index must be available and 1-based.'
+        }
+      }
+    }
+
+    return {
+      ok: true,
+      data: this.options.pageContent
+    }
+  }
+}
+
+function createPageContext (): PageContext {
+  return {
+    url: 'https://example.com/',
+    title: 'Example Domain',
+    timestamp: '2026-05-25T10:00:00.000Z',
+    selectedText: null,
+    preview: {
+      content: 'Example preview',
+      truncated: false,
+      maxBytes: 4096
+    },
+    structure: {
+      headings: [],
+      landmarks: [],
+      links: [],
+      images: [],
+      forms: [],
+      actions: []
+    },
+    content: {
+      available: true,
+      requestType: 'get_page_content',
+      firstIndex: 1,
+      defaultMaxPayloadBytes: 131072
+    }
   }
 }
 

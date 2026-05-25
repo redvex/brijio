@@ -4,18 +4,114 @@ export interface WebSocketEnvelope {
   payload: unknown
 }
 
+export const defaultPageContentMaxPayloadBytes = 131072
+
 export interface GetPageContextRequest {
   type: 'get_page_context'
+}
+
+export interface GetPageContentRequest {
+  type: 'get_page_content'
+  index?: number
+}
+
+export interface PageHeading {
+  id: string
+  level: number
+  text: string
+}
+
+export interface PageLandmark {
+  id: string
+  role: string
+  name: string
+}
+
+export interface PageLink {
+  id: string
+  text: string
+  href: string
+}
+
+export interface PageImage {
+  id: string
+  alt: string
+  src: string
+}
+
+export interface PageFormControl {
+  id: string
+  label: string
+  type: string
+  required: boolean
+  disabled: boolean
+  sensitive: boolean
+}
+
+export interface PageForm {
+  id: string
+  label: string
+  controls: PageFormControl[]
+}
+
+export interface PageAction {
+  id: string
+  role: string
+  name: string
+  enabled: boolean
 }
 
 export interface PageContext {
   url: string
   title: string
+  timestamp: string
+  selectedText: string | null
+  preview: {
+    content: string
+    truncated: boolean
+    maxBytes: number
+  }
+  structure: {
+    headings: PageHeading[]
+    landmarks: PageLandmark[]
+    links: PageLink[]
+    images: PageImage[]
+    forms: PageForm[]
+    actions: PageAction[]
+  }
+  content: {
+    available: boolean
+    requestType: 'get_page_content'
+    firstIndex: 1
+    defaultMaxPayloadBytes: number
+  }
+}
+
+export interface PageContent {
+  url: string
+  title: string
+  timestamp: string
+  index: number
+  content: string
+  truncated: boolean
+  maxPayloadBytes: number
 }
 
 export type PageContextErrorCode =
   | 'not_connected'
   | 'no_active_tab'
+  | 'unsupported_page'
+  | 'content_script_unavailable'
+  | 'extraction_failed'
+  | 'invalid_index'
+  | 'unsupported_request'
+
+export type PageContentErrorCode =
+  | 'no_active_tab'
+  | 'unsupported_page'
+  | 'content_script_unavailable'
+  | 'extraction_failed'
+  | 'invalid_index'
   | 'unsupported_request'
 
 export interface PageContextResponse {
@@ -33,7 +129,26 @@ export interface PageContextErrorResponse {
   }
 }
 
-export type ExtensionResponse = PageContextResponse | PageContextErrorResponse
+export interface PageContentResponse {
+  type: 'page_content_response'
+  ok: true
+  data: PageContent
+}
+
+export interface PageContentErrorResponse {
+  type: 'page_content_response'
+  ok: false
+  error: {
+    code: PageContentErrorCode
+    message: string
+  }
+}
+
+export type ExtensionResponse =
+  | PageContextResponse
+  | PageContextErrorResponse
+  | PageContentResponse
+  | PageContentErrorResponse
 
 export function isGetPageContextEnvelope (
   value: unknown
@@ -57,6 +172,39 @@ export function isGetPageContextEnvelope (
   return value.payload.type === 'get_page_context'
 }
 
+export function isGetPageContentEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: GetPageContentRequest } {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type !== 'message') {
+    return false
+  }
+
+  if (Object.hasOwn(value, 'id') && typeof value.id !== 'string') {
+    return false
+  }
+
+  if (!isRecord(value.payload)) {
+    return false
+  }
+
+  if (value.payload.type !== 'get_page_content') {
+    return false
+  }
+
+  if (
+    Object.hasOwn(value.payload, 'index') &&
+    (!Number.isInteger(value.payload.index) || Number(value.payload.index) < 1)
+  ) {
+    return false
+  }
+
+  return true
+}
+
 export function createPageContextResponse (
   id: string | undefined,
   context: PageContext
@@ -75,6 +223,32 @@ export function createPageContextErrorResponse (
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'page_context_response',
+    ok: false,
+    error: {
+      code,
+      message
+    }
+  })
+}
+
+export function createPageContentResponse (
+  id: string | undefined,
+  content: PageContent
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'page_content_response',
+    ok: true,
+    data: content
+  })
+}
+
+export function createPageContentErrorResponse (
+  id: string | undefined,
+  code: PageContentErrorCode,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'page_content_response',
     ok: false,
     error: {
       code,

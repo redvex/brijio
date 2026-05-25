@@ -1,7 +1,13 @@
 import {
   BrowserBridgeBackgroundController,
+  type PageReadResult,
   type BrowserBridgeSocket
 } from './background-controller.js'
+import type { ContentRequest, ContentResponse } from './content.js'
+import {
+  defaultPageContentMaxPayloadBytes,
+  type PageContentErrorCode
+} from './protocol.js'
 import { createGlobalTimers } from './timers.js'
 
 interface RuntimeMessage {
@@ -40,18 +46,28 @@ interface ChromeApi {
       set: (items: Record<string, unknown>) => Promise<void>
     }
   }
+  scripting: {
+    executeScript: (details: {
+      target: { tabId: number }
+      files: string[]
+    }) => Promise<unknown>
+  }
   tabs: {
     create: (properties: { url: string }) => Promise<unknown>
     query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{
+      id?: number
       title?: string
       url?: string
     }>>
+    sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   }
 }
 
 declare const chrome: ChromeApi
 
 const storageKey = 'websocketUrl'
+const previewMaxBytes = 4096
+const maxContentBytes = 120000
 
 const controller = new BrowserBridgeBackgroundController({
   action: {
@@ -87,25 +103,122 @@ const controller = new BrowserBridgeBackgroundController({
       await chrome.storage.local.set({ [storageKey]: url })
     }
   },
-  tabs: {
-    async getActiveTabContext () {
-      const [activeTab] = await chrome.tabs.query({
-        active: true,
-        currentWindow: true
+  pageReader: {
+    async getPageContext () {
+      return await readActiveTabPage({
+        type: 'extract_page_context',
+        previewMaxBytes,
+        defaultMaxPayloadBytes: defaultPageContentMaxPayloadBytes
       })
-
-      if (activeTab?.url === undefined) {
-        return undefined
-      }
-
-      return {
-        url: activeTab.url,
-        title: activeTab.title ?? ''
-      }
+    },
+    async getPageContent (index) {
+      return await readActiveTabPage({
+        type: 'extract_page_content',
+        index,
+        maxContentBytes,
+        maxPayloadBytes: defaultPageContentMaxPayloadBytes
+      })
     }
   },
   timers: createGlobalTimers()
 })
+
+async function readActiveTabPage<T> (
+  message: ContentRequest
+): Promise<PageReadResult<T>> {
+  const [activeTab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  })
+
+  if (activeTab?.id === undefined || activeTab.url === undefined) {
+    return {
+      ok: false,
+      error: {
+        code: 'no_active_tab',
+        message: 'No active tab with a URL is available.'
+      }
+    }
+  }
+
+  if (
+    !activeTab.url.startsWith('http://') &&
+    !activeTab.url.startsWith('https://')
+  ) {
+    return {
+      ok: false,
+      error: {
+        code: 'unsupported_page',
+        message: 'BrowserBridge can read page content only from HTTP and HTTPS tabs.'
+      }
+    }
+  }
+
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: activeTab.id },
+      files: ['content.js']
+    })
+
+    const response = await chrome.tabs.sendMessage(activeTab.id, message)
+
+    if (!isContentResponse(response)) {
+      return contentScriptUnavailable()
+    }
+
+    if (response.ok) {
+      return {
+        ok: true,
+        data: response.data as T
+      }
+    }
+
+    return response
+  } catch {
+    return contentScriptUnavailable()
+  }
+}
+
+function contentScriptUnavailable<T> (): PageReadResult<T> {
+  return {
+    ok: false,
+    error: {
+      code: 'content_script_unavailable',
+      message: 'Unable to reach the page content script.'
+    }
+  }
+}
+
+function isContentResponse (value: unknown): value is ContentResponse {
+  if (!isRecord(value) || typeof value.ok !== 'boolean') {
+    return false
+  }
+
+  if (value.ok) {
+    return Object.hasOwn(value, 'data')
+  }
+
+  return (
+    isRecord(value.error) &&
+    isPageContentErrorCode(value.error.code) &&
+    typeof value.error.message === 'string'
+  )
+}
+
+function isPageContentErrorCode (value: unknown): value is PageContentErrorCode {
+  return (
+    value === 'no_active_tab' ||
+    value === 'unsupported_page' ||
+    value === 'content_script_unavailable' ||
+    value === 'extraction_failed' ||
+    value === 'invalid_index' ||
+    value === 'unsupported_request'
+  )
+}
+
+function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
 
 class DomWebSocketAdapter implements BrowserBridgeSocket {
   private openListener: (() => void) | undefined

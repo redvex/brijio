@@ -11,5 +11,5 @@
   "action": {
     "default_title": "BrowserBridge"
   },
-  "permissions": ["storage", "tabs"]
+  "permissions": ["activeTab", "scripting", "storage", "tabs"]
 }
