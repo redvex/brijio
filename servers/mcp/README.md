@@ -1,8 +1,8 @@
 # BrowserBridge MCP Server
 
 The MCP server exposes BrowserBridge resources and tools to AI agents and
-routes explicit page-reading requests to an active browser extension session
-through the WebSocket server.
+routes explicit page-reading and click requests to an active browser extension
+session through the WebSocket server.
 
 ## Current Scope
 
@@ -21,15 +21,21 @@ The page content resource handler parses the 1-based `{index}` path segment,
 sends a `get_page_content` request for that chunk, waits for the matching
 `page_content_response`, and returns a structured JSON result.
 
-The implementation also exposes the read-only MCP tool from ADR 0010:
+The implementation also exposes MCP tools:
 
 - `read_current_page`
+- `click_element`
 
-The tool reads the current page context and, by default, the first available
-readable content chunk. It exists for tool-first clients and agents that are
-more likely to discover tools than resources. It reuses the same
+`read_current_page` reads the current page context and, by default, the first
+available readable content chunk. It exists for tool-first clients and agents
+that are more likely to discover tools than resources. It reuses the same
 `get_page_context` and `get_page_content` WebSocket request path as the
 resources.
+
+`click_element` clicks a visible link or button-like action from the current
+page using a short-lived target ID returned by `read_current_page`. It sends a
+`perform_action` click request over WebSocket and waits for the matching
+`action_result`.
 
 The stdio MCP runtime uses the official TypeScript MCP SDK for server
 lifecycle, protocol framing, initialization, resource discovery, resource
@@ -38,12 +44,13 @@ reading behavior and WebSocket request routing.
 
 The Chrome extension must already be connected by the user. The MCP server does
 not start browser access on its own and does not stream or store page state.
-
-Browser action tools remain out of scope for this package version.
+Clicking is a discrete browser-mutating tool call, not background automation.
 
 Out of scope for this package version:
 
-- Tools for browser actions such as navigation, click, fill, or submit.
+- Tools for browser actions such as navigation, fill, or submit.
+- CSS selector, XPath, text-query, coordinate, hover, keyboard, drag, or
+  multi-step action support.
 - Authentication and private session routing.
 - Multiple browser sessions.
 - Page body text or DOM extraction inside the MCP server. The MCP server only
@@ -122,7 +129,7 @@ Error codes are:
 - `browser_error`
 - `invalid_resource_uri`
 
-## Tool Result
+## Tool Results
 
 `read_current_page` accepts:
 
@@ -170,6 +177,48 @@ errors use:
 
 - `invalid_tool_input`
 
+`click_element` accepts:
+
+```json
+{
+  "kind": "link",
+  "id": "bb-1"
+}
+```
+
+`kind` must be `link` for targets from `structure.links[]` or `action` for
+targets from `structure.actions[]`. `id` must be a non-empty short-lived
+BrowserBridge target ID from the latest page context. Call
+`read_current_page` first, choose a target, then pass its kind and ID to
+`click_element`.
+
+Successful click calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "action": "click",
+    "target": {
+      "kind": "link",
+      "id": "bb-1"
+    }
+  }
+}
+```
+
+Click failures use the same structured shape:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "browser_error",
+    "message": "No matching click target was found."
+  }
+}
+```
+
 ## Environment
 
 Expected local variables:
@@ -193,8 +242,8 @@ pnpm --filter @browserbridge/mcp test
 
 The tests start local WebSocket servers on `127.0.0.1` with ephemeral ports and
 exercise request ID correlation, timeout handling, connection failures, protocol
-parsing, resource result shaping, page content chunk routing, resource template
-discovery, and SDK-backed MCP lifecycle behavior.
+parsing, resource result shaping, page content chunk routing, click action
+routing, resource template discovery, and SDK-backed MCP lifecycle behavior.
 
 ## Local Use
 
@@ -217,3 +266,7 @@ An MCP-compatible client can then read `browser://page/current` for rich page
 context. When `data.content.available` is true, the client can read
 `browser://page/current/content/1`, then continue with later indexes while
 `data.truncated` is true.
+
+For clicks, call the `read_current_page` tool and choose a target from
+`data.context.structure.links[]` or `data.context.structure.actions[]`. Then
+call `click_element` with that target's collection kind and ID.
