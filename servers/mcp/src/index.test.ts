@@ -76,7 +76,38 @@ void describe('BrowserBridge MCP stdio server', () => {
       )
 
       const tools = await client.listTools(undefined, { timeout: 1000 })
-      assert.deepEqual(tools.tools, [])
+      assert.deepEqual(
+        tools.tools.map((tool) => ({
+          name: tool.name,
+          title: tool.title,
+          description: tool.description
+        })),
+        [
+          {
+            name: 'read_current_page',
+            title: 'Read Current Page',
+            description:
+              'Read the current browser page context and optional readable content chunks.'
+          }
+        ]
+      )
+      assert.deepEqual(tools.tools[0].inputSchema, {
+        type: 'object',
+        properties: {
+          includeContent: {
+            type: 'boolean',
+            description:
+              'Whether to include readable page content chunks. Defaults to true.'
+          },
+          maxContentChunks: {
+            type: 'number',
+            description:
+              'Maximum readable content chunks to fetch. Defaults to 1.'
+          }
+        },
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
 
       const currentPage = await client.readResource(
         {
@@ -205,6 +236,34 @@ void describe('BrowserBridge MCP stdio server', () => {
           maxPayloadBytes: 131072
         }
       })
+
+      const toolResult = await client.callTool(
+        {
+          name: 'read_current_page',
+          arguments: {}
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(toolResult)), {
+        ok: true,
+        data: {
+          context: createRichPageContext(),
+          content: [
+            {
+              url: 'https://example.com/',
+              title: 'Example',
+              timestamp: '2026-05-25T10:00:00.000Z',
+              index: 1,
+              content: '# Example\n\nReadable content',
+              truncated: false,
+              maxPayloadBytes: 131072
+            }
+          ],
+          contentTruncated: false,
+          nextContentIndex: null
+        }
+      })
     } finally {
       await client.close()
     }
@@ -244,6 +303,47 @@ void describe('BrowserBridge MCP stdio server', () => {
           code: 'invalid_resource_uri',
           message:
             'Page content resource URI must end with a positive 1-based index.'
+        }
+      })
+    } finally {
+      await client.close()
+    }
+  })
+
+  void it('returns a structured tool error for invalid page reading input', async () => {
+    const client = new Client({
+      name: 'browserbridge-mcp-test',
+      version: '0.0.0'
+    })
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: ['--import', 'tsx', 'src/index.ts'],
+      cwd: packageRoot,
+      env: {
+        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+      },
+      stderr: 'pipe'
+    })
+
+    try {
+      await client.connect(transport, { timeout: 1000 })
+
+      const toolResult = await client.callTool(
+        {
+          name: 'read_current_page',
+          arguments: {
+            maxContentChunks: 6
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(toolResult)), {
+        ok: false,
+        error: {
+          code: 'invalid_tool_input',
+          message: 'maxContentChunks must be an integer from 0 through 5.'
         }
       })
     } finally {
@@ -310,6 +410,27 @@ function rawDataToString (data: RawData): string {
   }
 
   return Buffer.from(data).toString('utf8')
+}
+
+function getOnlyToolText (result: unknown): string {
+  assert.ok(isRecord(result))
+  const contents = result.content
+  assert.ok(Array.isArray(contents))
+  assert.equal(contents.length, 1)
+
+  const content = contents[0]
+  assert.ok(isRecord(content))
+  assert.equal(content.type, 'text')
+  const text = content.text
+  if (typeof text !== 'string') {
+    throw new Error('Expected MCP tool content text to be a string.')
+  }
+
+  return text
+}
+
+function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
+  return typeof value === 'object' && value !== null
 }
 
 function createRichPageContext (): unknown {

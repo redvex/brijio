@@ -3,18 +3,14 @@ import {
   ResourceTemplate
 } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import {
-  CallToolRequestSchema,
-  ErrorCode,
-  ListToolsRequestSchema,
-  McpError
-} from '@modelcontextprotocol/sdk/types.js'
+import { z } from 'zod'
 import {
   getCurrentPageContent,
   getCurrentPageContext,
   getPageContextConfigFromEnv,
   parsePageContentResourceIndex
 } from './page-context.js'
+import { readCurrentPage } from './page-reading-tool.js'
 
 const currentPageResourceUri = 'browser://page/current'
 const currentPageContentResourceTemplateUri =
@@ -33,16 +29,34 @@ server.server.registerCapabilities({
   }
 })
 
-server.server.setRequestHandler(ListToolsRequestSchema, () => ({
-  tools: []
-}))
+server.registerTool(
+  'read_current_page',
+  {
+    title: 'Read Current Page',
+    description:
+      'Read the current browser page context and optional readable content chunks.',
+    inputSchema: {
+      includeContent: z.boolean().optional().describe(
+        'Whether to include readable page content chunks. Defaults to true.'
+      ),
+      maxContentChunks: z.number().optional().describe(
+        'Maximum readable content chunks to fetch. Defaults to 1.'
+      )
+    }
+  },
+  async (input) => {
+    const result = await readCurrentPage(pageContextConfig, input)
 
-server.server.setRequestHandler(CallToolRequestSchema, (request) => {
-  throw new McpError(
-    ErrorCode.MethodNotFound,
-    `Tool is not registered: ${request.params.name}`
-  )
-})
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
 
 server.registerResource(
   'current-page-context',
