@@ -20,14 +20,25 @@ export interface ClickActionTarget {
   id: string
 }
 
+export interface WriteTextActionTarget {
+  formId: string
+  controlId: string
+}
+
 export interface PerformClickAction {
   type: 'click'
   target: ClickActionTarget
 }
 
+export interface PerformWriteTextAction {
+  type: 'write_text'
+  target: WriteTextActionTarget
+  text: string
+}
+
 export interface PerformActionRequest {
   type: 'perform_action'
-  action: PerformClickAction
+  action: PerformClickAction | PerformWriteTextAction
 }
 
 export interface PageHeading {
@@ -140,6 +151,8 @@ export type ActionResultErrorCode =
   | 'invalid_action_target'
   | 'target_not_found'
   | 'target_disabled'
+  | 'target_readonly'
+  | 'unsupported_control'
   | 'action_failed'
 
 export interface PageContextResponse {
@@ -177,10 +190,16 @@ export interface ActionResultData {
   target: ClickActionTarget
 }
 
+export interface WriteTextActionResultData {
+  action: 'write_text'
+  target: WriteTextActionTarget
+  textLength: number
+}
+
 export interface ActionResultResponse {
   type: 'action_result'
   ok: true
-  data: ActionResultData
+  data: ActionResultData | WriteTextActionResultData
 }
 
 export interface ActionResultErrorResponse {
@@ -282,20 +301,15 @@ export function isPerformActionEnvelope (
     return false
   }
 
-  if (value.payload.action.type !== 'click') {
-    return false
+  if (value.payload.action.type === 'click') {
+    return isClickAction(value.payload.action)
   }
 
-  if (!isRecord(value.payload.action.target)) {
-    return false
+  if (value.payload.action.type === 'write_text') {
+    return isWriteTextAction(value.payload.action)
   }
 
-  return (
-    (value.payload.action.target.kind === 'link' ||
-      value.payload.action.target.kind === 'action') &&
-    typeof value.payload.action.target.id === 'string' &&
-    value.payload.action.target.id.trim() !== ''
-  )
+  return false
 }
 
 export function createPageContextResponse (
@@ -352,7 +366,7 @@ export function createPageContentErrorResponse (
 
 export function createActionResultResponse (
   id: string | undefined,
-  data: ActionResultData
+  data: ActionResultData | WriteTextActionResultData
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'action_result',
@@ -392,6 +406,32 @@ function createEnvelope (
     id,
     payload
   }
+}
+
+function isClickAction (value: Record<PropertyKey, unknown>): boolean {
+  if (!isRecord(value.target)) {
+    return false
+  }
+
+  return (
+    (value.target.kind === 'link' || value.target.kind === 'action') &&
+    typeof value.target.id === 'string' &&
+    value.target.id.trim() !== ''
+  )
+}
+
+function isWriteTextAction (value: Record<PropertyKey, unknown>): boolean {
+  if (!isRecord(value.target)) {
+    return false
+  }
+
+  return (
+    typeof value.target.formId === 'string' &&
+    value.target.formId.trim() !== '' &&
+    typeof value.target.controlId === 'string' &&
+    value.target.controlId.trim() !== '' &&
+    typeof value.text === 'string'
+  )
 }
 
 function isRecord (value: unknown): value is Record<PropertyKey, unknown> {

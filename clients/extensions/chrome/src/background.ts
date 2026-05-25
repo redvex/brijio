@@ -10,7 +10,9 @@ import {
   type ActionResultErrorCode,
   type ClickActionTarget,
   defaultPageContentMaxPayloadBytes,
-  type PageContentErrorCode
+  type PageContentErrorCode,
+  type WriteTextActionResultData,
+  type WriteTextActionTarget
 } from './protocol.js'
 import {
   hasRegularPageAccess,
@@ -133,6 +135,9 @@ const controller = new BrowserBridgeBackgroundController({
   pageActions: {
     async click (target) {
       return await performActiveTabClick(target)
+    },
+    async writeText (target, text) {
+      return await performActiveTabWriteText(target, text)
     }
   },
   timers: createGlobalTimers()
@@ -206,6 +211,26 @@ async function readActiveTabPage<T> (
 async function performActiveTabClick (
   target: ClickActionTarget
 ): Promise<PageActionResult> {
+  return await performActiveTabAction({
+    type: 'perform_click',
+    target
+  })
+}
+
+async function performActiveTabWriteText (
+  target: WriteTextActionTarget,
+  text: string
+): Promise<PageActionResult> {
+  return await performActiveTabAction({
+    type: 'perform_write_text',
+    target,
+    text
+  })
+}
+
+async function performActiveTabAction (
+  message: ContentRequest
+): Promise<PageActionResult> {
   const [activeTab] = await chrome.tabs.query({
     active: true,
     currentWindow: true
@@ -237,10 +262,7 @@ async function performActiveTabClick (
       files: ['content.js']
     })
 
-    const response = await chrome.tabs.sendMessage(activeTab.id, {
-      type: 'perform_click',
-      target
-    })
+    const response = await chrome.tabs.sendMessage(activeTab.id, message)
 
     if (!isContentResponse(response)) {
       return actionContentScriptUnavailable()
@@ -249,7 +271,7 @@ async function performActiveTabClick (
     if (response.ok) {
       return {
         ok: true,
-        data: response.data as ActionResultData
+        data: response.data as ActionResultData | WriteTextActionResultData
       }
     }
 
@@ -342,6 +364,8 @@ function isPageContentErrorCode (
     value === 'invalid_action_target' ||
     value === 'target_not_found' ||
     value === 'target_disabled' ||
+    value === 'target_readonly' ||
+    value === 'unsupported_control' ||
     value === 'action_failed'
   )
 }
