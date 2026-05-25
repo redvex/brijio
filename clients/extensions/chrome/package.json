@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "BrowserBridge Chrome extension.",
-  "license": "AGPL-3.0-only",
+  "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json && esbuild src/content.ts --bundle --format=iife --platform=browser --target=chrome116 --outfile=dist/content.js && cp manifest.json dist/manifest.json && cp src/setup.html dist/setup.html && node scripts/verify-build-output.mjs",
