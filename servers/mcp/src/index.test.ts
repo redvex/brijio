@@ -94,6 +94,12 @@ void describe('BrowserBridge MCP stdio server', () => {
             title: 'Click Element',
             description:
               'Click a visible link or button-like action from the current browser page.'
+          },
+          {
+            name: 'fill_input',
+            title: 'Fill Input',
+            description:
+              'Write text into a visible form control from the current browser page.'
           }
         ]
       )
@@ -129,6 +135,28 @@ void describe('BrowserBridge MCP stdio server', () => {
           }
         },
         required: ['kind', 'id'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[2].inputSchema, {
+        type: 'object',
+        properties: {
+          controlId: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge form control ID from the latest page context.'
+          },
+          formId: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge form ID from the latest page context.'
+          },
+          text: {
+            type: 'string',
+            description: 'Text to write into the targeted form control.'
+          }
+        },
+        required: ['formId', 'controlId', 'text'],
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
@@ -170,10 +198,8 @@ void describe('BrowserBridge MCP stdio server', () => {
             index?: number
             action?: {
               type: string
-              target: {
-                kind: 'link' | 'action'
-                id: string
-              }
+              target: unknown
+              text?: string
             }
           }
         }
@@ -194,6 +220,25 @@ void describe('BrowserBridge MCP stdio server', () => {
         }
 
         if (request.payload.type === 'perform_action') {
+          if (request.payload.action?.type === 'write_text') {
+            socket.send(
+              JSON.stringify({
+                type: 'message',
+                id: request.id,
+                payload: {
+                  type: 'action_result',
+                  ok: true,
+                  data: {
+                    action: 'write_text',
+                    target: request.payload.action.target,
+                    textLength: request.payload.action.text?.length
+                  }
+                }
+              })
+            )
+            return
+          }
+
           socket.send(
             JSON.stringify({
               type: 'message',
@@ -335,6 +380,30 @@ void describe('BrowserBridge MCP stdio server', () => {
           }
         }
       })
+
+      const fillResult = await client.callTool(
+        {
+          name: 'fill_input',
+          arguments: {
+            formId: 'form-1',
+            controlId: 'control-1',
+            text: 'hello'
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(fillResult)), {
+        ok: true,
+        data: {
+          action: 'write_text',
+          target: {
+            formId: 'form-1',
+            controlId: 'control-1'
+          },
+          textLength: 5
+        }
+      })
     } finally {
       await client.close()
     }
@@ -457,6 +526,49 @@ void describe('BrowserBridge MCP stdio server', () => {
         error: {
           code: 'invalid_tool_input',
           message: 'kind must be either "link" or "action".'
+        }
+      })
+    } finally {
+      await client.close()
+    }
+  })
+
+  void it('returns a structured tool error for invalid fill input', async () => {
+    const client = new Client({
+      name: 'browserbridge-mcp-test',
+      version: '0.0.0'
+    })
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: ['--import', 'tsx', 'src/index.ts'],
+      cwd: packageRoot,
+      env: {
+        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+      },
+      stderr: 'pipe'
+    })
+
+    try {
+      await client.connect(transport, { timeout: 1000 })
+
+      const toolResult = await client.callTool(
+        {
+          name: 'fill_input',
+          arguments: {
+            formId: '',
+            controlId: 'control-1',
+            text: 'hello'
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(toolResult)), {
+        ok: false,
+        error: {
+          code: 'invalid_tool_input',
+          message: 'formId must be a non-empty string.'
         }
       })
     } finally {

@@ -4,6 +4,7 @@ import { afterEach, describe, it } from 'node:test'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 import {
   requestClickElement,
+  requestFillInput,
   requestPageContent,
   requestPageContext
 } from './websocket-client.js'
@@ -164,6 +165,73 @@ void describe('BrowserBridge WebSocket client', () => {
           kind: 'link',
           id: 'bb-1'
         }
+      }
+    })
+  })
+
+  void it('requests a fill input action and returns the matching action result', async () => {
+    let receivedPayload: unknown
+    const server = await startServer((socket) => {
+      socket.on('message', (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id: string
+          payload: unknown
+        }
+        receivedPayload = request.payload
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'action_result',
+              ok: true,
+              data: {
+                action: 'write_text',
+                target: {
+                  formId: 'form-1',
+                  controlId: 'control-1'
+                },
+                textLength: 5
+              }
+            }
+          })
+        )
+      })
+    })
+
+    assert.deepEqual(
+      await requestFillInput({
+        websocketUrl: server.url,
+        timeoutMs: 100,
+        target: {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        text: 'hello',
+        createRequestId: () => 'request-fill-1'
+      }),
+      {
+        ok: true,
+        data: {
+          action: 'write_text',
+          target: {
+            formId: 'form-1',
+            controlId: 'control-1'
+          },
+          textLength: 5
+        }
+      }
+    )
+    assert.deepEqual(receivedPayload, {
+      type: 'perform_action',
+      action: {
+        type: 'write_text',
+        target: {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        text: 'hello'
       }
     })
   })

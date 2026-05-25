@@ -1,14 +1,17 @@
 import WebSocket, { type RawData } from 'ws'
 import {
   type BrowserBridgeClickElementResult,
+  type BrowserBridgeFillInputResult,
   type BrowserBridgePageContentResult,
   type BrowserBridgePageContextResult,
   type BrowserBridgeResourceResult,
   type ClickElementTarget,
   createClickElementEnvelope,
+  createFillInputEnvelope,
   connectionFailedResponse,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
+  type FillInputTarget,
   invalidResponse,
   parseActionResultEnvelope,
   parsePageContentEnvelope,
@@ -28,6 +31,11 @@ export interface PageContentRequestOptions extends PageContextRequestOptions {
 
 export interface ClickElementRequestOptions extends PageContextRequestOptions {
   target: ClickElementTarget
+}
+
+export interface FillInputRequestOptions extends PageContextRequestOptions {
+  target: FillInputTarget
+  text: string
 }
 
 export async function requestPageContext (
@@ -67,9 +75,67 @@ export async function requestClickElement (
     websocketUrl: options.websocketUrl,
     timeoutMs: options.timeoutMs,
     requestEnvelope: createClickElementEnvelope(requestId, options.target),
-    parseEnvelope: (value) => parseActionResultEnvelope(value, requestId),
+    parseEnvelope: (value) => parseClickActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
+}
+
+export async function requestFillInput (
+  options: FillInputRequestOptions
+): Promise<BrowserBridgeFillInputResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrowserBridge({
+    websocketUrl: options.websocketUrl,
+    timeoutMs: options.timeoutMs,
+    requestEnvelope: createFillInputEnvelope(
+      requestId,
+      options.target,
+      options.text
+    ),
+    parseEnvelope: (value) => parseFillActionResultEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
+function parseClickActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrowserBridgeClickElementResult | { ok: false, ignored: true } {
+  const result = parseActionResultEnvelope(value, requestId)
+
+  if ('ignored' in result || !result.ok) {
+    return result
+  }
+
+  if (result.data.action === 'click') {
+    return {
+      ok: true,
+      data: result.data
+    }
+  }
+
+  return invalidResponse()
+}
+
+function parseFillActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrowserBridgeFillInputResult | { ok: false, ignored: true } {
+  const result = parseActionResultEnvelope(value, requestId)
+
+  if ('ignored' in result || !result.ok) {
+    return result
+  }
+
+  if (result.data.action === 'write_text') {
+    return {
+      ok: true,
+      data: result.data
+    }
+  }
+
+  return invalidResponse()
 }
 
 async function requestBrowserBridge<T> (options: {

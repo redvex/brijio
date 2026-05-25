@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
   createClickElementEnvelope,
+  createFillInputEnvelope,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
   parseActionResultEnvelope,
@@ -48,6 +49,34 @@ void describe('MCP page context protocol helpers', () => {
               kind: 'link',
               id: 'bb-1'
             }
+          }
+        }
+      }
+    )
+  })
+
+  void it('creates a perform_action write_text envelope with the request ID, target, and text', () => {
+    assert.deepEqual(
+      createFillInputEnvelope(
+        'request-fill-1',
+        {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        'hello'
+      ),
+      {
+        type: 'message',
+        id: 'request-fill-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'write_text',
+            target: {
+              formId: 'form-1',
+              controlId: 'control-1'
+            },
+            text: 'hello'
           }
         }
       }
@@ -138,6 +167,40 @@ void describe('MCP page context protocol helpers', () => {
           kind: 'action',
           id: 'bb-2'
         }
+      }
+    })
+  })
+
+  void it('parses a successful matching write_text action result', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-fill-1',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'write_text',
+            target: {
+              formId: 'form-1',
+              controlId: 'control-1'
+            },
+            textLength: 5
+          }
+        }
+      },
+      'request-fill-1'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        action: 'write_text',
+        target: {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        textLength: 5
       }
     })
   })

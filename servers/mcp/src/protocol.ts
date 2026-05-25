@@ -96,6 +96,17 @@ export interface ClickElementActionResultData {
   target: ClickElementTarget
 }
 
+export interface FillInputTarget {
+  formId: string
+  controlId: string
+}
+
+export interface FillInputActionResultData {
+  action: 'write_text'
+  target: FillInputTarget
+  textLength: number
+}
+
 export type BrowserBridgeErrorCode =
   | 'connection_failed'
   | 'timeout'
@@ -125,6 +136,9 @@ export type BrowserBridgePageContentResult =
 export type BrowserBridgeClickElementResult =
   BrowserBridgeResourceResult<ClickElementActionResultData>
 
+export type BrowserBridgeFillInputResult =
+  BrowserBridgeResourceResult<FillInputActionResultData>
+
 export type PageContextParseResult =
   | BrowserBridgePageContextResult
   | { ok: false, ignored: true }
@@ -135,6 +149,7 @@ export type PageContentParseResult =
 
 export type ActionResultParseResult =
   | BrowserBridgeClickElementResult
+  | BrowserBridgeFillInputResult
   | { ok: false, ignored: true }
 
 export function createGetPageContextEnvelope (
@@ -175,6 +190,25 @@ export function createClickElementEnvelope (
       action: {
         type: 'click',
         target
+      }
+    }
+  }
+}
+
+export function createFillInputEnvelope (
+  requestId: string,
+  target: FillInputTarget,
+  text: string
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'perform_action',
+      action: {
+        type: 'write_text',
+        target,
+        text
       }
     }
   }
@@ -301,15 +335,24 @@ function parsePageContentSuccessPayload (
 
 function parseActionResultSuccessPayload (
   payload: Record<PropertyKey, unknown>
-): BrowserBridgeClickElementResult {
-  if (!isClickElementActionResultData(payload.data)) {
-    return invalidResponse()
+): BrowserBridgeClickElementResult | BrowserBridgeFillInputResult {
+  const data = payload.data
+
+  if (isClickElementActionResultData(data)) {
+    return {
+      ok: true,
+      data
+    }
   }
 
-  return {
-    ok: true,
-    data: payload.data
+  if (isFillInputActionResultData(data)) {
+    return {
+      ok: true,
+      data
+    }
   }
+
+  return invalidResponse()
 }
 
 function parseErrorPayload<T> (
@@ -519,6 +562,20 @@ function isClickElementActionResultData (
   return value.action === 'click' && isClickElementTarget(value.target)
 }
 
+function isFillInputActionResultData (
+  value: unknown
+): value is FillInputActionResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return value.action === 'write_text' &&
+    isFillInputTarget(value.target) &&
+    typeof value.textLength === 'number' &&
+    Number.isInteger(value.textLength) &&
+    value.textLength >= 0
+}
+
 function isClickElementTarget (
   value: unknown
 ): value is ClickElementTarget {
@@ -530,6 +587,12 @@ function isClickElementTarget (
     (value.kind === 'link' || value.kind === 'action') &&
     typeof value.id === 'string'
   )
+}
+
+function isFillInputTarget (
+  value: unknown
+): value is FillInputTarget {
+  return hasStringProperties(value, ['formId', 'controlId'])
 }
 
 function hasStringProperties (
