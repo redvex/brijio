@@ -27,8 +27,12 @@ Current page action behavior:
 
 - `perform_action` with `action.type: "click"` clicks a visible link or
   button-like action from the active regular page.
+- `perform_action` with `action.type: "write_text"` writes provided text into a
+  supported visible text control from the active regular page.
 - Click targets use short-lived IDs from the latest `get_page_context`
   response, scoped by `target.kind`.
+- Text targets use short-lived form and control IDs from the latest
+  `get_page_context` response.
 - The extension returns `action_result` with the same request ID.
 
 ## User Flow
@@ -271,8 +275,57 @@ Disabled or missing targets return structured action errors:
 }
 ```
 
+To write text into a supported form control, first request page context and use
+IDs from `structure.forms[]` and `structure.forms[].controls[]`. Form IDs are
+scoped to the page context, and control IDs are scoped to the containing form:
+
+```json
+{
+  "type": "message",
+  "id": "action-2",
+  "payload": {
+    "type": "perform_action",
+    "action": {
+      "type": "write_text",
+      "target": {
+        "formId": "bb-1",
+        "controlId": "bb-2"
+      },
+      "text": "Ada Lovelace"
+    }
+  }
+}
+```
+
+Successful text action responses include the written text length but not the
+text itself:
+
+```json
+{
+  "type": "message",
+  "id": "action-2",
+  "payload": {
+    "type": "action_result",
+    "ok": true,
+    "data": {
+      "action": "write_text",
+      "target": {
+        "formId": "bb-1",
+        "controlId": "bb-2"
+      },
+      "textLength": 12
+    }
+  }
+}
+```
+
+The first write action supports visible `<textarea>`, `<input type="text">`,
+`<input type="search">`, and `<input>` controls without an explicit type. It
+does not submit forms or support password, file, checkbox, radio, select, or
+contenteditable controls.
+
 ## Current Limitations
 
 This package still uses the unauthenticated local single-channel WebSocket
 server from ADR 0002. Authenticated private routing, MCP content resources, and
-MCP action tools require separate ADR approval before implementation.
+new MCP action tools require separate ADR approval before implementation.
