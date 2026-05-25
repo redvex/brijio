@@ -1,5 +1,6 @@
 import {
   BrowserBridgeBackgroundController,
+  type BridgeSettings,
   type PageActionResult,
   type PageReadResult,
   type BrowserBridgeSocket
@@ -23,6 +24,11 @@ import { createGlobalTimers } from './timers.js'
 interface RuntimeMessage {
   type?: unknown
   websocketUrl?: unknown
+  pairingToken?: unknown
+  browserInstanceId?: unknown
+  browserName?: unknown
+  profileName?: unknown
+  label?: unknown
 }
 
 type SendResponse = (response: unknown) => void
@@ -78,7 +84,14 @@ interface ChromeApi {
 
 declare const chrome: ChromeApi
 
-const storageKey = 'websocketUrl'
+const bridgeSettingsKeys = [
+  'websocketUrl',
+  'pairingToken',
+  'browserInstanceId',
+  'browserName',
+  'profileName',
+  'label'
+]
 const previewMaxBytes = 4096
 const maxContentBytes = 120000
 
@@ -106,14 +119,13 @@ const controller = new BrowserBridgeBackgroundController({
     }
   },
   storage: {
-    async getWebSocketUrl () {
-      const values = await chrome.storage.local.get([storageKey])
-      const websocketUrl = values[storageKey]
+    async getBridgeSettings () {
+      const values = await chrome.storage.local.get(bridgeSettingsKeys)
 
-      return typeof websocketUrl === 'string' ? websocketUrl : undefined
+      return normalizeBridgeSettings(values)
     },
-    async setWebSocketUrl (url) {
-      await chrome.storage.local.set({ [storageKey]: url })
+    async setBridgeSettings (settings) {
+      await chrome.storage.local.set({ ...settings })
     }
   },
   pageReader: {
@@ -507,19 +519,36 @@ chrome.action.onClicked.addListener(() => {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'get_settings') {
-    void controller.getWebSocketUrl().then((websocketUrl) => {
-      sendResponse({ ok: true, data: { websocketUrl } })
+    void controller.getBridgeSettings().then((settings) => {
+      sendResponse({ ok: true, data: settings })
     })
     return true
   }
 
   if (
     message.type === 'save_settings' &&
-    typeof message.websocketUrl === 'string'
+    typeof message.websocketUrl === 'string' &&
+    typeof message.pairingToken === 'string' &&
+    typeof message.profileName === 'string' &&
+    typeof message.label === 'string'
   ) {
-    void controller.saveWebSocketUrl(message.websocketUrl).then(() => {
-      sendResponse({ ok: true })
-    })
+    void saveRuntimeSettings(message).then(
+      () => {
+        sendResponse({ ok: true })
+      },
+      (error: unknown) => {
+        sendResponse({
+          ok: false,
+          error: {
+            code: 'invalid_settings',
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Unable to save settings.'
+          }
+        })
+      }
+    )
     return true
   }
 
@@ -532,3 +561,72 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   })
   return undefined
 })
+
+async function saveRuntimeSettings (message: RuntimeMessage): Promise<void> {
+  const existing = await controller.getBridgeSettings()
+  const websocketUrl = requireString(message.websocketUrl, 'WebSocket URL')
+  const pairingToken = requireString(message.pairingToken, 'Pairing token')
+  const profileName = requireString(message.profileName, 'Profile name')
+  const label = requireString(message.label, 'Browser label')
+
+  const settings: BridgeSettings = {
+    websocketUrl,
+    pairingToken,
+    browserInstanceId:
+      stringValue(message.browserInstanceId) ??
+      existing?.browserInstanceId ??
+      createBrowserInstanceId(),
+    browserName:
+      stringValue(message.browserName) ?? existing?.browserName ?? 'Chrome',
+    profileName,
+    label
+  }
+
+  await controller.saveBridgeSettings(settings)
+}
+
+function normalizeBridgeSettings (
+  values: Record<string, unknown>
+): BridgeSettings | undefined {
+  const websocketUrl = stringValue(values.websocketUrl)
+  const pairingToken = stringValue(values.pairingToken)
+  const browserInstanceId = stringValue(values.browserInstanceId)
+  const browserName = stringValue(values.browserName) ?? 'Chrome'
+  const profileName = stringValue(values.profileName) ?? 'Default'
+  const label = stringValue(values.label) ?? `${browserName} ${profileName}`
+
+  if (
+    websocketUrl === undefined ||
+    pairingToken === undefined ||
+    browserInstanceId === undefined
+  ) {
+    return undefined
+  }
+
+  return {
+    websocketUrl,
+    pairingToken,
+    browserInstanceId,
+    browserName,
+    profileName,
+    label
+  }
+}
+
+function createBrowserInstanceId (): string {
+  return `chrome-${crypto.randomUUID()}`
+}
+
+function stringValue (value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() !== '' ? value : undefined
+}
+
+function requireString (value: unknown, label: string): string {
+  const normalized = stringValue(value)
+
+  if (normalized === undefined) {
+    throw new Error(`${label} is required.`)
+  }
+
+  return normalized
+}

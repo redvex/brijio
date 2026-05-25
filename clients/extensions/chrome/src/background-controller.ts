@@ -1,10 +1,14 @@
 import {
   createActionResultErrorResponse,
   createActionResultResponse,
+  createAuthEnvelope,
+  createBrowserPresenceAnnounceEnvelope,
   createPageContentErrorResponse,
   createPageContentResponse,
   createPageContextErrorResponse,
   createPageContextResponse,
+  isAuthSuccessEnvelope,
+  isBrowserPresenceRequestEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
   isPerformActionEnvelope,
@@ -23,9 +27,18 @@ import {
   type WriteTextActionTarget
 } from './protocol.js'
 
+export interface BridgeSettings {
+  websocketUrl: string
+  pairingToken: string
+  browserInstanceId: string
+  browserName: string
+  profileName: string
+  label: string
+}
+
 export interface StorageAdapter {
-  getWebSocketUrl: () => Promise<string | undefined>
-  setWebSocketUrl: (url: string) => Promise<void>
+  getBridgeSettings: () => Promise<BridgeSettings | undefined>
+  setBridgeSettings: (settings: BridgeSettings) => Promise<void>
 }
 
 export interface SetupAdapter {
@@ -116,6 +129,7 @@ export interface BrowserBridgeBackgroundControllerOptions {
 export class BrowserBridgeBackgroundController {
   private keepaliveTimerId: number | undefined
   private socket: BrowserBridgeSocket | undefined
+  private settings: BridgeSettings | undefined
 
   constructor (
     private readonly options: BrowserBridgeBackgroundControllerOptions
@@ -127,31 +141,33 @@ export class BrowserBridgeBackgroundController {
       return
     }
 
-    const websocketUrl = await this.options.storage.getWebSocketUrl()
+    const settings = await this.options.storage.getBridgeSettings()
 
-    if (websocketUrl === undefined || websocketUrl.trim() === '') {
+    if (!isUsableSettings(settings)) {
       await this.options.setup.openSetupPage()
       return
     }
 
-    await this.connect(websocketUrl)
+    await this.connect(settings)
   }
 
-  async saveWebSocketUrl (url: string): Promise<void> {
-    await this.options.storage.setWebSocketUrl(url)
+  async saveBridgeSettings (settings: BridgeSettings): Promise<void> {
+    await this.options.storage.setBridgeSettings(settings)
     await this.setStoppedState()
   }
 
-  async getWebSocketUrl (): Promise<string | undefined> {
-    return await this.options.storage.getWebSocketUrl()
+  async getBridgeSettings (): Promise<BridgeSettings | undefined> {
+    return await this.options.storage.getBridgeSettings()
   }
 
-  private async connect (url: string): Promise<void> {
-    const socket = this.options.createWebSocket(url)
+  private async connect (settings: BridgeSettings): Promise<void> {
+    const socket = this.options.createWebSocket(settings.websocketUrl)
     this.socket = socket
+    this.settings = settings
 
     socket.onopen = () => {
       if (this.socket === socket) {
+        socket.send(JSON.stringify(createAuthEnvelope(settings.pairingToken)))
         this.startKeepalive(socket)
         void this.setConnectedState()
       }
@@ -183,6 +199,7 @@ export class BrowserBridgeBackgroundController {
   private async disconnect (): Promise<void> {
     const socket = this.socket
     this.socket = undefined
+    this.settings = undefined
 
     this.stopKeepalive()
     socket?.close()
@@ -195,6 +212,16 @@ export class BrowserBridgeBackgroundController {
     try {
       message = JSON.parse(data)
     } catch {
+      return
+    }
+
+    if (isAuthSuccessEnvelope(message)) {
+      this.announcePresence()
+      return
+    }
+
+    if (isBrowserPresenceRequestEnvelope(message)) {
+      this.announcePresence()
       return
     }
 
@@ -469,6 +496,47 @@ export class BrowserBridgeBackgroundController {
     this.options.timers.clearInterval(this.keepaliveTimerId)
     this.keepaliveTimerId = undefined
   }
+
+  private announcePresence (): void {
+    if (this.socket === undefined || this.settings === undefined) {
+      return
+    }
+
+    this.socket.send(
+      JSON.stringify(
+        createBrowserPresenceAnnounceEnvelope({
+          browserInstanceId: this.settings.browserInstanceId,
+          label: this.settings.label,
+          browserName: this.settings.browserName,
+          profileName: this.settings.profileName,
+          capabilities: [
+            'page_context',
+            'page_content',
+            'click',
+            'fill_input',
+            'fill_editable',
+            'set_checked',
+            'select_options',
+            'submit_form'
+          ]
+        })
+      )
+    )
+  }
+}
+
+function isUsableSettings (
+  settings: BridgeSettings | undefined
+): settings is BridgeSettings {
+  return (
+    settings !== undefined &&
+    settings.websocketUrl.trim() !== '' &&
+    settings.pairingToken.trim() !== '' &&
+    settings.browserInstanceId.trim() !== '' &&
+    settings.browserName.trim() !== '' &&
+    settings.profileName.trim() !== '' &&
+    settings.label.trim() !== ''
+  )
 }
 
 function isPerformActionRequestEnvelope (

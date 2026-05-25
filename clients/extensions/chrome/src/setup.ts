@@ -4,6 +4,11 @@ interface RuntimeResponse {
   ok?: unknown
   data?: {
     websocketUrl?: unknown
+    pairingToken?: unknown
+    browserInstanceId?: unknown
+    browserName?: unknown
+    profileName?: unknown
+    label?: unknown
   }
   error?: {
     message?: unknown
@@ -24,6 +29,9 @@ declare const chrome: ChromeApi
 
 const form = document.querySelector<HTMLFormElement>('#settings-form')
 const input = document.querySelector<HTMLInputElement>('#websocket-url')
+const tokenInput = document.querySelector<HTMLInputElement>('#pairing-token')
+const profileInput = document.querySelector<HTMLInputElement>('#profile-name')
+const labelInput = document.querySelector<HTMLInputElement>('#browser-label')
 const regularPageAccessButton = document.querySelector<HTMLButtonElement>(
   '#regular-page-access'
 )
@@ -32,6 +40,9 @@ const status = document.querySelector<HTMLElement>('#status')
 if (
   form === null ||
   input === null ||
+  tokenInput === null ||
+  profileInput === null ||
+  labelInput === null ||
   regularPageAccessButton === null ||
   status === null
 ) {
@@ -40,6 +51,9 @@ if (
 
 const settingsForm = form
 const websocketUrlInput = input
+const pairingTokenInput = tokenInput
+const profileNameInput = profileInput
+const browserLabelInput = labelInput
 const regularPageAccess = regularPageAccessButton
 const statusMessage = status
 
@@ -47,7 +61,12 @@ void loadSettings()
 
 settingsForm.addEventListener('submit', (event) => {
   event.preventDefault()
-  void saveSettings(websocketUrlInput.value)
+  void saveSettings({
+    websocketUrl: websocketUrlInput.value,
+    pairingToken: pairingTokenInput.value,
+    profileName: profileNameInput.value,
+    label: browserLabelInput.value
+  })
 })
 
 regularPageAccess.addEventListener('click', () => {
@@ -63,12 +82,35 @@ async function loadSettings (): Promise<void> {
   ) {
     websocketUrlInput.value = response.data.websocketUrl
   }
+
+  if (
+    response.ok === true &&
+    typeof response.data?.pairingToken === 'string'
+  ) {
+    pairingTokenInput.value = response.data.pairingToken
+  }
+
+  if (
+    response.ok === true &&
+    typeof response.data?.profileName === 'string'
+  ) {
+    profileNameInput.value = response.data.profileName
+  }
+
+  if (response.ok === true && typeof response.data?.label === 'string') {
+    browserLabelInput.value = response.data.label
+  }
 }
 
-async function saveSettings (websocketUrl: string): Promise<void> {
+async function saveSettings (settings: {
+  websocketUrl: string
+  pairingToken: string
+  profileName: string
+  label: string
+}): Promise<void> {
   const response = await chrome.runtime.sendMessage({
     type: 'save_settings',
-    websocketUrl
+    ...settings
   })
 
   if (response.ok === true) {

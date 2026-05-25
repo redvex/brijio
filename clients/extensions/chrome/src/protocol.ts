@@ -4,6 +4,33 @@ export interface WebSocketEnvelope {
   payload: unknown
 }
 
+export type BrowserCapability =
+  | 'page_context'
+  | 'page_content'
+  | 'click'
+  | 'fill_input'
+  | 'fill_editable'
+  | 'set_checked'
+  | 'select_options'
+  | 'submit_form'
+
+export interface AuthSuccessPayload {
+  type: 'auth_success'
+}
+
+export interface BrowserPresenceRequestPayload {
+  type: 'browser_presence_request'
+}
+
+export interface BrowserPresenceAnnouncePayload {
+  type: 'browser_presence_announce'
+  browserInstanceId: string
+  label: string
+  browserName: string
+  profileName: string
+  capabilities: BrowserCapability[]
+}
+
 export const defaultPageContentMaxPayloadBytes = 131072
 
 export interface GetPageContextRequest {
@@ -295,6 +322,49 @@ export type ExtensionResponse =
   | ActionResultResponse
   | ActionResultErrorResponse
 
+export function createAuthEnvelope (token: string): WebSocketEnvelope {
+  return {
+    type: 'message',
+    payload: {
+      type: 'auth',
+      role: 'extension',
+      token
+    }
+  }
+}
+
+export function createBrowserPresenceAnnounceEnvelope (input: {
+  browserInstanceId: string
+  label: string
+  browserName: string
+  profileName: string
+  capabilities: BrowserCapability[]
+}): WebSocketEnvelope {
+  return {
+    type: 'message',
+    payload: {
+      type: 'browser_presence_announce',
+      browserInstanceId: input.browserInstanceId,
+      label: input.label,
+      browserName: input.browserName,
+      profileName: input.profileName,
+      capabilities: input.capabilities
+    }
+  }
+}
+
+export function isAuthSuccessEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: AuthSuccessPayload } {
+  return hasPayloadType(value, 'auth_success')
+}
+
+export function isBrowserPresenceRequestEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: BrowserPresenceRequestPayload } {
+  return hasPayloadType(value, 'browser_presence_request')
+}
+
 export function isGetPageContextEnvelope (
   value: unknown
 ): value is WebSocketEnvelope & { payload: GetPageContextRequest } {
@@ -569,6 +639,16 @@ function isFormControlTarget (value: unknown): value is WriteTextActionTarget {
     value.formId.trim() !== '' &&
     typeof value.controlId === 'string' &&
     value.controlId.trim() !== ''
+  )
+}
+
+function hasPayloadType (value: unknown, type: string): boolean {
+  return (
+    isRecord(value) &&
+    value.type === 'message' &&
+    (!Object.hasOwn(value, 'id') || typeof value.id === 'string') &&
+    isRecord(value.payload) &&
+    value.payload.type === type
   )
 }
 
