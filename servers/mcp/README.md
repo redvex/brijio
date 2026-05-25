@@ -26,6 +26,10 @@ The implementation also exposes MCP tools:
 - `read_current_page`
 - `click_element`
 - `fill_input`
+- `fill_editable`
+- `set_checked`
+- `select_options`
+- `submit_form`
 
 `read_current_page` reads the current page context and, by default, the first
 available readable content chunk. It exists for tool-first clients and agents
@@ -43,6 +47,17 @@ page using short-lived form and control IDs returned by `read_current_page`. It
 sends a `perform_action` `write_text` request over WebSocket and waits for the
 matching `action_result`.
 
+`fill_editable` writes plain text into a visible contenteditable target from
+the current page using a short-lived editable ID returned by
+`read_current_page`. It sends a `perform_action` `write_text` request with the
+ADR 0016 editable target shape.
+
+`set_checked` sets checkbox state or selects a radio option using a
+short-lived form control ID. `select_options` selects option values in a
+visible single-select or multi-select control. `submit_form` submits a visible
+form by short-lived form ID. Each tool sends one ADR 0016 `perform_action`
+message and waits for the matching `action_result`.
+
 The stdio MCP runtime uses the official TypeScript MCP SDK for server
 lifecycle, protocol framing, initialization, resource discovery, resource
 reads, tool discovery, and tool calls. BrowserBridge code only owns page
@@ -55,7 +70,7 @@ background automation.
 
 Out of scope for this package version:
 
-- Tools for browser actions such as navigation or submit.
+- Navigation tools.
 - CSS selector, XPath, text-query, coordinate, hover, keyboard, drag, or
   multi-step action support.
 - Authentication and private session routing.
@@ -274,6 +289,119 @@ Fill failures use the same structured shape:
 }
 ```
 
+`fill_editable` accepts:
+
+```json
+{
+  "id": "bb-1",
+  "text": "Plain text replacement"
+}
+```
+
+`id` must be a non-empty short-lived ID from
+`data.context.structure.editables[]`. `text` must be a string. Empty text is
+allowed so callers can clear a supported contenteditable target.
+
+Successful editable fill calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "action": "write_text",
+    "target": {
+      "kind": "editable",
+      "id": "bb-1"
+    },
+    "textLength": 22
+  }
+}
+```
+
+`set_checked` accepts:
+
+```json
+{
+  "formId": "form-1",
+  "controlId": "control-1",
+  "checked": true
+}
+```
+
+Use it for checkbox controls and for selecting radio options. Radio controls
+support `checked: true`; clearing a radio directly is rejected by the
+extension.
+
+Successful checked-state calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "action": "set_checked",
+    "target": {
+      "formId": "form-1",
+      "controlId": "control-1"
+    },
+    "checked": true,
+    "changed": true
+  }
+}
+```
+
+`select_options` accepts:
+
+```json
+{
+  "formId": "form-1",
+  "controlId": "control-1",
+  "values": ["alpha", "gamma"]
+}
+```
+
+Values must come from the target control's page-context `options[]` metadata.
+Single-select controls require one value. Multi-select controls accept zero or
+more values.
+
+Successful select calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "action": "select_options",
+    "target": {
+      "formId": "form-1",
+      "controlId": "control-1"
+    },
+    "values": ["alpha", "gamma"]
+  }
+}
+```
+
+`submit_form` accepts:
+
+```json
+{
+  "formId": "form-1"
+}
+```
+
+The extension resolves the visible form and uses browser-native submission
+behavior. Successful submit calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "action": "submit_form",
+    "target": {
+      "formId": "form-1"
+    }
+  }
+}
+```
+
 ## Environment
 
 Expected local variables:
@@ -298,7 +426,7 @@ pnpm --filter @browserbridge/mcp test
 The tests start local WebSocket servers on `127.0.0.1` with ephemeral ports and
 exercise request ID correlation, timeout handling, connection failures, protocol
 parsing, resource result shaping, page content chunk routing, click action
-routing, fill action routing, resource template discovery, and SDK-backed MCP
+routing, form action routing, resource template discovery, and SDK-backed MCP
 lifecycle behavior.
 
 ## Local Use
@@ -330,3 +458,11 @@ call `click_element` with that target's collection kind and ID.
 For input filling, call `read_current_page` and choose a control from
 `data.context.structure.forms[].controls[]`. Then call `fill_input` with the
 containing form ID, control ID, and text to write.
+
+For contenteditable text, choose a target from
+`data.context.structure.editables[]`, then call `fill_editable` with the
+editable ID and text to write.
+
+For checkboxes, radio options, selects, and form submission, choose the target
+form/control IDs from `data.context.structure.forms[]` and call `set_checked`,
+`select_options`, or `submit_form`.

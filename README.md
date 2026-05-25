@@ -148,19 +148,19 @@ responses to requests and handle timeouts clearly.
 
 ## MCP Resources And Tools
 
-The current MCP server exposes one read-only resource:
+The current MCP server exposes page resources:
 
 - `browser://page/current`, named `current-page-context`
+- `browser://page/current/content/{index}`, named `current-page-content`
 
-It also returns an empty `tools/list` response for MCP client startup
-compatibility. Browser action tools are intentionally not exposed yet.
+It also exposes tools for explicit page reads and discrete browser actions:
 
-Later MCP milestones are expected to expose action tools:
-
-- `get_browser_status`
-- `navigate_to_url`
+- `read_current_page`
 - `click_element`
 - `fill_input`
+- `fill_editable`
+- `set_checked`
+- `select_options`
 - `submit_form`
 
 Resource and tool results should use predictable structured responses, for
