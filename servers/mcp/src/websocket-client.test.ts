@@ -2,7 +2,10 @@ import assert from 'node:assert/strict'
 import { type AddressInfo } from 'node:net'
 import { afterEach, describe, it } from 'node:test'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
-import { requestPageContext } from './websocket-client.js'
+import {
+  requestPageContent,
+  requestPageContext
+} from './websocket-client.js'
 
 const servers: WebSocketServer[] = []
 
@@ -23,10 +26,7 @@ void describe('BrowserBridge WebSocket client', () => {
             payload: {
               type: 'page_context_response',
               ok: true,
-              data: {
-                url: 'https://example.com/',
-                title: 'Example'
-              }
+              data: createRichPageContext()
             }
           })
         )
@@ -41,12 +41,67 @@ void describe('BrowserBridge WebSocket client', () => {
       }),
       {
         ok: true,
+        data: createRichPageContext()
+      }
+    )
+  })
+
+  void it('requests page content and returns the matching response', async () => {
+    let receivedPayload: unknown
+    const server = await startServer((socket) => {
+      socket.on('message', (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id: string
+          payload: unknown
+        }
+        receivedPayload = request.payload
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'page_content_response',
+              ok: true,
+              data: {
+                url: 'https://example.com/',
+                title: 'Example',
+                timestamp: '2026-05-25T10:00:00.000Z',
+                index: 2,
+                content: 'Second chunk',
+                truncated: false,
+                maxPayloadBytes: 131072
+              }
+            }
+          })
+        )
+      })
+    })
+
+    assert.deepEqual(
+      await requestPageContent({
+        websocketUrl: server.url,
+        timeoutMs: 100,
+        index: 2,
+        createRequestId: () => 'request-content-1'
+      }),
+      {
+        ok: true,
         data: {
           url: 'https://example.com/',
-          title: 'Example'
+          title: 'Example',
+          timestamp: '2026-05-25T10:00:00.000Z',
+          index: 2,
+          content: 'Second chunk',
+          truncated: false,
+          maxPayloadBytes: 131072
         }
       }
     )
+    assert.deepEqual(receivedPayload, {
+      type: 'get_page_content',
+      index: 2
+    })
   })
 
   void it('times out when no matching response arrives', async () => {
@@ -59,10 +114,7 @@ void describe('BrowserBridge WebSocket client', () => {
             payload: {
               type: 'page_context_response',
               ok: true,
-              data: {
-                url: 'https://example.com/',
-                title: 'Example'
-              }
+              data: createRichPageContext()
             }
           })
         )
@@ -152,6 +204,34 @@ async function closeServer (server: WebSocketServer): Promise<void> {
       resolve()
     })
   })
+}
+
+function createRichPageContext (): unknown {
+  return {
+    url: 'https://example.com/',
+    title: 'Example',
+    timestamp: '2026-05-25T10:00:00.000Z',
+    selectedText: null,
+    preview: {
+      content: 'Example preview',
+      truncated: false,
+      maxBytes: 4096
+    },
+    structure: {
+      headings: [],
+      landmarks: [],
+      links: [],
+      images: [],
+      forms: [],
+      actions: []
+    },
+    content: {
+      available: true,
+      requestType: 'get_page_content',
+      firstIndex: 1,
+      defaultMaxPayloadBytes: 131072
+    }
+  }
 }
 
 function rawDataToString (data: RawData): string {

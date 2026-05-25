@@ -1,6 +1,12 @@
-import { type BrowserBridgePageContextResult } from './protocol.js'
 import {
+  type BrowserBridgePageContentResult,
+  type BrowserBridgePageContextResult,
+  invalidResourceUriResponse
+} from './protocol.js'
+import {
+  requestPageContent as defaultRequestPageContent,
   requestPageContext as defaultRequestPageContext,
+  type PageContentRequestOptions,
   type PageContextRequestOptions
 } from './websocket-client.js'
 
@@ -10,6 +16,9 @@ export interface BrowserBridgePageContextConfig {
   requestPageContext?: (
     options: PageContextRequestOptions
   ) => Promise<BrowserBridgePageContextResult>
+  requestPageContent?: (
+    options: PageContentRequestOptions
+  ) => Promise<BrowserBridgePageContentResult>
 }
 
 export function getPageContextConfigFromEnv (
@@ -32,6 +41,38 @@ export async function getCurrentPageContext (
     websocketUrl: config.websocketUrl,
     timeoutMs: config.timeoutMs
   })
+}
+
+export async function getCurrentPageContent (
+  config: BrowserBridgePageContextConfig,
+  index: number
+): Promise<BrowserBridgePageContentResult> {
+  const requestPageContent =
+    config.requestPageContent ?? defaultRequestPageContent
+
+  return await requestPageContent({
+    websocketUrl: config.websocketUrl,
+    timeoutMs: config.timeoutMs,
+    index
+  })
+}
+
+export function parsePageContentResourceIndex (
+  resourceUri: string
+): number | BrowserBridgePageContentResult {
+  const match = /^browser:\/\/page\/current\/content\/([^/]+)$/.exec(resourceUri)
+
+  if (match === null) {
+    return invalidResourceUriResponse()
+  }
+
+  const index = Number.parseInt(match[1], 10)
+
+  if (!/^[1-9]\d*$/.test(match[1]) || !Number.isSafeInteger(index)) {
+    return invalidResourceUriResponse()
+  }
+
+  return index
 }
 
 function parseTimeoutMs (value: string | undefined): number {
