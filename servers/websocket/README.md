@@ -4,19 +4,23 @@ The WebSocket server is the local message transport for BrowserBridge.
 
 ## Current Scope
 
-The current implementation is the first approved WebSocket milestone from ADR 0002. It is intentionally small:
+The current implementation authenticates MCP and extension WebSocket clients
+with a local pairing token, tracks live browser extension presence in memory,
+and routes MCP requests only to browser instances in the same token scope.
 
-- No authentication.
-- One implicit in-memory channel.
-- Every connected client is subscribed automatically.
-- Valid messages are forwarded only to other connected clients.
-- `extension_keepalive` messages are accepted and suppressed so clients do not
-  receive keepalive noise.
-- Invalid JSON and unsupported message envelopes return structured errors to
-  the sender.
-
-This package does not yet route browser sessions, MCP requests, or browser page
-state. Those behaviors need a later approved ADR.
+- The WebSocket server requires `BROWSERBRIDGE_PAIRING_TOKEN`.
+- MCP and extension clients must send an `auth` message before any other
+  message.
+- Extension connections announce browser presence after authentication and in
+  response to `browser_presence_request`.
+- MCP connections can call `list_browsers` or send browser requests with an
+  optional `target.browserInstanceId`.
+- If no target is supplied, routing succeeds only when exactly one browser is
+  online in the token scope.
+- Presence is runtime state only. It is removed when the extension socket
+  closes and does not include page URL, title, content, or DOM state.
+- Invalid JSON, auth failures, unsupported messages, missing browsers, invalid
+  targets, and ambiguous targets return structured errors.
 
 ## Message Format
 
@@ -27,7 +31,40 @@ Valid messages use this JSON envelope:
   "type": "message",
   "id": "optional-message-id",
   "payload": {
-    "text": "hello"
+    "type": "list_browsers"
+  }
+}
+```
+
+Clients authenticate with:
+
+```json
+{
+  "type": "message",
+  "id": "auth-1",
+  "payload": {
+    "type": "auth",
+    "role": "mcp",
+    "token": "your-local-token"
+  }
+}
+```
+
+Extension auth uses `"role": "extension"`. After extension auth succeeds, the
+server sends `browser_presence_request`; the extension replies with
+`browser_presence_announce`.
+
+MCP targeting uses the optional top-level `target` field:
+
+```json
+{
+  "type": "message",
+  "id": "request-1",
+  "target": {
+    "browserInstanceId": "chrome-default-test"
+  },
+  "payload": {
+    "type": "get_page_context"
   }
 }
 ```
@@ -63,6 +100,7 @@ Expected local variables:
 ```sh
 WEBSOCKET_HOST=127.0.0.1
 WEBSOCKET_PORT=8787
+BROWSERBRIDGE_PAIRING_TOKEN=replace-with-generated-token
 ```
 
 ## Development
@@ -91,17 +129,28 @@ In another terminal, connect with `wscat`:
 pnpm dlx wscat -c ws://127.0.0.1:8787
 ```
 
-Send a valid message:
+Send a valid auth message:
 
 ```json
-{ "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
+{
+  "type": "message",
+  "id": "auth-1",
+  "payload": {
+    "type": "auth",
+    "role": "mcp",
+    "token": "your-local-token"
+  }
+}
 ```
 
-The sending terminal should not receive its own message.
+Then request browser presence:
 
-To test publish/subscribe behavior, open a second `wscat` terminal connected to
-the same URL. Send a valid message from either terminal; the other connected
-client should receive it.
+```json
+{ "type": "message", "id": "list-1", "payload": { "type": "list_browsers" } }
+```
+
+The response contains online browser instances for the authenticated token
+scope.
 
 To test invalid JSON handling, send:
 
