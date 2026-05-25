@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
+  createClickElementEnvelope,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
+  parseActionResultEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope
 } from './protocol.js'
@@ -27,6 +29,29 @@ void describe('MCP page context protocol helpers', () => {
         index: 2
       }
     })
+  })
+
+  void it('creates a perform_action click envelope with the request ID and target', () => {
+    assert.deepEqual(
+      createClickElementEnvelope('request-click-1', {
+        kind: 'link',
+        id: 'bb-1'
+      }),
+      {
+        type: 'message',
+        id: 'request-click-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'click',
+            target: {
+              kind: 'link',
+              id: 'bb-1'
+            }
+          }
+        }
+      }
+    )
   })
 
   void it('parses a successful matching page context response', () => {
@@ -85,6 +110,38 @@ void describe('MCP page context protocol helpers', () => {
     })
   })
 
+  void it('parses a successful matching click action result', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-click-2',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'click',
+            target: {
+              kind: 'action',
+              id: 'bb-2'
+            }
+          }
+        }
+      },
+      'request-click-2'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        action: 'click',
+        target: {
+          kind: 'action',
+          id: 'bb-2'
+        }
+      }
+    })
+  })
+
   void it('parses a matching extension error as a browser_error', () => {
     const result = parsePageContextEnvelope(
       {
@@ -137,6 +194,32 @@ void describe('MCP page context protocol helpers', () => {
     })
   })
 
+  void it('parses a matching click action extension error as a browser_error', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-click-3',
+        payload: {
+          type: 'action_result',
+          ok: false,
+          error: {
+            code: 'target_not_found',
+            message: 'No matching click target was found.'
+          }
+        }
+      },
+      'request-click-3'
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'browser_error',
+        message: 'No matching click target was found.'
+      }
+    })
+  })
+
   void it('ignores envelopes for a different request ID', () => {
     const result = parsePageContextEnvelope(
       {
@@ -149,6 +232,29 @@ void describe('MCP page context protocol helpers', () => {
         }
       },
       'request-4'
+    )
+
+    assert.deepEqual(result, { ok: false, ignored: true })
+  })
+
+  void it('ignores click action result envelopes for a different request ID', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-click-4',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'click',
+            target: {
+              kind: 'link',
+              id: 'bb-1'
+            }
+          }
+        }
+      },
+      'request-click-5'
     )
 
     assert.deepEqual(result, { ok: false, ignored: true })
@@ -199,6 +305,35 @@ void describe('MCP page context protocol helpers', () => {
         }
       },
       'request-content-4'
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'invalid_response',
+        message: 'Received an invalid BrowserBridge response.'
+      }
+    })
+  })
+
+  void it('returns invalid_response for malformed matching click action results', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-click-6',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'click',
+            target: {
+              kind: 'image',
+              id: 'bb-1'
+            }
+          }
+        }
+      },
+      'request-click-6'
     )
 
     assert.deepEqual(result, {

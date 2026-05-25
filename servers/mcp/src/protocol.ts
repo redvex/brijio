@@ -86,6 +86,16 @@ export interface PageContent {
   maxPayloadBytes: number
 }
 
+export interface ClickElementTarget {
+  kind: 'link' | 'action'
+  id: string
+}
+
+export interface ClickElementActionResultData {
+  action: 'click'
+  target: ClickElementTarget
+}
+
 export type BrowserBridgeErrorCode =
   | 'connection_failed'
   | 'timeout'
@@ -112,12 +122,19 @@ export type BrowserBridgePageContextResult =
 export type BrowserBridgePageContentResult =
   BrowserBridgeResourceResult<PageContent>
 
+export type BrowserBridgeClickElementResult =
+  BrowserBridgeResourceResult<ClickElementActionResultData>
+
 export type PageContextParseResult =
   | BrowserBridgePageContextResult
   | { ok: false, ignored: true }
 
 export type PageContentParseResult =
   | BrowserBridgePageContentResult
+  | { ok: false, ignored: true }
+
+export type ActionResultParseResult =
+  | BrowserBridgeClickElementResult
   | { ok: false, ignored: true }
 
 export function createGetPageContextEnvelope (
@@ -142,6 +159,23 @@ export function createGetPageContentEnvelope (
     payload: {
       type: 'get_page_content',
       index
+    }
+  }
+}
+
+export function createClickElementEnvelope (
+  requestId: string,
+  target: ClickElementTarget
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'perform_action',
+      action: {
+        type: 'click',
+        target
+      }
     }
   }
 }
@@ -208,6 +242,37 @@ export function parsePageContentEnvelope (
   return invalidResponse()
 }
 
+export function parseActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): ActionResultParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  if (value.payload.type !== 'action_result') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok === true) {
+    return parseActionResultSuccessPayload(value.payload)
+  }
+
+  if (value.payload.ok === false) {
+    return parseErrorPayload(value.payload, invalidResponse())
+  }
+
+  return invalidResponse()
+}
+
 function parsePageContextSuccessPayload (
   payload: Record<PropertyKey, unknown>
 ): BrowserBridgePageContextResult {
@@ -225,6 +290,19 @@ function parsePageContentSuccessPayload (
   payload: Record<PropertyKey, unknown>
 ): BrowserBridgePageContentResult {
   if (!isPageContent(payload.data)) {
+    return invalidResponse()
+  }
+
+  return {
+    ok: true,
+    data: payload.data
+  }
+}
+
+function parseActionResultSuccessPayload (
+  payload: Record<PropertyKey, unknown>
+): BrowserBridgeClickElementResult {
+  if (!isClickElementActionResultData(payload.data)) {
     return invalidResponse()
   }
 
@@ -282,12 +360,14 @@ export function invalidResourceUriResponse (): BrowserBridgeResourceResult<never
   }
 }
 
-export function timeoutResponse (): BrowserBridgeResourceResult<never> {
+export function timeoutResponse (
+  message = 'Timed out waiting for a browser page context response.'
+): BrowserBridgeResourceResult<never> {
   return {
     ok: false,
     error: {
       code: 'timeout',
-      message: 'Timed out waiting for a browser page context response.'
+      message
     }
   }
 }
@@ -427,6 +507,29 @@ function isPageAction (value: unknown): value is PageAction {
   }
 
   return isRecord(value) && typeof value.enabled === 'boolean'
+}
+
+function isClickElementActionResultData (
+  value: unknown
+): value is ClickElementActionResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return value.action === 'click' && isClickElementTarget(value.target)
+}
+
+function isClickElementTarget (
+  value: unknown
+): value is ClickElementTarget {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    (value.kind === 'link' || value.kind === 'action') &&
+    typeof value.id === 'string'
+  )
 }
 
 function hasStringProperties (

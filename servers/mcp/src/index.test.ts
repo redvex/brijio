@@ -88,6 +88,12 @@ void describe('BrowserBridge MCP stdio server', () => {
             title: 'Read Current Page',
             description:
               'Read the current browser page context and optional readable content chunks.'
+          },
+          {
+            name: 'click_element',
+            title: 'Click Element',
+            description:
+              'Click a visible link or button-like action from the current browser page.'
           }
         ]
       )
@@ -105,6 +111,24 @@ void describe('BrowserBridge MCP stdio server', () => {
               'Maximum readable content chunks to fetch. Defaults to 1.'
           }
         },
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[1].inputSchema, {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge target ID from the latest page context.'
+          },
+          kind: {
+            type: 'string',
+            description:
+              'Target collection from the latest page context: link or action.'
+          }
+        },
+        required: ['kind', 'id'],
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
@@ -144,6 +168,13 @@ void describe('BrowserBridge MCP stdio server', () => {
           payload: {
             type: string
             index?: number
+            action?: {
+              type: string
+              target: {
+                kind: 'link' | 'action'
+                id: string
+              }
+            }
           }
         }
 
@@ -156,6 +187,24 @@ void describe('BrowserBridge MCP stdio server', () => {
                 type: 'page_context_response',
                 ok: true,
                 data: createRichPageContext()
+              }
+            })
+          )
+          return
+        }
+
+        if (request.payload.type === 'perform_action') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'action_result',
+                ok: true,
+                data: {
+                  action: 'click',
+                  target: request.payload.action?.target
+                }
               }
             })
           )
@@ -264,6 +313,28 @@ void describe('BrowserBridge MCP stdio server', () => {
           nextContentIndex: null
         }
       })
+
+      const clickResult = await client.callTool(
+        {
+          name: 'click_element',
+          arguments: {
+            kind: 'link',
+            id: 'bb-1'
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(clickResult)), {
+        ok: true,
+        data: {
+          action: 'click',
+          target: {
+            kind: 'link',
+            id: 'bb-1'
+          }
+        }
+      })
     } finally {
       await client.close()
     }
@@ -344,6 +415,48 @@ void describe('BrowserBridge MCP stdio server', () => {
         error: {
           code: 'invalid_tool_input',
           message: 'maxContentChunks must be an integer from 0 through 5.'
+        }
+      })
+    } finally {
+      await client.close()
+    }
+  })
+
+  void it('returns a structured tool error for invalid click input', async () => {
+    const client = new Client({
+      name: 'browserbridge-mcp-test',
+      version: '0.0.0'
+    })
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: ['--import', 'tsx', 'src/index.ts'],
+      cwd: packageRoot,
+      env: {
+        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+      },
+      stderr: 'pipe'
+    })
+
+    try {
+      await client.connect(transport, { timeout: 1000 })
+
+      const toolResult = await client.callTool(
+        {
+          name: 'click_element',
+          arguments: {
+            kind: 'image',
+            id: 'bb-1'
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(toolResult)), {
+        ok: false,
+        error: {
+          code: 'invalid_tool_input',
+          message: 'kind must be either "link" or "action".'
         }
       })
     } finally {
