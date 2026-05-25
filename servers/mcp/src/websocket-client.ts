@@ -1,6 +1,7 @@
 import WebSocket, { type RawData } from 'ws'
 import {
   type BrowserBridgeClickElementResult,
+  type BrowserBridgeBrowserListResult,
   type BrowserBridgeFillInputResult,
   type BrowserBridgePageContentResult,
   type BrowserBridgePageContextResult,
@@ -9,6 +10,7 @@ import {
   type BrowserBridgeSetCheckedResult,
   type BrowserBridgeSubmitFormResult,
   type ClickElementTarget,
+  createAuthEnvelope,
   createClickElementEnvelope,
   createFillInputEnvelope,
   createSelectOptionsEnvelope,
@@ -20,17 +22,22 @@ import {
   createGetPageContextEnvelope,
   type EditableTarget,
   type FillInputTarget,
+  authRequiredResponse,
   invalidResponse,
   parseActionResultEnvelope,
+  parseBrowserListEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
+  parseRouterErrorEnvelope,
   type SubmitFormTarget,
   timeoutResponse
 } from './protocol.js'
 
 export interface PageContextRequestOptions {
   websocketUrl: string
+  pairingToken: string
   timeoutMs: number
+  browserInstanceId?: string
   createRequestId?: () => string
 }
 
@@ -73,7 +80,9 @@ export async function requestPageContext (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createGetPageContextEnvelope(requestId),
     parseEnvelope: (value) => parsePageContextEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser page context response.'
@@ -87,7 +96,9 @@ export async function requestPageContent (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createGetPageContentEnvelope(requestId, options.index),
     parseEnvelope: (value) => parsePageContentEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser page content response.'
@@ -101,7 +112,9 @@ export async function requestClickElement (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createClickElementEnvelope(requestId, options.target),
     parseEnvelope: (value) => parseClickActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -115,7 +128,9 @@ export async function requestFillInput (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createFillInputEnvelope(
       requestId,
       options.target,
@@ -133,7 +148,9 @@ export async function requestWriteEditable (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createWriteEditableEnvelope(
       requestId,
       options.target,
@@ -151,7 +168,9 @@ export async function requestSetChecked (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createSetCheckedEnvelope(
       requestId,
       options.target,
@@ -169,7 +188,9 @@ export async function requestSelectOptions (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createSelectOptionsEnvelope(
       requestId,
       options.target,
@@ -187,10 +208,36 @@ export async function requestSubmitForm (
 
   return await requestBrowserBridge({
     websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
     requestEnvelope: createSubmitFormEnvelope(requestId, options.target),
     parseEnvelope: (value) => parseSubmitFormActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
+export async function requestBrowserList (options: {
+  websocketUrl: string
+  pairingToken: string
+  timeoutMs: number
+  createRequestId?: () => string
+}): Promise<BrowserBridgeBrowserListResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrowserBridge({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    requestEnvelope: {
+      type: 'message',
+      id: requestId,
+      payload: {
+        type: 'list_browsers'
+      }
+    },
+    parseEnvelope: (value) => parseBrowserListEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser list response.'
   })
 }
 
@@ -303,23 +350,35 @@ function parseSubmitFormActionResultEnvelope (
 
 async function requestBrowserBridge<T> (options: {
   websocketUrl: string
+  pairingToken: string
   timeoutMs: number
-  requestEnvelope: unknown
+  browserInstanceId?: string
+  requestEnvelope: {
+    type: 'message'
+    id?: string
+    target?: { browserInstanceId?: string }
+    payload: unknown
+  }
   timeoutMessage: string
   parseEnvelope: (
     value: unknown
   ) => BrowserBridgeResourceResult<T> | { ok: false, ignored: true }
 }): Promise<BrowserBridgeResourceResult<T>> {
+  if (options.pairingToken.trim() === '') {
+    return authRequiredResponse()
+  }
+
   return await new Promise((resolve) => {
     const socket = new WebSocket(options.websocketUrl)
     let settled = false
+    let authenticated = false
 
     const timeout = setTimeout(() => {
       settle(timeoutResponse(options.timeoutMessage))
     }, options.timeoutMs)
 
     socket.once('open', () => {
-      socket.send(JSON.stringify(options.requestEnvelope))
+      socket.send(JSON.stringify(createAuthEnvelope(options.pairingToken)))
     })
 
     socket.on('message', (data) => {
@@ -328,6 +387,24 @@ async function requestBrowserBridge<T> (options: {
       try {
         parsed = JSON.parse(rawDataToString(data))
       } catch {
+        settle(invalidResponse())
+        return
+      }
+
+      const routerError = parseRouterErrorEnvelope(parsed)
+
+      if (!('ignored' in routerError)) {
+        settle(routerError)
+        return
+      }
+
+      if (!authenticated) {
+        if (isAuthSuccessEnvelope(parsed)) {
+          authenticated = true
+          socket.send(JSON.stringify(targetEnvelope(options)))
+          return
+        }
+
         settle(invalidResponse())
         return
       }
@@ -360,6 +437,48 @@ async function requestBrowserBridge<T> (options: {
       resolve(result)
     }
   })
+}
+
+function targetEnvelope (options: {
+  browserInstanceId?: string
+  requestEnvelope: {
+    type: 'message'
+    id?: string
+    target?: { browserInstanceId?: string }
+    payload: unknown
+  }
+}): {
+    type: 'message'
+    id?: string
+    target?: { browserInstanceId?: string }
+    payload: unknown
+  } {
+  if (options.browserInstanceId === undefined) {
+    return options.requestEnvelope
+  }
+
+  return {
+    ...options.requestEnvelope,
+    target: {
+      browserInstanceId: options.browserInstanceId
+    }
+  }
+}
+
+function isAuthSuccessEnvelope (value: unknown): boolean {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    'type' in value &&
+    value.type === 'message' &&
+    'payload' in value &&
+    typeof value.payload === 'object' &&
+    value.payload !== null &&
+    !Array.isArray(value.payload) &&
+    'type' in value.payload &&
+    value.payload.type === 'auth_success'
+  )
 }
 
 function createRequestId (): string {

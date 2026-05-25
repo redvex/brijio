@@ -25,7 +25,9 @@ import {
 
 export interface BrowserBridgePageActionsConfig {
   websocketUrl: string
+  pairingToken?: string
   timeoutMs: number
+  defaultBrowserInstanceId?: string
   requestClickElement?: (
     options: ClickElementRequestOptions
   ) => Promise<BrowserBridgeClickElementResult>
@@ -48,14 +50,17 @@ export interface BrowserBridgePageActionsConfig {
 
 export async function clickCurrentPageElement (
   config: BrowserBridgePageActionsConfig,
-  target: ClickElementTarget
+  target: ClickElementTarget,
+  browserInstanceId?: string
 ): Promise<BrowserBridgeClickElementResult> {
   const requestClickElement =
     config.requestClickElement ?? defaultRequestClickElement
 
   return await requestClickElement({
     websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target
   })
 }
@@ -63,13 +68,16 @@ export async function clickCurrentPageElement (
 export async function fillCurrentPageInput (
   config: BrowserBridgePageActionsConfig,
   target: FillInputTarget,
-  text: string
+  text: string,
+  browserInstanceId?: string
 ): Promise<BrowserBridgeFillInputResult> {
   const requestFillInput = config.requestFillInput ?? defaultRequestFillInput
 
   return await requestFillInput({
     websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     text
   })
@@ -78,14 +86,17 @@ export async function fillCurrentPageInput (
 export async function fillCurrentPageEditable (
   config: BrowserBridgePageActionsConfig,
   target: EditableTarget,
-  text: string
+  text: string,
+  browserInstanceId?: string
 ): Promise<BrowserBridgeFillInputResult> {
   const requestWriteEditable =
     config.requestWriteEditable ?? defaultRequestWriteEditable
 
   return await requestWriteEditable({
     websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     text
   })
@@ -94,14 +105,17 @@ export async function fillCurrentPageEditable (
 export async function setCurrentPageChecked (
   config: BrowserBridgePageActionsConfig,
   target: FillInputTarget,
-  checked: boolean
+  checked: boolean,
+  browserInstanceId?: string
 ): Promise<BrowserBridgeSetCheckedResult> {
   const requestSetChecked =
     config.requestSetChecked ?? defaultRequestSetChecked
 
   return await requestSetChecked({
     websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     checked
   })
@@ -110,14 +124,17 @@ export async function setCurrentPageChecked (
 export async function selectCurrentPageOptions (
   config: BrowserBridgePageActionsConfig,
   target: FillInputTarget,
-  values: string[]
+  values: string[],
+  browserInstanceId?: string
 ): Promise<BrowserBridgeSelectOptionsResult> {
   const requestSelectOptions =
     config.requestSelectOptions ?? defaultRequestSelectOptions
 
   return await requestSelectOptions({
     websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     values
   })
@@ -125,14 +142,17 @@ export async function selectCurrentPageOptions (
 
 export async function submitCurrentPageForm (
   config: BrowserBridgePageActionsConfig,
-  formId: string
+  formId: string,
+  browserInstanceId?: string
 ): Promise<BrowserBridgeSubmitFormResult> {
   const requestSubmitForm =
     config.requestSubmitForm ?? defaultRequestSubmitForm
 
   return await requestSubmitForm({
     websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target: {
       formId
     }

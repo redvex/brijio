@@ -12,7 +12,9 @@ import {
 
 export interface BrowserBridgePageContextConfig {
   websocketUrl: string
+  pairingToken?: string
   timeoutMs: number
+  defaultBrowserInstanceId?: string
   requestPageContext?: (
     options: PageContextRequestOptions
   ) => Promise<BrowserBridgePageContextResult>
@@ -27,33 +29,42 @@ export function getPageContextConfigFromEnv (
   return {
     websocketUrl:
       env.BROWSERBRIDGE_WEBSOCKET_URL ?? env.WEBSOCKET_URL ?? 'ws://127.0.0.1:8787',
+    pairingToken:
+      env.BROWSERBRIDGE_PAIRING_TOKEN ?? env.BROWSERBRIDGE_TOKEN ?? '',
+    defaultBrowserInstanceId: env.BROWSERBRIDGE_BROWSER_INSTANCE_ID,
     timeoutMs: parseTimeoutMs(env.BROWSERBRIDGE_REQUEST_TIMEOUT_MS)
   }
 }
 
 export async function getCurrentPageContext (
-  config: BrowserBridgePageContextConfig
+  config: BrowserBridgePageContextConfig,
+  browserInstanceId?: string
 ): Promise<BrowserBridgePageContextResult> {
   const requestPageContext =
     config.requestPageContext ?? defaultRequestPageContext
 
   return await requestPageContext({
     websocketUrl: config.websocketUrl,
-    timeoutMs: config.timeoutMs
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId
   })
 }
 
 export async function getCurrentPageContent (
   config: BrowserBridgePageContextConfig,
-  index: number
+  index: number,
+  browserInstanceId?: string
 ): Promise<BrowserBridgePageContentResult> {
   const requestPageContent =
     config.requestPageContent ?? defaultRequestPageContent
 
   return await requestPageContent({
     websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
-    index
+    index,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId
   })
 }
 
