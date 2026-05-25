@@ -12,6 +12,7 @@ export interface FillInputInput {
   formId?: unknown
   controlId?: unknown
   text?: unknown
+  browserInstanceId?: unknown
 }
 
 export type FillInputResult =
@@ -30,13 +31,18 @@ export async function fillInput (
   return await fillCurrentPageInput(
     config,
     normalizedInput.data.target,
-    normalizedInput.data.text
+    normalizedInput.data.text,
+    normalizedInput.data.browserInstanceId
   )
 }
 
 function normalizeInput (
   input: FillInputInput
-): BrowserBridgeToolResult<{ target: FillInputTarget, text: string }> {
+): BrowserBridgeToolResult<{
+    target: FillInputTarget
+    text: string
+    browserInstanceId?: string
+  }> {
   if (typeof input.formId !== 'string' || input.formId.length === 0) {
     return invalidToolInputResponse('formId must be a non-empty string.')
   }
@@ -52,6 +58,14 @@ function normalizeInput (
     return invalidToolInputResponse('text must be a string.')
   }
 
+  const browserInstanceId = normalizeBrowserInstanceId(
+    input.browserInstanceId
+  )
+
+  if (!browserInstanceId.ok) {
+    return browserInstanceId
+  }
+
   return {
     ok: true,
     data: {
@@ -59,8 +73,33 @@ function normalizeInput (
         formId: input.formId,
         controlId: input.controlId
       },
-      text: input.text
+      text: input.text,
+      ...(browserInstanceId.data !== undefined
+        ? { browserInstanceId: browserInstanceId.data }
+        : {})
     }
+  }
+}
+
+function normalizeBrowserInstanceId (
+  value: unknown
+): BrowserBridgeToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'browserInstanceId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 

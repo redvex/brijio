@@ -40,27 +40,36 @@ void describe('MCP page reading tool', () => {
 
   void it('reads the first available content chunk by default', async () => {
     const requestedContentIndexes: number[] = []
+    const requestedBrowserInstanceIds: Array<string | undefined> = []
 
     const result = await readCurrentPage(
       {
         websocketUrl: 'ws://127.0.0.1:8787',
         timeoutMs: 5000,
-        requestPageContext: async () => ({
-          ok: true,
-          data: createPageContext()
-        }),
+        requestPageContext: async (options) => {
+          requestedBrowserInstanceIds.push(options.browserInstanceId)
+          return {
+            ok: true,
+            data: createPageContext()
+          }
+        },
         requestPageContent: async (options) => {
           requestedContentIndexes.push(options.index)
+          requestedBrowserInstanceIds.push(options.browserInstanceId)
           return {
             ok: true,
             data: createPageContent(options.index, false)
           }
         }
       },
-      {}
+      { browserInstanceId: 'chrome-default-test' }
     )
 
     assert.deepEqual(requestedContentIndexes, [1])
+    assert.deepEqual(requestedBrowserInstanceIds, [
+      'chrome-default-test',
+      'chrome-default-test'
+    ])
     assert.deepEqual(result, {
       ok: true,
       data: {

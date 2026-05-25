@@ -85,6 +85,12 @@ void describe('BrowserBridge MCP stdio server', () => {
         })),
         [
           {
+            name: 'list_browsers',
+            title: 'List Browsers',
+            description:
+              'List BrowserBridge browser instances currently online for the configured pairing token.'
+          },
+          {
             name: 'read_current_page',
             title: 'Read Current Page',
             description:
@@ -130,7 +136,17 @@ void describe('BrowserBridge MCP stdio server', () => {
       )
       assert.deepEqual(tools.tools[0].inputSchema, {
         type: 'object',
+        properties: {},
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[1].inputSchema, {
+        type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           includeContent: {
             type: 'boolean',
             description:
@@ -145,9 +161,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[1].inputSchema, {
+      assert.deepEqual(tools.tools[2].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           id: {
             type: 'string',
             description:
@@ -163,9 +184,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[2].inputSchema, {
+      assert.deepEqual(tools.tools[3].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           controlId: {
             type: 'string',
             description:
@@ -185,9 +211,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[3].inputSchema, {
+      assert.deepEqual(tools.tools[4].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           id: {
             type: 'string',
             description:
@@ -203,9 +234,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[4].inputSchema, {
+      assert.deepEqual(tools.tools[5].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           checked: {
             type: 'boolean',
             description: 'Desired checked state.'
@@ -225,9 +261,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[5].inputSchema, {
+      assert.deepEqual(tools.tools[6].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           controlId: {
             type: 'string',
             description:
@@ -251,9 +292,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[6].inputSchema, {
+      assert.deepEqual(tools.tools[7].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           formId: {
             type: 'string',
             description:
@@ -319,6 +365,33 @@ void describe('BrowserBridge MCP stdio server', () => {
                 type: 'page_context_response',
                 ok: true,
                 data: createRichPageContext()
+              }
+            })
+          )
+          return
+        }
+
+        if (request.payload.type === 'list_browsers') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'browser_list',
+                ok: true,
+                data: {
+                  browsers: [
+                    {
+                      browserInstanceId: 'chrome-default-test',
+                      browserName: 'Chrome',
+                      profileName: 'Default',
+                      label: 'Chrome Default on MacBook Pro',
+                      connectedAt: '2026-05-25T10:00:00.000Z',
+                      lastSeenAt: '2026-05-25T10:00:01.000Z',
+                      capabilities: ['page_context', 'page_actions']
+                    }
+                  ]
+                }
               }
             })
           )
@@ -520,6 +593,31 @@ void describe('BrowserBridge MCP stdio server', () => {
           ],
           contentTruncated: false,
           nextContentIndex: null
+        }
+      })
+
+      const browserListResult = await client.callTool(
+        {
+          name: 'list_browsers',
+          arguments: {}
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(browserListResult)), {
+        ok: true,
+        data: {
+          browsers: [
+            {
+              browserInstanceId: 'chrome-default-test',
+              browserName: 'Chrome',
+              profileName: 'Default',
+              label: 'Chrome Default on MacBook Pro',
+              connectedAt: '2026-05-25T10:00:00.000Z',
+              lastSeenAt: '2026-05-25T10:00:01.000Z',
+              capabilities: ['page_context', 'page_actions']
+            }
+          ]
         }
       })
 
