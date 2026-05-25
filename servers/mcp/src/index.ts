@@ -11,6 +11,7 @@ import {
   parsePageContentResourceIndex
 } from './page-context.js'
 import { clickElement } from './click-element-tool.js'
+import { fillInput } from './fill-input-tool.js'
 import { readCurrentPage } from './page-reading-tool.js'
 
 const currentPageResourceUri = 'browser://page/current'
@@ -76,6 +77,38 @@ server.registerTool(
   },
   async (input) => {
     const result = await clickElement(pageContextConfig, input)
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
+
+server.registerTool(
+  'fill_input',
+  {
+    title: 'Fill Input',
+    description:
+      'Write text into a visible form control from the current browser page.',
+    inputSchema: {
+      formId: z.string().describe(
+        'Short-lived BrowserBridge form ID from the latest page context.'
+      ),
+      controlId: z.string().describe(
+        'Short-lived BrowserBridge form control ID from the latest page context.'
+      ),
+      text: z.string().describe(
+        'Text to write into the targeted form control.'
+      )
+    }
+  },
+  async (input) => {
+    const result = await fillInput(pageContextConfig, input)
 
     return {
       content: [
