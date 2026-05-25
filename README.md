@@ -12,11 +12,12 @@ cloud deployment.
 
 ## Status
 
-This project has the initial skeleton in place and a first local WebSocket
-transport milestone. The next product milestone remains:
+This project has the initial local WebSocket transport, Chrome extension page
+context response, and first MCP page-context tool in place. The current working
+milestone is:
 
 1. A local Chrome extension manually connects to the WebSocket server.
-2. The MCP server requests browser status through the WebSocket server.
+2. The MCP server requests page context through the WebSocket server.
 3. The Chrome extension responds with the current tab URL and title.
 
 Features beyond that milestone require an approved ADR before implementation.
@@ -119,13 +120,13 @@ sequenceDiagram
 
   User->>Ext: Start bridge
   Ext->>WS: extension_connected
-  Agent->>MCP: get_browser_status
-  MCP->>WS: get_status
-  WS->>Ext: get_status
+  Agent->>MCP: get_current_page_context
+  MCP->>WS: get_page_context
+  WS->>Ext: get_page_context
   Ext->>Tab: Read active tab URL and title
   Tab-->>Ext: URL and title
-  Ext-->>WS: status_response
-  WS-->>MCP: status_response
+  Ext-->>WS: page_context_response
+  WS-->>MCP: page_context_response
   MCP-->>Agent: Structured tool result
 ```
 
@@ -147,10 +148,13 @@ responses to tool calls and handle timeouts clearly.
 
 ## MCP Tools
 
-The initial MCP server should expose:
+The current MCP server exposes:
+
+- `get_current_page_context`
+
+Later MCP milestones are expected to expose:
 
 - `get_browser_status`
-- `get_current_page_context`
 - `navigate_to_url`
 - `click_element`
 - `fill_input`
@@ -187,9 +191,9 @@ Docker-based local development should start the server components together:
 docker compose --profile runtime up --build
 ```
 
-The WebSocket server currently runs a temporary no-auth, single-channel echo and
-pub/sub protocol. MCP routing and browser extension integration are not
-implemented yet.
+The WebSocket server currently runs a temporary no-auth, single-channel
+peer-forwarding protocol. The Chrome extension and MCP server can use that
+local channel for the first page-context milestone.
 
 ### Testing The WebSocket Server With A CLI
 
@@ -211,10 +215,9 @@ Send a valid message:
 { "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
 ```
 
-The server should echo the same JSON envelope back to that terminal. To test
-pub/sub fan-out, open a second `wscat` terminal connected to the same URL, then
-send the message from either terminal. Both connected clients should receive the
-message.
+The sending terminal should not receive its own message. To test peer fan-out,
+open a second `wscat` terminal connected to the same URL, then send the message
+from either terminal. The other connected client should receive the message.
 
 To test structured error handling, send invalid JSON:
 
@@ -234,13 +237,15 @@ The initial `.env.example` should include values like:
 ```sh
 WEBSOCKET_HOST=127.0.0.1
 WEBSOCKET_PORT=8787
-WEBSOCKET_URL=ws://127.0.0.1:8787
+BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
+BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
 BROWSERBRIDGE_TOKEN=local-dev-token
 MCP_SESSION_ID=local
 ```
 
 `BROWSERBRIDGE_TOKEN` is reserved for the later authenticated routing milestone;
-the current WebSocket echo/pub-sub server does not require authentication.
+the current local WebSocket peer-forwarding server does not require
+authentication.
 
 ## Security Model
 
@@ -267,12 +272,12 @@ Chrome is the first supported extension target.
 
 Initial Chrome behavior:
 
-- User manually connects and disconnects from the popup.
+- User manually connects and disconnects from the extension action after setup.
 - The background script owns the WebSocket connection.
 - The extension responds to MCP-originated requests.
 - The extension can read current tab URL and title.
-- The content script can extract basic page text and perform simple DOM actions
-  where possible.
+- It does not extract page body text or perform DOM actions in the current
+  milestone.
 
 Safari and Firefox are planned placeholders until their extension packaging and
 permission models are designed.
@@ -293,9 +298,9 @@ For feature or behavioral changes:
 
 - Create the pnpm workspace skeleton.
 - Define shared protocol schemas and types.
-- Implement the WebSocket session router.
-- Implement the MCP server and first browser status tool.
+- Implement the local WebSocket peer-forwarding transport.
 - Build the manually controlled Chrome extension.
+- Implement the MCP server and first page-context tool.
 - Add tests around protocol validation, session routing, and MCP tool results.
 - Add Docker Compose local development support.
 - Document the first working milestone.
