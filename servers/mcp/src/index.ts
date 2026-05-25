@@ -1,4 +1,7 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import {
+  McpServer,
+  ResourceTemplate
+} from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
@@ -7,11 +10,15 @@ import {
   McpError
 } from '@modelcontextprotocol/sdk/types.js'
 import {
+  getCurrentPageContent,
   getCurrentPageContext,
-  getPageContextConfigFromEnv
+  getPageContextConfigFromEnv,
+  parsePageContentResourceIndex
 } from './page-context.js'
 
 const currentPageResourceUri = 'browser://page/current'
+const currentPageContentResourceTemplateUri =
+  'browser://page/current/content/{index}'
 
 const server = new McpServer({
   name: 'browserbridge-mcp',
@@ -53,6 +60,36 @@ server.registerResource(
       contents: [
         {
           uri: currentPageResourceUri,
+          mimeType: 'application/json',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
+
+server.registerResource(
+  'current-page-content',
+  new ResourceTemplate(currentPageContentResourceTemplateUri, {
+    list: undefined
+  }),
+  {
+    title: 'Current Page Content',
+    description:
+      'Read a chunk of normalized current browser page content through BrowserBridge.',
+    mimeType: 'application/json'
+  },
+  async (uri) => {
+    const index = parsePageContentResourceIndex(uri.href)
+    const result =
+      typeof index === 'number'
+        ? await getCurrentPageContent(pageContextConfig, index)
+        : index
+
+    return {
+      contents: [
+        {
+          uri: uri.href,
           mimeType: 'application/json',
           text: JSON.stringify(result)
         }

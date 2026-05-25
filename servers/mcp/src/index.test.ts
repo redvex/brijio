@@ -1,12 +1,20 @@
 import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { type AddressInfo } from 'node:net'
+import { afterEach, describe, it } from 'node:test'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
+import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const currentPageResourceUri = 'browser://page/current'
+const currentPageContentTemplateUri = 'browser://page/current/content/{index}'
+const servers: WebSocketServer[] = []
+
+afterEach(async () => {
+  await Promise.all(servers.splice(0).map(closeServer))
+})
 
 void describe('BrowserBridge MCP stdio server', () => {
   void it('uses the official MCP lifecycle for initialize, resource discovery, and ping', async () => {
@@ -49,6 +57,24 @@ void describe('BrowserBridge MCP stdio server', () => {
         ]
       )
 
+      const resourceTemplates = await client.listResourceTemplates(undefined, {
+        timeout: 1000
+      })
+      assert.deepEqual(
+        resourceTemplates.resourceTemplates.map((template) => ({
+          uriTemplate: template.uriTemplate,
+          name: template.name,
+          mimeType: template.mimeType
+        })),
+        [
+          {
+            uriTemplate: currentPageContentTemplateUri,
+            name: 'current-page-content',
+            mimeType: 'application/json'
+          }
+        ]
+      )
+
       const tools = await client.listTools(undefined, { timeout: 1000 })
       assert.deepEqual(tools.tools, [])
 
@@ -78,4 +104,238 @@ void describe('BrowserBridge MCP stdio server', () => {
       await client.close()
     }
   })
+
+  void it('reads rich page context and paginated page content resources', async () => {
+    const server = await startServer((socket) => {
+      socket.on('message', (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id: string
+          payload: {
+            type: string
+            index?: number
+          }
+        }
+
+        if (request.payload.type === 'get_page_context') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'page_context_response',
+                ok: true,
+                data: createRichPageContext()
+              }
+            })
+          )
+          return
+        }
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'page_content_response',
+              ok: true,
+              data: {
+                url: 'https://example.com/',
+                title: 'Example',
+                timestamp: '2026-05-25T10:00:00.000Z',
+                index: request.payload.index,
+                content: '# Example\n\nReadable content',
+                truncated: false,
+                maxPayloadBytes: 131072
+              }
+            }
+          })
+        )
+      })
+    })
+    const client = new Client({
+      name: 'browserbridge-mcp-test',
+      version: '0.0.0'
+    })
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: ['--import', 'tsx', 'src/index.ts'],
+      cwd: packageRoot,
+      env: {
+        BROWSERBRIDGE_WEBSOCKET_URL: server.url,
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+      },
+      stderr: 'pipe'
+    })
+
+    try {
+      await client.connect(transport, { timeout: 1000 })
+
+      const currentPage = await client.readResource(
+        {
+          uri: currentPageResourceUri
+        },
+        { timeout: 1000 }
+      )
+      assert.equal(currentPage.contents.length, 1)
+      const currentPageContent = currentPage.contents[0]
+      assert.ok('text' in currentPageContent)
+      assert.deepEqual(JSON.parse(currentPageContent.text), {
+        ok: true,
+        data: createRichPageContext()
+      })
+
+      const pageContent = await client.readResource(
+        {
+          uri: 'browser://page/current/content/1'
+        },
+        { timeout: 1000 }
+      )
+      assert.equal(pageContent.contents.length, 1)
+      const content = pageContent.contents[0]
+      assert.ok('text' in content)
+      assert.deepEqual(JSON.parse(content.text), {
+        ok: true,
+        data: {
+          url: 'https://example.com/',
+          title: 'Example',
+          timestamp: '2026-05-25T10:00:00.000Z',
+          index: 1,
+          content: '# Example\n\nReadable content',
+          truncated: false,
+          maxPayloadBytes: 131072
+        }
+      })
+    } finally {
+      await client.close()
+    }
+  })
+
+  void it('returns a structured error for invalid page content resource indexes', async () => {
+    const client = new Client({
+      name: 'browserbridge-mcp-test',
+      version: '0.0.0'
+    })
+    const transport = new StdioClientTransport({
+      command: process.execPath,
+      args: ['--import', 'tsx', 'src/index.ts'],
+      cwd: packageRoot,
+      env: {
+        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+      },
+      stderr: 'pipe'
+    })
+
+    try {
+      await client.connect(transport, { timeout: 1000 })
+
+      const pageContent = await client.readResource(
+        {
+          uri: 'browser://page/current/content/0'
+        },
+        { timeout: 1000 }
+      )
+      assert.equal(pageContent.contents.length, 1)
+      const content = pageContent.contents[0]
+      assert.ok('text' in content)
+      assert.deepEqual(JSON.parse(content.text), {
+        ok: false,
+        error: {
+          code: 'invalid_resource_uri',
+          message:
+            'Page content resource URI must end with a positive 1-based index.'
+        }
+      })
+    } finally {
+      await client.close()
+    }
+  })
 })
+
+async function startServer (
+  onConnection: (socket: WebSocket) => void
+): Promise<{ server: WebSocketServer, url: string }> {
+  const server = new WebSocketServer({ host: '127.0.0.1', port: 0 })
+  server.on('connection', onConnection)
+
+  await new Promise<void>((resolve, reject) => {
+    server.once('listening', resolve)
+    server.once('error', reject)
+  })
+
+  servers.push(server)
+
+  const address = getAddress(server)
+
+  return {
+    server,
+    url: `ws://127.0.0.1:${address.port}`
+  }
+}
+
+function getAddress (server: WebSocketServer): AddressInfo {
+  const address = server.address()
+
+  if (address === null || typeof address === 'string') {
+    throw new Error('WebSocket test server is not listening on a TCP port.')
+  }
+
+  return address
+}
+
+async function closeServer (server: WebSocketServer): Promise<void> {
+  for (const client of server.clients) {
+    client.close()
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    server.close((error) => {
+      if (error != null && !String(error.message).includes('not running')) {
+        reject(error)
+        return
+      }
+
+      resolve()
+    })
+  })
+}
+
+function rawDataToString (data: RawData): string {
+  if (Buffer.isBuffer(data)) {
+    return data.toString('utf8')
+  }
+
+  if (Array.isArray(data)) {
+    return Buffer.concat(data).toString('utf8')
+  }
+
+  return Buffer.from(data).toString('utf8')
+}
+
+function createRichPageContext (): unknown {
+  return {
+    url: 'https://example.com/',
+    title: 'Example',
+    timestamp: '2026-05-25T10:00:00.000Z',
+    selectedText: 'selected words',
+    preview: {
+      content: 'Example preview',
+      truncated: false,
+      maxBytes: 4096
+    },
+    structure: {
+      headings: [{ id: 'bb-1', level: 1, text: 'Example' }],
+      landmarks: [],
+      links: [],
+      images: [],
+      forms: [],
+      actions: []
+    },
+    content: {
+      available: true,
+      requestType: 'get_page_content',
+      firstIndex: 1,
+      defaultMaxPayloadBytes: 131072
+    }
+  }
+}
