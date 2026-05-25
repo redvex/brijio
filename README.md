@@ -10,6 +10,10 @@ extension to perform approved browser actions through that WebSocket channel.
 BrowserBridge is designed for local-first development with a path to private
 cloud deployment.
 
+BrowserBridge is source-available and free for non-commercial use. Commercial
+use requires separate written permission from the relevant copyright holder or
+holders.
+
 ## Status
 
 This project has the initial local WebSocket transport, Chrome extension page
@@ -321,5 +325,16 @@ For feature or behavioral changes:
 
 ## License
 
-BrowserBridge is licensed under the GNU Affero General Public License v3.0. See
-`LICENSE` for details.
+BrowserBridge source code is licensed under the PolyForm Noncommercial License
+1.0.0. See `LICENSE`.
+
+Documentation, diagrams, examples, and other non-code written materials are
+licensed under Creative Commons Attribution-NonCommercial 4.0 International
+unless a file says otherwise. See `LICENSE-DOCS.md`.
+
+Commercial use requires separate written permission from the relevant copyright
+holder or holders. See `COMMERCIAL-LICENSING.md`.
+
+Contributions are accepted under an inbound-equals-outbound model. Contributors
+keep copyright in their contributions and do not grant automatic commercial
+relicensing rights. See `CONTRIBUTING.md`.
