@@ -99,7 +99,6 @@ flowchart TD
   RepoDocs -->|Only if owner-authored or separately approved| Commercial
   Contributor -->|Optional separate permission| Commercial
 ```
-````
 
 ## Commercial Permission Flow
 
@@ -145,7 +144,6 @@ non-code written materials.
 Add repository tooling tests that fail while AGPL metadata or AGPL README
 language remains and pass once the new license policy files and package metadata
 are in place.
-
 ````
 
 - [ ] **Step 2: Run Markdown formatting check**
@@ -154,7 +152,7 @@ Run:
 
 ```sh
 pnpm lint:md
-````
+```
 
 Expected: PASS, or FAIL only on formatting in the new ADR.
 
