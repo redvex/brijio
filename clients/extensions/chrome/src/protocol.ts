@@ -25,6 +25,11 @@ export interface WriteTextActionTarget {
   controlId: string
 }
 
+export interface WriteTextEditableTarget {
+  kind: 'editable'
+  id: string
+}
+
 export interface PerformClickAction {
   type: 'click'
   target: ClickActionTarget
@@ -32,13 +37,37 @@ export interface PerformClickAction {
 
 export interface PerformWriteTextAction {
   type: 'write_text'
-  target: WriteTextActionTarget
+  target: WriteTextActionTarget | WriteTextEditableTarget
   text: string
+}
+
+export interface PerformSetCheckedAction {
+  type: 'set_checked'
+  target: WriteTextActionTarget
+  checked: boolean
+}
+
+export interface PerformSelectOptionsAction {
+  type: 'select_options'
+  target: WriteTextActionTarget
+  values: string[]
+}
+
+export interface PerformSubmitFormAction {
+  type: 'submit_form'
+  target: {
+    formId: string
+  }
 }
 
 export interface PerformActionRequest {
   type: 'perform_action'
-  action: PerformClickAction | PerformWriteTextAction
+  action:
+  | PerformClickAction
+  | PerformWriteTextAction
+  | PerformSetCheckedAction
+  | PerformSelectOptionsAction
+  | PerformSubmitFormAction
 }
 
 export interface PageHeading {
@@ -71,13 +100,31 @@ export interface PageFormControl {
   type: string
   required: boolean
   disabled: boolean
+  readonly?: boolean
   sensitive: boolean
+  checked?: boolean
+  multiple?: boolean
+  options?: PageFormControlOption[]
+}
+
+export interface PageFormControlOption {
+  value: string
+  label: string
+  selected: boolean
+  disabled: boolean
 }
 
 export interface PageForm {
   id: string
   label: string
   controls: PageFormControl[]
+}
+
+export interface PageEditable {
+  id: string
+  label: string
+  role: string
+  multiline: boolean
 }
 
 export interface PageAction {
@@ -103,6 +150,7 @@ export interface PageContext {
     links: PageLink[]
     images: PageImage[]
     forms: PageForm[]
+    editables: PageEditable[]
     actions: PageAction[]
   }
   content: {
@@ -153,6 +201,9 @@ export type ActionResultErrorCode =
   | 'target_disabled'
   | 'target_readonly'
   | 'unsupported_control'
+  | 'invalid_control_value'
+  | 'option_not_found'
+  | 'target_option_disabled'
   | 'action_failed'
 
 export interface PageContextResponse {
@@ -192,14 +243,39 @@ export interface ActionResultData {
 
 export interface WriteTextActionResultData {
   action: 'write_text'
-  target: WriteTextActionTarget
+  target: WriteTextActionTarget | WriteTextEditableTarget
   textLength: number
+}
+
+export interface SetCheckedActionResultData {
+  action: 'set_checked'
+  target: WriteTextActionTarget
+  checked: boolean
+  changed: boolean
+}
+
+export interface SelectOptionsActionResultData {
+  action: 'select_options'
+  target: WriteTextActionTarget
+  values: string[]
+}
+
+export interface SubmitFormActionResultData {
+  action: 'submit_form'
+  target: {
+    formId: string
+  }
 }
 
 export interface ActionResultResponse {
   type: 'action_result'
   ok: true
-  data: ActionResultData | WriteTextActionResultData
+  data:
+  | ActionResultData
+  | WriteTextActionResultData
+  | SetCheckedActionResultData
+  | SelectOptionsActionResultData
+  | SubmitFormActionResultData
 }
 
 export interface ActionResultErrorResponse {
@@ -309,6 +385,18 @@ export function isPerformActionEnvelope (
     return isWriteTextAction(value.payload.action)
   }
 
+  if (value.payload.action.type === 'set_checked') {
+    return isSetCheckedAction(value.payload.action)
+  }
+
+  if (value.payload.action.type === 'select_options') {
+    return isSelectOptionsAction(value.payload.action)
+  }
+
+  if (value.payload.action.type === 'submit_form') {
+    return isSubmitFormAction(value.payload.action)
+  }
+
   return false
 }
 
@@ -366,7 +454,12 @@ export function createPageContentErrorResponse (
 
 export function createActionResultResponse (
   id: string | undefined,
-  data: ActionResultData | WriteTextActionResultData
+  data:
+  | ActionResultData
+  | WriteTextActionResultData
+  | SetCheckedActionResultData
+  | SelectOptionsActionResultData
+  | SubmitFormActionResultData
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'action_result',
@@ -425,12 +518,57 @@ function isWriteTextAction (value: Record<PropertyKey, unknown>): boolean {
     return false
   }
 
+  if (value.target.kind === 'editable') {
+    return (
+      typeof value.target.id === 'string' &&
+      value.target.id.trim() !== '' &&
+      typeof value.text === 'string'
+    )
+  }
+
   return (
     typeof value.target.formId === 'string' &&
     value.target.formId.trim() !== '' &&
     typeof value.target.controlId === 'string' &&
     value.target.controlId.trim() !== '' &&
     typeof value.text === 'string'
+  )
+}
+
+function isSetCheckedAction (value: Record<PropertyKey, unknown>): boolean {
+  return (
+    isFormControlTarget(value.target) && typeof value.checked === 'boolean'
+  )
+}
+
+function isSelectOptionsAction (value: Record<PropertyKey, unknown>): boolean {
+  return (
+    isFormControlTarget(value.target) &&
+    Array.isArray(value.values) &&
+    value.values.every((option) => typeof option === 'string')
+  )
+}
+
+function isSubmitFormAction (value: Record<PropertyKey, unknown>): boolean {
+  if (!isRecord(value.target)) {
+    return false
+  }
+
+  return (
+    typeof value.target.formId === 'string' && value.target.formId.trim() !== ''
+  )
+}
+
+function isFormControlTarget (value: unknown): value is WriteTextActionTarget {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    typeof value.formId === 'string' &&
+    value.formId.trim() !== '' &&
+    typeof value.controlId === 'string' &&
+    value.controlId.trim() !== ''
   )
 }
 

@@ -28,10 +28,17 @@ Current page action behavior:
 - `perform_action` with `action.type: "click"` clicks a visible link or
   button-like action from the active regular page.
 - `perform_action` with `action.type: "write_text"` writes provided text into a
-  supported visible text control from the active regular page.
+  supported visible form control or contenteditable surface from the active
+  regular page.
+- `perform_action` with `action.type: "set_checked"` sets checkbox state or
+  selects a radio option.
+- `perform_action` with `action.type: "select_options"` selects options in
+  single-select and multi-select controls.
+- `perform_action` with `action.type: "submit_form"` submits a visible form
+  with browser validation.
 - Click targets use short-lived IDs from the latest `get_page_context`
   response, scoped by `target.kind`.
-- Text targets use short-lived form and control IDs from the latest
+- Form-control actions use short-lived form and control IDs from the latest
   `get_page_context` response.
 - The extension returns `action_result` with the same request ID.
 
@@ -319,10 +326,69 @@ text itself:
 }
 ```
 
-The first write action supports visible `<textarea>`, `<input type="text">`,
-`<input type="search">`, and `<input>` controls without an explicit type. It
-does not submit forms or support password, file, checkbox, radio, select, or
-contenteditable controls.
+The write action supports visible `<textarea>`, contenteditable text surfaces,
+and visible value-entry inputs including text, search, email, URL, telephone,
+number, date, time, datetime-local, month, week, color, and range controls. It
+does not support password, file, hidden, checkbox, radio, select, button,
+submit, reset, or rich HTML insertion.
+
+Checkboxes and radio buttons use `set_checked`:
+
+```json
+{
+  "type": "message",
+  "id": "action-3",
+  "payload": {
+    "type": "perform_action",
+    "action": {
+      "type": "set_checked",
+      "target": {
+        "formId": "bb-1",
+        "controlId": "bb-4"
+      },
+      "checked": true
+    }
+  }
+}
+```
+
+Select controls use `select_options` with option values from page context:
+
+```json
+{
+  "type": "message",
+  "id": "action-4",
+  "payload": {
+    "type": "perform_action",
+    "action": {
+      "type": "select_options",
+      "target": {
+        "formId": "bb-1",
+        "controlId": "bb-5"
+      },
+      "values": ["alpha", "gamma"]
+    }
+  }
+}
+```
+
+Forms use an explicit `submit_form` action:
+
+```json
+{
+  "type": "message",
+  "id": "action-5",
+  "payload": {
+    "type": "perform_action",
+    "action": {
+      "type": "submit_form",
+      "target": {
+        "formId": "bb-1"
+      }
+    }
+  }
+}
+```
 
 ## Current Limitations
 
