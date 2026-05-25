@@ -10,6 +10,7 @@ import {
   getPageContextConfigFromEnv,
   parsePageContentResourceIndex
 } from './page-context.js'
+import { listBrowsers } from './browser-list-tool.js'
 import { clickElement } from './click-element-tool.js'
 import { fillInput } from './fill-input-tool.js'
 import {
@@ -30,12 +31,37 @@ const server = new McpServer({
 })
 
 const pageContextConfig = getPageContextConfigFromEnv()
+const browserInstanceIdInput = z.string().optional().describe(
+  'Optional BrowserBridge browser instance ID to target.'
+)
 
 server.server.registerCapabilities({
   tools: {
     listChanged: true
   }
 })
+
+server.registerTool(
+  'list_browsers',
+  {
+    title: 'List Browsers',
+    description:
+      'List BrowserBridge browser instances currently online for the configured pairing token.',
+    inputSchema: {}
+  },
+  async () => {
+    const result = await listBrowsers(pageContextConfig)
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
 
 server.registerTool(
   'read_current_page',
@@ -49,7 +75,8 @@ server.registerTool(
       ),
       maxContentChunks: z.number().optional().describe(
         'Maximum readable content chunks to fetch. Defaults to 1.'
-      )
+      ),
+      browserInstanceId: browserInstanceIdInput
     }
   },
   async (input) => {
@@ -78,7 +105,8 @@ server.registerTool(
       ),
       id: z.string().describe(
         'Short-lived BrowserBridge target ID from the latest page context.'
-      )
+      ),
+      browserInstanceId: browserInstanceIdInput
     }
   },
   async (input) => {
@@ -110,7 +138,8 @@ server.registerTool(
       ),
       text: z.string().describe(
         'Text to write into the targeted form control.'
-      )
+      ),
+      browserInstanceId: browserInstanceIdInput
     }
   },
   async (input) => {
@@ -139,7 +168,8 @@ server.registerTool(
       ),
       text: z.string().describe(
         'Text to write into the targeted contenteditable surface.'
-      )
+      ),
+      browserInstanceId: browserInstanceIdInput
     }
   },
   async (input) => {
@@ -169,7 +199,8 @@ server.registerTool(
       controlId: z.string().describe(
         'Short-lived BrowserBridge form control ID from the latest page context.'
       ),
-      checked: z.boolean().describe('Desired checked state.')
+      checked: z.boolean().describe('Desired checked state.'),
+      browserInstanceId: browserInstanceIdInput
     }
   },
   async (input) => {
@@ -201,7 +232,8 @@ server.registerTool(
       ),
       values: z.array(z.string()).describe(
         'Option values to select in the targeted select control.'
-      )
+      ),
+      browserInstanceId: browserInstanceIdInput
     }
   },
   async (input) => {
@@ -227,7 +259,8 @@ server.registerTool(
     inputSchema: {
       formId: z.string().describe(
         'Short-lived BrowserBridge form ID from the latest page context.'
-      )
+      ),
+      browserInstanceId: browserInstanceIdInput
     }
   },
   async (input) => {

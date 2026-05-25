@@ -8,6 +8,7 @@ import { type BrowserBridgeToolResult } from './page-reading-tool.js'
 export interface ClickElementInput {
   kind?: unknown
   id?: unknown
+  browserInstanceId?: unknown
 }
 
 export type ClickElementResult =
@@ -26,12 +27,19 @@ export async function clickElement (
     return normalizedInput
   }
 
-  return await clickCurrentPageElement(config, normalizedInput.data)
+  return await clickCurrentPageElement(
+    config,
+    normalizedInput.data.target,
+    normalizedInput.data.browserInstanceId
+  )
 }
 
 function normalizeInput (
   input: ClickElementInput
-): BrowserBridgeToolResult<ClickElementTarget> {
+): BrowserBridgeToolResult<{
+    target: ClickElementTarget
+    browserInstanceId?: string
+  }> {
   if (input.kind !== 'link' && input.kind !== 'action') {
     return invalidToolInputResponse('kind must be either "link" or "action".')
   }
@@ -40,12 +48,47 @@ function normalizeInput (
     return invalidToolInputResponse('id must be a non-empty string.')
   }
 
+  const browserInstanceId = normalizeBrowserInstanceId(
+    input.browserInstanceId
+  )
+
+  if (!browserInstanceId.ok) {
+    return browserInstanceId
+  }
+
   return {
     ok: true,
     data: {
-      kind: input.kind,
-      id: input.id
+      target: {
+        kind: input.kind,
+        id: input.id
+      },
+      ...(browserInstanceId.data !== undefined
+        ? { browserInstanceId: browserInstanceId.data }
+        : {})
     }
+  }
+}
+
+function normalizeBrowserInstanceId (
+  value: unknown
+): BrowserBridgeToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'browserInstanceId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 

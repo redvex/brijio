@@ -37,7 +37,8 @@ void describe('MCP form action tools', () => {
         requestSetChecked: async (options) => {
           requestedInputs.push({
             target: options.target,
-            checked: options.checked
+            checked: options.checked,
+            browserInstanceId: options.browserInstanceId
           })
           return {
             ok: true,
@@ -53,7 +54,8 @@ void describe('MCP form action tools', () => {
       {
         formId: 'form-1',
         controlId: 'control-1',
-        checked: true
+        checked: true,
+        browserInstanceId: 'chrome-default-test'
       }
     )
 
@@ -63,7 +65,8 @@ void describe('MCP form action tools', () => {
           formId: 'form-1',
           controlId: 'control-1'
         },
-        checked: true
+        checked: true,
+        browserInstanceId: 'chrome-default-test'
       }
     ])
     assert.deepEqual(result, {

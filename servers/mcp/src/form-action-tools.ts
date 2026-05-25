@@ -19,21 +19,25 @@ export interface SetCheckedInput {
   formId?: unknown
   controlId?: unknown
   checked?: unknown
+  browserInstanceId?: unknown
 }
 
 export interface SelectOptionsInput {
   formId?: unknown
   controlId?: unknown
   values?: unknown
+  browserInstanceId?: unknown
 }
 
 export interface SubmitFormInput {
   formId?: unknown
+  browserInstanceId?: unknown
 }
 
 export interface FillEditableInput {
   id?: unknown
   text?: unknown
+  browserInstanceId?: unknown
 }
 
 export type SetCheckedResult =
@@ -62,7 +66,12 @@ export async function setChecked (
     return invalidToolInputResponse('checked must be a boolean.')
   }
 
-  return await setCurrentPageChecked(config, targetResult.data, input.checked)
+  return await setCurrentPageChecked(
+    config,
+    targetResult.data.target,
+    input.checked,
+    targetResult.data.browserInstanceId
+  )
 }
 
 export async function selectOptions (
@@ -84,8 +93,9 @@ export async function selectOptions (
 
   return await selectCurrentPageOptions(
     config,
-    targetResult.data,
-    input.values
+    targetResult.data.target,
+    input.values,
+    targetResult.data.browserInstanceId
   )
 }
 
@@ -97,7 +107,19 @@ export async function submitForm (
     return invalidToolInputResponse('formId must be a non-empty string.')
   }
 
-  return await submitCurrentPageForm(config, input.formId)
+  const browserInstanceId = normalizeBrowserInstanceId(
+    input.browserInstanceId
+  )
+
+  if (!browserInstanceId.ok) {
+    return browserInstanceId
+  }
+
+  return await submitCurrentPageForm(
+    config,
+    input.formId,
+    browserInstanceId.data
+  )
 }
 
 export async function fillEditable (
@@ -114,12 +136,20 @@ export async function fillEditable (
     return invalidToolInputResponse('text must be a string.')
   }
 
-  return await fillCurrentPageEditable(config, targetResult.data, input.text)
+  return await fillCurrentPageEditable(
+    config,
+    targetResult.data.target,
+    input.text,
+    targetResult.data.browserInstanceId
+  )
 }
 
 function normalizeFormControlTarget (
   input: SetCheckedInput | SelectOptionsInput
-): BrowserBridgeToolResult<FillInputTarget> {
+): BrowserBridgeToolResult<{
+    target: FillInputTarget
+    browserInstanceId?: string
+  }> {
   if (typeof input.formId !== 'string' || input.formId.length === 0) {
     return invalidToolInputResponse('formId must be a non-empty string.')
   }
@@ -131,28 +161,79 @@ function normalizeFormControlTarget (
     return invalidToolInputResponse('controlId must be a non-empty string.')
   }
 
+  const browserInstanceId = normalizeBrowserInstanceId(
+    input.browserInstanceId
+  )
+
+  if (!browserInstanceId.ok) {
+    return browserInstanceId
+  }
+
   return {
     ok: true,
     data: {
-      formId: input.formId,
-      controlId: input.controlId
+      target: {
+        formId: input.formId,
+        controlId: input.controlId
+      },
+      ...(browserInstanceId.data !== undefined
+        ? { browserInstanceId: browserInstanceId.data }
+        : {})
     }
   }
 }
 
 function normalizeEditableTarget (
   input: FillEditableInput
-): BrowserBridgeToolResult<EditableTarget> {
+): BrowserBridgeToolResult<{
+    target: EditableTarget
+    browserInstanceId?: string
+  }> {
   if (typeof input.id !== 'string' || input.id.length === 0) {
     return invalidToolInputResponse('id must be a non-empty string.')
+  }
+
+  const browserInstanceId = normalizeBrowserInstanceId(
+    input.browserInstanceId
+  )
+
+  if (!browserInstanceId.ok) {
+    return browserInstanceId
   }
 
   return {
     ok: true,
     data: {
-      kind: 'editable',
-      id: input.id
+      target: {
+        kind: 'editable',
+        id: input.id
+      },
+      ...(browserInstanceId.data !== undefined
+        ? { browserInstanceId: browserInstanceId.data }
+        : {})
     }
+  }
+}
+
+function normalizeBrowserInstanceId (
+  value: unknown
+): BrowserBridgeToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'browserInstanceId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 
