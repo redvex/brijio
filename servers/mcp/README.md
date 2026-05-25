@@ -24,6 +24,10 @@ routing.
 The Chrome extension must already be connected by the user. The MCP server does
 not start browser access on its own and does not stream or store page state.
 
+For MCP client startup compatibility, the server also responds to `tools/list`
+with an empty tool list. Browser action tools remain out of scope for this
+package version.
+
 Out of scope for this package version:
 
 - Tools for browser actions such as navigation, click, fill, or submit.

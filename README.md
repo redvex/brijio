@@ -152,6 +152,9 @@ The current MCP server exposes one read-only resource:
 
 - `browser://page/current`, named `current-page-context`
 
+It also returns an empty `tools/list` response for MCP client startup
+compatibility. Browser action tools are intentionally not exposed yet.
+
 Later MCP milestones are expected to expose action tools:
 
 - `get_browser_status`

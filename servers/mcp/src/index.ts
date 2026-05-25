@@ -1,6 +1,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
+  CallToolRequestSchema,
+  ErrorCode,
+  ListToolsRequestSchema,
+  McpError
+} from '@modelcontextprotocol/sdk/types.js'
+import {
   getCurrentPageContext,
   getPageContextConfigFromEnv
 } from './page-context.js'
@@ -13,6 +19,23 @@ const server = new McpServer({
 })
 
 const pageContextConfig = getPageContextConfigFromEnv()
+
+server.server.registerCapabilities({
+  tools: {
+    listChanged: true
+  }
+})
+
+server.server.setRequestHandler(ListToolsRequestSchema, () => ({
+  tools: []
+}))
+
+server.server.setRequestHandler(CallToolRequestSchema, (request) => {
+  throw new McpError(
+    ErrorCode.MethodNotFound,
+    `Tool is not registered: ${request.params.name}`
+  )
+})
 
 server.registerResource(
   'current-page-context',

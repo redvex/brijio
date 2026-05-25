@@ -7,6 +7,9 @@ It exposes the `browser://page/current` MCP resource and routes explicit
 resource reads through the local WebSocket server to the user-started Chrome
 extension.
 
+For MCP client startup compatibility, the server also responds to `tools/list`
+with an empty tool list. No browser action tools are exposed in this milestone.
+
 This milestone returns only the active tab URL and title. The resource URI is
 intended to remain stable when the extension later returns full page context. It
 does not perform browser actions, stream state, or store page context.
@@ -23,6 +26,8 @@ sequenceDiagram
   participant Tab as Active Browser Tab
 
   Agent->>SDK: resources/read browser://page/current
+  Agent->>SDK: tools/list
+  SDK-->>Agent: []
   SDK->>MCP: Invoke resource handler
   MCP->>WS: get_page_context envelope with request ID
   WS->>Ext: Forward request

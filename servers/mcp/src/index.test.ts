@@ -49,6 +49,9 @@ void describe('BrowserBridge MCP stdio server', () => {
         ]
       )
 
+      const tools = await client.listTools(undefined, { timeout: 1000 })
+      assert.deepEqual(tools.tools, [])
+
       const currentPage = await client.readResource(
         {
           uri: currentPageResourceUri

@@ -95,6 +95,12 @@ BrowserBridge result object. The extension currently returns URL and title; the
 same resource URI will remain the place for the full page context once the
 extension implementation expands.
 
+Some MCP clients probe `tools/list` during startup even when a server only
+advertises resources. To keep BrowserBridge compatible with those clients
+without exposing browser action tools early, the MCP server will also answer
+`tools/list` with an empty tool list. Browser action tools remain out of scope
+for this ADR.
+
 Configuration will use environment variables:
 
 - `BROWSERBRIDGE_WEBSOCKET_URL`, defaulting to `ws://127.0.0.1:8787`.
@@ -112,6 +118,8 @@ sequenceDiagram
   participant Tab as Active Browser Tab
 
   Agent->>SDK: initialize / resources/list / resources/read
+  Agent->>SDK: tools/list
+  SDK-->>Agent: []
   SDK->>MCP: read browser://page/current
   MCP->>WS: get_page_context envelope with request ID
   WS->>Ext: Forward request to peer
@@ -189,6 +197,7 @@ In scope:
   handling.
 - Add tests for SDK-backed initialize, resource discovery, and resource read
   behavior.
+- Add tests that client startup tool discovery receives an empty tool list.
 - Use the official SDK for MCP stdio transport and resource registration.
 - Add request ID generation and response correlation.
 - Add timeout handling.
