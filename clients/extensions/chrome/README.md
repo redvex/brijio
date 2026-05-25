@@ -23,6 +23,14 @@ Current page read behavior:
 - `page_content_response.data.truncated` tells the requester whether another
   chunk is available at the next index.
 
+Current page action behavior:
+
+- `perform_action` with `action.type: "click"` clicks a visible link or
+  button-like action from the active regular page.
+- Click targets use short-lived IDs from the latest `get_page_context`
+  response, scoped by `target.kind`.
+- The extension returns `action_result` with the same request ID.
+
 ## User Flow
 
 The extension is transparent during normal use:
@@ -49,6 +57,8 @@ service worker active while the user-visible bridge state is `ON`.
 
 The extension reads DOM content only after an explicit WebSocket request while
 the user-started bridge is connected. It does not stream or store page content.
+Browser actions follow the same explicit request model and are not performed
+unless a WebSocket peer sends a structured action request.
 
 ## Permissions
 
@@ -203,8 +213,66 @@ regular page access has not been enabled, the extension returns:
 }
 ```
 
+To click a link or button-like page action, first request page context and use
+an ID from either `structure.links[]` or `structure.actions[]`. Link and action
+IDs are scoped to their own target kind:
+
+```json
+{
+  "type": "message",
+  "id": "action-1",
+  "payload": {
+    "type": "perform_action",
+    "action": {
+      "type": "click",
+      "target": {
+        "kind": "link",
+        "id": "bb-1"
+      }
+    }
+  }
+}
+```
+
+Successful action responses preserve the request ID:
+
+```json
+{
+  "type": "message",
+  "id": "action-1",
+  "payload": {
+    "type": "action_result",
+    "ok": true,
+    "data": {
+      "action": "click",
+      "target": {
+        "kind": "link",
+        "id": "bb-1"
+      }
+    }
+  }
+}
+```
+
+Disabled or missing targets return structured action errors:
+
+```json
+{
+  "type": "message",
+  "id": "action-1",
+  "payload": {
+    "type": "action_result",
+    "ok": false,
+    "error": {
+      "code": "target_not_found",
+      "message": "No matching click target was found."
+    }
+  }
+}
+```
+
 ## Current Limitations
 
 This package still uses the unauthenticated local single-channel WebSocket
 server from ADR 0002. Authenticated private routing, MCP content resources, and
-browser actions require separate ADR approval before implementation.
+MCP action tools require separate ADR approval before implementation.

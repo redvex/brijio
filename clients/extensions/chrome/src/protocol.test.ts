@@ -5,6 +5,9 @@ import {
   createPageContentResponse,
   createPageContextErrorResponse,
   createPageContextResponse,
+  createActionResultErrorResponse,
+  createActionResultResponse,
+  isPerformActionEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope
 } from './protocol.js'
@@ -59,6 +62,46 @@ void describe('Chrome extension protocol helpers', () => {
         payload: {
           type: 'get_page_content',
           index: 0
+        }
+      }),
+      false
+    )
+  })
+
+  void it('recognizes perform_action click message envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'click',
+            target: {
+              kind: 'link',
+              id: 'bb-1'
+            }
+          }
+        }
+      }),
+      true
+    )
+  })
+
+  void it('rejects perform_action envelopes with invalid click targets', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-2',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'click',
+            target: {
+              kind: 'image',
+              id: 'bb-1'
+            }
+          }
         }
       }),
       false
@@ -190,6 +233,55 @@ void describe('Chrome extension protocol helpers', () => {
           error: {
             code: 'invalid_index',
             message: 'Page content chunk index must be available and 1-based.'
+          }
+        }
+      }
+    )
+  })
+
+  void it('builds action result responses', () => {
+    assert.deepEqual(
+      createActionResultResponse('action-3', {
+        action: 'click',
+        target: {
+          kind: 'action',
+          id: 'bb-2'
+        }
+      }),
+      {
+        type: 'message',
+        id: 'action-3',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'click',
+            target: {
+              kind: 'action',
+              id: 'bb-2'
+            }
+          }
+        }
+      }
+    )
+  })
+
+  void it('builds action result error responses', () => {
+    assert.deepEqual(
+      createActionResultErrorResponse(
+        'action-4',
+        'target_not_found',
+        'No matching click target was found.'
+      ),
+      {
+        type: 'message',
+        id: 'action-4',
+        payload: {
+          type: 'action_result',
+          ok: false,
+          error: {
+            code: 'target_not_found',
+            message: 'No matching click target was found.'
           }
         }
       }

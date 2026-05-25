@@ -1,10 +1,14 @@
 import {
   BrowserBridgeBackgroundController,
+  type PageActionResult,
   type PageReadResult,
   type BrowserBridgeSocket
 } from './background-controller.js'
 import type { ContentRequest, ContentResponse } from './content.js'
 import {
+  type ActionResultData,
+  type ActionResultErrorCode,
+  type ClickActionTarget,
   defaultPageContentMaxPayloadBytes,
   type PageContentErrorCode
 } from './protocol.js'
@@ -126,6 +130,11 @@ const controller = new BrowserBridgeBackgroundController({
       })
     }
   },
+  pageActions: {
+    async click (target) {
+      return await performActiveTabClick(target)
+    }
+  },
   timers: createGlobalTimers()
 })
 
@@ -178,13 +187,85 @@ async function readActiveTabPage<T> (
       }
     }
 
-    return response
+    return {
+      ok: false,
+      error: {
+        code: response.error.code as PageContentErrorCode,
+        message: response.error.message
+      }
+    }
   } catch {
     if (!await hasRegularPageAccess(chrome.permissions)) {
       return regularPagePermissionRequired()
     }
 
     return contentScriptUnavailable()
+  }
+}
+
+async function performActiveTabClick (
+  target: ClickActionTarget
+): Promise<PageActionResult> {
+  const [activeTab] = await chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  })
+
+  if (activeTab?.id === undefined || activeTab.url === undefined) {
+    return {
+      ok: false,
+      error: {
+        code: 'no_active_tab',
+        message: 'No active tab with a URL is available.'
+      }
+    }
+  }
+
+  if (!isRegularPageUrl(activeTab.url)) {
+    return {
+      ok: false,
+      error: {
+        code: 'unsupported_page',
+        message: 'BrowserBridge can perform actions only on HTTP and HTTPS tabs.'
+      }
+    }
+  }
+
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: activeTab.id },
+      files: ['content.js']
+    })
+
+    const response = await chrome.tabs.sendMessage(activeTab.id, {
+      type: 'perform_click',
+      target
+    })
+
+    if (!isContentResponse(response)) {
+      return actionContentScriptUnavailable()
+    }
+
+    if (response.ok) {
+      return {
+        ok: true,
+        data: response.data as ActionResultData
+      }
+    }
+
+    return {
+      ok: false,
+      error: {
+        code: response.error.code as ActionResultErrorCode,
+        message: response.error.message
+      }
+    }
+  } catch {
+    if (!await hasRegularPageAccess(chrome.permissions)) {
+      return actionRegularPagePermissionRequired()
+    }
+
+    return actionContentScriptUnavailable()
   }
 }
 
@@ -199,7 +280,28 @@ function regularPagePermissionRequired<T> (): PageReadResult<T> {
   }
 }
 
+function actionRegularPagePermissionRequired (): PageActionResult {
+  return {
+    ok: false,
+    error: {
+      code: 'regular_page_permission_required',
+      message:
+        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+    }
+  }
+}
+
 function contentScriptUnavailable<T> (): PageReadResult<T> {
+  return {
+    ok: false,
+    error: {
+      code: 'content_script_unavailable',
+      message: 'Unable to reach the page content script.'
+    }
+  }
+}
+
+function actionContentScriptUnavailable (): PageActionResult {
   return {
     ok: false,
     error: {
@@ -225,7 +327,9 @@ function isContentResponse (value: unknown): value is ContentResponse {
   )
 }
 
-function isPageContentErrorCode (value: unknown): value is PageContentErrorCode {
+function isPageContentErrorCode (
+  value: unknown
+): value is PageContentErrorCode | ActionResultErrorCode {
   return (
     value === 'no_active_tab' ||
     value === 'unsupported_page' ||
@@ -233,7 +337,12 @@ function isPageContentErrorCode (value: unknown): value is PageContentErrorCode 
     value === 'content_script_unavailable' ||
     value === 'extraction_failed' ||
     value === 'invalid_index' ||
-    value === 'unsupported_request'
+    value === 'unsupported_request' ||
+    value === 'unsupported_action' ||
+    value === 'invalid_action_target' ||
+    value === 'target_not_found' ||
+    value === 'target_disabled' ||
+    value === 'action_failed'
   )
 }
 
