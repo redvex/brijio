@@ -17,6 +17,10 @@ import type {
   PageContent,
   PageContentErrorCode,
   PageContext,
+  SelectOptionsActionResultData,
+  SetCheckedActionResultData,
+  SubmitFormActionResultData,
+  WriteTextEditableTarget,
   WriteTextActionTarget
 } from './protocol.js'
 
@@ -339,6 +343,155 @@ void describe('BrowserBridge background controller', () => {
     })
   })
 
+  void it('responds to perform_action set_checked with an action result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      setCheckedResult: {
+        action: 'set_checked',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-3'
+        },
+        checked: true,
+        changed: true
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-check-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'set_checked',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-3'
+            },
+            checked: true
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-check-1',
+      payload: {
+        type: 'action_result',
+        ok: true,
+        data: {
+          action: 'set_checked',
+          target: {
+            formId: 'bb-1',
+            controlId: 'bb-3'
+          },
+          checked: true,
+          changed: true
+        }
+      }
+    })
+  })
+
+  void it('responds to perform_action select_options with an action result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      selectOptionsResult: {
+        action: 'select_options',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-4'
+        },
+        values: ['alpha']
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-select-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'select_options',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-4'
+            },
+            values: ['alpha']
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-select-1',
+      payload: {
+        type: 'action_result',
+        ok: true,
+        data: {
+          action: 'select_options',
+          target: {
+            formId: 'bb-1',
+            controlId: 'bb-4'
+          },
+          values: ['alpha']
+        }
+      }
+    })
+  })
+
+  void it('responds to perform_action submit_form with an action result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      submitFormResult: {
+        action: 'submit_form',
+        target: {
+          formId: 'bb-1'
+        }
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-submit-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'submit_form',
+            target: {
+              formId: 'bb-1'
+            }
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-submit-1',
+      payload: {
+        type: 'action_result',
+        ok: true,
+        data: {
+          action: 'submit_form',
+          target: {
+            formId: 'bb-1'
+          }
+        }
+      }
+    })
+  })
+
   void it('returns action errors from perform_action click requests', async () => {
     const harness = createHarness({
       websocketUrl: 'ws://127.0.0.1:8787',
@@ -411,7 +564,8 @@ void describe('BrowserBridge background controller', () => {
         ok: false,
         error: {
           code: 'unsupported_action',
-          message: 'Only click and write_text actions are supported.'
+          message:
+            'Only click, write_text, set_checked, select_options, and submit_form actions are supported.'
         }
       }
     })
@@ -542,6 +696,9 @@ interface HarnessOptions {
   }
   clickTarget?: ClickActionTarget
   writeTextTarget?: WriteTextActionTarget
+  setCheckedResult?: SetCheckedActionResultData
+  selectOptionsResult?: SelectOptionsActionResultData
+  submitFormResult?: SubmitFormActionResultData
   pageActionError?: {
     code: ActionResultErrorCode
     message: string
@@ -604,7 +761,7 @@ class FakePageActionAdapter implements PageActionAdapter {
   }
 
   async writeText (
-    target: WriteTextActionTarget,
+    target: WriteTextActionTarget | WriteTextEditableTarget,
     text: string
   ): Promise<PageActionResult> {
     if (this.options.pageActionError !== undefined) {
@@ -620,6 +777,66 @@ class FakePageActionAdapter implements PageActionAdapter {
         action: 'write_text',
         target: this.options.writeTextTarget ?? target,
         textLength: text.length
+      }
+    }
+  }
+
+  async setChecked (
+    target: WriteTextActionTarget,
+    checked: boolean
+  ): Promise<PageActionResult> {
+    if (this.options.pageActionError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageActionError
+      }
+    }
+
+    return {
+      ok: true,
+      data: this.options.setCheckedResult ?? {
+        action: 'set_checked',
+        target,
+        checked,
+        changed: true
+      }
+    }
+  }
+
+  async selectOptions (
+    target: WriteTextActionTarget,
+    values: string[]
+  ): Promise<PageActionResult> {
+    if (this.options.pageActionError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageActionError
+      }
+    }
+
+    return {
+      ok: true,
+      data: this.options.selectOptionsResult ?? {
+        action: 'select_options',
+        target,
+        values
+      }
+    }
+  }
+
+  async submitForm (target: { formId: string }): Promise<PageActionResult> {
+    if (this.options.pageActionError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageActionError
+      }
+    }
+
+    return {
+      ok: true,
+      data: this.options.submitFormResult ?? {
+        action: 'submit_form',
+        target
       }
     }
   }
@@ -731,6 +948,7 @@ function createPageContext (): PageContext {
       links: [],
       images: [],
       forms: [],
+      editables: [],
       actions: []
     },
     content: {

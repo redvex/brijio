@@ -109,6 +109,88 @@ void describe('Chrome extension protocol helpers', () => {
     )
   })
 
+  void it('recognizes perform_action write_text editable target envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-write-editable-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'write_text',
+            target: {
+              kind: 'editable',
+              id: 'bb-1'
+            },
+            text: 'Plain text'
+          }
+        }
+      }),
+      true
+    )
+  })
+
+  void it('recognizes perform_action set_checked message envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-check-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'set_checked',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-3'
+            },
+            checked: true
+          }
+        }
+      }),
+      true
+    )
+  })
+
+  void it('recognizes perform_action select_options message envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-select-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'select_options',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-4'
+            },
+            values: ['alpha', 'beta']
+          }
+        }
+      }),
+      true
+    )
+  })
+
+  void it('recognizes perform_action submit_form message envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-submit-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'submit_form',
+            target: {
+              formId: 'bb-1'
+            }
+          }
+        }
+      }),
+      true
+    )
+  })
+
   void it('rejects perform_action envelopes with invalid click targets', () => {
     assert.equal(
       isPerformActionEnvelope({
@@ -150,6 +232,27 @@ void describe('Chrome extension protocol helpers', () => {
     )
   })
 
+  void it('rejects perform_action envelopes with invalid select option values', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-select-2',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'select_options',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-4'
+            },
+            values: ['alpha', 2]
+          }
+        }
+      }),
+      false
+    )
+  })
+
   void it('preserves request ids in page context responses', () => {
     assert.deepEqual(
       createPageContextResponse('request-3', createPageContextFixture()),
@@ -183,6 +286,7 @@ void describe('Chrome extension protocol helpers', () => {
           links: [],
           images: [],
           forms: [],
+          editables: [],
           actions: []
         },
         content: {
@@ -214,6 +318,7 @@ void describe('Chrome extension protocol helpers', () => {
               links: [],
               images: [],
               forms: [],
+              editables: [],
               actions: []
             },
             content: {
@@ -361,7 +466,11 @@ void describe('Chrome extension protocol helpers', () => {
 
   void it('builds structured page context error responses', () => {
     assert.deepEqual(
-      createPageContextErrorResponse('request-4', 'no_active_tab', 'No active tab is available.'),
+      createPageContextErrorResponse(
+        'request-4',
+        'no_active_tab',
+        'No active tab is available.'
+      ),
       {
         type: 'message',
         id: 'request-4',
@@ -395,6 +504,7 @@ function createPageContextFixture (): PageContext {
       links: [],
       images: [],
       forms: [],
+      editables: [],
       actions: []
     },
     content: {
