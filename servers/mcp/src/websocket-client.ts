@@ -5,17 +5,26 @@ import {
   type BrowserBridgePageContentResult,
   type BrowserBridgePageContextResult,
   type BrowserBridgeResourceResult,
+  type BrowserBridgeSelectOptionsResult,
+  type BrowserBridgeSetCheckedResult,
+  type BrowserBridgeSubmitFormResult,
   type ClickElementTarget,
   createClickElementEnvelope,
   createFillInputEnvelope,
+  createSelectOptionsEnvelope,
+  createSetCheckedEnvelope,
+  createSubmitFormEnvelope,
+  createWriteEditableEnvelope,
   connectionFailedResponse,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
+  type EditableTarget,
   type FillInputTarget,
   invalidResponse,
   parseActionResultEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
+  type SubmitFormTarget,
   timeoutResponse
 } from './protocol.js'
 
@@ -36,6 +45,25 @@ export interface ClickElementRequestOptions extends PageContextRequestOptions {
 export interface FillInputRequestOptions extends PageContextRequestOptions {
   target: FillInputTarget
   text: string
+}
+
+export interface WriteEditableRequestOptions extends PageContextRequestOptions {
+  target: EditableTarget
+  text: string
+}
+
+export interface SetCheckedRequestOptions extends PageContextRequestOptions {
+  target: FillInputTarget
+  checked: boolean
+}
+
+export interface SelectOptionsRequestOptions extends PageContextRequestOptions {
+  target: FillInputTarget
+  values: string[]
+}
+
+export interface SubmitFormRequestOptions extends PageContextRequestOptions {
+  target: SubmitFormTarget
 }
 
 export async function requestPageContext (
@@ -98,6 +126,74 @@ export async function requestFillInput (
   })
 }
 
+export async function requestWriteEditable (
+  options: WriteEditableRequestOptions
+): Promise<BrowserBridgeFillInputResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrowserBridge({
+    websocketUrl: options.websocketUrl,
+    timeoutMs: options.timeoutMs,
+    requestEnvelope: createWriteEditableEnvelope(
+      requestId,
+      options.target,
+      options.text
+    ),
+    parseEnvelope: (value) => parseWriteTextActionResultEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
+export async function requestSetChecked (
+  options: SetCheckedRequestOptions
+): Promise<BrowserBridgeSetCheckedResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrowserBridge({
+    websocketUrl: options.websocketUrl,
+    timeoutMs: options.timeoutMs,
+    requestEnvelope: createSetCheckedEnvelope(
+      requestId,
+      options.target,
+      options.checked
+    ),
+    parseEnvelope: (value) => parseSetCheckedActionResultEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
+export async function requestSelectOptions (
+  options: SelectOptionsRequestOptions
+): Promise<BrowserBridgeSelectOptionsResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrowserBridge({
+    websocketUrl: options.websocketUrl,
+    timeoutMs: options.timeoutMs,
+    requestEnvelope: createSelectOptionsEnvelope(
+      requestId,
+      options.target,
+      options.values
+    ),
+    parseEnvelope: (value) => parseSelectOptionsActionResultEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
+export async function requestSubmitForm (
+  options: SubmitFormRequestOptions
+): Promise<BrowserBridgeSubmitFormResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrowserBridge({
+    websocketUrl: options.websocketUrl,
+    timeoutMs: options.timeoutMs,
+    requestEnvelope: createSubmitFormEnvelope(requestId, options.target),
+    parseEnvelope: (value) => parseSubmitFormActionResultEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
 function parseClickActionResultEnvelope (
   value: unknown,
   requestId: string
@@ -122,6 +218,13 @@ function parseFillActionResultEnvelope (
   value: unknown,
   requestId: string
 ): BrowserBridgeFillInputResult | { ok: false, ignored: true } {
+  return parseWriteTextActionResultEnvelope(value, requestId)
+}
+
+function parseWriteTextActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrowserBridgeFillInputResult | { ok: false, ignored: true } {
   const result = parseActionResultEnvelope(value, requestId)
 
   if ('ignored' in result || !result.ok) {
@@ -129,6 +232,66 @@ function parseFillActionResultEnvelope (
   }
 
   if (result.data.action === 'write_text') {
+    return {
+      ok: true,
+      data: result.data
+    }
+  }
+
+  return invalidResponse()
+}
+
+function parseSetCheckedActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrowserBridgeSetCheckedResult | { ok: false, ignored: true } {
+  const result = parseActionResultEnvelope(value, requestId)
+
+  if ('ignored' in result || !result.ok) {
+    return result
+  }
+
+  if (result.data.action === 'set_checked') {
+    return {
+      ok: true,
+      data: result.data
+    }
+  }
+
+  return invalidResponse()
+}
+
+function parseSelectOptionsActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrowserBridgeSelectOptionsResult | { ok: false, ignored: true } {
+  const result = parseActionResultEnvelope(value, requestId)
+
+  if ('ignored' in result || !result.ok) {
+    return result
+  }
+
+  if (result.data.action === 'select_options') {
+    return {
+      ok: true,
+      data: result.data
+    }
+  }
+
+  return invalidResponse()
+}
+
+function parseSubmitFormActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrowserBridgeSubmitFormResult | { ok: false, ignored: true } {
+  const result = parseActionResultEnvelope(value, requestId)
+
+  if ('ignored' in result || !result.ok) {
+    return result
+  }
+
+  if (result.data.action === 'submit_form') {
     return {
       ok: true,
       data: result.data

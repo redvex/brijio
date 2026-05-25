@@ -2,7 +2,10 @@ import {
   fillCurrentPageInput,
   type BrowserBridgePageActionsConfig
 } from './page-actions.js'
-import { type FillInputTarget } from './protocol.js'
+import {
+  type FillInputActionResultData,
+  type FillInputTarget
+} from './protocol.js'
 import { type BrowserBridgeToolResult } from './page-reading-tool.js'
 
 export interface FillInputInput {
@@ -12,11 +15,7 @@ export interface FillInputInput {
 }
 
 export type FillInputResult =
-  BrowserBridgeToolResult<{
-    action: 'write_text'
-    target: FillInputTarget
-    textLength: number
-  }>
+  BrowserBridgeToolResult<FillInputActionResultData>
 
 export async function fillInput (
   config: BrowserBridgePageActionsConfig,
