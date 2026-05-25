@@ -67,4 +67,11 @@ describe("repository tooling", () => {
     assert.match(workflow, /pnpm install --frozen-lockfile/);
     assert.match(workflow, /pnpm lint/);
   });
+
+  it("keeps Docker service networking independent from host .env values", async () => {
+    const compose = await readFile("docker-compose.yml", "utf8");
+
+    assert.match(compose, /WEBSOCKET_HOST: 0\.0\.0\.0/);
+    assert.match(compose, /BROWSERBRIDGE_WEBSOCKET_URL: ws:\/\/websocket:8787/);
+  });
 });
