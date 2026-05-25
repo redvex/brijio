@@ -1,8 +1,8 @@
 # BrowserBridge MCP Server
 
-The MCP server exposes BrowserBridge resources to AI agents and routes explicit
-resource reads to an active browser extension session through the WebSocket
-server.
+The MCP server exposes BrowserBridge resources and tools to AI agents and
+routes explicit page-reading requests to an active browser extension session
+through the WebSocket server.
 
 ## Current Scope
 
@@ -21,17 +21,25 @@ The page content resource handler parses the 1-based `{index}` path segment,
 sends a `get_page_content` request for that chunk, waits for the matching
 `page_content_response`, and returns a structured JSON result.
 
+The implementation also exposes the read-only MCP tool from ADR 0010:
+
+- `read_current_page`
+
+The tool reads the current page context and, by default, the first available
+readable content chunk. It exists for tool-first clients and agents that are
+more likely to discover tools than resources. It reuses the same
+`get_page_context` and `get_page_content` WebSocket request path as the
+resources.
+
 The stdio MCP runtime uses the official TypeScript MCP SDK for server
-lifecycle, protocol framing, initialization, resource discovery, and resource
-reads. BrowserBridge code only owns page-context behavior and WebSocket request
-routing.
+lifecycle, protocol framing, initialization, resource discovery, resource
+reads, tool discovery, and tool calls. BrowserBridge code only owns page
+reading behavior and WebSocket request routing.
 
 The Chrome extension must already be connected by the user. The MCP server does
 not start browser access on its own and does not stream or store page state.
 
-For MCP client startup compatibility, the server also responds to `tools/list`
-with an empty tool list. Browser action tools remain out of scope for this
-package version.
+Browser action tools remain out of scope for this package version.
 
 Out of scope for this package version:
 
@@ -40,6 +48,7 @@ Out of scope for this package version:
 - Multiple browser sessions.
 - Page body text or DOM extraction inside the MCP server. The MCP server only
   relays explicit requests to the connected extension.
+- Server-side LLM summarization.
 
 ## Resource Result
 
@@ -112,6 +121,54 @@ Error codes are:
 - `invalid_response`
 - `browser_error`
 - `invalid_resource_uri`
+
+## Tool Result
+
+`read_current_page` accepts:
+
+```json
+{
+  "includeContent": true,
+  "maxContentChunks": 1
+}
+```
+
+Both fields are optional. `includeContent` defaults to `true`.
+`maxContentChunks` defaults to `1` and must be an integer from `0` through `5`.
+Use `includeContent: false` or `maxContentChunks: 0` to return only page
+context.
+
+Successful tool calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "context": {
+      "url": "https://example.com/",
+      "title": "Example"
+    },
+    "content": [
+      {
+        "index": 1,
+        "content": "# Example\n\nReadable content",
+        "truncated": false
+      }
+    ],
+    "contentTruncated": false,
+    "nextContentIndex": null
+  }
+}
+```
+
+When the final fetched chunk is still truncated because `maxContentChunks` was
+reached, `contentTruncated` is `true` and `nextContentIndex` points at the next
+1-based chunk index to request through the resource path or a later tool call.
+
+Tool failures use the same structured `ok: false` shape. Tool-specific input
+errors use:
+
+- `invalid_tool_input`
 
 ## Environment
 
