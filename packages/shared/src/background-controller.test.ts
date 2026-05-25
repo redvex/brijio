@@ -3,6 +3,7 @@ import { describe, it } from 'node:test'
 import {
   BrowserBridgeBackgroundController,
   type ActionAdapter,
+  type BridgeSettings,
   type PageActionAdapter,
   type PageActionResult,
   type BrowserBridgeSocket,
@@ -34,6 +35,20 @@ void describe('BrowserBridge background controller', () => {
     assert.equal(harness.sockets.created.length, 0)
   })
 
+  void it('opens setup when required bridge settings are missing', async () => {
+    const harness = createHarness({
+      bridgeSettings: {
+        ...createBridgeSettings(),
+        pairingToken: ''
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+
+    assert.equal(harness.setup.opened, true)
+    assert.equal(harness.sockets.created.length, 0)
+  })
+
   void it('connects when action is clicked with a stored WebSocket URL', async () => {
     const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
 
@@ -43,6 +58,84 @@ void describe('BrowserBridge background controller', () => {
     assert.equal(harness.sockets.created[0].url, 'ws://127.0.0.1:8787')
     assert.equal(harness.action.badgeText, '...')
     assert.equal(harness.action.title, 'BrowserBridge connecting')
+  })
+
+  void it('authenticates when the socket opens', async () => {
+    const harness = createHarness({
+      bridgeSettings: createBridgeSettings()
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      payload: {
+        type: 'auth',
+        role: 'extension',
+        token: 'local-token'
+      }
+    })
+  })
+
+  void it('announces presence after auth success', async () => {
+    const harness = createHarness({
+      bridgeSettings: createBridgeSettings()
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        payload: {
+          type: 'auth_success'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      payload: createPresencePayload()
+    })
+  })
+
+  void it('announces presence when the server requests presence', async () => {
+    const harness = createHarness({
+      bridgeSettings: createBridgeSettings()
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'presence-1',
+        payload: {
+          type: 'browser_presence_request'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      payload: createPresencePayload()
+    })
+  })
+
+  void it('saves token profile label and stable instance id', async () => {
+    const harness = createHarness()
+    const settings = createBridgeSettings({
+      browserInstanceId: 'chrome-work-test',
+      profileName: 'Work',
+      label: 'Chrome Work'
+    })
+
+    await harness.controller.saveBridgeSettings(settings)
+
+    assert.deepEqual(await harness.controller.getBridgeSettings(), settings)
+    assert.equal(harness.action.badgeText, 'OFF')
+    assert.equal(harness.action.title, 'BrowserBridge stopped')
   })
 
   void it('sets connected state when the socket opens', async () => {
@@ -85,7 +178,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'context-1',
       payload: {
@@ -117,7 +210,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'request-2',
       payload: {
@@ -158,7 +251,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'content-1',
       payload: {
@@ -199,7 +292,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'content-2',
       payload: {
@@ -236,7 +329,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'content-3',
       payload: {
@@ -279,7 +372,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-1',
       payload: {
@@ -325,7 +418,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-write-1',
       payload: {
@@ -377,7 +470,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-check-1',
       payload: {
@@ -429,7 +522,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-select-1',
       payload: {
@@ -476,7 +569,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-submit-1',
       payload: {
@@ -520,7 +613,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-2',
       payload: {
@@ -556,7 +649,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-3',
       payload: {
@@ -593,7 +686,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-4',
       payload: {
@@ -630,7 +723,7 @@ void describe('BrowserBridge background controller', () => {
       })
     )
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       id: 'action-write-2',
       payload: {
@@ -664,7 +757,7 @@ void describe('BrowserBridge background controller', () => {
     harness.sockets.created[0].open()
     harness.timers.tick()
 
-    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+    assert.deepEqual(parseLastSent(harness), {
       type: 'message',
       payload: {
         type: 'extension_keepalive'
@@ -681,7 +774,16 @@ void describe('BrowserBridge background controller', () => {
     await harness.controller.handleActionClicked()
     harness.timers.tick()
 
-    assert.deepEqual(harness.sockets.created[0].sent, [])
+    assert.deepEqual(harness.sockets.created[0].sent, [
+      JSON.stringify({
+        type: 'message',
+        payload: {
+          type: 'auth',
+          role: 'extension',
+          token: 'local-token'
+        }
+      })
+    ])
     assert.equal(harness.timers.cleared, true)
   })
 
@@ -752,6 +854,7 @@ void describe('BrowserBridge background controller', () => {
 
 interface HarnessOptions {
   websocketUrl?: string
+  bridgeSettings?: BridgeSettings
   pageContext?: PageContext
   pageContent?: PageContent
   pageReaderError?: {
@@ -778,7 +881,12 @@ interface Harness {
 }
 
 function createHarness (options: HarnessOptions = {}): Harness {
-  const storage = new FakeStorageAdapter(options.websocketUrl)
+  const storage = new FakeStorageAdapter(
+    options.bridgeSettings ??
+    (options.websocketUrl === undefined
+      ? undefined
+      : createBridgeSettings({ websocketUrl: options.websocketUrl }))
+  )
   const setup = new FakeSetupAdapter()
   const action = new FakeActionAdapter()
   const pageReader = new FakePageReaderAdapter(options)
@@ -802,6 +910,16 @@ function createHarness (options: HarnessOptions = {}): Harness {
     sockets,
     timers
   }
+}
+
+function parseLastSent (harness: Harness): unknown {
+  const message = harness.sockets.created[0].sent.at(-1)
+
+  if (typeof message !== 'string') {
+    throw new Error('Expected socket to have sent a message.')
+  }
+
+  return JSON.parse(message)
 }
 
 class FakePageActionAdapter implements PageActionAdapter {
@@ -907,14 +1025,48 @@ class FakePageActionAdapter implements PageActionAdapter {
 }
 
 class FakeStorageAdapter implements StorageAdapter {
-  constructor (private websocketUrl: string | undefined) {}
+  constructor (private bridgeSettings: BridgeSettings | undefined) {}
 
-  async getWebSocketUrl (): Promise<string | undefined> {
-    return this.websocketUrl
+  async getBridgeSettings (): Promise<BridgeSettings | undefined> {
+    return this.bridgeSettings
   }
 
-  async setWebSocketUrl (url: string): Promise<void> {
-    this.websocketUrl = url
+  async setBridgeSettings (settings: BridgeSettings): Promise<void> {
+    this.bridgeSettings = settings
+  }
+}
+
+function createBridgeSettings (
+  overrides: Partial<BridgeSettings> = {}
+): BridgeSettings {
+  return {
+    websocketUrl: 'ws://127.0.0.1:8787',
+    pairingToken: 'local-token',
+    browserInstanceId: 'chrome-default-test',
+    browserName: 'Chrome',
+    profileName: 'Default',
+    label: 'Chrome Default',
+    ...overrides
+  }
+}
+
+function createPresencePayload (): unknown {
+  return {
+    type: 'browser_presence_announce',
+    browserInstanceId: 'chrome-default-test',
+    label: 'Chrome Default',
+    browserName: 'Chrome',
+    profileName: 'Default',
+    capabilities: [
+      'page_context',
+      'page_content',
+      'click',
+      'fill_input',
+      'fill_editable',
+      'set_checked',
+      'select_options',
+      'submit_form'
+    ]
   }
 }
 

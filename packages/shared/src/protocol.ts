@@ -375,7 +375,24 @@ export function createAuthEnvelope (input: {
   requestId?: string
   token: string
   role: BrowserBridgeRole
+}): BrowserBridgeEnvelope
+export function createAuthEnvelope (token: string): BrowserBridgeEnvelope
+export function createAuthEnvelope (input: string | {
+  requestId?: string
+  token: string
+  role: BrowserBridgeRole
 }): BrowserBridgeEnvelope {
+  if (typeof input === 'string') {
+    return {
+      type: 'message',
+      payload: {
+        type: 'auth',
+        role: 'extension',
+        token: input
+      }
+    }
+  }
+
   return {
     type: 'message',
     id: input.requestId,
@@ -503,6 +520,18 @@ export function isBrowserPresenceRequestPayload (
   value: unknown
 ): value is BrowserPresenceRequestPayload {
   return isRecord(value) && value.type === 'browser_presence_request'
+}
+
+export function isAuthSuccessEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: AuthSuccessPayload } {
+  return hasPayloadType(value, 'auth_success')
+}
+
+export function isBrowserPresenceRequestEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: BrowserPresenceRequestPayload } {
+  return hasPayloadType(value, 'browser_presence_request')
 }
 
 export function isGetPageContextEnvelope (
@@ -810,6 +839,16 @@ function isBrowserCapability (value: unknown): value is BrowserCapability {
     value === 'set_checked' ||
     value === 'select_options' ||
     value === 'submit_form'
+  )
+}
+
+function hasPayloadType (value: unknown, type: string): boolean {
+  return (
+    isRecord(value) &&
+    value.type === 'message' &&
+    (!Object.hasOwn(value, 'id') || typeof value.id === 'string') &&
+    isRecord(value.payload) &&
+    value.payload.type === type
   )
 }
 
