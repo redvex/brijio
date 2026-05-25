@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && cp manifest.json dist/manifest.json && cp src/setup.html dist/setup.html",
+    "build": "tsc -p tsconfig.build.json && esbuild src/content.ts --bundle --format=iife --platform=browser --target=chrome116 --outfile=dist/content.js && cp manifest.json dist/manifest.json && cp src/setup.html dist/setup.html && node scripts/verify-build-output.mjs",
     "check": "tsc --noEmit",
     "dev": "echo \"Chrome extension dev workflow is not implemented yet\"",
     "test": "node --import tsx --test src/**/*.test.ts"
@@ -16,6 +16,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
+    "esbuild": "^0.28.0",
+    "linkedom": "^0.18.12",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   }

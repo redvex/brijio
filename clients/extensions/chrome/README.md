@@ -11,13 +11,17 @@ It must remain user-controlled:
 - The extension reads browser state only for explicit requests.
 - The extension does not continuously stream page content.
 
-First milestone behavior:
+Current page read behavior:
 
 - Connect to the local WebSocket server.
-- Respond to `get_page_context`.
-- Return the current tab URL and title.
-
-Future behavior requires ADR approval before implementation.
+- `get_page_context` returns the active tab URL, title, selected text, a small
+  readable preview, and a structure snapshot for headings, landmarks, links,
+  images, forms, and actions.
+- `get_page_content` returns readable page content in 1-based chunks.
+- Page content is plain text with light Markdown for headings, links, images,
+  and simple tables.
+- `page_content_response.data.truncated` tells the requester whether another
+  chunk is available at the next index.
 
 ## User Flow
 
@@ -35,23 +39,31 @@ The extension shows connection state through the toolbar badge and title:
 - `ON`: connected to the WebSocket server.
 - `ERR`: the WebSocket connection reported an error.
 
-No page context is sent until the extension receives an explicit
-`get_page_context` request over the user-started WebSocket connection.
+No page context or page content is sent until the extension receives an
+explicit read request over the user-started WebSocket connection.
 
 While connected, the extension sends a small `extension_keepalive` message every
 20 seconds. This message contains no browser state. It keeps the Manifest V3
 service worker active while the user-visible bridge state is `ON`.
 
+The extension reads DOM content only after an explicit WebSocket request while
+the user-started bridge is connected. It does not stream or store page content.
+
 ## Permissions
 
-The manifest declares only the permissions required for the first milestone:
+The manifest declares only the permissions required for the current extension
+behavior:
 
+- `activeTab`: grants temporary access to the active page after the user starts
+  the bridge from the toolbar.
+- `scripting`: injects the content script on demand for explicit page context
+  and page content requests.
 - `storage`: remembers the user-entered WebSocket URL.
-- `tabs`: reads the active tab URL and title when responding to an explicit
-  `get_page_context` request.
+- `tabs`: reads the active tab URL and title and sends messages to the active
+  tab.
 
-The extension does not declare host permissions for this milestone because it
-does not inject scripts or read DOM content.
+The extension does not declare host permissions. Page DOM access is tied to
+explicit active-tab reads while the user-controlled bridge is connected.
 
 ## Development
 
@@ -71,7 +83,7 @@ pnpm --filter @browserbridge/chrome-extension check
 Load `clients/extensions/chrome/dist` through Chrome's "Load unpacked" flow.
 The extension requires Chrome 116 or newer.
 
-## Local WebSocket Request
+## Local WebSocket Requests
 
 With the local WebSocket server running and the extension connected, send a
 message in the current single-channel envelope shape:
@@ -99,7 +111,63 @@ back to the sender.
     "ok": true,
     "data": {
       "url": "https://example.com/",
-      "title": "Example Domain"
+      "title": "Example Domain",
+      "timestamp": "2026-05-25T10:00:00.000Z",
+      "selectedText": null,
+      "preview": {
+        "content": "Example preview",
+        "truncated": false,
+        "maxBytes": 4096
+      },
+      "structure": {
+        "headings": [],
+        "landmarks": [],
+        "links": [],
+        "images": [],
+        "forms": [],
+        "actions": []
+      },
+      "content": {
+        "available": true,
+        "requestType": "get_page_content",
+        "firstIndex": 1,
+        "defaultMaxPayloadBytes": 131072
+      }
+    }
+  }
+}
+```
+
+To read page content, request a 1-based chunk index:
+
+```json
+{
+  "type": "message",
+  "id": "content-1",
+  "payload": {
+    "type": "get_page_content",
+    "index": 1
+  }
+}
+```
+
+The content response uses plain text with minimal Markdown:
+
+```json
+{
+  "type": "message",
+  "id": "content-1",
+  "payload": {
+    "type": "page_content_response",
+    "ok": true,
+    "data": {
+      "url": "https://example.com/",
+      "title": "Example Domain",
+      "timestamp": "2026-05-25T10:00:01.000Z",
+      "index": 1,
+      "content": "# Example Domain\n\nReadable page content",
+      "truncated": false,
+      "maxPayloadBytes": 131072
     }
   }
 }
@@ -108,6 +176,5 @@ back to the sender.
 ## Current Limitations
 
 This package still uses the unauthenticated local single-channel WebSocket
-server from ADR 0002. Authenticated private routing, MCP integration, richer
-page context, and browser actions require separate ADR approval before
-implementation.
+server from ADR 0002. Authenticated private routing, MCP content resources, and
+browser actions require separate ADR approval before implementation.

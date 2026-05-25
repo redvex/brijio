@@ -1,7 +1,12 @@
 import {
+  createPageContentErrorResponse,
+  createPageContentResponse,
   createPageContextErrorResponse,
   createPageContextResponse,
+  isGetPageContentEnvelope,
   isGetPageContextEnvelope,
+  type PageContent,
+  type PageContentErrorCode,
   type PageContext
 } from './protocol.js'
 
@@ -21,13 +26,24 @@ export interface ActionAdapter {
   setTitle: (title: string) => Promise<void>
 }
 
-export interface TabsAdapter {
-  getActiveTabContext: () => Promise<PageContext | undefined>
-}
-
 export interface TimersAdapter {
   setInterval: (callback: () => void, intervalMs: number) => number
   clearInterval: (timerId: number) => void
+}
+
+export type PageReadResult<T> =
+  | { ok: true, data: T }
+  | {
+    ok: false
+    error: {
+      code: PageContentErrorCode
+      message: string
+    }
+  }
+
+export interface PageReaderAdapter {
+  getPageContext: () => Promise<PageReadResult<PageContext>>
+  getPageContent: (index: number) => Promise<PageReadResult<PageContent>>
 }
 
 export interface BrowserBridgeSocket {
@@ -42,9 +58,9 @@ export interface BrowserBridgeSocket {
 export interface BrowserBridgeBackgroundControllerOptions {
   action: ActionAdapter
   createWebSocket: (url: string) => BrowserBridgeSocket
+  pageReader: PageReaderAdapter
   setup: SetupAdapter
   storage: StorageAdapter
-  tabs: TabsAdapter
   timers: TimersAdapter
 }
 
@@ -133,26 +149,61 @@ export class BrowserBridgeBackgroundController {
       return
     }
 
-    if (!isGetPageContextEnvelope(message)) {
+    if (isGetPageContextEnvelope(message)) {
+      await this.handlePageContextRequest(message.id)
       return
     }
 
-    const context = await this.options.tabs.getActiveTabContext()
+    if (isGetPageContentEnvelope(message)) {
+      await this.handlePageContentRequest(message.id, message.payload.index ?? 1)
+    }
+  }
 
-    if (context === undefined) {
+  private async handlePageContextRequest (
+    requestId: string | undefined
+  ): Promise<void> {
+    const result = await this.options.pageReader.getPageContext()
+
+    if (!result.ok) {
       this.socket?.send(
         JSON.stringify(
           createPageContextErrorResponse(
-            message.id,
-            'no_active_tab',
-            'No active tab with a URL is available.'
+            requestId,
+            result.error.code,
+            result.error.message
           )
         )
       )
       return
     }
 
-    this.socket?.send(JSON.stringify(createPageContextResponse(message.id, context)))
+    this.socket?.send(
+      JSON.stringify(createPageContextResponse(requestId, result.data))
+    )
+  }
+
+  private async handlePageContentRequest (
+    requestId: string | undefined,
+    index: number
+  ): Promise<void> {
+    const result = await this.options.pageReader.getPageContent(index)
+
+    if (!result.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createPageContentErrorResponse(
+            requestId,
+            result.error.code,
+            result.error.message
+          )
+        )
+      )
+      return
+    }
+
+    this.socket?.send(
+      JSON.stringify(createPageContentResponse(requestId, result.data))
+    )
   }
 
   private async setConnectedState (): Promise<void> {
