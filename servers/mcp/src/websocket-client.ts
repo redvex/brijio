@@ -1,12 +1,16 @@
 import WebSocket, { type RawData } from 'ws'
 import {
+  type BrowserBridgeClickElementResult,
   type BrowserBridgePageContentResult,
   type BrowserBridgePageContextResult,
   type BrowserBridgeResourceResult,
+  type ClickElementTarget,
+  createClickElementEnvelope,
   connectionFailedResponse,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
   invalidResponse,
+  parseActionResultEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
   timeoutResponse
@@ -22,6 +26,10 @@ export interface PageContentRequestOptions extends PageContextRequestOptions {
   index: number
 }
 
+export interface ClickElementRequestOptions extends PageContextRequestOptions {
+  target: ClickElementTarget
+}
+
 export async function requestPageContext (
   options: PageContextRequestOptions
 ): Promise<BrowserBridgePageContextResult> {
@@ -31,7 +39,8 @@ export async function requestPageContext (
     websocketUrl: options.websocketUrl,
     timeoutMs: options.timeoutMs,
     requestEnvelope: createGetPageContextEnvelope(requestId),
-    parseEnvelope: (value) => parsePageContextEnvelope(value, requestId)
+    parseEnvelope: (value) => parsePageContextEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser page context response.'
   })
 }
 
@@ -44,7 +53,22 @@ export async function requestPageContent (
     websocketUrl: options.websocketUrl,
     timeoutMs: options.timeoutMs,
     requestEnvelope: createGetPageContentEnvelope(requestId, options.index),
-    parseEnvelope: (value) => parsePageContentEnvelope(value, requestId)
+    parseEnvelope: (value) => parsePageContentEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser page content response.'
+  })
+}
+
+export async function requestClickElement (
+  options: ClickElementRequestOptions
+): Promise<BrowserBridgeClickElementResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrowserBridge({
+    websocketUrl: options.websocketUrl,
+    timeoutMs: options.timeoutMs,
+    requestEnvelope: createClickElementEnvelope(requestId, options.target),
+    parseEnvelope: (value) => parseActionResultEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser action result.'
   })
 }
 
@@ -52,6 +76,7 @@ async function requestBrowserBridge<T> (options: {
   websocketUrl: string
   timeoutMs: number
   requestEnvelope: unknown
+  timeoutMessage: string
   parseEnvelope: (
     value: unknown
   ) => BrowserBridgeResourceResult<T> | { ok: false, ignored: true }
@@ -61,7 +86,7 @@ async function requestBrowserBridge<T> (options: {
     let settled = false
 
     const timeout = setTimeout(() => {
-      settle(timeoutResponse())
+      settle(timeoutResponse(options.timeoutMessage))
     }, options.timeoutMs)
 
     socket.once('open', () => {

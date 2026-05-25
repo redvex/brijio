@@ -10,6 +10,7 @@ import {
   getPageContextConfigFromEnv,
   parsePageContentResourceIndex
 } from './page-context.js'
+import { clickElement } from './click-element-tool.js'
 import { readCurrentPage } from './page-reading-tool.js'
 
 const currentPageResourceUri = 'browser://page/current'
@@ -46,6 +47,35 @@ server.registerTool(
   },
   async (input) => {
     const result = await readCurrentPage(pageContextConfig, input)
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
+
+server.registerTool(
+  'click_element',
+  {
+    title: 'Click Element',
+    description:
+      'Click a visible link or button-like action from the current browser page.',
+    inputSchema: {
+      kind: z.string().describe(
+        'Target collection from the latest page context: link or action.'
+      ),
+      id: z.string().describe(
+        'Short-lived BrowserBridge target ID from the latest page context.'
+      )
+    }
+  },
+  async (input) => {
+    const result = await clickElement(pageContextConfig, input)
 
     return {
       content: [
