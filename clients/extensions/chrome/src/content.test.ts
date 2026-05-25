@@ -157,6 +157,176 @@ void describe('content script request handler', () => {
     assert.equal(clickedText, 'Publish')
   })
 
+  void it('writes text to a visible text input target by form-control id', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Name <input type="text" value="Grace" /></label>
+          <label>Search <input type="search" value="" /></label>
+        </form>
+      </main>
+    `)
+    const input = document.querySelector('input[type="search"]') as HTMLInputElement
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-2'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: true,
+      data: {
+        action: 'write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-2'
+        },
+        textLength: 12
+      }
+    })
+    assert.equal(input.value, 'Ada Lovelace')
+  })
+
+  void it('writes text to a visible textarea target and dispatches input events', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <textarea>Draft</textarea>
+        </form>
+      </main>
+    `)
+    const textarea = document.querySelector('textarea') as HTMLTextAreaElement
+    const dispatchedEvents: string[] = []
+
+    textarea.addEventListener('input', () => dispatchedEvents.push('input'))
+    textarea.addEventListener('change', () => dispatchedEvents.push('change'))
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ready'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(textarea.value, 'Ready')
+    assert.deepEqual(dispatchedEvents, ['input', 'change'])
+  })
+
+  void it('returns target_disabled for disabled text targets', () => {
+    const { document } = parseHTML(
+      '<main><form><input type="text" disabled /></form></main>'
+    )
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: false,
+      error: {
+        code: 'target_disabled',
+        message: 'The requested text target is disabled.'
+      }
+    })
+  })
+
+  void it('returns target_readonly for readonly text targets', () => {
+    const { document } = parseHTML(
+      '<main><form><input type="text" readonly /></form></main>'
+    )
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: false,
+      error: {
+        code: 'target_readonly',
+        message: 'The requested text target is read-only.'
+      }
+    })
+  })
+
+  void it('returns unsupported_control for unsupported form controls', () => {
+    const { document } = parseHTML(
+      '<main><form><input type="password" /></form></main>'
+    )
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: false,
+      error: {
+        code: 'unsupported_control',
+        message: 'The requested form control does not support text writing.'
+      }
+    })
+  })
+
+  void it('returns target_not_found when no matching text target exists', () => {
+    const { document } = parseHTML('<main><form><input type="text" /></form></main>')
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-2',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: false,
+      error: {
+        code: 'target_not_found',
+        message: 'No matching text target was found.'
+      }
+    })
+  })
+
   void it('returns target_disabled for disabled button-like action targets', () => {
     const { document } = parseHTML('<main><button disabled>Save</button></main>')
 

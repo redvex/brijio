@@ -16,7 +16,8 @@ import type {
   ClickActionTarget,
   PageContent,
   PageContentErrorCode,
-  PageContext
+  PageContext,
+  WriteTextActionTarget
 } from './protocol.js'
 
 void describe('BrowserBridge background controller', () => {
@@ -291,6 +292,53 @@ void describe('BrowserBridge background controller', () => {
     })
   })
 
+  void it('responds to perform_action write_text with an action result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      writeTextTarget: {
+        formId: 'bb-1',
+        controlId: 'bb-2'
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-write-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'write_text',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-2'
+            },
+            text: 'Ada Lovelace'
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-write-1',
+      payload: {
+        type: 'action_result',
+        ok: true,
+        data: {
+          action: 'write_text',
+          target: {
+            formId: 'bb-1',
+            controlId: 'bb-2'
+          },
+          textLength: 12
+        }
+      }
+    })
+  })
+
   void it('returns action errors from perform_action click requests', async () => {
     const harness = createHarness({
       websocketUrl: 'ws://127.0.0.1:8787',
@@ -363,7 +411,7 @@ void describe('BrowserBridge background controller', () => {
         ok: false,
         error: {
           code: 'unsupported_action',
-          message: 'Only click actions are supported.'
+          message: 'Only click and write_text actions are supported.'
         }
       }
     })
@@ -400,6 +448,43 @@ void describe('BrowserBridge background controller', () => {
         error: {
           code: 'invalid_action_target',
           message: 'Click targets must identify a link or action by ID.'
+        }
+      }
+    })
+  })
+
+  void it('returns invalid_action_target for invalid write_text targets', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-write-2',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'write_text',
+            target: {
+              formId: 'bb-1',
+              controlId: ''
+            },
+            text: 'Ada Lovelace'
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-write-2',
+      payload: {
+        type: 'action_result',
+        ok: false,
+        error: {
+          code: 'invalid_action_target',
+          message: 'Text targets must identify a form control by ID.'
         }
       }
     })
@@ -456,6 +541,7 @@ interface HarnessOptions {
     message: string
   }
   clickTarget?: ClickActionTarget
+  writeTextTarget?: WriteTextActionTarget
   pageActionError?: {
     code: ActionResultErrorCode
     message: string
@@ -513,6 +599,27 @@ class FakePageActionAdapter implements PageActionAdapter {
       data: {
         action: 'click',
         target: this.options.clickTarget ?? target
+      }
+    }
+  }
+
+  async writeText (
+    target: WriteTextActionTarget,
+    text: string
+  ): Promise<PageActionResult> {
+    if (this.options.pageActionError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageActionError
+      }
+    }
+
+    return {
+      ok: true,
+      data: {
+        action: 'write_text',
+        target: this.options.writeTextTarget ?? target,
+        textLength: text.length
       }
     }
   }

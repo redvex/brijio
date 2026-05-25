@@ -14,7 +14,9 @@ import {
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
-  type WebSocketEnvelope
+  type WebSocketEnvelope,
+  type WriteTextActionResultData,
+  type WriteTextActionTarget
 } from './protocol.js'
 
 export interface StorageAdapter {
@@ -49,7 +51,7 @@ export type PageReadResult<T> =
   }
 
 export type PageActionResult =
-  | { ok: true, data: ActionResultData }
+  | { ok: true, data: ActionResultData | WriteTextActionResultData }
   | {
     ok: false
     error: {
@@ -65,6 +67,10 @@ export interface PageReaderAdapter {
 
 export interface PageActionAdapter {
   click: (target: ClickActionTarget) => Promise<PageActionResult>
+  writeText: (
+    target: WriteTextActionTarget,
+    text: string
+  ) => Promise<PageActionResult>
 }
 
 export interface BrowserBridgeSocket {
@@ -182,10 +188,7 @@ export class BrowserBridgeBackgroundController {
     }
 
     if (isPerformActionEnvelope(message)) {
-      await this.handlePerformActionRequest(
-        message.id,
-        message.payload.action.target
-      )
+      await this.handlePerformActionRequest(message.id, message.payload.action)
       return
     }
 
@@ -246,9 +249,19 @@ export class BrowserBridgeBackgroundController {
 
   private async handlePerformActionRequest (
     requestId: string | undefined,
-    target: ClickActionTarget
+    action: {
+      type: 'click'
+      target: ClickActionTarget
+    } | {
+      type: 'write_text'
+      target: WriteTextActionTarget
+      text: string
+    }
   ): Promise<void> {
-    const result = await this.options.pageActions.click(target)
+    const result =
+      action.type === 'click'
+        ? await this.options.pageActions.click(action.target)
+        : await this.options.pageActions.writeText(action.target, action.text)
 
     if (!result.ok) {
       this.socket?.send(
@@ -278,10 +291,15 @@ export class BrowserBridgeBackgroundController {
             code: 'invalid_action_target' as const,
             message: 'Click targets must identify a link or action by ID.'
           }
-        : {
-            code: 'unsupported_action' as const,
-            message: 'Only click actions are supported.'
-          }
+        : isRecord(action) && action.type === 'write_text'
+          ? {
+              code: 'invalid_action_target' as const,
+              message: 'Text targets must identify a form control by ID.'
+            }
+          : {
+              code: 'unsupported_action' as const,
+              message: 'Only click and write_text actions are supported.'
+            }
 
     this.socket?.send(
       JSON.stringify(

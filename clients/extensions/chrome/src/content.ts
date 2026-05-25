@@ -6,7 +6,9 @@ import {
   type ClickActionTarget,
   type PageContent,
   type PageContentErrorCode,
-  type PageContext
+  type PageContext,
+  type WriteTextActionResultData,
+  type WriteTextActionTarget
 } from './protocol.js'
 
 export type ContentRequest =
@@ -25,11 +27,16 @@ export type ContentRequest =
     type: 'perform_click'
     target: ClickActionTarget
   }
+  | {
+    type: 'perform_write_text'
+    target: WriteTextActionTarget
+    text: string
+  }
 
 export type ContentResponse =
   | {
     ok: true
-    data: PageContext | PageContent | ActionResultData
+    data: PageContext | PageContent | ActionResultData | WriteTextActionResultData
   }
   | {
     ok: false
@@ -89,6 +96,10 @@ export function handleContentRequest (
       return performClick(request.target, environment.document)
     }
 
+    if (request.type === 'perform_write_text') {
+      return performWriteText(request.target, request.text, environment.document)
+    }
+
     const content = extractPageContent(environment.document)
     const chunk = chunkReadableContent(
       content,
@@ -124,6 +135,79 @@ export function handleContentRequest (
       error: {
         code: 'extraction_failed',
         message: 'Unable to extract page content from the active tab.'
+      }
+    }
+  }
+}
+
+function performWriteText (
+  target: WriteTextActionTarget,
+  text: string,
+  document: Document
+): ContentResponse {
+  const element = findWriteTextTarget(target, document)
+
+  if (element === null) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_not_found',
+        message: 'No matching text target was found.'
+      }
+    }
+  }
+
+  if (element.hasAttribute('disabled')) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_disabled',
+        message: 'The requested text target is disabled.'
+      }
+    }
+  }
+
+  if (element.hasAttribute('readonly')) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_readonly',
+        message: 'The requested text target is read-only.'
+      }
+    }
+  }
+
+  if (!isSupportedTextControl(element)) {
+    return {
+      ok: false,
+      error: {
+        code: 'unsupported_control',
+        message: 'The requested form control does not support text writing.'
+      }
+    }
+  }
+
+  try {
+    const control = element as HTMLInputElement | HTMLTextAreaElement
+    control.focus?.()
+    control.value = text
+    dispatchControlEvent(control, 'input')
+    dispatchControlEvent(control, 'change')
+
+    return {
+      ok: true,
+      data: {
+        action: 'write_text',
+        target,
+        textLength: text.length
+      }
+    }
+  } catch {
+    return {
+      ok: false,
+      error: {
+        code: 'action_failed',
+        message: 'Unable to perform the requested text action.'
       }
     }
   }
@@ -177,6 +261,31 @@ function performClick (
   }
 }
 
+function findWriteTextTarget (
+  target: WriteTextActionTarget,
+  document: Document
+): Element | null {
+  const formIndex = parseTargetId(target.formId)
+  const controlIndex = parseTargetId(target.controlId)
+
+  if (formIndex === null || controlIndex === null) {
+    return null
+  }
+
+  const forms = Array.from(document.querySelectorAll('form')).filter(isVisible)
+  const form = forms[formIndex - 1]
+
+  if (form === undefined) {
+    return null
+  }
+
+  const controls = Array.from(
+    form.querySelectorAll('input, textarea, select, button')
+  ).filter(isVisible)
+
+  return controls[controlIndex - 1] ?? null
+}
+
 function findClickTarget (
   target: ClickActionTarget,
   document: Document
@@ -196,6 +305,30 @@ function findClickTarget (
   )
 
   return elements[index - 1] ?? null
+}
+
+function isSupportedTextControl (element: Element): boolean {
+  const tagName = element.tagName.toLowerCase()
+
+  if (tagName === 'textarea') {
+    return true
+  }
+
+  if (tagName !== 'input') {
+    return false
+  }
+
+  const type = (element.getAttribute('type') ?? 'text').toLowerCase()
+
+  return type === 'text' || type === 'search'
+}
+
+function dispatchControlEvent (
+  control: HTMLInputElement | HTMLTextAreaElement,
+  type: 'input' | 'change'
+): void {
+  const EventConstructor = control.ownerDocument.defaultView?.Event ?? Event
+  control.dispatchEvent(new EventConstructor(type, { bubbles: true }))
 }
 
 function parseTargetId (id: string): number | null {
