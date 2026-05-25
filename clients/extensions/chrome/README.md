@@ -7,6 +7,9 @@ It must remain user-controlled:
 - The user manually starts and stops the bridge through the extension toolbar
   action.
 - The extension opens a WebSocket connection only after user action.
+- The extension authenticates with the configured local pairing token.
+- The extension announces browser instance presence after authentication and
+  whenever the WebSocket server asks for presence.
 - The extension responds to MCP-originated requests while connected.
 - The extension reads browser state only for explicit requests.
 - The extension does not continuously stream page content.
@@ -49,9 +52,11 @@ The extension is transparent during normal use:
 1. Load the extension in Chrome.
 2. Click the BrowserBridge toolbar action the first time.
 3. Enter the local WebSocket URL, for example `ws://127.0.0.1:8787`.
-4. Optionally enable regular page access for HTTP and HTTPS pages.
-5. Click the toolbar action again to start the bridge.
-6. Click the toolbar action while connected to stop the bridge.
+4. Enter the pairing token generated with `pnpm token`.
+5. Confirm the auto-generated browser identity or edit the profile/label fields.
+6. Optionally enable regular page access for HTTP and HTTPS pages.
+7. Click the toolbar action again to start the bridge.
+8. Click the toolbar action while connected to stop the bridge.
 
 The extension shows connection state through the toolbar badge and title:
 
@@ -62,9 +67,11 @@ The extension shows connection state through the toolbar badge and title:
 No page context or page content is sent until the extension receives an
 explicit read request over the user-started WebSocket connection.
 
-While connected, the extension sends a small `extension_keepalive` message every
-20 seconds. This message contains no browser state. It keeps the Manifest V3
-service worker active while the user-visible bridge state is `ON`.
+While connected, the extension authenticates first, announces presence, and
+sends a small `extension_keepalive` message every 20 seconds. Keepalive messages
+contain no browser state. Presence contains only the browser instance ID, browser
+name, profile name, user-visible label, and supported capability names. It does
+not include page URL, title, content, selected text, or DOM state.
 
 The extension reads DOM content only after an explicit WebSocket request while
 the user-started bridge is connected. It does not stream or store page content.
@@ -80,7 +87,8 @@ behavior:
   the bridge from the toolbar.
 - `scripting`: injects the content script on demand for explicit page context
   and page content requests.
-- `storage`: remembers the user-entered WebSocket URL.
+- `storage`: remembers the user-entered WebSocket URL, pairing token, and
+  browser identity fields.
 - `tabs`: reads the active tab URL and title and sends messages to the active
   tab.
 
@@ -118,8 +126,40 @@ The extension requires Chrome 116 or newer.
 
 ## Local WebSocket Requests
 
-With the local WebSocket server running and the extension connected, send a
-message in the current single-channel envelope shape:
+With the local WebSocket server running and the extension connected, clients
+must authenticate before sending browser requests. Extension auth uses:
+
+```json
+{
+  "type": "message",
+  "id": "auth-1",
+  "payload": {
+    "type": "auth",
+    "role": "extension",
+    "token": "your-local-token"
+  }
+}
+```
+
+After auth succeeds, the extension announces presence:
+
+```json
+{
+  "type": "message",
+  "id": "presence-1",
+  "payload": {
+    "type": "browser_presence_announce",
+    "browserInstanceId": "chrome-default-test",
+    "label": "Chrome Default",
+    "browserName": "Chrome",
+    "profileName": "Default",
+    "capabilities": ["page_context", "page_content", "page_actions"]
+  }
+}
+```
+
+The MCP side can then send browser requests through the authenticated WebSocket
+server:
 
 ```json
 {
@@ -392,6 +432,6 @@ Forms use an explicit `submit_form` action:
 
 ## Current Limitations
 
-This package still uses the unauthenticated local single-channel WebSocket
-server from ADR 0002. Authenticated private routing, MCP content resources, and
-new MCP action tools require separate ADR approval before implementation.
+Presence is runtime-only and exists only while the user-controlled WebSocket is
+connected. Browser identity is local extension configuration; future cloud token
+issuance and hosted account/session handling remain separate milestones.
