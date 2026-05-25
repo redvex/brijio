@@ -88,6 +88,27 @@ void describe('Chrome extension protocol helpers', () => {
     )
   })
 
+  void it('recognizes perform_action write_text message envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-write-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'write_text',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-2'
+            },
+            text: 'Ada Lovelace'
+          }
+        }
+      }),
+      true
+    )
+  })
+
   void it('rejects perform_action envelopes with invalid click targets', () => {
     assert.equal(
       isPerformActionEnvelope({
@@ -101,6 +122,27 @@ void describe('Chrome extension protocol helpers', () => {
               kind: 'image',
               id: 'bb-1'
             }
+          }
+        }
+      }),
+      false
+    )
+  })
+
+  void it('rejects perform_action envelopes with invalid write_text targets', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-write-2',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'write_text',
+            target: {
+              formId: 'bb-1',
+              controlId: ''
+            },
+            text: 'Ada Lovelace'
           }
         }
       }),
@@ -239,7 +281,7 @@ void describe('Chrome extension protocol helpers', () => {
     )
   })
 
-  void it('builds action result responses', () => {
+  void it('builds click action result responses', () => {
     assert.deepEqual(
       createActionResultResponse('action-3', {
         action: 'click',
@@ -260,6 +302,35 @@ void describe('Chrome extension protocol helpers', () => {
               kind: 'action',
               id: 'bb-2'
             }
+          }
+        }
+      }
+    )
+  })
+
+  void it('builds write_text action result responses', () => {
+    assert.deepEqual(
+      createActionResultResponse('action-write-3', {
+        action: 'write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-2'
+        },
+        textLength: 12
+      }),
+      {
+        type: 'message',
+        id: 'action-write-3',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'write_text',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-2'
+            },
+            textLength: 12
           }
         }
       }
