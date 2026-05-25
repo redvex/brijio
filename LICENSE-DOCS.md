@@ -12,5 +12,5 @@ This notice does not grant rights to BrowserBridge names, logos, trademarks, or
 branding. Those remain reserved unless a separate brand policy grants specific
 rights.
 
-The full Creative Commons Attribution-NonCommercial 4.0 International legal code
-is available from Creative Commons.
+The SPDX identifier is `CC-BY-NC-4.0`. The full Creative Commons Attribution-NonCommercial 4.0 International legal code is available at
+https://creativecommons.org/licenses/by-nc/4.0/legalcode.
