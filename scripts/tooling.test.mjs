@@ -117,6 +117,6 @@ describe("repository tooling", () => {
     );
     assert.match(contributing, /inbound-equals-outbound/);
     assert.match(readme, /source-available and free for non-commercial use/);
-    assert.doesNotMatch(readme, /GNU Affero General Public License/);
+    assert.doesNotMatch(readme, /AGPL|GNU Affero|Affero General Public License/);
   });
 });
