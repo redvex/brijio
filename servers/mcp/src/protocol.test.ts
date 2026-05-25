@@ -5,6 +5,10 @@ import {
   createFillInputEnvelope,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
+  createSelectOptionsEnvelope,
+  createSetCheckedEnvelope,
+  createSubmitFormEnvelope,
+  createWriteEditableEnvelope,
   parseActionResultEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope
@@ -77,6 +81,111 @@ void describe('MCP page context protocol helpers', () => {
               controlId: 'control-1'
             },
             text: 'hello'
+          }
+        }
+      }
+    )
+  })
+
+  void it('creates a perform_action write_text editable envelope with the request ID, target, and text', () => {
+    assert.deepEqual(
+      createWriteEditableEnvelope(
+        'request-editable-1',
+        {
+          kind: 'editable',
+          id: 'bb-1'
+        },
+        'hello'
+      ),
+      {
+        type: 'message',
+        id: 'request-editable-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'write_text',
+            target: {
+              kind: 'editable',
+              id: 'bb-1'
+            },
+            text: 'hello'
+          }
+        }
+      }
+    )
+  })
+
+  void it('creates a perform_action set_checked envelope with the request ID, target, and checked state', () => {
+    assert.deepEqual(
+      createSetCheckedEnvelope(
+        'request-check-1',
+        {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        true
+      ),
+      {
+        type: 'message',
+        id: 'request-check-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'set_checked',
+            target: {
+              formId: 'form-1',
+              controlId: 'control-1'
+            },
+            checked: true
+          }
+        }
+      }
+    )
+  })
+
+  void it('creates a perform_action select_options envelope with the request ID, target, and values', () => {
+    assert.deepEqual(
+      createSelectOptionsEnvelope(
+        'request-select-1',
+        {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        ['alpha', 'gamma']
+      ),
+      {
+        type: 'message',
+        id: 'request-select-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'select_options',
+            target: {
+              formId: 'form-1',
+              controlId: 'control-1'
+            },
+            values: ['alpha', 'gamma']
+          }
+        }
+      }
+    )
+  })
+
+  void it('creates a perform_action submit_form envelope with the request ID and target', () => {
+    assert.deepEqual(
+      createSubmitFormEnvelope('request-submit-1', {
+        formId: 'form-1'
+      }),
+      {
+        type: 'message',
+        id: 'request-submit-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'submit_form',
+            target: {
+              formId: 'form-1'
+            }
           }
         }
       }
@@ -201,6 +310,140 @@ void describe('MCP page context protocol helpers', () => {
           controlId: 'control-1'
         },
         textLength: 5
+      }
+    })
+  })
+
+  void it('parses a successful matching write_text editable action result', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-editable-1',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'write_text',
+            target: {
+              kind: 'editable',
+              id: 'bb-1'
+            },
+            textLength: 5
+          }
+        }
+      },
+      'request-editable-1'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        action: 'write_text',
+        target: {
+          kind: 'editable',
+          id: 'bb-1'
+        },
+        textLength: 5
+      }
+    })
+  })
+
+  void it('parses a successful matching set_checked action result', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-check-1',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'set_checked',
+            target: {
+              formId: 'form-1',
+              controlId: 'control-1'
+            },
+            checked: true,
+            changed: false
+          }
+        }
+      },
+      'request-check-1'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        action: 'set_checked',
+        target: {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        checked: true,
+        changed: false
+      }
+    })
+  })
+
+  void it('parses a successful matching select_options action result', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-select-1',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'select_options',
+            target: {
+              formId: 'form-1',
+              controlId: 'control-1'
+            },
+            values: ['alpha', 'gamma']
+          }
+        }
+      },
+      'request-select-1'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        action: 'select_options',
+        target: {
+          formId: 'form-1',
+          controlId: 'control-1'
+        },
+        values: ['alpha', 'gamma']
+      }
+    })
+  })
+
+  void it('parses a successful matching submit_form action result', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'request-submit-1',
+        payload: {
+          type: 'action_result',
+          ok: true,
+          data: {
+            action: 'submit_form',
+            target: {
+              formId: 'form-1'
+            }
+          }
+        }
+      },
+      'request-submit-1'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        action: 'submit_form',
+        target: {
+          formId: 'form-1'
+        }
       }
     })
   })

@@ -100,6 +100,30 @@ void describe('BrowserBridge MCP stdio server', () => {
             title: 'Fill Input',
             description:
               'Write text into a visible form control from the current browser page.'
+          },
+          {
+            name: 'fill_editable',
+            title: 'Fill Editable',
+            description:
+              'Write text into a visible contenteditable target from the current browser page.'
+          },
+          {
+            name: 'set_checked',
+            title: 'Set Checked',
+            description:
+              'Set the checked state for a checkbox or select a radio option from the current browser page.'
+          },
+          {
+            name: 'select_options',
+            title: 'Select Options',
+            description:
+              'Select option values in a visible select control from the current browser page.'
+          },
+          {
+            name: 'submit_form',
+            title: 'Submit Form',
+            description:
+              'Submit a visible form from the current browser page.'
           }
         ]
       )
@@ -160,6 +184,85 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
+      assert.deepEqual(tools.tools[3].inputSchema, {
+        type: 'object',
+        properties: {
+          id: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge editable target ID from the latest page context.'
+          },
+          text: {
+            type: 'string',
+            description:
+              'Text to write into the targeted contenteditable surface.'
+          }
+        },
+        required: ['id', 'text'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[4].inputSchema, {
+        type: 'object',
+        properties: {
+          checked: {
+            type: 'boolean',
+            description: 'Desired checked state.'
+          },
+          controlId: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge form control ID from the latest page context.'
+          },
+          formId: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge form ID from the latest page context.'
+          }
+        },
+        required: ['formId', 'controlId', 'checked'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[5].inputSchema, {
+        type: 'object',
+        properties: {
+          controlId: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge form control ID from the latest page context.'
+          },
+          formId: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge form ID from the latest page context.'
+          },
+          values: {
+            type: 'array',
+            items: {
+              type: 'string'
+            },
+            description:
+              'Option values to select in the targeted select control.'
+          }
+        },
+        required: ['formId', 'controlId', 'values'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[6].inputSchema, {
+        type: 'object',
+        properties: {
+          formId: {
+            type: 'string',
+            description:
+              'Short-lived BrowserBridge form ID from the latest page context.'
+          }
+        },
+        required: ['formId'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
 
       const currentPage = await client.readResource(
         {
@@ -200,6 +303,8 @@ void describe('BrowserBridge MCP stdio server', () => {
               type: string
               target: unknown
               text?: string
+              checked?: boolean
+              values?: string[]
             }
           }
         }
@@ -232,6 +337,63 @@ void describe('BrowserBridge MCP stdio server', () => {
                     action: 'write_text',
                     target: request.payload.action.target,
                     textLength: request.payload.action.text?.length
+                  }
+                }
+              })
+            )
+            return
+          }
+
+          if (request.payload.action?.type === 'set_checked') {
+            socket.send(
+              JSON.stringify({
+                type: 'message',
+                id: request.id,
+                payload: {
+                  type: 'action_result',
+                  ok: true,
+                  data: {
+                    action: 'set_checked',
+                    target: request.payload.action.target,
+                    checked: request.payload.action.checked,
+                    changed: true
+                  }
+                }
+              })
+            )
+            return
+          }
+
+          if (request.payload.action?.type === 'select_options') {
+            socket.send(
+              JSON.stringify({
+                type: 'message',
+                id: request.id,
+                payload: {
+                  type: 'action_result',
+                  ok: true,
+                  data: {
+                    action: 'select_options',
+                    target: request.payload.action.target,
+                    values: request.payload.action.values
+                  }
+                }
+              })
+            )
+            return
+          }
+
+          if (request.payload.action?.type === 'submit_form') {
+            socket.send(
+              JSON.stringify({
+                type: 'message',
+                id: request.id,
+                payload: {
+                  type: 'action_result',
+                  ok: true,
+                  data: {
+                    action: 'submit_form',
+                    target: request.payload.action.target
                   }
                 }
               })
@@ -402,6 +564,98 @@ void describe('BrowserBridge MCP stdio server', () => {
             controlId: 'control-1'
           },
           textLength: 5
+        }
+      })
+
+      const fillEditableResult = await client.callTool(
+        {
+          name: 'fill_editable',
+          arguments: {
+            id: 'bb-1',
+            text: 'hello'
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(fillEditableResult)), {
+        ok: true,
+        data: {
+          action: 'write_text',
+          target: {
+            kind: 'editable',
+            id: 'bb-1'
+          },
+          textLength: 5
+        }
+      })
+
+      const setCheckedResult = await client.callTool(
+        {
+          name: 'set_checked',
+          arguments: {
+            formId: 'form-1',
+            controlId: 'control-1',
+            checked: true
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(setCheckedResult)), {
+        ok: true,
+        data: {
+          action: 'set_checked',
+          target: {
+            formId: 'form-1',
+            controlId: 'control-1'
+          },
+          checked: true,
+          changed: true
+        }
+      })
+
+      const selectOptionsResult = await client.callTool(
+        {
+          name: 'select_options',
+          arguments: {
+            formId: 'form-1',
+            controlId: 'control-1',
+            values: ['alpha', 'gamma']
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(selectOptionsResult)), {
+        ok: true,
+        data: {
+          action: 'select_options',
+          target: {
+            formId: 'form-1',
+            controlId: 'control-1'
+          },
+          values: ['alpha', 'gamma']
+        }
+      })
+
+      const submitFormResult = await client.callTool(
+        {
+          name: 'submit_form',
+          arguments: {
+            formId: 'form-1'
+          }
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(submitFormResult)), {
+        ok: true,
+        data: {
+          action: 'submit_form',
+          target: {
+            formId: 'form-1'
+          }
         }
       })
     } finally {

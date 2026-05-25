@@ -12,6 +12,12 @@ import {
 } from './page-context.js'
 import { clickElement } from './click-element-tool.js'
 import { fillInput } from './fill-input-tool.js'
+import {
+  fillEditable,
+  selectOptions,
+  setChecked,
+  submitForm
+} from './form-action-tools.js'
 import { readCurrentPage } from './page-reading-tool.js'
 
 const currentPageResourceUri = 'browser://page/current'
@@ -109,6 +115,123 @@ server.registerTool(
   },
   async (input) => {
     const result = await fillInput(pageContextConfig, input)
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
+
+server.registerTool(
+  'fill_editable',
+  {
+    title: 'Fill Editable',
+    description:
+      'Write text into a visible contenteditable target from the current browser page.',
+    inputSchema: {
+      id: z.string().describe(
+        'Short-lived BrowserBridge editable target ID from the latest page context.'
+      ),
+      text: z.string().describe(
+        'Text to write into the targeted contenteditable surface.'
+      )
+    }
+  },
+  async (input) => {
+    const result = await fillEditable(pageContextConfig, input)
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
+
+server.registerTool(
+  'set_checked',
+  {
+    title: 'Set Checked',
+    description:
+      'Set the checked state for a checkbox or select a radio option from the current browser page.',
+    inputSchema: {
+      formId: z.string().describe(
+        'Short-lived BrowserBridge form ID from the latest page context.'
+      ),
+      controlId: z.string().describe(
+        'Short-lived BrowserBridge form control ID from the latest page context.'
+      ),
+      checked: z.boolean().describe('Desired checked state.')
+    }
+  },
+  async (input) => {
+    const result = await setChecked(pageContextConfig, input)
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
+
+server.registerTool(
+  'select_options',
+  {
+    title: 'Select Options',
+    description:
+      'Select option values in a visible select control from the current browser page.',
+    inputSchema: {
+      formId: z.string().describe(
+        'Short-lived BrowserBridge form ID from the latest page context.'
+      ),
+      controlId: z.string().describe(
+        'Short-lived BrowserBridge form control ID from the latest page context.'
+      ),
+      values: z.array(z.string()).describe(
+        'Option values to select in the targeted select control.'
+      )
+    }
+  },
+  async (input) => {
+    const result = await selectOptions(pageContextConfig, input)
+
+    return {
+      content: [
+        {
+          type: 'text',
+          text: JSON.stringify(result)
+        }
+      ]
+    }
+  }
+)
+
+server.registerTool(
+  'submit_form',
+  {
+    title: 'Submit Form',
+    description:
+      'Submit a visible form from the current browser page.',
+    inputSchema: {
+      formId: z.string().describe(
+        'Short-lived BrowserBridge form ID from the latest page context.'
+      )
+    }
+  },
+  async (input) => {
+    const result = await submitForm(pageContextConfig, input)
 
     return {
       content: [

@@ -101,10 +101,39 @@ export interface FillInputTarget {
   controlId: string
 }
 
+export interface EditableTarget {
+  kind: 'editable'
+  id: string
+}
+
+export type WriteTextTarget = FillInputTarget | EditableTarget
+
 export interface FillInputActionResultData {
   action: 'write_text'
-  target: FillInputTarget
+  target: WriteTextTarget
   textLength: number
+}
+
+export interface SetCheckedActionResultData {
+  action: 'set_checked'
+  target: FillInputTarget
+  checked: boolean
+  changed: boolean
+}
+
+export interface SelectOptionsActionResultData {
+  action: 'select_options'
+  target: FillInputTarget
+  values: string[]
+}
+
+export interface SubmitFormTarget {
+  formId: string
+}
+
+export interface SubmitFormActionResultData {
+  action: 'submit_form'
+  target: SubmitFormTarget
 }
 
 export type BrowserBridgeErrorCode =
@@ -139,6 +168,15 @@ export type BrowserBridgeClickElementResult =
 export type BrowserBridgeFillInputResult =
   BrowserBridgeResourceResult<FillInputActionResultData>
 
+export type BrowserBridgeSetCheckedResult =
+  BrowserBridgeResourceResult<SetCheckedActionResultData>
+
+export type BrowserBridgeSelectOptionsResult =
+  BrowserBridgeResourceResult<SelectOptionsActionResultData>
+
+export type BrowserBridgeSubmitFormResult =
+  BrowserBridgeResourceResult<SubmitFormActionResultData>
+
 export type PageContextParseResult =
   | BrowserBridgePageContextResult
   | { ok: false, ignored: true }
@@ -150,6 +188,9 @@ export type PageContentParseResult =
 export type ActionResultParseResult =
   | BrowserBridgeClickElementResult
   | BrowserBridgeFillInputResult
+  | BrowserBridgeSetCheckedResult
+  | BrowserBridgeSelectOptionsResult
+  | BrowserBridgeSubmitFormResult
   | { ok: false, ignored: true }
 
 export function createGetPageContextEnvelope (
@@ -209,6 +250,80 @@ export function createFillInputEnvelope (
         type: 'write_text',
         target,
         text
+      }
+    }
+  }
+}
+
+export function createWriteEditableEnvelope (
+  requestId: string,
+  target: EditableTarget,
+  text: string
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'perform_action',
+      action: {
+        type: 'write_text',
+        target,
+        text
+      }
+    }
+  }
+}
+
+export function createSetCheckedEnvelope (
+  requestId: string,
+  target: FillInputTarget,
+  checked: boolean
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'perform_action',
+      action: {
+        type: 'set_checked',
+        target,
+        checked
+      }
+    }
+  }
+}
+
+export function createSelectOptionsEnvelope (
+  requestId: string,
+  target: FillInputTarget,
+  values: string[]
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'perform_action',
+      action: {
+        type: 'select_options',
+        target,
+        values
+      }
+    }
+  }
+}
+
+export function createSubmitFormEnvelope (
+  requestId: string,
+  target: SubmitFormTarget
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'perform_action',
+      action: {
+        type: 'submit_form',
+        target
       }
     }
   }
@@ -335,7 +450,12 @@ function parsePageContentSuccessPayload (
 
 function parseActionResultSuccessPayload (
   payload: Record<PropertyKey, unknown>
-): BrowserBridgeClickElementResult | BrowserBridgeFillInputResult {
+):
+  | BrowserBridgeClickElementResult
+  | BrowserBridgeFillInputResult
+  | BrowserBridgeSetCheckedResult
+  | BrowserBridgeSelectOptionsResult
+  | BrowserBridgeSubmitFormResult {
   const data = payload.data
 
   if (isClickElementActionResultData(data)) {
@@ -346,6 +466,27 @@ function parseActionResultSuccessPayload (
   }
 
   if (isFillInputActionResultData(data)) {
+    return {
+      ok: true,
+      data
+    }
+  }
+
+  if (isSetCheckedActionResultData(data)) {
+    return {
+      ok: true,
+      data
+    }
+  }
+
+  if (isSelectOptionsActionResultData(data)) {
+    return {
+      ok: true,
+      data
+    }
+  }
+
+  if (isSubmitFormActionResultData(data)) {
     return {
       ok: true,
       data
@@ -570,10 +711,46 @@ function isFillInputActionResultData (
   }
 
   return value.action === 'write_text' &&
-    isFillInputTarget(value.target) &&
+    isWriteTextTarget(value.target) &&
     typeof value.textLength === 'number' &&
     Number.isInteger(value.textLength) &&
     value.textLength >= 0
+}
+
+function isSetCheckedActionResultData (
+  value: unknown
+): value is SetCheckedActionResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return value.action === 'set_checked' &&
+    isFillInputTarget(value.target) &&
+    typeof value.checked === 'boolean' &&
+    typeof value.changed === 'boolean'
+}
+
+function isSelectOptionsActionResultData (
+  value: unknown
+): value is SelectOptionsActionResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return value.action === 'select_options' &&
+    isFillInputTarget(value.target) &&
+    isArrayOf(value.values, isString)
+}
+
+function isSubmitFormActionResultData (
+  value: unknown
+): value is SubmitFormActionResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return value.action === 'submit_form' &&
+    isSubmitFormTarget(value.target)
 }
 
 function isClickElementTarget (
@@ -595,6 +772,28 @@ function isFillInputTarget (
   return hasStringProperties(value, ['formId', 'controlId'])
 }
 
+function isEditableTarget (
+  value: unknown
+): value is EditableTarget {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return value.kind === 'editable' && typeof value.id === 'string'
+}
+
+function isWriteTextTarget (
+  value: unknown
+): value is WriteTextTarget {
+  return isFillInputTarget(value) || isEditableTarget(value)
+}
+
+function isSubmitFormTarget (
+  value: unknown
+): value is SubmitFormTarget {
+  return hasStringProperties(value, ['formId'])
+}
+
 function hasStringProperties (
   value: unknown,
   properties: string[]
@@ -611,6 +810,10 @@ function isArrayOf<T> (
   predicate: (item: unknown) => item is T
 ): value is T[] {
   return Array.isArray(value) && value.every(predicate)
+}
+
+function isString (value: unknown): value is string {
+  return typeof value === 'string'
 }
 
 function isPositiveNumber (value: unknown): boolean {
