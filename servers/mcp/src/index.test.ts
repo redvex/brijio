@@ -28,7 +28,8 @@ void describe('BrowserBridge MCP stdio server', () => {
       cwd: packageRoot,
       env: {
         BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
+        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
       },
       stderr: 'pipe'
     })
@@ -293,7 +294,7 @@ void describe('BrowserBridge MCP stdio server', () => {
 
   void it('reads rich page context and paginated page content resources', async () => {
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: {
@@ -449,7 +450,8 @@ void describe('BrowserBridge MCP stdio server', () => {
       cwd: packageRoot,
       env: {
         BROWSERBRIDGE_WEBSOCKET_URL: server.url,
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
+        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
       },
       stderr: 'pipe'
     })
@@ -674,7 +676,8 @@ void describe('BrowserBridge MCP stdio server', () => {
       cwd: packageRoot,
       env: {
         BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
+        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
       },
       stderr: 'pipe'
     })
@@ -715,7 +718,8 @@ void describe('BrowserBridge MCP stdio server', () => {
       cwd: packageRoot,
       env: {
         BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
+        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
       },
       stderr: 'pipe'
     })
@@ -756,7 +760,8 @@ void describe('BrowserBridge MCP stdio server', () => {
       cwd: packageRoot,
       env: {
         BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
+        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
       },
       stderr: 'pipe'
     })
@@ -798,7 +803,8 @@ void describe('BrowserBridge MCP stdio server', () => {
       cwd: packageRoot,
       env: {
         BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
+        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
       },
       stderr: 'pipe'
     })
@@ -850,6 +856,35 @@ async function startServer (
     server,
     url: `ws://127.0.0.1:${address.port}`
   }
+}
+
+function onAuthenticatedMessage (
+  socket: WebSocket,
+  onMessage: (data: RawData) => void
+): void {
+  socket.on('message', (data) => {
+    const request = JSON.parse(rawDataToString(data)) as {
+      id?: string
+      payload?: {
+        type?: string
+      }
+    }
+
+    if (request.payload?.type === 'auth') {
+      socket.send(
+        JSON.stringify({
+          type: 'message',
+          id: request.id,
+          payload: {
+            type: 'auth_success'
+          }
+        })
+      )
+      return
+    }
+
+    onMessage(data)
+  })
 }
 
 function getAddress (server: WebSocketServer): AddressInfo {
