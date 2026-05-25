@@ -1,13 +1,20 @@
 import {
+  createActionResultErrorResponse,
+  createActionResultResponse,
   createPageContentErrorResponse,
   createPageContentResponse,
   createPageContextErrorResponse,
   createPageContextResponse,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
+  isPerformActionEnvelope,
+  type ActionResultData,
+  type ActionResultErrorCode,
+  type ClickActionTarget,
   type PageContent,
   type PageContentErrorCode,
-  type PageContext
+  type PageContext,
+  type WebSocketEnvelope
 } from './protocol.js'
 
 export interface StorageAdapter {
@@ -41,9 +48,23 @@ export type PageReadResult<T> =
     }
   }
 
+export type PageActionResult =
+  | { ok: true, data: ActionResultData }
+  | {
+    ok: false
+    error: {
+      code: ActionResultErrorCode
+      message: string
+    }
+  }
+
 export interface PageReaderAdapter {
   getPageContext: () => Promise<PageReadResult<PageContext>>
   getPageContent: (index: number) => Promise<PageReadResult<PageContent>>
+}
+
+export interface PageActionAdapter {
+  click: (target: ClickActionTarget) => Promise<PageActionResult>
 }
 
 export interface BrowserBridgeSocket {
@@ -58,6 +79,7 @@ export interface BrowserBridgeSocket {
 export interface BrowserBridgeBackgroundControllerOptions {
   action: ActionAdapter
   createWebSocket: (url: string) => BrowserBridgeSocket
+  pageActions: PageActionAdapter
   pageReader: PageReaderAdapter
   setup: SetupAdapter
   storage: StorageAdapter
@@ -156,6 +178,22 @@ export class BrowserBridgeBackgroundController {
 
     if (isGetPageContentEnvelope(message)) {
       await this.handlePageContentRequest(message.id, message.payload.index ?? 1)
+      return
+    }
+
+    if (isPerformActionEnvelope(message)) {
+      await this.handlePerformActionRequest(
+        message.id,
+        message.payload.action.target
+      )
+      return
+    }
+
+    if (isPerformActionRequestEnvelope(message)) {
+      await this.handleInvalidPerformActionRequest(
+        message.id,
+        message.payload.action
+      )
     }
   }
 
@@ -203,6 +241,52 @@ export class BrowserBridgeBackgroundController {
 
     this.socket?.send(
       JSON.stringify(createPageContentResponse(requestId, result.data))
+    )
+  }
+
+  private async handlePerformActionRequest (
+    requestId: string | undefined,
+    target: ClickActionTarget
+  ): Promise<void> {
+    const result = await this.options.pageActions.click(target)
+
+    if (!result.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createActionResultErrorResponse(
+            requestId,
+            result.error.code,
+            result.error.message
+          )
+        )
+      )
+      return
+    }
+
+    this.socket?.send(
+      JSON.stringify(createActionResultResponse(requestId, result.data))
+    )
+  }
+
+  private async handleInvalidPerformActionRequest (
+    requestId: string | undefined,
+    action: unknown
+  ): Promise<void> {
+    const error =
+      isRecord(action) && action.type === 'click'
+        ? {
+            code: 'invalid_action_target' as const,
+            message: 'Click targets must identify a link or action by ID.'
+          }
+        : {
+            code: 'unsupported_action' as const,
+            message: 'Only click actions are supported.'
+          }
+
+    this.socket?.send(
+      JSON.stringify(
+        createActionResultErrorResponse(requestId, error.code, error.message)
+      )
     )
   }
 
@@ -256,4 +340,30 @@ export class BrowserBridgeBackgroundController {
     this.options.timers.clearInterval(this.keepaliveTimerId)
     this.keepaliveTimerId = undefined
   }
+}
+
+function isPerformActionRequestEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: { type: 'perform_action', action: unknown } } {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type !== 'message') {
+    return false
+  }
+
+  if (Object.hasOwn(value, 'id') && typeof value.id !== 'string') {
+    return false
+  }
+
+  if (!isRecord(value.payload)) {
+    return false
+  }
+
+  return value.payload.type === 'perform_action'
+}
+
+function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }

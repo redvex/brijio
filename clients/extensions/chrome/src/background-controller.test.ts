@@ -3,6 +3,8 @@ import { describe, it } from 'node:test'
 import {
   BrowserBridgeBackgroundController,
   type ActionAdapter,
+  type PageActionAdapter,
+  type PageActionResult,
   type BrowserBridgeSocket,
   type PageReadResult,
   type PageReaderAdapter,
@@ -10,6 +12,8 @@ import {
   type StorageAdapter
 } from './background-controller.js'
 import type {
+  ActionResultErrorCode,
+  ClickActionTarget,
   PageContent,
   PageContentErrorCode,
   PageContext
@@ -242,6 +246,165 @@ void describe('BrowserBridge background controller', () => {
     })
   })
 
+  void it('responds to perform_action click with an action result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      clickTarget: {
+        kind: 'link',
+        id: 'bb-1'
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'click',
+            target: {
+              kind: 'link',
+              id: 'bb-1'
+            }
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-1',
+      payload: {
+        type: 'action_result',
+        ok: true,
+        data: {
+          action: 'click',
+          target: {
+            kind: 'link',
+            id: 'bb-1'
+          }
+        }
+      }
+    })
+  })
+
+  void it('returns action errors from perform_action click requests', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pageActionError: {
+        code: 'target_not_found',
+        message: 'No matching click target was found.'
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-2',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'click',
+            target: {
+              kind: 'action',
+              id: 'bb-3'
+            }
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-2',
+      payload: {
+        type: 'action_result',
+        ok: false,
+        error: {
+          code: 'target_not_found',
+          message: 'No matching click target was found.'
+        }
+      }
+    })
+  })
+
+  void it('returns unsupported_action for unsupported perform_action requests', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-3',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'hover',
+            target: {
+              kind: 'action',
+              id: 'bb-1'
+            }
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-3',
+      payload: {
+        type: 'action_result',
+        ok: false,
+        error: {
+          code: 'unsupported_action',
+          message: 'Only click actions are supported.'
+        }
+      }
+    })
+  })
+
+  void it('returns invalid_action_target for invalid click targets', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'action-4',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'click',
+            target: {
+              kind: 'image',
+              id: 'bb-1'
+            }
+          }
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'action-4',
+      payload: {
+        type: 'action_result',
+        ok: false,
+        error: {
+          code: 'invalid_action_target',
+          message: 'Click targets must identify a link or action by ID.'
+        }
+      }
+    })
+  })
+
   void it('keeps the error state when a socket error is followed by close', async () => {
     const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
 
@@ -292,6 +455,11 @@ interface HarnessOptions {
     code: PageContentErrorCode
     message: string
   }
+  clickTarget?: ClickActionTarget
+  pageActionError?: {
+    code: ActionResultErrorCode
+    message: string
+  }
 }
 
 interface Harness {
@@ -307,6 +475,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const setup = new FakeSetupAdapter()
   const action = new FakeActionAdapter()
   const pageReader = new FakePageReaderAdapter(options)
+  const pageActions = new FakePageActionAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
   const controller = new BrowserBridgeBackgroundController({
@@ -315,6 +484,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
     setup,
     storage,
     pageReader,
+    pageActions,
     timers
   })
 
@@ -324,6 +494,27 @@ function createHarness (options: HarnessOptions = {}): Harness {
     setup,
     sockets,
     timers
+  }
+}
+
+class FakePageActionAdapter implements PageActionAdapter {
+  constructor (private readonly options: HarnessOptions) {}
+
+  async click (target: ClickActionTarget): Promise<PageActionResult> {
+    if (this.options.pageActionError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageActionError
+      }
+    }
+
+    return {
+      ok: true,
+      data: {
+        action: 'click',
+        target: this.options.clickTarget ?? target
+      }
+    }
   }
 }
 

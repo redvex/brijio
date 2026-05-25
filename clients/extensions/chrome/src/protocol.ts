@@ -15,6 +15,21 @@ export interface GetPageContentRequest {
   index?: number
 }
 
+export interface ClickActionTarget {
+  kind: 'link' | 'action'
+  id: string
+}
+
+export interface PerformClickAction {
+  type: 'click'
+  target: ClickActionTarget
+}
+
+export interface PerformActionRequest {
+  type: 'perform_action'
+  action: PerformClickAction
+}
+
 export interface PageHeading {
   id: string
   level: number
@@ -116,6 +131,17 @@ export type PageContentErrorCode =
   | 'invalid_index'
   | 'unsupported_request'
 
+export type ActionResultErrorCode =
+  | 'no_active_tab'
+  | 'unsupported_page'
+  | 'regular_page_permission_required'
+  | 'content_script_unavailable'
+  | 'unsupported_action'
+  | 'invalid_action_target'
+  | 'target_not_found'
+  | 'target_disabled'
+  | 'action_failed'
+
 export interface PageContextResponse {
   type: 'page_context_response'
   ok: true
@@ -146,11 +172,33 @@ export interface PageContentErrorResponse {
   }
 }
 
+export interface ActionResultData {
+  action: 'click'
+  target: ClickActionTarget
+}
+
+export interface ActionResultResponse {
+  type: 'action_result'
+  ok: true
+  data: ActionResultData
+}
+
+export interface ActionResultErrorResponse {
+  type: 'action_result'
+  ok: false
+  error: {
+    code: ActionResultErrorCode
+    message: string
+  }
+}
+
 export type ExtensionResponse =
   | PageContextResponse
   | PageContextErrorResponse
   | PageContentResponse
   | PageContentErrorResponse
+  | ActionResultResponse
+  | ActionResultErrorResponse
 
 export function isGetPageContextEnvelope (
   value: unknown
@@ -207,6 +255,49 @@ export function isGetPageContentEnvelope (
   return true
 }
 
+export function isPerformActionEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: PerformActionRequest } {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type !== 'message') {
+    return false
+  }
+
+  if (Object.hasOwn(value, 'id') && typeof value.id !== 'string') {
+    return false
+  }
+
+  if (!isRecord(value.payload)) {
+    return false
+  }
+
+  if (value.payload.type !== 'perform_action') {
+    return false
+  }
+
+  if (!isRecord(value.payload.action)) {
+    return false
+  }
+
+  if (value.payload.action.type !== 'click') {
+    return false
+  }
+
+  if (!isRecord(value.payload.action.target)) {
+    return false
+  }
+
+  return (
+    (value.payload.action.target.kind === 'link' ||
+      value.payload.action.target.kind === 'action') &&
+    typeof value.payload.action.target.id === 'string' &&
+    value.payload.action.target.id.trim() !== ''
+  )
+}
+
 export function createPageContextResponse (
   id: string | undefined,
   context: PageContext
@@ -251,6 +342,32 @@ export function createPageContentErrorResponse (
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'page_content_response',
+    ok: false,
+    error: {
+      code,
+      message
+    }
+  })
+}
+
+export function createActionResultResponse (
+  id: string | undefined,
+  data: ActionResultData
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'action_result',
+    ok: true,
+    data
+  })
+}
+
+export function createActionResultErrorResponse (
+  id: string | undefined,
+  code: ActionResultErrorCode,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'action_result',
     ok: false,
     error: {
       code,
