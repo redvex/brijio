@@ -204,6 +204,44 @@ void describe('BrowserBridge background controller', () => {
     })
   })
 
+  void it('returns regular_page_permission_required when a regular page needs host permission', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pageReaderError: {
+        code: 'regular_page_permission_required',
+        message:
+          'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'content-3',
+        payload: {
+          type: 'get_page_content',
+          index: 1
+        }
+      })
+    )
+
+    assert.deepEqual(JSON.parse(harness.sockets.created[0].sent[0]), {
+      type: 'message',
+      id: 'content-3',
+      payload: {
+        type: 'page_content_response',
+        ok: false,
+        error: {
+          code: 'regular_page_permission_required',
+          message:
+            'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+        }
+      }
+    })
+  })
+
   void it('keeps the error state when a socket error is followed by close', async () => {
     const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
 

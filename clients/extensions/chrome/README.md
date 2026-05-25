@@ -30,8 +30,9 @@ The extension is transparent during normal use:
 1. Load the extension in Chrome.
 2. Click the BrowserBridge toolbar action the first time.
 3. Enter the local WebSocket URL, for example `ws://127.0.0.1:8787`.
-4. Click the toolbar action again to start the bridge.
-5. Click the toolbar action while connected to stop the bridge.
+4. Optionally enable regular page access for HTTP and HTTPS pages.
+5. Click the toolbar action again to start the bridge.
+6. Click the toolbar action while connected to stop the bridge.
 
 The extension shows connection state through the toolbar badge and title:
 
@@ -62,8 +63,19 @@ behavior:
 - `tabs`: reads the active tab URL and title and sends messages to the active
   tab.
 
-The extension does not declare host permissions. Page DOM access is tied to
-explicit active-tab reads while the user-controlled bridge is connected.
+The manifest also declares optional host permissions for regular pages:
+
+- `http://*/*`
+- `https://*/*`
+
+These optional permissions are requested only from the setup page after user
+action. They let BrowserBridge read regular HTTP and HTTPS pages when the
+temporary `activeTab` grant is not available. The extension still rejects
+Chrome internal pages, extension pages, local files, and other unsupported
+schemes.
+
+Page DOM access remains tied to explicit reads while the user-controlled bridge
+is connected. The extension does not continuously stream or store page content.
 
 ## Development
 
@@ -168,6 +180,24 @@ The content response uses plain text with minimal Markdown:
       "content": "# Example Domain\n\nReadable page content",
       "truncated": false,
       "maxPayloadBytes": 131072
+    }
+  }
+}
+```
+
+If Chrome denies content script injection on a regular HTTP or HTTPS page and
+regular page access has not been enabled, the extension returns:
+
+```json
+{
+  "type": "message",
+  "id": "content-1",
+  "payload": {
+    "type": "page_content_response",
+    "ok": false,
+    "error": {
+      "code": "regular_page_permission_required",
+      "message": "Regular page access is not enabled. Open BrowserBridge setup and enable regular page access."
     }
   }
 }

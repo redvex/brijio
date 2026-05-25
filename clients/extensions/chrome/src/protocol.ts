@@ -101,6 +101,7 @@ export type PageContextErrorCode =
   | 'not_connected'
   | 'no_active_tab'
   | 'unsupported_page'
+  | 'regular_page_permission_required'
   | 'content_script_unavailable'
   | 'extraction_failed'
   | 'invalid_index'
@@ -109,6 +110,7 @@ export type PageContextErrorCode =
 export type PageContentErrorCode =
   | 'no_active_tab'
   | 'unsupported_page'
+  | 'regular_page_permission_required'
   | 'content_script_unavailable'
   | 'extraction_failed'
   | 'invalid_index'

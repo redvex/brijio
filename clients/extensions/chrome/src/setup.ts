@@ -1,3 +1,5 @@
+import { requestRegularPageAccess } from './permissions.js'
+
 interface RuntimeResponse {
   ok?: unknown
   data?: {
@@ -9,6 +11,10 @@ interface RuntimeResponse {
 }
 
 interface ChromeApi {
+  permissions: {
+    contains: (permissions: { origins: string[] }) => Promise<boolean>
+    request: (permissions: { origins: string[] }) => Promise<boolean>
+  }
   runtime: {
     sendMessage: (message: unknown) => Promise<RuntimeResponse>
   }
@@ -18,14 +24,23 @@ declare const chrome: ChromeApi
 
 const form = document.querySelector<HTMLFormElement>('#settings-form')
 const input = document.querySelector<HTMLInputElement>('#websocket-url')
+const regularPageAccessButton = document.querySelector<HTMLButtonElement>(
+  '#regular-page-access'
+)
 const status = document.querySelector<HTMLElement>('#status')
 
-if (form === null || input === null || status === null) {
+if (
+  form === null ||
+  input === null ||
+  regularPageAccessButton === null ||
+  status === null
+) {
   throw new Error('BrowserBridge setup page is missing required elements.')
 }
 
 const settingsForm = form
 const websocketUrlInput = input
+const regularPageAccess = regularPageAccessButton
 const statusMessage = status
 
 void loadSettings()
@@ -33,6 +48,10 @@ void loadSettings()
 settingsForm.addEventListener('submit', (event) => {
   event.preventDefault()
   void saveSettings(websocketUrlInput.value)
+})
+
+regularPageAccess.addEventListener('click', () => {
+  void enableRegularPageAccess()
 })
 
 async function loadSettings (): Promise<void> {
@@ -62,4 +81,12 @@ async function saveSettings (websocketUrl: string): Promise<void> {
     typeof response.error?.message === 'string'
       ? response.error.message
       : 'Unable to save settings.'
+}
+
+async function enableRegularPageAccess (): Promise<void> {
+  const granted = await requestRegularPageAccess(chrome.permissions)
+
+  statusMessage.textContent = granted
+    ? 'Regular page access enabled for HTTP and HTTPS pages.'
+    : 'Regular page access was not enabled.'
 }

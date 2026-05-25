@@ -8,6 +8,11 @@ import {
   defaultPageContentMaxPayloadBytes,
   type PageContentErrorCode
 } from './protocol.js'
+import {
+  hasRegularPageAccess,
+  isRegularPageUrl,
+  type ChromePermissionsApi
+} from './permissions.js'
 import { createGlobalTimers } from './timers.js'
 
 interface RuntimeMessage {
@@ -40,6 +45,7 @@ interface ChromeApi {
       ) => void
     }
   }
+  permissions: ChromePermissionsApi
   storage: {
     local: {
       get: (keys: string[]) => Promise<Record<string, unknown>>
@@ -142,8 +148,7 @@ async function readActiveTabPage<T> (
   }
 
   if (
-    !activeTab.url.startsWith('http://') &&
-    !activeTab.url.startsWith('https://')
+    !isRegularPageUrl(activeTab.url)
   ) {
     return {
       ok: false,
@@ -175,7 +180,22 @@ async function readActiveTabPage<T> (
 
     return response
   } catch {
+    if (!await hasRegularPageAccess(chrome.permissions)) {
+      return regularPagePermissionRequired()
+    }
+
     return contentScriptUnavailable()
+  }
+}
+
+function regularPagePermissionRequired<T> (): PageReadResult<T> {
+  return {
+    ok: false,
+    error: {
+      code: 'regular_page_permission_required',
+      message:
+        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+    }
   }
 }
 
@@ -209,6 +229,7 @@ function isPageContentErrorCode (value: unknown): value is PageContentErrorCode 
   return (
     value === 'no_active_tab' ||
     value === 'unsupported_page' ||
+    value === 'regular_page_permission_required' ||
     value === 'content_script_unavailable' ||
     value === 'extraction_failed' ||
     value === 'invalid_index' ||
