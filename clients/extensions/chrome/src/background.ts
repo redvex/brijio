@@ -6,12 +6,11 @@ import {
 } from './background-controller.js'
 import type { ContentRequest, ContentResponse } from './content.js'
 import {
-  type ActionResultData,
   type ActionResultErrorCode,
   type ClickActionTarget,
   defaultPageContentMaxPayloadBytes,
   type PageContentErrorCode,
-  type WriteTextActionResultData,
+  type WriteTextEditableTarget,
   type WriteTextActionTarget
 } from './protocol.js'
 import {
@@ -46,8 +45,8 @@ interface ChromeApi {
         callback: (
           message: RuntimeMessage,
           sender: unknown,
-          sendResponse: SendResponse
-        ) => boolean | undefined
+          sendResponse: SendResponse,
+        ) => boolean | undefined,
       ) => void
     }
   }
@@ -66,11 +65,13 @@ interface ChromeApi {
   }
   tabs: {
     create: (properties: { url: string }) => Promise<unknown>
-    query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{
+    query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<
+    Array<{
       id?: number
       title?: string
       url?: string
-    }>>
+    }>
+    >
     sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   }
 }
@@ -138,6 +139,15 @@ const controller = new BrowserBridgeBackgroundController({
     },
     async writeText (target, text) {
       return await performActiveTabWriteText(target, text)
+    },
+    async setChecked (target, checked) {
+      return await performActiveTabSetChecked(target, checked)
+    },
+    async selectOptions (target, values) {
+      return await performActiveTabSelectOptions(target, values)
+    },
+    async submitForm (target) {
+      return await performActiveTabSubmitForm(target)
     }
   },
   timers: createGlobalTimers()
@@ -161,14 +171,13 @@ async function readActiveTabPage<T> (
     }
   }
 
-  if (
-    !isRegularPageUrl(activeTab.url)
-  ) {
+  if (!isRegularPageUrl(activeTab.url)) {
     return {
       ok: false,
       error: {
         code: 'unsupported_page',
-        message: 'BrowserBridge can read page content only from HTTP and HTTPS tabs.'
+        message:
+          'BrowserBridge can read page content only from HTTP and HTTPS tabs.'
       }
     }
   }
@@ -200,7 +209,7 @@ async function readActiveTabPage<T> (
       }
     }
   } catch {
-    if (!await hasRegularPageAccess(chrome.permissions)) {
+    if (!(await hasRegularPageAccess(chrome.permissions))) {
       return regularPagePermissionRequired()
     }
 
@@ -218,13 +227,44 @@ async function performActiveTabClick (
 }
 
 async function performActiveTabWriteText (
-  target: WriteTextActionTarget,
+  target: WriteTextActionTarget | WriteTextEditableTarget,
   text: string
 ): Promise<PageActionResult> {
   return await performActiveTabAction({
     type: 'perform_write_text',
     target,
     text
+  })
+}
+
+async function performActiveTabSetChecked (
+  target: WriteTextActionTarget,
+  checked: boolean
+): Promise<PageActionResult> {
+  return await performActiveTabAction({
+    type: 'perform_set_checked',
+    target,
+    checked
+  })
+}
+
+async function performActiveTabSelectOptions (
+  target: WriteTextActionTarget,
+  values: string[]
+): Promise<PageActionResult> {
+  return await performActiveTabAction({
+    type: 'perform_select_options',
+    target,
+    values
+  })
+}
+
+async function performActiveTabSubmitForm (target: {
+  formId: string
+}): Promise<PageActionResult> {
+  return await performActiveTabAction({
+    type: 'perform_submit_form',
+    target
   })
 }
 
@@ -251,7 +291,8 @@ async function performActiveTabAction (
       ok: false,
       error: {
         code: 'unsupported_page',
-        message: 'BrowserBridge can perform actions only on HTTP and HTTPS tabs.'
+        message:
+          'BrowserBridge can perform actions only on HTTP and HTTPS tabs.'
       }
     }
   }
@@ -271,7 +312,12 @@ async function performActiveTabAction (
     if (response.ok) {
       return {
         ok: true,
-        data: response.data as ActionResultData | WriteTextActionResultData
+        data: response.data as PageActionResult extends {
+          ok: true
+          data: infer T
+        }
+          ? T
+          : never
       }
     }
 
@@ -283,7 +329,7 @@ async function performActiveTabAction (
       }
     }
   } catch {
-    if (!await hasRegularPageAccess(chrome.permissions)) {
+    if (!(await hasRegularPageAccess(chrome.permissions))) {
       return actionRegularPagePermissionRequired()
     }
 
@@ -366,6 +412,9 @@ function isPageContentErrorCode (
     value === 'target_disabled' ||
     value === 'target_readonly' ||
     value === 'unsupported_control' ||
+    value === 'invalid_control_value' ||
+    value === 'option_not_found' ||
+    value === 'target_option_disabled' ||
     value === 'action_failed'
   )
 }

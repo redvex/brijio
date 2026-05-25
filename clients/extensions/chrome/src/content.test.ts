@@ -166,7 +166,9 @@ void describe('content script request handler', () => {
         </form>
       </main>
     `)
-    const input = document.querySelector('input[type="search"]') as HTMLInputElement
+    const input = document.querySelector(
+      'input[type="search"]'
+    ) as HTMLInputElement
 
     const response = handleContentRequest(
       {
@@ -223,6 +225,74 @@ void describe('content script request handler', () => {
     assert.equal(response.ok, true)
     assert.equal(textarea.value, 'Ready')
     assert.deepEqual(dispatchedEvents, ['input', 'change'])
+  })
+
+  void it('writes text to additional value-entry input types', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <input type="email" />
+          <input type="url" />
+          <input type="number" />
+        </form>
+      </main>
+    `)
+    const input = document.querySelector(
+      'input[type="number"]'
+    ) as HTMLInputElement
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-3'
+        },
+        text: '42'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(input.value, '42')
+  })
+
+  void it('writes text to a visible contenteditable target', () => {
+    const { document } = parseHTML(`
+      <main>
+        <div contenteditable="true" role="textbox" aria-label="Notes">Draft</div>
+      </main>
+    `)
+    const editable = document.querySelector('[contenteditable]') as HTMLElement
+    const dispatchedEvents: string[] = []
+
+    editable.addEventListener('input', () => dispatchedEvents.push('input'))
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          kind: 'editable',
+          id: 'bb-1'
+        },
+        text: 'Ready'
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: true,
+      data: {
+        action: 'write_text',
+        target: {
+          kind: 'editable',
+          id: 'bb-1'
+        },
+        textLength: 5
+      }
+    })
+    assert.equal(editable.textContent, 'Ready')
+    assert.deepEqual(dispatchedEvents, ['input'])
   })
 
   void it('returns target_disabled for disabled text targets', () => {
@@ -303,8 +373,177 @@ void describe('content script request handler', () => {
     })
   })
 
+  void it('sets checkbox checked state by form-control id', () => {
+    const { document } = parseHTML(
+      '<main><form><input type="checkbox" /></form></main>'
+    )
+    const checkbox = document.querySelector('input') as HTMLInputElement
+    const dispatchedEvents: string[] = []
+
+    checkbox.addEventListener('input', () => dispatchedEvents.push('input'))
+    checkbox.addEventListener('change', () => dispatchedEvents.push('change'))
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_set_checked',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        checked: true
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: true,
+      data: {
+        action: 'set_checked',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        checked: true,
+        changed: true
+      }
+    })
+    assert.equal(checkbox.checked, true)
+    assert.deepEqual(dispatchedEvents, ['input', 'change'])
+  })
+
+  void it('selects a radio option by form-control id', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <input name="choice" type="radio" value="one" checked />
+          <input name="choice" type="radio" value="two" />
+        </form>
+      </main>
+    `)
+    const radios = document.querySelectorAll('input')
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_set_checked',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-2'
+        },
+        checked: true
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal((radios[0]).checked, false)
+    assert.equal((radios[1]).checked, true)
+  })
+
+  void it('selects options by form-control id', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <select multiple>
+            <option value="alpha">Alpha</option>
+            <option value="beta">Beta</option>
+            <option value="gamma">Gamma</option>
+          </select>
+        </form>
+      </main>
+    `)
+    const options = document.querySelectorAll('option')
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_select_options',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        values: ['alpha', 'gamma']
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: true,
+      data: {
+        action: 'select_options',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        values: ['alpha', 'gamma']
+      }
+    })
+    assert.equal((options[0]).selected, true)
+    assert.equal((options[1]).selected, false)
+    assert.equal((options[2]).selected, true)
+  })
+
+  void it('returns option_not_found for unavailable option values', () => {
+    const { document } = parseHTML(
+      '<main><form><select><option value="alpha">Alpha</option></select></form></main>'
+    )
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_select_options',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        values: ['missing']
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: false,
+      error: {
+        code: 'option_not_found',
+        message: 'The requested option value was not found.'
+      }
+    })
+  })
+
+  void it('submits a visible form by form id', () => {
+    const { document } = parseHTML('<main><form></form></main>')
+    const form = document.querySelector('form') as HTMLFormElement & {
+      requestSubmit: () => void
+    }
+    let submitted = false
+
+    form.requestSubmit = () => {
+      submitted = true
+    }
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_submit_form',
+        target: {
+          formId: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: true,
+      data: {
+        action: 'submit_form',
+        target: {
+          formId: 'bb-1'
+        }
+      }
+    })
+    assert.equal(submitted, true)
+  })
+
   void it('returns target_not_found when no matching text target exists', () => {
-    const { document } = parseHTML('<main><form><input type="text" /></form></main>')
+    const { document } = parseHTML(
+      '<main><form><input type="text" /></form></main>'
+    )
 
     const response = handleContentRequest(
       {
@@ -328,7 +567,9 @@ void describe('content script request handler', () => {
   })
 
   void it('returns target_disabled for disabled button-like action targets', () => {
-    const { document } = parseHTML('<main><button disabled>Save</button></main>')
+    const { document } = parseHTML(
+      '<main><button disabled>Save</button></main>'
+    )
 
     const response = handleContentRequest(
       {

@@ -1,0 +1,22 @@
+{ "type": "message", "id": "ctx-1", "payload": { "type": "get_page_context" } }
+{ "type": "message", "id": "fill-1", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-1" }, "text": "Mira Stone" } } }
+{ "type": "message", "id": "fill-2", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-2" }, "text": "Implicit text value" } } }
+{ "type": "message", "id": "fill-3", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-3" }, "text": "browser bridge test" } } }
+{ "type": "message", "id": "fill-4", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-4" }, "text": "Random multiline note for the BrowserBridge test form." } } }
+{ "type": "message", "id": "fill-7", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-7" }, "text": "mira.stone@example.com" } } }
+{ "type": "message", "id": "fill-9", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-9" }, "text": "https://example.com/random-path" } } }
+{ "type": "message", "id": "fill-10", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-10" }, "text": "+15550134982" } } }
+{ "type": "message", "id": "fill-11", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-11" }, "text": "73" } } }
+{ "type": "message", "id": "fill-12", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-12" }, "text": "2026-08-14" } } }
+{ "type": "message", "id": "fill-13", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-13" }, "text": "14:35" } } }
+{ "type": "message", "id": "fill-14", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-14" }, "text": "2026-08-14T14:35" } } }
+{ "type": "message", "id": "fill-15", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-15" }, "text": "2026-08" } } }
+{ "type": "message", "id": "fill-16", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-16" }, "text": "2026-W33" } } }
+{ "type": "message", "id": "fill-17", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-17" }, "text": "#22aa88" } } }
+{ "type": "message", "id": "fill-18", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "formId": "bb-1", "controlId": "bb-18" }, "text": "7" } } }
+{ "type": "message", "id": "check-20", "payload": { "type": "perform_action", "action": { "type": "set_checked", "target": { "formId": "bb-1", "controlId": "bb-20" }, "checked": true } } }
+{ "type": "message", "id": "check-21", "payload": { "type": "perform_action", "action": { "type": "set_checked", "target": { "formId": "bb-1", "controlId": "bb-21" }, "checked": false } } }
+{ "type": "message", "id": "radio-23", "payload": { "type": "perform_action", "action": { "type": "set_checked", "target": { "formId": "bb-1", "controlId": "bb-23" }, "checked": true } } }
+{ "type": "message", "id": "select-24", "payload": { "type": "perform_action", "action": { "type": "select_options", "target": { "formId": "bb-1", "controlId": "bb-24" }, "values": ["two"] } } }
+{ "type": "message", "id": "select-25", "payload": { "type": "perform_action", "action": { "type": "select_options", "target": { "formId": "bb-1", "controlId": "bb-25" }, "values": ["alpha", "gamma"] } } }
+{ "type": "message", "id": "editable-1", "payload": { "type": "perform_action", "action": { "type": "write_text", "target": { "kind": "editable", "id": "bb-1" }, "text": "Random contenteditable value" } } }

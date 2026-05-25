@@ -1,10 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { parseHTML } from 'linkedom'
-import {
-  extractPageContent,
-  extractPageContext
-} from './page-context.js'
+import { extractPageContent, extractPageContext } from './page-context.js'
 
 void describe('page context extraction', () => {
   void it('extracts structure, selected text, and preview', () => {
@@ -34,7 +31,10 @@ void describe('page context extraction', () => {
     assert.equal(context.url, 'https://example.com/dashboard')
     assert.equal(context.title, 'Dashboard')
     assert.equal(context.selectedText, 'Welcome')
-    assert.equal(context.preview.content.includes('Welcome to the dashboard.'), true)
+    assert.equal(
+      context.preview.content.includes('Welcome to the dashboard.'),
+      true
+    )
     assert.deepEqual(context.structure.headings[0], {
       id: 'bb-1',
       level: 1,
@@ -71,7 +71,9 @@ void describe('page context extraction', () => {
     assert.equal(content.includes('Public text'), true)
     assert.equal(content.includes('[Docs](https://example.com/docs)'), true)
     assert.equal(
-      content.includes('![Architecture diagram](https://example.com/diagram.png)'),
+      content.includes(
+        '![Architecture diagram](https://example.com/diagram.png)'
+      ),
       true
     )
     assert.equal(content.includes('| Name | Status |'), true)
@@ -115,5 +117,73 @@ void describe('page context extraction', () => {
     assert.equal(main?.name.includes('Long article body'), false)
     assert.equal(main?.name.includes('documentElement'), false)
     assert.equal(nav?.name, 'On this page')
+  })
+
+  void it('extracts form action metadata for supported form control actions', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form aria-label="Preferences">
+          <label>Email <input id="email" type="email" readonly /></label>
+          <label><input id="opt-in" type="checkbox" checked /> Opt in</label>
+          <label><input id="radio-one" name="choice" type="radio" value="one" checked /> One</label>
+          <label><input id="radio-two" name="choice" type="radio" value="two" /> Two</label>
+          <label>
+            Select
+            <select id="select">
+              <option value="">Choose</option>
+              <option value="one" selected>One</option>
+              <option value="two" disabled>Two</option>
+            </select>
+          </label>
+          <label>
+            Multi
+            <select id="multi" multiple>
+              <option value="alpha" selected>Alpha</option>
+              <option value="beta">Beta</option>
+            </select>
+          </label>
+          <input id="reset" type="reset" value="Reset form" />
+        </form>
+        <div contenteditable="true" role="textbox" aria-label="Notes"></div>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/preferences',
+      title: 'Preferences',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    const controls = context.structure.forms[0].controls
+
+    assert.equal(controls[0].readonly, true)
+    assert.equal(controls[1].checked, true)
+    assert.equal(controls[2].checked, true)
+    assert.equal(controls[3].checked, false)
+    assert.equal(controls[4].multiple, false)
+    assert.deepEqual(controls[4].options, [
+      { value: '', label: 'Choose', selected: false, disabled: false },
+      { value: 'one', label: 'One', selected: true, disabled: false },
+      { value: 'two', label: 'Two', selected: false, disabled: true }
+    ])
+    assert.equal(controls[5].multiple, true)
+    assert.deepEqual(controls[5].options, [
+      { value: 'alpha', label: 'Alpha', selected: true, disabled: false },
+      { value: 'beta', label: 'Beta', selected: false, disabled: false }
+    ])
+    assert.equal(
+      context.structure.actions.some((action) => action.name === 'Reset form'),
+      true
+    )
+    assert.deepEqual(context.structure.editables[0], {
+      id: 'bb-1',
+      label: 'Notes',
+      role: 'textbox',
+      multiline: true
+    })
   })
 })

@@ -11,11 +11,15 @@ import {
   type ActionResultData,
   type ActionResultErrorCode,
   type ClickActionTarget,
+  type SelectOptionsActionResultData,
+  type SetCheckedActionResultData,
+  type SubmitFormActionResultData,
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
   type WebSocketEnvelope,
   type WriteTextActionResultData,
+  type WriteTextEditableTarget,
   type WriteTextActionTarget
 } from './protocol.js'
 
@@ -51,7 +55,15 @@ export type PageReadResult<T> =
   }
 
 export type PageActionResult =
-  | { ok: true, data: ActionResultData | WriteTextActionResultData }
+  | {
+    ok: true
+    data:
+    | ActionResultData
+    | WriteTextActionResultData
+    | SetCheckedActionResultData
+    | SelectOptionsActionResultData
+    | SubmitFormActionResultData
+  }
   | {
     ok: false
     error: {
@@ -68,9 +80,18 @@ export interface PageReaderAdapter {
 export interface PageActionAdapter {
   click: (target: ClickActionTarget) => Promise<PageActionResult>
   writeText: (
-    target: WriteTextActionTarget,
-    text: string
+    target: WriteTextActionTarget | WriteTextEditableTarget,
+    text: string,
   ) => Promise<PageActionResult>
+  setChecked: (
+    target: WriteTextActionTarget,
+    checked: boolean,
+  ) => Promise<PageActionResult>
+  selectOptions: (
+    target: WriteTextActionTarget,
+    values: string[],
+  ) => Promise<PageActionResult>
+  submitForm: (target: { formId: string }) => Promise<PageActionResult>
 }
 
 export interface BrowserBridgeSocket {
@@ -183,7 +204,10 @@ export class BrowserBridgeBackgroundController {
     }
 
     if (isGetPageContentEnvelope(message)) {
-      await this.handlePageContentRequest(message.id, message.payload.index ?? 1)
+      await this.handlePageContentRequest(
+        message.id,
+        message.payload.index ?? 1
+      )
       return
     }
 
@@ -249,19 +273,34 @@ export class BrowserBridgeBackgroundController {
 
   private async handlePerformActionRequest (
     requestId: string | undefined,
-    action: {
+    action:
+    | {
       type: 'click'
       target: ClickActionTarget
-    } | {
+    }
+    | {
       type: 'write_text'
-      target: WriteTextActionTarget
+      target: WriteTextActionTarget | WriteTextEditableTarget
       text: string
     }
+    | {
+      type: 'set_checked'
+      target: WriteTextActionTarget
+      checked: boolean
+    }
+    | {
+      type: 'select_options'
+      target: WriteTextActionTarget
+      values: string[]
+    }
+    | {
+      type: 'submit_form'
+      target: {
+        formId: string
+      }
+    }
   ): Promise<void> {
-    const result =
-      action.type === 'click'
-        ? await this.options.pageActions.click(action.target)
-        : await this.options.pageActions.writeText(action.target, action.text)
+    const result = await this.performPageAction(action)
 
     if (!result.ok) {
       this.socket?.send(
@@ -281,6 +320,62 @@ export class BrowserBridgeBackgroundController {
     )
   }
 
+  private async performPageAction (
+    action:
+    | {
+      type: 'click'
+      target: ClickActionTarget
+    }
+    | {
+      type: 'write_text'
+      target: WriteTextActionTarget | WriteTextEditableTarget
+      text: string
+    }
+    | {
+      type: 'set_checked'
+      target: WriteTextActionTarget
+      checked: boolean
+    }
+    | {
+      type: 'select_options'
+      target: WriteTextActionTarget
+      values: string[]
+    }
+    | {
+      type: 'submit_form'
+      target: {
+        formId: string
+      }
+    }
+  ): Promise<PageActionResult> {
+    if (action.type === 'click') {
+      return await this.options.pageActions.click(action.target)
+    }
+
+    if (action.type === 'write_text') {
+      return await this.options.pageActions.writeText(
+        action.target,
+        action.text
+      )
+    }
+
+    if (action.type === 'set_checked') {
+      return await this.options.pageActions.setChecked(
+        action.target,
+        action.checked
+      )
+    }
+
+    if (action.type === 'select_options') {
+      return await this.options.pageActions.selectOptions(
+        action.target,
+        action.values
+      )
+    }
+
+    return await this.options.pageActions.submitForm(action.target)
+  }
+
   private async handleInvalidPerformActionRequest (
     requestId: string | undefined,
     action: unknown
@@ -296,10 +391,26 @@ export class BrowserBridgeBackgroundController {
               code: 'invalid_action_target' as const,
               message: 'Text targets must identify a form control by ID.'
             }
-          : {
-              code: 'unsupported_action' as const,
-              message: 'Only click and write_text actions are supported.'
-            }
+          : isRecord(action) && action.type === 'set_checked'
+            ? {
+                code: 'invalid_action_target' as const,
+                message: 'Checked targets must identify a form control by ID.'
+              }
+            : isRecord(action) && action.type === 'select_options'
+              ? {
+                  code: 'invalid_action_target' as const,
+                  message: 'Select targets must identify a form control by ID.'
+                }
+              : isRecord(action) && action.type === 'submit_form'
+                ? {
+                    code: 'invalid_action_target' as const,
+                    message: 'Submit targets must identify a form by ID.'
+                  }
+                : {
+                    code: 'unsupported_action' as const,
+                    message:
+                      'Only click, write_text, set_checked, select_options, and submit_form actions are supported.'
+                  }
 
     this.socket?.send(
       JSON.stringify(
@@ -362,7 +473,9 @@ export class BrowserBridgeBackgroundController {
 
 function isPerformActionRequestEnvelope (
   value: unknown
-): value is WebSocketEnvelope & { payload: { type: 'perform_action', action: unknown } } {
+): value is WebSocketEnvelope & {
+  payload: { type: 'perform_action', action: unknown }
+} {
   if (!isRecord(value)) {
     return false
   }

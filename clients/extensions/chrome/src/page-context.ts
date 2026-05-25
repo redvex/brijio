@@ -7,9 +7,11 @@ import {
 import {
   defaultPageContentMaxPayloadBytes,
   type PageAction,
+  type PageEditable,
   type PageContext,
   type PageForm,
   type PageFormControl,
+  type PageFormControlOption,
   type PageHeading,
   type PageImage,
   type PageLandmark,
@@ -53,6 +55,7 @@ export function extractPageContext (
       links: extractLinks(options.document),
       images: extractImages(options.document),
       forms: extractForms(options.document),
+      editables: extractEditables(options.document),
       actions: extractActions(options.document)
     },
     content: {
@@ -146,9 +149,7 @@ function extractForms (document: Document): PageForm[] {
 }
 
 function extractFormControls (form: Element): PageFormControl[] {
-  return Array.from(
-    form.querySelectorAll('input, textarea, select, button')
-  )
+  return Array.from(form.querySelectorAll('input, textarea, select, button'))
     .filter(isVisible)
     .map((control, index) => {
       const type = getControlType(control)
@@ -159,14 +160,20 @@ function extractFormControls (form: Element): PageFormControl[] {
         type,
         required: control.hasAttribute('required'),
         disabled: control.hasAttribute('disabled'),
-        sensitive: isSensitiveType(type)
+        readonly: control.hasAttribute('readonly') || undefined,
+        sensitive: isSensitiveType(type),
+        checked: getCheckedState(control),
+        multiple: getMultipleState(control),
+        options: getSelectOptions(control)
       }
     })
 }
 
 function extractActions (document: Document): PageAction[] {
   return Array.from(
-    document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]')
+    document.querySelectorAll(
+      'button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"]'
+    )
   )
     .filter(isVisible)
     .map((element, index) => ({
@@ -176,6 +183,22 @@ function extractActions (document: Document): PageAction[] {
       enabled: !element.hasAttribute('disabled')
     }))
     .filter((action) => action.name !== '')
+}
+
+function extractEditables (document: Document): PageEditable[] {
+  return Array.from(
+    document.querySelectorAll(
+      '[contenteditable="true"], [contenteditable="plaintext-only"]'
+    )
+  )
+    .filter(isVisible)
+    .map((element, index) => ({
+      id: createId(index + 1),
+      label: getAccessibleName(element),
+      role: element.getAttribute('role') ?? 'textbox',
+      multiline: true
+    }))
+    .filter((editable) => editable.label !== '')
 }
 
 function visitReadableNode (node: Node, blocks: string[]): void {
@@ -340,6 +363,45 @@ function getControlType (control: Element): string {
   return tagName
 }
 
+function getCheckedState (control: Element): boolean | undefined {
+  const type = getControlType(control)
+
+  if (type !== 'checkbox' && type !== 'radio') {
+    return undefined
+  }
+
+  return (
+    (control as HTMLInputElement).checked ||
+    control.hasAttribute('checked')
+  )
+}
+
+function getMultipleState (control: Element): boolean | undefined {
+  if (control.tagName.toLowerCase() !== 'select') {
+    return undefined
+  }
+
+  return (
+    (control as HTMLSelectElement).multiple ||
+    control.hasAttribute('multiple')
+  )
+}
+
+function getSelectOptions (
+  control: Element
+): PageFormControlOption[] | undefined {
+  if (control.tagName.toLowerCase() !== 'select') {
+    return undefined
+  }
+
+  return Array.from((control as HTMLSelectElement).options).map((option) => ({
+    value: option.value,
+    label: normalizeText(option.textContent ?? ''),
+    selected: option.selected || option.hasAttribute('selected'),
+    disabled: option.disabled || option.hasAttribute('disabled')
+  }))
+}
+
 function getControlLabel (control: Element): string {
   const ariaLabel = control.getAttribute('aria-label')
 
@@ -375,6 +437,14 @@ function getAccessibleName (element: Element): string {
     return labelledName
   }
 
+  if (element.tagName.toLowerCase() === 'input') {
+    const value = element.getAttribute('value')
+
+    if (value !== null && value.trim() !== '') {
+      return normalizeText(value)
+    }
+  }
+
   const alt = element.getAttribute('alt')
 
   if (alt !== null && alt.trim() !== '') {
@@ -397,7 +467,9 @@ function getExplicitAccessibleName (element: Element): string {
     const label = ariaLabelledBy
       .split(/\s+/u)
       .map((id) => element.ownerDocument?.getElementById(id))
-      .filter((labelElement): labelElement is HTMLElement => labelElement != null)
+      .filter(
+        (labelElement): labelElement is HTMLElement => labelElement != null
+      )
       .map(getReadableElementText)
       .filter((text) => text !== '')
       .join(' ')

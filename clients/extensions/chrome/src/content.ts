@@ -7,6 +7,10 @@ import {
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
+  type SelectOptionsActionResultData,
+  type SetCheckedActionResultData,
+  type SubmitFormActionResultData,
+  type WriteTextEditableTarget,
   type WriteTextActionResultData,
   type WriteTextActionTarget
 } from './protocol.js'
@@ -29,14 +33,37 @@ export type ContentRequest =
   }
   | {
     type: 'perform_write_text'
-    target: WriteTextActionTarget
+    target: WriteTextActionTarget | WriteTextEditableTarget
     text: string
+  }
+  | {
+    type: 'perform_set_checked'
+    target: WriteTextActionTarget
+    checked: boolean
+  }
+  | {
+    type: 'perform_select_options'
+    target: WriteTextActionTarget
+    values: string[]
+  }
+  | {
+    type: 'perform_submit_form'
+    target: {
+      formId: string
+    }
   }
 
 export type ContentResponse =
   | {
     ok: true
-    data: PageContext | PageContent | ActionResultData | WriteTextActionResultData
+    data:
+    | PageContext
+    | PageContent
+    | ActionResultData
+    | WriteTextActionResultData
+    | SetCheckedActionResultData
+    | SelectOptionsActionResultData
+    | SubmitFormActionResultData
   }
   | {
     ok: false
@@ -63,8 +90,8 @@ interface ChromeRuntimeApi {
         callback: (
           message: ContentRequest,
           sender: unknown,
-          sendResponse: SendResponse
-        ) => boolean
+          sendResponse: SendResponse,
+        ) => boolean,
       ) => void
     }
   }
@@ -97,7 +124,31 @@ export function handleContentRequest (
     }
 
     if (request.type === 'perform_write_text') {
-      return performWriteText(request.target, request.text, environment.document)
+      return performWriteText(
+        request.target,
+        request.text,
+        environment.document
+      )
+    }
+
+    if (request.type === 'perform_set_checked') {
+      return performSetChecked(
+        request.target,
+        request.checked,
+        environment.document
+      )
+    }
+
+    if (request.type === 'perform_select_options') {
+      return performSelectOptions(
+        request.target,
+        request.values,
+        environment.document
+      )
+    }
+
+    if (request.type === 'perform_submit_form') {
+      return performSubmitForm(request.target, environment.document)
     }
 
     const content = extractPageContent(environment.document)
@@ -141,7 +192,7 @@ export function handleContentRequest (
 }
 
 function performWriteText (
-  target: WriteTextActionTarget,
+  target: WriteTextActionTarget | WriteTextEditableTarget,
   text: string,
   document: Document
 ): ContentResponse {
@@ -153,6 +204,32 @@ function performWriteText (
       error: {
         code: 'target_not_found',
         message: 'No matching text target was found.'
+      }
+    }
+  }
+
+  if (isEditableTarget(target)) {
+    try {
+      const editable = element as HTMLElement
+      editable.focus?.()
+      editable.textContent = text
+      dispatchElementEvent(editable, 'input')
+
+      return {
+        ok: true,
+        data: {
+          action: 'write_text',
+          target,
+          textLength: text.length
+        }
+      }
+    } catch {
+      return {
+        ok: false,
+        error: {
+          code: 'action_failed',
+          message: 'Unable to perform the requested text action.'
+        }
       }
     }
   }
@@ -191,8 +268,17 @@ function performWriteText (
     const control = element as HTMLInputElement | HTMLTextAreaElement
     control.focus?.()
     control.value = text
-    dispatchControlEvent(control, 'input')
-    dispatchControlEvent(control, 'change')
+    if (text !== '' && control.value === '') {
+      return {
+        ok: false,
+        error: {
+          code: 'invalid_control_value',
+          message: 'The requested value is not valid for this form control.'
+        }
+      }
+    }
+    dispatchElementEvent(control, 'input')
+    dispatchElementEvent(control, 'change')
 
     return {
       ok: true,
@@ -208,6 +294,252 @@ function performWriteText (
       error: {
         code: 'action_failed',
         message: 'Unable to perform the requested text action.'
+      }
+    }
+  }
+}
+
+function performSetChecked (
+  target: WriteTextActionTarget,
+  checked: boolean,
+  document: Document
+): ContentResponse {
+  const element = findFormControlTarget(target, document)
+
+  if (element === null) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_not_found',
+        message: 'No matching checkable target was found.'
+      }
+    }
+  }
+
+  if (element.hasAttribute('disabled')) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_disabled',
+        message: 'The requested checkable target is disabled.'
+      }
+    }
+  }
+
+  if (!isCheckableControl(element)) {
+    return {
+      ok: false,
+      error: {
+        code: 'unsupported_control',
+        message: 'The requested form control does not support checked state.'
+      }
+    }
+  }
+
+  const control = element as HTMLInputElement
+  const type = getInputType(control)
+
+  if (type === 'radio' && !checked) {
+    return {
+      ok: false,
+      error: {
+        code: 'unsupported_control',
+        message: 'Radio buttons can be selected by choosing another option.'
+      }
+    }
+  }
+
+  const changed = control.checked !== checked
+
+  if (changed) {
+    if (type === 'radio' && checked) {
+      uncheckRadioGroup(control, document)
+    }
+
+    control.checked = checked
+    dispatchElementEvent(control, 'input')
+    dispatchElementEvent(control, 'change')
+  }
+
+  return {
+    ok: true,
+    data: {
+      action: 'set_checked',
+      target,
+      checked: control.checked,
+      changed
+    }
+  }
+}
+
+function performSelectOptions (
+  target: WriteTextActionTarget,
+  values: string[],
+  document: Document
+): ContentResponse {
+  const element = findFormControlTarget(target, document)
+
+  if (element === null) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_not_found',
+        message: 'No matching select target was found.'
+      }
+    }
+  }
+
+  if (element.hasAttribute('disabled')) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_disabled',
+        message: 'The requested select target is disabled.'
+      }
+    }
+  }
+
+  if (element.tagName.toLowerCase() !== 'select') {
+    return {
+      ok: false,
+      error: {
+        code: 'unsupported_control',
+        message:
+          'The requested form control does not support option selection.'
+      }
+    }
+  }
+
+  const select = element as HTMLSelectElement
+
+  const multiple = select.multiple || select.hasAttribute('multiple')
+
+  if (!multiple && values.length !== 1) {
+    return {
+      ok: false,
+      error: {
+        code: 'invalid_control_value',
+        message: 'Single select controls require exactly one option value.'
+      }
+    }
+  }
+
+  const options = Array.from(select.options)
+
+  for (const value of values) {
+    const option = options.find((candidate) => candidate.value === value)
+
+    if (option === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'option_not_found',
+          message: 'The requested option value was not found.'
+        }
+      }
+    }
+
+    if (option.disabled) {
+      return {
+        ok: false,
+        error: {
+          code: 'target_option_disabled',
+          message: 'The requested option value is disabled.'
+        }
+      }
+    }
+  }
+
+  for (const option of options) {
+    const selected = values.includes(option.value)
+    setOptionSelected(option, selected)
+  }
+
+  for (const option of options) {
+    const selected = values.includes(option.value)
+
+    if (option.selected !== selected) {
+      Object.defineProperty(option, 'selected', {
+        configurable: true,
+        value: selected,
+        writable: true
+      })
+    }
+  }
+
+  dispatchElementEvent(select, 'input')
+  dispatchElementEvent(select, 'change')
+
+  return {
+    ok: true,
+    data: {
+      action: 'select_options',
+      target,
+      values
+    }
+  }
+}
+
+function setOptionSelected (option: HTMLOptionElement, selected: boolean): void {
+  option.selected = selected
+
+  if (selected) {
+    option.setAttribute('selected', '')
+  } else {
+    option.removeAttribute('selected')
+  }
+
+  if (option.selected !== selected) {
+    Object.defineProperty(option, 'selected', {
+      configurable: true,
+      value: selected,
+      writable: true
+    })
+  }
+}
+
+function performSubmitForm (
+  target: { formId: string },
+  document: Document
+): ContentResponse {
+  const form = findFormTarget(target.formId, document)
+
+  if (form === null) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_not_found',
+        message: 'No matching form target was found.'
+      }
+    }
+  }
+
+  if (typeof form.requestSubmit !== 'function') {
+    return {
+      ok: false,
+      error: {
+        code: 'action_failed',
+        message: 'Unable to submit the requested form with browser validation.'
+      }
+    }
+  }
+
+  try {
+    form.requestSubmit()
+
+    return {
+      ok: true,
+      data: {
+        action: 'submit_form',
+        target
+      }
+    }
+  } catch {
+    return {
+      ok: false,
+      error: {
+        code: 'action_failed',
+        message: 'Unable to perform the requested submit action.'
       }
     }
   }
@@ -262,6 +594,17 @@ function performClick (
 }
 
 function findWriteTextTarget (
+  target: WriteTextActionTarget | WriteTextEditableTarget,
+  document: Document
+): Element | null {
+  if (isEditableTarget(target)) {
+    return findEditableTarget(target.id, document)
+  }
+
+  return findFormControlTarget(target, document)
+}
+
+function findFormControlTarget (
   target: WriteTextActionTarget,
   document: Document
 ): Element | null {
@@ -284,6 +627,37 @@ function findWriteTextTarget (
   ).filter(isVisible)
 
   return controls[controlIndex - 1] ?? null
+}
+
+function findFormTarget (
+  formId: string,
+  document: Document
+): HTMLFormElement | null {
+  const formIndex = parseTargetId(formId)
+
+  if (formIndex === null) {
+    return null
+  }
+
+  const forms = Array.from(document.querySelectorAll('form')).filter(isVisible)
+
+  return (forms[formIndex - 1] as HTMLFormElement | undefined) ?? null
+}
+
+function findEditableTarget (id: string, document: Document): Element | null {
+  const index = parseTargetId(id)
+
+  if (index === null) {
+    return null
+  }
+
+  const editables = Array.from(
+    document.querySelectorAll(
+      '[contenteditable="true"], [contenteditable="plaintext-only"]'
+    )
+  ).filter(isVisible)
+
+  return editables[index - 1] ?? null
 }
 
 function findClickTarget (
@@ -320,15 +694,72 @@ function isSupportedTextControl (element: Element): boolean {
 
   const type = (element.getAttribute('type') ?? 'text').toLowerCase()
 
-  return type === 'text' || type === 'search'
+  return [
+    'text',
+    'search',
+    'email',
+    'url',
+    'tel',
+    'number',
+    'date',
+    'time',
+    'datetime-local',
+    'month',
+    'week',
+    'color',
+    'range'
+  ].includes(type)
 }
 
-function dispatchControlEvent (
-  control: HTMLInputElement | HTMLTextAreaElement,
+function isCheckableControl (element: Element): boolean {
+  if (element.tagName.toLowerCase() !== 'input') {
+    return false
+  }
+
+  const type = getInputType(element)
+
+  return type === 'checkbox' || type === 'radio'
+}
+
+function getInputType (element: Element): string {
+  return (element.getAttribute('type') ?? 'text').toLowerCase()
+}
+
+function uncheckRadioGroup (
+  control: HTMLInputElement,
+  document: Document
+): void {
+  const name = control.getAttribute('name')
+
+  if (name === null || name === '') {
+    return
+  }
+
+  const radios = Array.from(
+    document.querySelectorAll(
+      `input[type="radio"][name="${escapeAttributeValue(name)}"]`
+    )
+  )
+
+  for (const radio of radios) {
+    if (radio !== control) {
+      (radio as HTMLInputElement).checked = false
+    }
+  }
+}
+
+function dispatchElementEvent (
+  control: Element,
   type: 'input' | 'change'
 ): void {
   const EventConstructor = control.ownerDocument.defaultView?.Event ?? Event
   control.dispatchEvent(new EventConstructor(type, { bubbles: true }))
+}
+
+function isEditableTarget (
+  target: WriteTextActionTarget | WriteTextEditableTarget
+): target is WriteTextEditableTarget {
+  return 'kind' in target && target.kind === 'editable'
 }
 
 function parseTargetId (id: string): number | null {
@@ -356,6 +787,10 @@ function isSkippedElement (element: Element): boolean {
     element.getAttribute('aria-hidden') === 'true' ||
     (tagName === 'input' && element.getAttribute('type') === 'hidden')
   )
+}
+
+function escapeAttributeValue (value: string): string {
+  return value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
 }
 
 if (typeof chrome !== 'undefined') {
