@@ -11,5 +11,6 @@
   "action": {
     "default_title": "BrowserBridge"
   },
-  "permissions": ["activeTab", "scripting", "storage", "tabs"]
+  "permissions": ["activeTab", "scripting", "storage", "tabs"],
+  "optional_host_permissions": ["http://*/*", "https://*/*"]
 }
