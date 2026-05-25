@@ -9,9 +9,14 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "echo \"Shared package build is not implemented yet\"",
-    "check": "echo \"Shared package checks are not implemented yet\"",
+    "build": "tsc --noEmit",
+    "check": "tsc --noEmit",
     "dev": "echo \"Shared package dev workflow is not implemented yet\"",
-    "test": "echo \"No tests defined for @browserbridge/shared yet\""
+    "test": "node --import tsx --test src/**/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }
