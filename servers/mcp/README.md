@@ -6,15 +6,20 @@ server.
 
 ## Current Scope
 
-The current implementation is the first approved MCP milestone from ADR 0007.
-It exposes one resource:
+The current implementation exposes the read-only MCP resources from ADR 0007
+and ADR 0009:
 
 - `browser://page/current`, named `current-page-context`
+- `browser://page/current/content/{index}`, named `current-page-content`
 
-The resource handler opens a WebSocket connection to the configured BrowserBridge
-WebSocket server, sends a `get_page_context` request with a generated request
-ID, waits for the matching `page_context_response`, and returns a structured
-JSON result.
+The page context resource handler opens a WebSocket connection to the
+configured BrowserBridge WebSocket server, sends a `get_page_context` request
+with a generated request ID, waits for the matching `page_context_response`, and
+returns a structured JSON result.
+
+The page content resource handler parses the 1-based `{index}` path segment,
+sends a `get_page_content` request for that chunk, waits for the matching
+`page_content_response`, and returns a structured JSON result.
 
 The stdio MCP runtime uses the official TypeScript MCP SDK for server
 lifecycle, protocol framing, initialization, resource discovery, and resource
@@ -33,7 +38,8 @@ Out of scope for this package version:
 - Tools for browser actions such as navigation, click, fill, or submit.
 - Authentication and private session routing.
 - Multiple browser sessions.
-- Page body text or DOM extraction.
+- Page body text or DOM extraction inside the MCP server. The MCP server only
+  relays explicit requests to the connected extension.
 
 ## Resource Result
 
@@ -44,7 +50,45 @@ Successful responses use:
   "ok": true,
   "data": {
     "url": "https://example.com/",
-    "title": "Example"
+    "title": "Example",
+    "timestamp": "2026-05-25T10:00:00.000Z",
+    "selectedText": null,
+    "preview": {
+      "content": "Example preview",
+      "truncated": false,
+      "maxBytes": 4096
+    },
+    "structure": {
+      "headings": [],
+      "landmarks": [],
+      "links": [],
+      "images": [],
+      "forms": [],
+      "actions": []
+    },
+    "content": {
+      "available": true,
+      "requestType": "get_page_content",
+      "firstIndex": 1,
+      "defaultMaxPayloadBytes": 131072
+    }
+  }
+}
+```
+
+Page content chunk responses use:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "url": "https://example.com/",
+    "title": "Example",
+    "timestamp": "2026-05-25T10:00:00.000Z",
+    "index": 1,
+    "content": "# Example\n\nReadable content",
+    "truncated": false,
+    "maxPayloadBytes": 131072
   }
 }
 ```
@@ -67,6 +111,7 @@ Error codes are:
 - `timeout`
 - `invalid_response`
 - `browser_error`
+- `invalid_resource_uri`
 
 ## Environment
 
@@ -91,7 +136,8 @@ pnpm --filter @browserbridge/mcp test
 
 The tests start local WebSocket servers on `127.0.0.1` with ephemeral ports and
 exercise request ID correlation, timeout handling, connection failures, protocol
-parsing, resource result shaping, and SDK-backed MCP lifecycle behavior.
+parsing, resource result shaping, page content chunk routing, resource template
+discovery, and SDK-backed MCP lifecycle behavior.
 
 ## Local Use
 
@@ -110,7 +156,7 @@ Run the MCP server over stdio:
 BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787 pnpm --filter @browserbridge/mcp exec tsx src/index.ts
 ```
 
-An MCP-compatible client can then read `browser://page/current`. The returned
-data is limited to the current active tab URL and title for this milestone, and
-the same resource will carry the full page context when the extension supports
-it.
+An MCP-compatible client can then read `browser://page/current` for rich page
+context. When `data.content.available` is true, the client can read
+`browser://page/current/content/1`, then continue with later indexes while
+`data.truncated` is true.
