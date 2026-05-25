@@ -195,6 +195,12 @@ Docker-based local development should start the server components together:
 docker compose --profile runtime up --build
 ```
 
+The runtime profile also serves the local form test page over HTTP:
+
+```text
+http://127.0.0.1:${TEST_PAGE_PORT:-8080}/test.html
+```
+
 The WebSocket server currently runs a temporary no-auth, single-channel
 peer-forwarding protocol. The Chrome extension and MCP server can use that
 local channel for the first page-context milestone.

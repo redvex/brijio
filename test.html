@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BrowserBridge Form Test Page</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
+
+      body {
+        margin: 0;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 32px 20px 48px;
+      }
+
+      h1,
+      h2 {
+        line-height: 1.2;
+      }
+
+      .intro {
+        max-width: 720px;
+      }
+
+      form {
+        display: grid;
+        gap: 24px;
+      }
+
+      fieldset {
+        display: grid;
+        gap: 16px;
+        border: 1px solid color-mix(in srgb, CanvasText 22%, transparent);
+        border-radius: 8px;
+        padding: 18px;
+      }
+
+      legend {
+        padding: 0 8px;
+        font-weight: 700;
+      }
+
+      label,
+      .control {
+        display: grid;
+        gap: 6px;
+      }
+
+      input,
+      textarea,
+      select,
+      button {
+        max-width: 420px;
+        font: inherit;
+      }
+
+      input,
+      textarea,
+      select {
+        border: 1px solid color-mix(in srgb, CanvasText 28%, transparent);
+        border-radius: 6px;
+        padding: 8px 10px;
+        background: Canvas;
+        color: CanvasText;
+      }
+
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+
+      .inline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 20px;
+      }
+
+      .inline label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .note,
+      output {
+        color: color-mix(in srgb, CanvasText 70%, transparent);
+        font-size: 0.95rem;
+      }
+
+      .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      button,
+      input[type="button"],
+      input[type="submit"],
+      input[type="reset"] {
+        cursor: pointer;
+        border: 1px solid color-mix(in srgb, CanvasText 28%, transparent);
+        border-radius: 6px;
+        padding: 8px 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>BrowserBridge Form Test Page</h1>
+      <p class="intro">
+        Use this page to inspect BrowserBridge page context and test MCP
+        `fill_input` against supported and unsupported form controls.
+      </p>
+
+      <form id="browserbridge-test-form" action="#" method="post">
+        <fieldset>
+          <legend>Supported text-writing controls</legend>
+
+          <label>
+            Text input
+            <input
+              id="text-input"
+              name="textInput"
+              type="text"
+              placeholder="Expected to support fill_input"
+            >
+          </label>
+
+          <label>
+            Input with implicit text type
+            <input
+              id="implicit-text-input"
+              name="implicitTextInput"
+              placeholder="No explicit type attribute"
+            >
+          </label>
+
+          <label>
+            Search input
+            <input
+              id="search-input"
+              name="searchInput"
+              type="search"
+              placeholder="Expected to support fill_input"
+            >
+          </label>
+
+          <label>
+            Textarea
+            <textarea
+              id="textarea-input"
+              name="textareaInput"
+              placeholder="Expected to support fill_input"
+            ></textarea>
+          </label>
+
+          <label>
+            Readonly text input
+            <input
+              id="readonly-text-input"
+              name="readonlyTextInput"
+              type="text"
+              value="Readonly value"
+              readonly
+            >
+          </label>
+
+          <label>
+            Disabled text input
+            <input
+              id="disabled-text-input"
+              name="disabledTextInput"
+              type="text"
+              value="Disabled value"
+              disabled
+            >
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Other input types</legend>
+
+          <label>
+            Email
+            <input id="email-input" name="emailInput" type="email">
+          </label>
+
+          <label>
+            Password
+            <input id="password-input" name="passwordInput" type="password">
+          </label>
+
+          <label>
+            URL
+            <input id="url-input" name="urlInput" type="url">
+          </label>
+
+          <label>
+            Telephone
+            <input id="tel-input" name="telInput" type="tel">
+          </label>
+
+          <label>
+            Number
+            <input id="number-input" name="numberInput" type="number" min="0" max="100">
+          </label>
+
+          <label>
+            Date
+            <input id="date-input" name="dateInput" type="date">
+          </label>
+
+          <label>
+            Time
+            <input id="time-input" name="timeInput" type="time">
+          </label>
+
+          <label>
+            Datetime local
+            <input id="datetime-input" name="datetimeInput" type="datetime-local">
+          </label>
+
+          <label>
+            Month
+            <input id="month-input" name="monthInput" type="month">
+          </label>
+
+          <label>
+            Week
+            <input id="week-input" name="weekInput" type="week">
+          </label>
+
+          <label>
+            Color
+            <input id="color-input" name="colorInput" type="color" value="#3366ff">
+          </label>
+
+          <label>
+            Range
+            <input id="range-input" name="rangeInput" type="range" min="0" max="10">
+          </label>
+
+          <label>
+            File
+            <input id="file-input" name="fileInput" type="file">
+          </label>
+
+          <input id="hidden-input" name="hiddenInput" type="hidden" value="hidden value">
+        </fieldset>
+
+        <fieldset>
+          <legend>Choice controls</legend>
+
+          <div class="inline" role="group" aria-labelledby="checkbox-label">
+            <span id="checkbox-label" class="note">Checkboxes</span>
+            <label>
+              <input id="checkbox-alpha" name="checkboxAlpha" type="checkbox">
+              Alpha
+            </label>
+            <label>
+              <input id="checkbox-beta" name="checkboxBeta" type="checkbox" checked>
+              Beta
+            </label>
+          </div>
+
+          <div class="inline" role="radiogroup" aria-labelledby="radio-label">
+            <span id="radio-label" class="note">Radio buttons</span>
+            <label>
+              <input id="radio-one" name="radioChoice" type="radio" value="one" checked>
+              One
+            </label>
+            <label>
+              <input id="radio-two" name="radioChoice" type="radio" value="two">
+              Two
+            </label>
+          </div>
+
+          <label>
+            Select
+            <select id="select-input" name="selectInput">
+              <option value="">Choose an option</option>
+              <option value="one">One</option>
+              <option value="two">Two</option>
+            </select>
+          </label>
+
+          <label>
+            Multi-select
+            <select id="multi-select-input" name="multiSelectInput" multiple>
+              <option value="alpha">Alpha</option>
+              <option value="beta">Beta</option>
+              <option value="gamma">Gamma</option>
+            </select>
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Buttons and actions</legend>
+
+          <div class="button-row">
+            <button id="button-element" type="button">Button element</button>
+            <input id="button-input" type="button" value="Input button">
+            <input id="submit-input" type="submit" value="Submit input">
+            <input id="reset-input" type="reset" value="Reset input">
+            <button id="submit-button" type="submit">Submit button</button>
+          </div>
+
+          <a id="test-link" href="#link-target">Test link target</a>
+          <div id="link-target" class="note">Link destination</div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Non-form editable surface</legend>
+
+          <div
+            id="contenteditable-box"
+            contenteditable="true"
+            role="textbox"
+            aria-label="Contenteditable test box"
+            style="border: 1px solid color-mix(in srgb, CanvasText 28%, transparent); border-radius: 6px; max-width: 420px; min-height: 72px; padding: 8px 10px;"
+          >
+            Contenteditable text
+          </div>
+        </fieldset>
+
+        <output id="event-log" for="browserbridge-test-form">
+          No input or change events yet.
+        </output>
+      </form>
+    </main>
+
+    <script>
+      const eventLog = document.querySelector("#event-log");
+      const form = document.querySelector("#browserbridge-test-form");
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        eventLog.value = "submit event prevented";
+      });
+
+      form.addEventListener("input", (event) => {
+        eventLog.value = `input event from ${event.target.id || event.target.name}`;
+      });
+
+      form.addEventListener("change", (event) => {
+        eventLog.value = `change event from ${event.target.id || event.target.name}`;
+      });
+    </script>
+  </body>
+</html>

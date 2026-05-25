@@ -24,3 +24,12 @@ services:
       - websocket
     profiles:
       - runtime
+
+  test-page:
+    image: nginx:1.27-alpine
+    ports:
+      - "${TEST_PAGE_PORT:-8080}:80"
+    volumes:
+      - ./test.html:/usr/share/nginx/html/test.html:ro
+    profiles:
+      - runtime
