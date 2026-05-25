@@ -1,31 +1,39 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
-import { getCurrentPageContext, getToolConfigFromEnv } from './tools.js'
+import {
+  getCurrentPageContext,
+  getPageContextConfigFromEnv
+} from './page-context.js'
+
+const currentPageResourceUri = 'browser://page/current'
 
 const server = new McpServer({
   name: 'browserbridge-mcp',
   version: '0.0.0'
 })
 
-const toolConfig = getToolConfigFromEnv()
+const pageContextConfig = getPageContextConfigFromEnv()
 
-server.registerTool(
-  'get_current_page_context',
+server.registerResource(
+  'current-page-context',
+  currentPageResourceUri,
   {
+    title: 'Current Page Context',
     description:
-      'Request the active browser tab URL and title through BrowserBridge.'
+      'Read the current browser page context through BrowserBridge.',
+    mimeType: 'application/json'
   },
   async () => {
-    const result = await getCurrentPageContext(toolConfig)
+    const result = await getCurrentPageContext(pageContextConfig)
 
     return {
-      content: [
+      contents: [
         {
-          type: 'text',
+          uri: currentPageResourceUri,
+          mimeType: 'application/json',
           text: JSON.stringify(result)
         }
-      ],
-      isError: !result.ok
+      ]
     }
   }
 )

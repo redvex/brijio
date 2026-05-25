@@ -1,20 +1,20 @@
-import { type BrowserBridgeToolResult } from './protocol.js'
+import { type BrowserBridgePageContextResult } from './protocol.js'
 import {
   requestPageContext as defaultRequestPageContext,
   type PageContextRequestOptions
 } from './websocket-client.js'
 
-export interface BrowserBridgeToolConfig {
+export interface BrowserBridgePageContextConfig {
   websocketUrl: string
   timeoutMs: number
   requestPageContext?: (
     options: PageContextRequestOptions
-  ) => Promise<BrowserBridgeToolResult>
+  ) => Promise<BrowserBridgePageContextResult>
 }
 
-export function getToolConfigFromEnv (
+export function getPageContextConfigFromEnv (
   env: NodeJS.ProcessEnv = process.env
-): Omit<BrowserBridgeToolConfig, 'requestPageContext'> {
+): Omit<BrowserBridgePageContextConfig, 'requestPageContext'> {
   return {
     websocketUrl:
       env.BROWSERBRIDGE_WEBSOCKET_URL ?? env.WEBSOCKET_URL ?? 'ws://127.0.0.1:8787',
@@ -23,8 +23,8 @@ export function getToolConfigFromEnv (
 }
 
 export async function getCurrentPageContext (
-  config: BrowserBridgeToolConfig
-): Promise<BrowserBridgeToolResult> {
+  config: BrowserBridgePageContextConfig
+): Promise<BrowserBridgePageContextResult> {
   const requestPageContext =
     config.requestPageContext ?? defaultRequestPageContext
 

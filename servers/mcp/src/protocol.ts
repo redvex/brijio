@@ -9,13 +9,13 @@ export interface PageContext {
   title: string
 }
 
-export type BrowserBridgeToolErrorCode =
+export type BrowserBridgePageContextErrorCode =
   | 'connection_failed'
   | 'timeout'
   | 'invalid_response'
   | 'browser_error'
 
-export type BrowserBridgeToolResult =
+export type BrowserBridgePageContextResult =
   | {
     ok: true
     data: PageContext
@@ -23,13 +23,13 @@ export type BrowserBridgeToolResult =
   | {
     ok: false
     error: {
-      code: BrowserBridgeToolErrorCode
+      code: BrowserBridgePageContextErrorCode
       message: string
     }
   }
 
 export type PageContextParseResult =
-  | BrowserBridgeToolResult
+  | BrowserBridgePageContextResult
   | { ok: false, ignored: true }
 
 export function createGetPageContextEnvelope (
@@ -77,7 +77,7 @@ export function parsePageContextEnvelope (
 
 function parseSuccessPayload (
   payload: Record<PropertyKey, unknown>
-): BrowserBridgeToolResult {
+): BrowserBridgePageContextResult {
   if (!isRecord(payload.data)) {
     return invalidResponse()
   }
@@ -100,7 +100,7 @@ function parseSuccessPayload (
 
 function parseErrorPayload (
   payload: Record<PropertyKey, unknown>
-): BrowserBridgeToolResult {
+): BrowserBridgePageContextResult {
   if (!isRecord(payload.error) || typeof payload.error.message !== 'string') {
     return invalidResponse()
   }
@@ -114,7 +114,7 @@ function parseErrorPayload (
   }
 }
 
-export function invalidResponse (): BrowserBridgeToolResult {
+export function invalidResponse (): BrowserBridgePageContextResult {
   return {
     ok: false,
     error: {
@@ -124,7 +124,7 @@ export function invalidResponse (): BrowserBridgeToolResult {
   }
 }
 
-export function timeoutResponse (): BrowserBridgeToolResult {
+export function timeoutResponse (): BrowserBridgePageContextResult {
   return {
     ok: false,
     error: {
@@ -136,7 +136,7 @@ export function timeoutResponse (): BrowserBridgeToolResult {
 
 export function connectionFailedResponse (
   websocketUrl: string
-): BrowserBridgeToolResult {
+): BrowserBridgePageContextResult {
   return {
     ok: false,
     error: {

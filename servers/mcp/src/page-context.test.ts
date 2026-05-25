@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { getCurrentPageContext } from './tools.js'
+import { getCurrentPageContext } from './page-context.js'
 
-void describe('MCP browser tools', () => {
+void describe('MCP page context resource helpers', () => {
   void it('returns page context from the configured WebSocket request function', async () => {
     const result = await getCurrentPageContext({
       websocketUrl: 'ws://127.0.0.1:8787',

@@ -1,35 +1,37 @@
 # BrowserBridge MCP Server
 
-The MCP server exposes BrowserBridge tools to AI agents and routes those tool
-calls to an active browser extension session through the WebSocket server.
+The MCP server exposes BrowserBridge resources to AI agents and routes explicit
+resource reads to an active browser extension session through the WebSocket
+server.
 
 ## Current Scope
 
 The current implementation is the first approved MCP milestone from ADR 0007.
-It exposes one tool:
+It exposes one resource:
 
-- `get_current_page_context`
+- `browser://page/current`, named `current-page-context`
 
-The tool opens a WebSocket connection to the configured BrowserBridge
+The resource handler opens a WebSocket connection to the configured BrowserBridge
 WebSocket server, sends a `get_page_context` request with a generated request
 ID, waits for the matching `page_context_response`, and returns a structured
-result.
+JSON result.
 
 The stdio MCP runtime uses the official TypeScript MCP SDK for server
-lifecycle, protocol framing, initialization, tool discovery, and tool calls.
-BrowserBridge code only owns tool behavior and WebSocket request routing.
+lifecycle, protocol framing, initialization, resource discovery, and resource
+reads. BrowserBridge code only owns page-context behavior and WebSocket request
+routing.
 
 The Chrome extension must already be connected by the user. The MCP server does
 not start browser access on its own and does not stream or store page state.
 
 Out of scope for this package version:
 
-- Browser actions such as navigation, click, fill, or submit.
+- Tools for browser actions such as navigation, click, fill, or submit.
 - Authentication and private session routing.
 - Multiple browser sessions.
 - Page body text or DOM extraction.
 
-## Tool Result
+## Resource Result
 
 Successful responses use:
 
@@ -85,7 +87,7 @@ pnpm --filter @browserbridge/mcp test
 
 The tests start local WebSocket servers on `127.0.0.1` with ephemeral ports and
 exercise request ID correlation, timeout handling, connection failures, protocol
-parsing, tool result shaping, and SDK-backed MCP lifecycle behavior.
+parsing, resource result shaping, and SDK-backed MCP lifecycle behavior.
 
 ## Local Use
 
@@ -104,5 +106,7 @@ Run the MCP server over stdio:
 BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787 pnpm --filter @browserbridge/mcp exec tsx src/index.ts
 ```
 
-An MCP-compatible client can then call `get_current_page_context`. The returned
-data is limited to the current active tab URL and title for this milestone.
+An MCP-compatible client can then read `browser://page/current`. The returned
+data is limited to the current active tab URL and title for this milestone, and
+the same resource will carry the full page context when the extension supports
+it.

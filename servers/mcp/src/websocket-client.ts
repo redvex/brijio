@@ -1,6 +1,6 @@
 import WebSocket, { type RawData } from 'ws'
 import {
-  type BrowserBridgeToolResult,
+  type BrowserBridgePageContextResult,
   connectionFailedResponse,
   createGetPageContextEnvelope,
   invalidResponse,
@@ -16,7 +16,7 @@ export interface PageContextRequestOptions {
 
 export async function requestPageContext (
   options: PageContextRequestOptions
-): Promise<BrowserBridgeToolResult> {
+): Promise<BrowserBridgePageContextResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
   return await new Promise((resolve) => {
@@ -58,7 +58,7 @@ export async function requestPageContext (
       settle(connectionFailedResponse(options.websocketUrl))
     })
 
-    function settle (result: BrowserBridgeToolResult): void {
+    function settle (result: BrowserBridgePageContextResult): void {
       if (settled) {
         return
       }

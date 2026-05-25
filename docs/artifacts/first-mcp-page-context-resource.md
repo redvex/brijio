@@ -1,14 +1,15 @@
-# First MCP Page Context Tool
+# First MCP Page Context Resource
 
 ## Summary
 
 `servers/mcp` now provides the first BrowserBridge agent-facing runtime path.
-It exposes the `get_current_page_context` MCP tool and routes that explicit
-tool call through the local WebSocket server to the user-started Chrome
+It exposes the `browser://page/current` MCP resource and routes explicit
+resource reads through the local WebSocket server to the user-started Chrome
 extension.
 
-This milestone returns only the active tab URL and title. It does not read page
-body text, perform browser actions, stream state, or store page context.
+This milestone returns only the active tab URL and title. The resource URI is
+intended to remain stable when the extension later returns full page context. It
+does not perform browser actions, stream state, or store page context.
 
 ## Flow
 
@@ -16,13 +17,13 @@ body text, perform browser actions, stream state, or store page context.
 sequenceDiagram
   participant Agent as AI Agent
   participant SDK as MCP SDK Stdio Transport
-  participant MCP as BrowserBridge Tool Handler
+  participant MCP as BrowserBridge Resource Handler
   participant WS as WebSocket Server
   participant Ext as Chrome Extension
   participant Tab as Active Browser Tab
 
-  Agent->>SDK: tools/call get_current_page_context
-  SDK->>MCP: Invoke tool handler
+  Agent->>SDK: resources/read browser://page/current
+  SDK->>MCP: Invoke resource handler
   MCP->>WS: get_page_context envelope with request ID
   WS->>Ext: Forward request
   Ext->>Tab: Read active tab URL and title
@@ -30,7 +31,7 @@ sequenceDiagram
   Ext-->>WS: page_context_response with same request ID
   WS-->>MCP: Forward response
   MCP-->>SDK: Structured ok/data or ok/error result
-  SDK-->>Agent: MCP tool response
+  SDK-->>Agent: MCP resource response
 ```
 
 ## Runtime Pieces
@@ -39,10 +40,10 @@ sequenceDiagram
   matching `page_context_response` envelopes.
 - `servers/mcp/src/websocket-client.ts` opens a local WebSocket connection,
   sends the request, correlates responses by request ID, and handles timeouts.
-- `servers/mcp/src/tools.ts` exposes the package-level
-  `getCurrentPageContext` tool function and environment configuration.
+- `servers/mcp/src/page-context.ts` exposes the package-level
+  `getCurrentPageContext` resource helper and environment configuration.
 - `servers/mcp/src/index.ts` uses the official TypeScript MCP SDK to run a
-  stdio MCP server with one tool: `get_current_page_context`.
+  stdio MCP server with one resource: `browser://page/current`.
 
 ## Environment
 
@@ -64,7 +65,8 @@ pnpm --filter @browserbridge/mcp exec tsx src/index.ts
 
 The MCP tests use local loopback WebSocket servers with ephemeral ports, so they
 may require permission for local networking in restricted environments. They
-also verify SDK-backed MCP initialize, tool discovery, and ping behavior.
+also verify SDK-backed MCP initialize, resource discovery, resource reads, and
+ping behavior.
 
 ## Limits
 

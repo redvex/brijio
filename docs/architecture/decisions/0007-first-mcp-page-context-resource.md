@@ -1,4 +1,4 @@
-# ADR 0007: First MCP Page Context Tool
+# ADR 0007: First MCP Page Context Resource
 
 ## Status
 
@@ -19,11 +19,15 @@ first usable MCP server path that lets an AI agent explicitly request the
 current browser page context and receive the active tab URL and title.
 
 The MCP server should not hand-roll MCP JSON-RPC framing, request dispatch,
-initialize responses, tool listing, or tool calling. MCP clients expect protocol
-details such as initialization, capability negotiation, notifications, error
-shaping, tool metadata, and future resources or prompts to follow the MCP
-specification. The official TypeScript MCP SDK provides `McpServer` and stdio
-transport abstractions for this role.
+initialize responses, resource listing, resource reads, or future tool calls.
+MCP clients expect protocol details such as initialization, capability
+negotiation, notifications, error shaping, resource metadata, and future tools
+or prompts to follow the MCP specification. The official TypeScript MCP SDK
+provides `McpServer` and stdio transport abstractions for this role.
+
+Page context is read-only browser state. MCP resources are the better fit for
+readable contextual data, while MCP tools should be reserved for browser
+actions such as navigation, clicking, filling inputs, and submitting forms.
 
 This must remain a local development milestone. It should not add continuous
 browser state streaming, background surveillance, storage of page context, or
@@ -31,11 +35,13 @@ browser actions.
 
 ## Decision
 
-Implement the first MCP server in `servers/mcp` with one tool:
+Implement the first MCP server in `servers/mcp` with one resource:
 
-- `get_current_page_context`
+- URI: `browser://page/current`
+- Name: `current-page-context`
+- MIME type: `application/json`
 
-The tool will:
+The resource read handler will:
 
 1. Open a WebSocket connection to the configured local WebSocket server.
 2. Send the existing protocol envelope with a generated request ID:
@@ -49,10 +55,10 @@ The tool will:
    ```
 
 3. Wait for a matching `page_context_response` envelope with the same ID.
-4. Return a typed MCP result object:
+4. Return a typed JSON result object:
 
    ```ts
-   type BrowserBridgeToolResult =
+   type BrowserBridgePageContextResult =
      | {
          ok: true;
          data: {
@@ -74,20 +80,20 @@ The tool will:
    ```
 
 The implementation will keep the WebSocket request/response behavior in a small
-testable client module and keep MCP tool registration in a separate module.
+testable client module and keep MCP resource registration in the SDK entrypoint.
 The first CLI entrypoint will run an MCP stdio server for local agents using the
 official TypeScript MCP SDK:
 
 1. Create an SDK `McpServer` with BrowserBridge server metadata.
-2. Register `get_current_page_context` through the SDK tool registration API.
+2. Register `browser://page/current` through the SDK resource registration API.
 3. Use an SDK `StdioServerTransport` for stdio framing and MCP lifecycle
    handling.
 4. Write diagnostics only to stderr, never stdout.
 
-The SDK tool response will wrap the BrowserBridge result object in MCP tool
-content. If the selected SDK version supports typed structured tool output in a
-stable way, use it while preserving the same `ok`, `data`, and `error` shape.
-Otherwise, return a JSON text content item for this milestone.
+The SDK resource response will return one JSON text content item with the
+BrowserBridge result object. The extension currently returns URL and title; the
+same resource URI will remain the place for the full page context once the
+extension implementation expands.
 
 Configuration will use environment variables:
 
@@ -100,20 +106,20 @@ Configuration will use environment variables:
 sequenceDiagram
   participant Agent as AI Agent
   participant SDK as MCP SDK Stdio Transport
-  participant MCP as BrowserBridge Tool Handler
+  participant MCP as BrowserBridge Resource Handler
   participant WS as WebSocket Server
   participant Ext as Chrome Extension
   participant Tab as Active Browser Tab
 
-  Agent->>SDK: initialize / tools/list / tools/call
-  SDK->>MCP: get_current_page_context
+  Agent->>SDK: initialize / resources/list / resources/read
+  SDK->>MCP: read browser://page/current
   MCP->>WS: get_page_context envelope with request ID
   WS->>Ext: Forward request to peer
   Ext->>Tab: Read active tab URL and title
   Tab-->>Ext: URL and title
   Ext-->>WS: page_context_response envelope with same ID
   WS-->>MCP: Forward response to peer
-  MCP-->>SDK: MCP tool content
+  MCP-->>SDK: MCP resource content
   SDK-->>Agent: { ok: true, data: { url, title } }
 ```
 
@@ -121,8 +127,8 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-  Entry[index.ts<br/>SDK server + stdio transport] --> Tools[tools.ts<br/>tool registration + result mapping]
-  Tools --> Client[websocket-client.ts<br/>BrowserBridge request/response]
+  Entry[index.ts<br/>SDK server + resource registration] --> Context[page-context.ts<br/>result mapping + config]
+  Context --> Client[websocket-client.ts<br/>BrowserBridge request/response]
   Client --> Protocol[protocol.ts<br/>BrowserBridge envelope parsing]
   Client --> Server[Local WebSocket server]
   Server --> Extension[User-started Chrome extension]
@@ -138,13 +144,14 @@ This would satisfy the original first milestone wording, but the extension
 already supports `get_page_context`, and the user need is to request page
 information through the MCP server.
 
-### Option 2: Add One Page Context Tool
+### Option 2: Add One Page Context Resource
 
-Expose `get_current_page_context` and route it through the existing local
-WebSocket protocol.
+Expose `browser://page/current` and route resource reads through the existing
+local WebSocket protocol.
 
 This is the selected approach. It proves the end-to-end agent-to-browser path
-while staying within the accepted extension and WebSocket protocol.
+while staying within the accepted extension and WebSocket protocol. It also
+keeps tools available for future browser actions.
 
 ### Option 3: Add All Initial MCP Tools
 
@@ -157,16 +164,16 @@ approval, permissions, and tests.
 ### Option 4: Hand-Roll The MCP Runtime
 
 Implement custom stdio parsing and direct handlers for `initialize`,
-`tools/list`, and `tools/call`.
+`resources/list`, and `resources/read`.
 
 This keeps dependencies low, but it makes BrowserBridge responsible for MCP
 protocol behavior that should be owned by the official SDK. This approach is
 rejected.
 
-### Option 5: Use The Official SDK For Transport And Tool Registration
+### Option 5: Use The Official SDK For Transport And Resource Registration
 
 Adopt the official TypeScript MCP SDK for server lifecycle, stdio transport,
-and tool registration while preserving the existing BrowserBridge WebSocket
+and resource registration while preserving the existing BrowserBridge WebSocket
 client.
 
 This is selected for the MCP runtime. It removes custom MCP protocol code
@@ -178,9 +185,11 @@ In scope:
 
 - Add official MCP TypeScript SDK dependencies.
 - Add MCP server TypeScript runtime files in `servers/mcp/src`.
-- Add tests for MCP tool result shaping and WebSocket request/response handling.
-- Add tests for SDK-backed initialize, tool discovery, and tool call behavior.
-- Use the official SDK for MCP stdio transport and tool registration.
+- Add tests for MCP resource result shaping and WebSocket request/response
+  handling.
+- Add tests for SDK-backed initialize, resource discovery, and resource read
+  behavior.
+- Use the official SDK for MCP stdio transport and resource registration.
 - Add request ID generation and response correlation.
 - Add timeout handling.
 - Add clear errors for connection failures, timeout, invalid responses, and
@@ -192,7 +201,7 @@ Out of scope:
 
 - Browser actions such as navigation, click, fill, and submit.
 - Custom MCP stdio JSON-RPC runtime code.
-- MCP resources or prompts.
+- MCP tools or prompts.
 - HTTP MCP transport.
 - Authenticated private user/session/channel routing.
 - Multiple concurrent browser sessions.
@@ -205,12 +214,13 @@ Out of scope:
 
 Use TDD:
 
-1. Add failing tests for SDK-backed initialize and tool discovery behavior.
-2. Add failing tests for response parsing and tool result shaping.
+1. Add failing tests for SDK-backed initialize and resource discovery behavior.
+2. Add failing tests for response parsing and resource result shaping.
 3. Add failing tests for WebSocket client request/response success, timeout, and
    invalid response behavior.
 4. Implement the smallest runtime code needed to pass those tests.
-5. Add the SDK-backed MCP stdio entrypoint once the tool behavior is covered.
+5. Add the SDK-backed MCP stdio entrypoint once the resource behavior is
+   covered.
 
 Verification should include:
 
@@ -221,7 +231,7 @@ Verification should include:
 - `pnpm test`
 
 Manual verification should use a running WebSocket server and connected Chrome
-extension to call `get_current_page_context` from an MCP-compatible client.
+extension to read `browser://page/current` from an MCP-compatible client.
 
 ## Consequences
 
