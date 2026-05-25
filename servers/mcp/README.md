@@ -1,8 +1,8 @@
 # BrowserBridge MCP Server
 
 The MCP server exposes BrowserBridge resources and tools to AI agents and
-routes explicit page-reading and click requests to an active browser extension
-session through the WebSocket server.
+routes explicit page-reading, click, and form-fill requests to an active
+browser extension session through the WebSocket server.
 
 ## Current Scope
 
@@ -25,6 +25,7 @@ The implementation also exposes MCP tools:
 
 - `read_current_page`
 - `click_element`
+- `fill_input`
 
 `read_current_page` reads the current page context and, by default, the first
 available readable content chunk. It exists for tool-first clients and agents
@@ -37,6 +38,11 @@ page using a short-lived target ID returned by `read_current_page`. It sends a
 `perform_action` click request over WebSocket and waits for the matching
 `action_result`.
 
+`fill_input` writes text into a supported visible form control from the current
+page using short-lived form and control IDs returned by `read_current_page`. It
+sends a `perform_action` `write_text` request over WebSocket and waits for the
+matching `action_result`.
+
 The stdio MCP runtime uses the official TypeScript MCP SDK for server
 lifecycle, protocol framing, initialization, resource discovery, resource
 reads, tool discovery, and tool calls. BrowserBridge code only owns page
@@ -44,11 +50,12 @@ reading behavior and WebSocket request routing.
 
 The Chrome extension must already be connected by the user. The MCP server does
 not start browser access on its own and does not stream or store page state.
-Clicking is a discrete browser-mutating tool call, not background automation.
+Clicking and filling inputs are discrete browser-mutating tool calls, not
+background automation.
 
 Out of scope for this package version:
 
-- Tools for browser actions such as navigation, fill, or submit.
+- Tools for browser actions such as navigation or submit.
 - CSS selector, XPath, text-query, coordinate, hover, keyboard, drag, or
   multi-step action support.
 - Authentication and private session routing.
@@ -219,6 +226,54 @@ Click failures use the same structured shape:
 }
 ```
 
+`fill_input` accepts:
+
+```json
+{
+  "formId": "form-1",
+  "controlId": "control-1",
+  "text": "hello"
+}
+```
+
+`formId` must be a non-empty short-lived ID from `structure.forms[]`.
+`controlId` must be a non-empty short-lived ID from that form's
+`controls[]`. `text` must be a string. Empty text is allowed so callers can
+clear a supported text control.
+
+Call `read_current_page` first, choose a target from
+`data.context.structure.forms[].controls[]`, then pass the containing form ID,
+control ID, and desired text to `fill_input`. The tool writes text only; it
+does not submit the form.
+
+Successful fill calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "action": "write_text",
+    "target": {
+      "formId": "form-1",
+      "controlId": "control-1"
+    },
+    "textLength": 5
+  }
+}
+```
+
+Fill failures use the same structured shape:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "browser_error",
+    "message": "No matching form control was found."
+  }
+}
+```
+
 ## Environment
 
 Expected local variables:
@@ -243,7 +298,8 @@ pnpm --filter @browserbridge/mcp test
 The tests start local WebSocket servers on `127.0.0.1` with ephemeral ports and
 exercise request ID correlation, timeout handling, connection failures, protocol
 parsing, resource result shaping, page content chunk routing, click action
-routing, resource template discovery, and SDK-backed MCP lifecycle behavior.
+routing, fill action routing, resource template discovery, and SDK-backed MCP
+lifecycle behavior.
 
 ## Local Use
 
@@ -270,3 +326,7 @@ context. When `data.content.available` is true, the client can read
 For clicks, call the `read_current_page` tool and choose a target from
 `data.context.structure.links[]` or `data.context.structure.actions[]`. Then
 call `click_element` with that target's collection kind and ID.
+
+For input filling, call `read_current_page` and choose a control from
+`data.context.structure.forms[].controls[]`. Then call `fill_input` with the
+containing form ID, control ID, and text to write.
