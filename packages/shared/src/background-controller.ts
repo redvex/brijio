@@ -146,6 +146,37 @@ export class BrowserBridgeBackgroundController {
     return await this.options.storage.getWebSocketUrl()
   }
 
+  /**
+   * Explicitly connect using the stored WebSocket URL.
+   * Used by Safari's popup Connect button (Chrome uses handleActionClicked toggle).
+   */
+  async requestConnect (): Promise<void> {
+    const websocketUrl = await this.options.storage.getWebSocketUrl()
+    if (websocketUrl === undefined || websocketUrl.trim() === '') {
+      await this.options.setup.openSetupPage()
+      return
+    }
+    await this.connect(websocketUrl)
+  }
+
+  /**
+   * Explicitly disconnect the WebSocket.
+   * Used by Safari's popup Disconnect button (Chrome uses handleActionClicked toggle).
+   */
+  async requestDisconnect (): Promise<void> {
+    if (this.socket !== undefined) {
+      await this.disconnect()
+    }
+  }
+
+  /**
+   * Returns whether the controller currently has an active WebSocket connection.
+   * Used by Safari's popup to display connection status.
+   */
+  isConnected (): boolean {
+    return this.socket !== undefined
+  }
+
   private async connect (url: string): Promise<void> {
     const socket = this.options.createWebSocket(url)
     this.socket = socket

@@ -23,6 +23,7 @@ safari-extension-build:
 safari-xcode-project: safari-extension-build
 	xcrun safari-web-extension-converter \
 		--force \
+		--bundle-identifier com.redvex.BrowserBridge \
 		--project-location clients/extensions/safari/BrowserBridge \
 		clients/extensions/safari/dist
 
