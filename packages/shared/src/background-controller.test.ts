@@ -684,6 +684,70 @@ void describe('BrowserBridge background controller', () => {
     assert.deepEqual(harness.sockets.created[0].sent, [])
     assert.equal(harness.timers.cleared, true)
   })
+
+  // --- requestConnect / requestDisconnect / isConnected ---
+
+  void it('requestConnect connects using the stored WebSocket URL', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.requestConnect()
+
+    assert.equal(harness.sockets.created.length, 1)
+    assert.equal(harness.action.badgeText, '...')
+    assert.equal(harness.action.title, 'BrowserBridge connecting')
+  })
+
+  void it('requestConnect opens setup when no URL is stored', async () => {
+    const harness = createHarness()
+
+    await harness.controller.requestConnect()
+
+    assert.equal(harness.setup.opened, true)
+    assert.equal(harness.sockets.created.length, 0)
+  })
+
+  void it('requestDisconnect closes the socket when connected', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.requestConnect()
+    harness.sockets.created[0].open()
+    await harness.controller.requestDisconnect()
+
+    assert.equal(harness.sockets.created[0].closed, true)
+    assert.equal(harness.action.badgeText, 'OFF')
+  })
+
+  void it('requestDisconnect is a no-op when not connected', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.requestDisconnect()
+
+    // Should not throw and no sockets created
+    assert.equal(harness.sockets.created.length, 0)
+  })
+
+  void it('isConnected returns false when no socket exists', () => {
+    const harness = createHarness()
+
+    assert.equal(harness.controller.isConnected(), false)
+  })
+
+  void it('isConnected returns true when socket exists', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.requestConnect()
+
+    assert.equal(harness.controller.isConnected(), true)
+  })
+
+  void it('isConnected returns false after disconnect', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.requestConnect()
+    await harness.controller.requestDisconnect()
+
+    assert.equal(harness.controller.isConnected(), false)
+  })
 })
 
 interface HarnessOptions {

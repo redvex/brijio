@@ -96,24 +96,22 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'connect') {
-    void controller.handleActionClicked().then(() => {
+    void controller.requestConnect().then(() => {
       sendResponse({ ok: true })
     })
     return true
   }
 
   if (message.type === 'disconnect') {
-    void controller.handleActionClicked().then(() => {
+    void controller.requestDisconnect().then(() => {
       sendResponse({ ok: true })
     })
     return true
   }
 
   if (message.type === 'get_status') {
-    void controller.getWebSocketUrl().then((websocketUrl) => {
-      sendResponse({ ok: true, data: { connected: websocketUrl !== undefined && websocketUrl !== '' } })
-    })
-    return true
+    sendResponse({ ok: true, data: { connected: controller.isConnected() } })
+    return undefined
   }
 
   sendResponse({
