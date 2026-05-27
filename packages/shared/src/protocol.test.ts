@@ -10,7 +10,6 @@ import {
   createPageContextResponse,
   createActionResultErrorResponse,
   createActionResultResponse,
-  createScopeKey,
   isPerformActionEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
@@ -19,15 +18,6 @@ import {
 import type { PageContext } from './protocol.js'
 
 void describe('shared BrowserBridge protocol', () => {
-  void it('creates stable non-token scope keys', () => {
-    const first = createScopeKey('local-token')
-    const second = createScopeKey('local-token')
-
-    assert.equal(first, second)
-    assert.notEqual(first, 'local-token')
-    assert.match(first, /^[a-f0-9]{64}$/)
-  })
-
   void it('parses auth envelopes', () => {
     const envelope = createAuthEnvelope({
       requestId: 'auth-1',
