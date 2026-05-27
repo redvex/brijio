@@ -1,4 +1,3 @@
-import { chunkReadableContent } from './page-content.js'
 import { extractPageContent, extractPageContext } from './page-context.js'
 import {
   type ActionResultData,
@@ -12,7 +11,8 @@ import {
   type SubmitFormActionResultData,
   type WriteTextEditableTarget,
   type WriteTextActionResultData,
-  type WriteTextActionTarget
+  type WriteTextActionTarget,
+  chunkReadableContent
 } from '@browserbridge/shared'
 
 export type ContentRequest =

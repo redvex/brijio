@@ -3,7 +3,7 @@ import {
   renderMarkdownImage,
   renderMarkdownLink,
   renderMarkdownTable
-} from './page-content.js'
+} from '@browserbridge/shared'
 import {
   defaultPageContentMaxPayloadBytes,
   type PageAction,

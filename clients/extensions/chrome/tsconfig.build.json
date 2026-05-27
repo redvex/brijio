@@ -8,7 +8,6 @@
     "src/background.ts",
     "src/background-controller.ts",
     "src/content.ts",
-    "src/page-content.ts",
     "src/page-context.ts",
     "src/protocol.ts",
     "src/setup.ts",
