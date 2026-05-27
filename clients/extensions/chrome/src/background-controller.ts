@@ -21,7 +21,7 @@ import {
   type WriteTextActionResultData,
   type WriteTextEditableTarget,
   type WriteTextActionTarget
-} from './protocol.js'
+} from '@browserbridge/shared'
 
 export interface StorageAdapter {
   getWebSocketUrl: () => Promise<string | undefined>

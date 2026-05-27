@@ -22,7 +22,7 @@ import type {
   SubmitFormActionResultData,
   WriteTextEditableTarget,
   WriteTextActionTarget
-} from './protocol.js'
+} from '@browserbridge/shared'
 
 void describe('BrowserBridge background controller', () => {
   void it('opens setup when action is clicked without a stored WebSocket URL', async () => {

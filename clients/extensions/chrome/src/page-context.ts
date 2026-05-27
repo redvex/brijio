@@ -16,7 +16,7 @@ import {
   type PageImage,
   type PageLandmark,
   type PageLink
-} from './protocol.js'
+} from '@browserbridge/shared'
 
 export interface ExtractPageContextOptions {
   document: Document

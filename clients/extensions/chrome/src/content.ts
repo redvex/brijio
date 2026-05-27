@@ -13,7 +13,7 @@ import {
   type WriteTextEditableTarget,
   type WriteTextActionResultData,
   type WriteTextActionTarget
-} from './protocol.js'
+} from '@browserbridge/shared'
 
 export type ContentRequest =
   | {

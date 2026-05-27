@@ -12,7 +12,7 @@ import {
   type PageContentErrorCode,
   type WriteTextEditableTarget,
   type WriteTextActionTarget
-} from './protocol.js'
+} from '@browserbridge/shared'
 import {
   hasRegularPageAccess,
   isRegularPageUrl,
