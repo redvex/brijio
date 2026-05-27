@@ -70,16 +70,32 @@ void describe('createGetSettingsMessage', () => {
 })
 
 void describe('createSaveSettingsMessage', () => {
-  void it('returns a message with type "save_settings" and the provided URL', () => {
-    const message = createSaveSettingsMessage('ws://127.0.0.1:8787')
+  void it('returns a message with type "save_settings" and complete pairing settings', () => {
+    const message = createSaveSettingsMessage({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pairingToken: 'local-token',
+      profileName: 'Default',
+      label: 'Safari Default'
+    })
     assert.equal(message.type, 'save_settings')
     assert.equal(message.websocketUrl, 'ws://127.0.0.1:8787')
+    assert.equal(message.pairingToken, 'local-token')
+    assert.equal(message.profileName, 'Default')
+    assert.equal(message.label, 'Safari Default')
   })
 
-  void it('preserves the exact URL string without modification', () => {
-    const url = 'wss://example.com:443/ws'
-    const message = createSaveSettingsMessage(url)
-    assert.equal(message.websocketUrl, url)
+  void it('preserves the exact settings strings without modification', () => {
+    const settings = {
+      websocketUrl: 'wss://example.com:443/ws',
+      pairingToken: '  local-token  ',
+      profileName: 'Work',
+      label: 'Safari Work'
+    }
+    const message = createSaveSettingsMessage(settings)
+    assert.equal(message.websocketUrl, settings.websocketUrl)
+    assert.equal(message.pairingToken, settings.pairingToken)
+    assert.equal(message.profileName, settings.profileName)
+    assert.equal(message.label, settings.label)
   })
 })
 
@@ -107,44 +123,68 @@ void describe('createGetStatusMessage', () => {
 // --- Response parsing tests ---
 
 void describe('parseSettingsResponse', () => {
-  void it('returns the websocketUrl when response is successful', () => {
-    const response = { ok: true, data: { websocketUrl: 'ws://127.0.0.1:8787' } }
-    const url = parseSettingsResponse(response)
-    assert.equal(url, 'ws://127.0.0.1:8787')
+  void it('returns editable pairing settings when response is successful', () => {
+    const response = {
+      ok: true,
+      data: {
+        websocketUrl: 'ws://127.0.0.1:8787',
+        pairingToken: 'local-token',
+        profileName: 'Default',
+        label: 'Safari Default'
+      }
+    }
+    const settings = parseSettingsResponse(response)
+    assert.deepEqual(settings, {
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pairingToken: 'local-token',
+      profileName: 'Default',
+      label: 'Safari Default'
+    })
   })
 
   void it('returns undefined when response ok is false', () => {
     const response = { ok: false, error: { message: 'Error' } }
-    const url = parseSettingsResponse(response)
-    assert.equal(url, undefined)
+    const settings = parseSettingsResponse(response)
+    assert.equal(settings, undefined)
   })
 
   void it('returns undefined when data is missing', () => {
     const response = { ok: true }
-    const url = parseSettingsResponse(response)
-    assert.equal(url, undefined)
+    const settings = parseSettingsResponse(response)
+    assert.equal(settings, undefined)
   })
 
-  void it('returns undefined when websocketUrl is not a string', () => {
-    const response = { ok: true, data: { websocketUrl: 123 } }
-    const url = parseSettingsResponse(response)
-    assert.equal(url, undefined)
+  void it('ignores non-string fields', () => {
+    const response = {
+      ok: true,
+      data: {
+        websocketUrl: 123,
+        pairingToken: 'local-token',
+        profileName: false,
+        label: 'Safari Default'
+      }
+    }
+    const settings = parseSettingsResponse(response)
+    assert.deepEqual(settings, {
+      pairingToken: 'local-token',
+      label: 'Safari Default'
+    })
   })
 
-  void it('returns undefined when websocketUrl is missing', () => {
+  void it('returns undefined when no editable fields are present', () => {
     const response = { ok: true, data: {} }
-    const url = parseSettingsResponse(response)
-    assert.equal(url, undefined)
+    const settings = parseSettingsResponse(response)
+    assert.equal(settings, undefined)
   })
 
   void it('returns undefined for null response', () => {
-    const url = parseSettingsResponse(null)
-    assert.equal(url, undefined)
+    const settings = parseSettingsResponse(null)
+    assert.equal(settings, undefined)
   })
 
   void it('returns undefined for non-object response', () => {
-    const url = parseSettingsResponse('ok')
-    assert.equal(url, undefined)
+    const settings = parseSettingsResponse('ok')
+    assert.equal(settings, undefined)
   })
 })
 

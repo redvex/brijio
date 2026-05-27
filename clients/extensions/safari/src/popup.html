@@ -34,7 +34,7 @@
           sans-serif;
         font-size: 14px;
         line-height: 1.5;
-        min-width: 280px;
+        min-width: 320px;
         padding: 16px;
       }
 
@@ -125,6 +125,29 @@
         placeholder="ws://127.0.0.1:8787"
         required
         type="url"
+      />
+      <label for="pairing-token">Pairing token</label>
+      <input
+        id="pairing-token"
+        name="pairingToken"
+        required
+        type="password"
+      />
+      <label for="profile-name">Profile name</label>
+      <input
+        id="profile-name"
+        name="profileName"
+        required
+        type="text"
+        value="Default"
+      />
+      <label for="browser-label">Browser label</label>
+      <input
+        id="browser-label"
+        name="label"
+        required
+        type="text"
+        value="Safari Default"
       />
       <div class="actions">
         <button id="save-button" type="submit">Save</button>
