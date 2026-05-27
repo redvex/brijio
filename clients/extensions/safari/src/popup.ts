@@ -8,12 +8,40 @@
 
 import type { BrowserApi } from './popup-entry.js'
 
+export interface EditableBridgeSettings {
+  websocketUrl?: string
+  pairingToken?: string
+  profileName?: string
+  label?: string
+}
+
+export interface RequiredEditableBridgeSettings {
+  websocketUrl: string
+  pairingToken: string
+  profileName: string
+  label: string
+}
+
 export function createGetSettingsMessage (): { type: 'get_settings' } {
   return { type: 'get_settings' }
 }
 
-export function createSaveSettingsMessage (websocketUrl: string): { type: 'save_settings', websocketUrl: string } {
-  return { type: 'save_settings', websocketUrl }
+export function createSaveSettingsMessage (
+  settings: RequiredEditableBridgeSettings
+): {
+    type: 'save_settings'
+    websocketUrl: string
+    pairingToken: string
+    profileName: string
+    label: string
+  } {
+  return {
+    type: 'save_settings',
+    websocketUrl: settings.websocketUrl,
+    pairingToken: settings.pairingToken,
+    profileName: settings.profileName,
+    label: settings.label
+  }
 }
 
 export function createConnectMessage (): { type: 'connect' } {
@@ -42,15 +70,35 @@ export async function sendMessage (browser: BrowserApi, message: unknown): Promi
   })
 }
 
-export function parseSettingsResponse (response: unknown): string | undefined {
+export function parseSettingsResponse (response: unknown): EditableBridgeSettings | undefined {
   if (
     typeof response === 'object' && response !== null &&
     'ok' in response && Boolean((response as unknown as { ok: boolean }).ok) &&
-    'data' in response && typeof ((response as unknown as { data: { websocketUrl: string } }).data?.websocketUrl) === 'string'
+    'data' in response &&
+    typeof (response as unknown as { data: unknown }).data === 'object' &&
+    (response as unknown as { data: unknown }).data !== null
   ) {
-    const data: { websocketUrl: string } | undefined = (response as unknown as { data: { websocketUrl: string } }).data
-    if (data != null) {
-      return data.websocketUrl
+    const data = (response as unknown as { data: Record<string, unknown> }).data
+    const settings: EditableBridgeSettings = {}
+
+    if (typeof data.websocketUrl === 'string') {
+      settings.websocketUrl = data.websocketUrl
+    }
+
+    if (typeof data.pairingToken === 'string') {
+      settings.pairingToken = data.pairingToken
+    }
+
+    if (typeof data.profileName === 'string') {
+      settings.profileName = data.profileName
+    }
+
+    if (typeof data.label === 'string') {
+      settings.label = data.label
+    }
+
+    if (Object.keys(settings).length > 0) {
+      return settings
     }
   }
   return undefined

@@ -81,18 +81,31 @@ browser.browserAction.onClicked.addListener(() => {
 browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'get_settings') {
     void controller.getBridgeSettings().then((settings) => {
-      sendResponse({ ok: true, data: { websocketUrl: settings?.websocketUrl } })
+      sendResponse({ ok: true, data: settings })
     })
     return true
   }
 
   if (
-    message.type === 'save_settings' &&
-    typeof message.websocketUrl === 'string'
+    message.type === 'save_settings'
   ) {
-    void saveRuntimeSettings(message.websocketUrl).then(() => {
-      sendResponse({ ok: true })
-    })
+    void saveRuntimeSettings(message).then(
+      () => {
+        sendResponse({ ok: true })
+      },
+      (error: unknown) => {
+        sendResponse({
+          ok: false,
+          error: {
+            code: 'invalid_settings',
+            message:
+              error instanceof Error
+                ? error.message
+                : 'Unable to save settings.'
+          }
+        })
+      }
+    )
     return true
   }
 
@@ -125,18 +138,31 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   return undefined
 })
 
-async function saveRuntimeSettings (websocketUrl: string): Promise<void> {
+async function saveRuntimeSettings (message: {
+  websocketUrl?: unknown
+  pairingToken?: unknown
+  browserInstanceId?: unknown
+  browserName?: unknown
+  profileName?: unknown
+  label?: unknown
+}): Promise<void> {
   const existing = await controller.getBridgeSettings()
-  const browserName = existing?.browserName ?? 'Safari'
-  const profileName = existing?.profileName ?? 'Default'
+  const websocketUrl = requireString(message.websocketUrl, 'WebSocket URL')
+  const pairingToken = requireString(message.pairingToken, 'Pairing token')
+  const profileName = requireString(message.profileName, 'Profile name')
+  const label = requireString(message.label, 'Browser label')
+
   const settings: BridgeSettings = {
     websocketUrl,
-    pairingToken: existing?.pairingToken ?? '',
+    pairingToken,
     browserInstanceId:
-      existing?.browserInstanceId ?? createBrowserInstanceId(),
-    browserName,
+      stringValue(message.browserInstanceId) ??
+      existing?.browserInstanceId ??
+      createBrowserInstanceId(),
+    browserName:
+      stringValue(message.browserName) ?? existing?.browserName ?? 'Safari',
     profileName,
-    label: existing?.label ?? `${browserName} ${profileName}`
+    label
   }
 
   await controller.saveBridgeSettings(settings)
@@ -144,4 +170,18 @@ async function saveRuntimeSettings (websocketUrl: string): Promise<void> {
 
 function createBrowserInstanceId (): string {
   return `safari-${crypto.randomUUID()}`
+}
+
+function stringValue (value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() !== '' ? value : undefined
+}
+
+function requireString (value: unknown, label: string): string {
+  const normalized = stringValue(value)
+
+  if (normalized === undefined) {
+    throw new Error(`${label} is required.`)
+  }
+
+  return normalized
 }

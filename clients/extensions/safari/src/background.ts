@@ -21,6 +21,11 @@ import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 interface RuntimeMessage {
   type?: unknown
   websocketUrl?: unknown
+  pairingToken?: unknown
+  browserInstanceId?: unknown
+  browserName?: unknown
+  profileName?: unknown
+  label?: unknown
 }
 
 type SendResponse = (response: unknown) => void
