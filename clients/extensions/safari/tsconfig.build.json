@@ -6,6 +6,7 @@
   },
   "include": [
     "src/background.ts",
+    "src/background-entry.ts",
     "src/content-script-entry.ts",
     "src/placeholder.ts"
   ]
