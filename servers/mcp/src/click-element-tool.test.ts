@@ -53,6 +53,7 @@ void describe('MCP click element tool', () => {
 
   void it('clicks a valid page context target', async () => {
     const requestedTargets: unknown[] = []
+    const requestedBrowserInstanceIds: Array<string | undefined> = []
 
     const result = await clickElement(
       {
@@ -60,6 +61,7 @@ void describe('MCP click element tool', () => {
         timeoutMs: 5000,
         requestClickElement: async (options) => {
           requestedTargets.push(options.target)
+          requestedBrowserInstanceIds.push(options.browserInstanceId)
           return {
             ok: true,
             data: {
@@ -71,10 +73,12 @@ void describe('MCP click element tool', () => {
       },
       {
         kind: 'action',
-        id: 'bb-2'
+        id: 'bb-2',
+        browserInstanceId: 'chrome-default-test'
       }
     )
 
+    assert.deepEqual(requestedBrowserInstanceIds, ['chrome-default-test'])
     assert.deepEqual(requestedTargets, [
       {
         kind: 'action',

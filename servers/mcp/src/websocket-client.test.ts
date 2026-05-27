@@ -4,6 +4,7 @@ import { afterEach, describe, it } from 'node:test'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 import {
   requestClickElement,
+  requestBrowserList,
   requestFillInput,
   requestPageContent,
   requestPageContext,
@@ -20,9 +21,60 @@ afterEach(async () => {
 })
 
 void describe('BrowserBridge WebSocket client', () => {
-  void it('requests page context and returns the matching response', async () => {
+  void it('authenticates before sending a page context request', async () => {
+    const receivedPayloadTypes: string[] = []
     const server = await startServer((socket) => {
       socket.on('message', (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id?: string
+          payload: { type: string }
+        }
+        receivedPayloadTypes.push(request.payload.type)
+
+        if (request.payload.type === 'auth') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'auth_success'
+              }
+            })
+          )
+          return
+        }
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'page_context_response',
+              ok: true,
+              data: createRichPageContext()
+            }
+          })
+        )
+      })
+    })
+
+    assert.equal(
+      (
+        await requestPageContext({
+          websocketUrl: server.url,
+          pairingToken: 'local-token',
+          timeoutMs: 100,
+          createRequestId: () => 'request-auth-1'
+        })
+      ).ok,
+      true
+    )
+    assert.deepEqual(receivedPayloadTypes, ['auth', 'get_page_context'])
+  })
+
+  void it('requests page context and returns the matching response', async () => {
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as { id: string }
 
         socket.send(
@@ -42,6 +94,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestPageContext({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         createRequestId: () => 'request-1'
       }),
@@ -55,7 +108,7 @@ void describe('BrowserBridge WebSocket client', () => {
   void it('requests page content and returns the matching response', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: unknown
@@ -87,6 +140,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestPageContent({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         index: 2,
         createRequestId: () => 'request-content-1'
@@ -110,10 +164,104 @@ void describe('BrowserBridge WebSocket client', () => {
     })
   })
 
+  void it('requests the browser list', async () => {
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, (data) => {
+        const request = JSON.parse(rawDataToString(data)) as { id: string }
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'browser_list',
+              ok: true,
+              data: {
+                browsers: [
+                  {
+                    browserInstanceId: 'chrome-default-test',
+                    label: 'Chrome Default',
+                    browserName: 'Chrome',
+                    profileName: 'Default',
+                    connectedAt: '2026-05-25T10:00:00.000Z',
+                    lastSeenAt: '2026-05-25T10:00:00.000Z',
+                    capabilities: ['page_context']
+                  }
+                ]
+              }
+            }
+          })
+        )
+      })
+    })
+
+    assert.deepEqual(
+      await requestBrowserList({
+        websocketUrl: server.url,
+        pairingToken: 'local-token',
+        timeoutMs: 100,
+        createRequestId: () => 'request-browsers-1'
+      }),
+      {
+        ok: true,
+        data: {
+          browsers: [
+            {
+              browserInstanceId: 'chrome-default-test',
+              label: 'Chrome Default',
+              browserName: 'Chrome',
+              profileName: 'Default',
+              connectedAt: '2026-05-25T10:00:00.000Z',
+              lastSeenAt: '2026-05-25T10:00:00.000Z',
+              capabilities: ['page_context']
+            }
+          ]
+        }
+      }
+    )
+  })
+
+  void it('adds browserInstanceId targets to page requests', async () => {
+    let receivedTarget: unknown
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id: string
+          target: unknown
+        }
+        receivedTarget = request.target
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'page_context_response',
+              ok: true,
+              data: createRichPageContext()
+            }
+          })
+        )
+      })
+    })
+
+    await requestPageContext({
+      websocketUrl: server.url,
+      pairingToken: 'local-token',
+      timeoutMs: 100,
+      browserInstanceId: 'chrome-default-test',
+      createRequestId: () => 'request-target-1'
+    })
+
+    assert.deepEqual(receivedTarget, {
+      browserInstanceId: 'chrome-default-test'
+    })
+  })
+
   void it('requests a click action and returns the matching action result', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: unknown
@@ -143,6 +291,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestClickElement({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         target: {
           kind: 'link',
@@ -176,7 +325,7 @@ void describe('BrowserBridge WebSocket client', () => {
   void it('requests a fill input action and returns the matching action result', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: unknown
@@ -207,6 +356,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestFillInput({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         target: {
           formId: 'form-1',
@@ -243,7 +393,7 @@ void describe('BrowserBridge WebSocket client', () => {
   void it('requests a write editable action and returns the matching action result', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: unknown
@@ -274,6 +424,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestWriteEditable({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         target: {
           kind: 'editable',
@@ -310,7 +461,7 @@ void describe('BrowserBridge WebSocket client', () => {
   void it('requests a set checked action and returns the matching action result', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: unknown
@@ -342,6 +493,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestSetChecked({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         target: {
           formId: 'form-1',
@@ -379,7 +531,7 @@ void describe('BrowserBridge WebSocket client', () => {
   void it('requests a select options action and returns the matching action result', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: unknown
@@ -410,6 +562,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestSelectOptions({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         target: {
           formId: 'form-1',
@@ -446,7 +599,7 @@ void describe('BrowserBridge WebSocket client', () => {
   void it('requests a submit form action and returns the matching action result', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: unknown
@@ -475,6 +628,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestSubmitForm({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         target: {
           formId: 'form-1'
@@ -504,7 +658,7 @@ void describe('BrowserBridge WebSocket client', () => {
 
   void it('times out when no matching response arrives', async () => {
     const server = await startServer((socket) => {
-      socket.on('message', () => {
+      onAuthenticatedMessage(socket, () => {
         socket.send(
           JSON.stringify({
             type: 'message',
@@ -522,6 +676,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestPageContext({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 25,
         createRequestId: () => 'request-2'
       }),
@@ -537,7 +692,7 @@ void describe('BrowserBridge WebSocket client', () => {
 
   void it('returns a click-specific timeout when no action result arrives', async () => {
     const server = await startServer((socket) => {
-      socket.on('message', () => {
+      onAuthenticatedMessage(socket, () => {
         socket.send(
           JSON.stringify({
             type: 'message',
@@ -561,6 +716,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestClickElement({
         websocketUrl: server.url,
+        pairingToken: 'local-token',
         timeoutMs: 25,
         target: {
           kind: 'link',
@@ -578,6 +734,62 @@ void describe('BrowserBridge WebSocket client', () => {
     )
   })
 
+  void it('returns ambiguous_browser_target errors from the router', async () => {
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, () => {
+        socket.send(
+          JSON.stringify({
+            type: 'error',
+            error: {
+              code: 'ambiguous_browser_target',
+              message:
+                'Multiple BrowserBridge browsers are online. Specify browserInstanceId.',
+              browsers: [
+                {
+                  browserInstanceId: 'chrome-default-test',
+                  label: 'Chrome Default',
+                  browserName: 'Chrome',
+                  profileName: 'Default',
+                  connectedAt: '2026-05-25T10:00:00.000Z',
+                  lastSeenAt: '2026-05-25T10:00:00.000Z',
+                  capabilities: ['page_context']
+                }
+              ]
+            }
+          })
+        )
+      })
+    })
+
+    assert.deepEqual(
+      await requestPageContext({
+        websocketUrl: server.url,
+        pairingToken: 'local-token',
+        timeoutMs: 100,
+        createRequestId: () => 'request-ambiguous-1'
+      }),
+      {
+        ok: false,
+        error: {
+          code: 'ambiguous_browser_target',
+          message:
+            'Multiple BrowserBridge browsers are online. Specify browserInstanceId.',
+          browsers: [
+            {
+              browserInstanceId: 'chrome-default-test',
+              label: 'Chrome Default',
+              browserName: 'Chrome',
+              profileName: 'Default',
+              connectedAt: '2026-05-25T10:00:00.000Z',
+              lastSeenAt: '2026-05-25T10:00:00.000Z',
+              capabilities: ['page_context']
+            }
+          ]
+        }
+      }
+    )
+  })
+
   void it('returns connection_failed when the WebSocket cannot connect', async () => {
     const closedServer = await startServer(() => {})
     await closeServer(closedServer.server)
@@ -585,6 +797,7 @@ void describe('BrowserBridge WebSocket client', () => {
     assert.deepEqual(
       await requestPageContext({
         websocketUrl: closedServer.url,
+        pairingToken: 'local-token',
         timeoutMs: 100,
         createRequestId: () => 'request-3'
       }),
@@ -598,6 +811,35 @@ void describe('BrowserBridge WebSocket client', () => {
     )
   })
 })
+
+function onAuthenticatedMessage (
+  socket: WebSocket,
+  onMessage: (data: RawData) => void
+): void {
+  socket.on('message', (data) => {
+    const message = JSON.parse(rawDataToString(data)) as {
+      id?: string
+      payload?: {
+        type?: string
+      }
+    }
+
+    if (message.payload?.type === 'auth') {
+      socket.send(
+        JSON.stringify({
+          type: 'message',
+          id: message.id,
+          payload: {
+            type: 'auth_success'
+          }
+        })
+      )
+      return
+    }
+
+    onMessage(data)
+  })
+}
 
 async function startServer (
   onConnection: (socket: WebSocket) => void

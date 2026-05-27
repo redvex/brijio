@@ -6,8 +6,9 @@ browser extension session through the WebSocket server.
 
 ## Current Scope
 
-The current implementation exposes the read-only MCP resources from ADR 0007
-and ADR 0009:
+The current implementation authenticates to the BrowserBridge WebSocket server
+with a local pairing token and exposes the read-only MCP resources from ADR
+0007 and ADR 0009:
 
 - `browser://page/current`, named `current-page-context`
 - `browser://page/current/content/{index}`, named `current-page-content`
@@ -23,6 +24,7 @@ sends a `get_page_content` request for that chunk, waits for the matching
 
 The implementation also exposes MCP tools:
 
+- `list_browsers`
 - `read_current_page`
 - `click_element`
 - `fill_input`
@@ -30,6 +32,10 @@ The implementation also exposes MCP tools:
 - `set_checked`
 - `select_options`
 - `submit_form`
+
+`list_browsers` returns the browser instances currently online for the
+configured pairing token. Use it when more than one browser extension instance
+is connected and an agent needs to choose a target.
 
 `read_current_page` reads the current page context and, by default, the first
 available readable content chunk. It exists for tool-first clients and agents
@@ -58,23 +64,26 @@ visible single-select or multi-select control. `submit_form` submits a visible
 form by short-lived form ID. Each tool sends one ADR 0016 `perform_action`
 message and waits for the matching `action_result`.
 
-The stdio MCP runtime uses the official TypeScript MCP SDK for server
-lifecycle, protocol framing, initialization, resource discovery, resource
-reads, tool discovery, and tool calls. BrowserBridge code only owns page
-reading behavior and WebSocket request routing.
+The HTTP MCP runtime uses the official TypeScript MCP SDK Streamable HTTP
+transport for server lifecycle, protocol framing, initialization, resource
+discovery, resource reads, tool discovery, and tool calls. BrowserBridge code
+owns HTTP boundary checks, page reading behavior, and WebSocket request routing.
 
 The Chrome extension must already be connected by the user. The MCP server does
 not start browser access on its own and does not stream or store page state.
 Clicking and filling inputs are discrete browser-mutating tool calls, not
 background automation.
 
+Browser tools accept optional `browserInstanceId`. If omitted, the WebSocket
+server routes automatically only when exactly one browser is online for the
+pairing token. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` can set a default target for
+all tool and resource requests from this MCP server.
+
 Out of scope for this package version:
 
 - Navigation tools.
 - CSS selector, XPath, text-query, coordinate, hover, keyboard, drag, or
   multi-step action support.
-- Authentication and private session routing.
-- Multiple browser sessions.
 - Page body text or DOM extraction inside the MCP server. The MCP server only
   relays explicit requests to the connected extension.
 - Server-side LLM summarization.
@@ -150,6 +159,11 @@ Error codes are:
 - `invalid_response`
 - `browser_error`
 - `invalid_resource_uri`
+- `auth_required`
+- `auth_failed`
+- `browser_unavailable`
+- `ambiguous_browser_target`
+- `invalid_browser_target`
 
 ## Tool Results
 
@@ -158,11 +172,12 @@ Error codes are:
 ```json
 {
   "includeContent": true,
-  "maxContentChunks": 1
+  "maxContentChunks": 1,
+  "browserInstanceId": "chrome-default-test"
 }
 ```
 
-Both fields are optional. `includeContent` defaults to `true`.
+All fields are optional. `includeContent` defaults to `true`.
 `maxContentChunks` defaults to `1` and must be an integer from `0` through `5`.
 Use `includeContent: false` or `maxContentChunks: 0` to return only page
 context.
@@ -204,7 +219,8 @@ errors use:
 ```json
 {
   "kind": "link",
-  "id": "bb-1"
+  "id": "bb-1",
+  "browserInstanceId": "chrome-default-test"
 }
 ```
 
@@ -247,7 +263,8 @@ Click failures use the same structured shape:
 {
   "formId": "form-1",
   "controlId": "control-1",
-  "text": "hello"
+  "text": "hello",
+  "browserInstanceId": "chrome-default-test"
 }
 ```
 
@@ -294,7 +311,8 @@ Fill failures use the same structured shape:
 ```json
 {
   "id": "bb-1",
-  "text": "Plain text replacement"
+  "text": "Plain text replacement",
+  "browserInstanceId": "chrome-default-test"
 }
 ```
 
@@ -324,7 +342,8 @@ Successful editable fill calls return:
 {
   "formId": "form-1",
   "controlId": "control-1",
-  "checked": true
+  "checked": true,
+  "browserInstanceId": "chrome-default-test"
 }
 ```
 
@@ -355,7 +374,8 @@ Successful checked-state calls return:
 {
   "formId": "form-1",
   "controlId": "control-1",
-  "values": ["alpha", "gamma"]
+  "values": ["alpha", "gamma"],
+  "browserInstanceId": "chrome-default-test"
 }
 ```
 
@@ -383,7 +403,8 @@ Successful select calls return:
 
 ```json
 {
-  "formId": "form-1"
+  "formId": "form-1",
+  "browserInstanceId": "chrome-default-test"
 }
 ```
 
@@ -409,10 +430,25 @@ Expected local variables:
 ```sh
 BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
 BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
+BROWSERBRIDGE_PAIRING_TOKEN=replace-with-generated-token
+BROWSERBRIDGE_BROWSER_INSTANCE_ID=
+MCP_HTTP_HOST=127.0.0.1
+MCP_HTTP_PORT=8788
+MCP_HTTP_PATH=/mcp
+MCP_HTTP_AUTH_TOKEN=replace-with-generated-mcp-token
+MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost
+MCP_HTTP_ALLOWED_ORIGINS=
 ```
 
 `WEBSOCKET_URL` is also accepted as a backward-compatible alias for
-`BROWSERBRIDGE_WEBSOCKET_URL`.
+`BROWSERBRIDGE_WEBSOCKET_URL`. `BROWSERBRIDGE_TOKEN` is accepted as a
+backward-compatible alias for `BROWSERBRIDGE_PAIRING_TOKEN`.
+
+`MCP_HTTP_AUTH_TOKEN` is required. It authenticates MCP clients to this HTTP
+server and must not be reused as the BrowserBridge pairing token.
+`MCP_HTTP_ALLOWED_HOSTS` accepts comma-separated host names or host values.
+`MCP_HTTP_ALLOWED_ORIGINS` accepts comma-separated origins for browser-based
+MCP clients that send an `Origin` header.
 
 ## Development
 
@@ -438,16 +474,21 @@ pnpm --filter @browserbridge/websocket dev
 ```
 
 Build and load the Chrome extension, configure it with
-`ws://127.0.0.1:8787`, then start the bridge from the extension action.
+`ws://127.0.0.1:8787` and the same pairing token, then start the bridge from
+the extension action.
 
-Run the MCP server over stdio:
+Run the MCP server over HTTP:
 
 ```sh
-BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787 pnpm --filter @browserbridge/mcp exec tsx src/index.ts
+BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787 BROWSERBRIDGE_PAIRING_TOKEN=your-local-token MCP_HTTP_AUTH_TOKEN=your-mcp-http-token pnpm --filter @browserbridge/mcp dev
 ```
 
-An MCP-compatible client can then read `browser://page/current` for rich page
-context. When `data.content.available` is true, the client can read
+The default MCP endpoint is `http://127.0.0.1:8788/mcp`. MCP clients must send
+`Authorization: Bearer your-mcp-http-token`.
+
+An MCP-compatible client can call `list_browsers` to discover online browser
+instances and then read `browser://page/current` for rich page context. When
+`data.content.available` is true, the client can read
 `browser://page/current/content/1`, then continue with later indexes while
 `data.truncated` is true.
 

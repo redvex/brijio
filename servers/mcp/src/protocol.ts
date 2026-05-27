@@ -1,7 +1,20 @@
 export interface WebSocketEnvelope {
   type: 'message'
   id?: string
+  target?: {
+    browserInstanceId?: string
+  }
   payload: unknown
+}
+
+export interface BrowserPresence {
+  browserInstanceId: string
+  label: string
+  browserName: string
+  profileName: string
+  connectedAt: string
+  lastSeenAt: string
+  capabilities: string[]
 }
 
 export interface PageHeading {
@@ -137,6 +150,12 @@ export interface SubmitFormActionResultData {
 }
 
 export type BrowserBridgeErrorCode =
+  | 'auth_required'
+  | 'auth_failed'
+  | 'invalid_auth_message'
+  | 'browser_unavailable'
+  | 'ambiguous_browser_target'
+  | 'invalid_browser_target'
   | 'connection_failed'
   | 'timeout'
   | 'invalid_response'
@@ -153,6 +172,7 @@ export type BrowserBridgeResourceResult<T> =
     error: {
       code: BrowserBridgeErrorCode
       message: string
+      browsers?: BrowserPresence[]
     }
   }
 
@@ -177,6 +197,9 @@ export type BrowserBridgeSelectOptionsResult =
 export type BrowserBridgeSubmitFormResult =
   BrowserBridgeResourceResult<SubmitFormActionResultData>
 
+export type BrowserBridgeBrowserListResult =
+  BrowserBridgeResourceResult<{ browsers: BrowserPresence[] }>
+
 export type PageContextParseResult =
   | BrowserBridgePageContextResult
   | { ok: false, ignored: true }
@@ -191,6 +214,10 @@ export type ActionResultParseResult =
   | BrowserBridgeSetCheckedResult
   | BrowserBridgeSelectOptionsResult
   | BrowserBridgeSubmitFormResult
+  | { ok: false, ignored: true }
+
+export type BrowserListParseResult =
+  | BrowserBridgeBrowserListResult
   | { ok: false, ignored: true }
 
 export function createGetPageContextEnvelope (
@@ -422,6 +449,65 @@ export function parseActionResultEnvelope (
   return invalidResponse()
 }
 
+export function parseBrowserListEnvelope (
+  value: unknown,
+  requestId: string
+): BrowserListParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload) || value.payload.type !== 'browser_list') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok !== true || !isRecord(value.payload.data)) {
+    return invalidResponse()
+  }
+
+  if (!isArrayOf(value.payload.data.browsers, isBrowserPresence)) {
+    return invalidResponse()
+  }
+
+  return {
+    ok: true,
+    data: {
+      browsers: value.payload.data.browsers
+    }
+  }
+}
+
+export function parseRouterErrorEnvelope (
+  value: unknown
+): BrowserBridgeResourceResult<never> | { ok: false, ignored: true } {
+  if (!isRecord(value) || value.type !== 'error') {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.error) || typeof value.error.message !== 'string') {
+    return invalidResponse()
+  }
+
+  if (!isBrowserBridgeErrorCode(value.error.code)) {
+    return invalidResponse()
+  }
+
+  return {
+    ok: false,
+    error: {
+      code: value.error.code,
+      message: value.error.message,
+      ...(isArrayOf(value.error.browsers, isBrowserPresence)
+        ? { browsers: value.error.browsers }
+        : {})
+    }
+  }
+}
+
 function parsePageContextSuccessPayload (
   payload: Record<PropertyKey, unknown>
 ): BrowserBridgePageContextResult {
@@ -568,6 +654,27 @@ export function connectionFailedResponse (
   }
 }
 
+export function authRequiredResponse (): BrowserBridgeResourceResult<never> {
+  return {
+    ok: false,
+    error: {
+      code: 'auth_required',
+      message: 'BROWSERBRIDGE_PAIRING_TOKEN must be configured.'
+    }
+  }
+}
+
+export function createAuthEnvelope (token: string): WebSocketEnvelope {
+  return {
+    type: 'message',
+    payload: {
+      type: 'auth',
+      role: 'mcp',
+      token
+    }
+  }
+}
+
 function isPageContext (value: unknown): value is PageContext {
   if (!isRecord(value)) {
     return false
@@ -691,6 +798,40 @@ function isPageAction (value: unknown): value is PageAction {
   }
 
   return isRecord(value) && typeof value.enabled === 'boolean'
+}
+
+function isBrowserPresence (value: unknown): value is BrowserPresence {
+  return (
+    hasStringProperties(value, [
+      'browserInstanceId',
+      'label',
+      'browserName',
+      'profileName',
+      'connectedAt',
+      'lastSeenAt'
+    ]) &&
+    isRecord(value) &&
+    Array.isArray(value.capabilities) &&
+    value.capabilities.every((capability) => typeof capability === 'string')
+  )
+}
+
+function isBrowserBridgeErrorCode (
+  value: unknown
+): value is BrowserBridgeErrorCode {
+  return (
+    value === 'auth_required' ||
+    value === 'auth_failed' ||
+    value === 'invalid_auth_message' ||
+    value === 'browser_unavailable' ||
+    value === 'ambiguous_browser_target' ||
+    value === 'invalid_browser_target' ||
+    value === 'connection_failed' ||
+    value === 'timeout' ||
+    value === 'invalid_response' ||
+    value === 'browser_error' ||
+    value === 'invalid_resource_uri'
+  )
 }
 
 function isClickElementActionResultData (

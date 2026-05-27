@@ -88,7 +88,8 @@ void describe('MCP fill input tool', () => {
         requestFillInput: async (options) => {
           requestedInputs.push({
             target: options.target,
-            text: options.text
+            text: options.text,
+            browserInstanceId: options.browserInstanceId
           })
           return {
             ok: true,
@@ -103,7 +104,8 @@ void describe('MCP fill input tool', () => {
       {
         formId: 'form-1',
         controlId: 'control-1',
-        text: ''
+        text: '',
+        browserInstanceId: 'chrome-default-test'
       }
     )
 
@@ -113,7 +115,8 @@ void describe('MCP fill input tool', () => {
           formId: 'form-1',
           controlId: 'control-1'
         },
-        text: ''
+        text: '',
+        browserInstanceId: 'chrome-default-test'
       }
     ])
     assert.deepEqual(result, {

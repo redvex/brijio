@@ -16,17 +16,19 @@ holders.
 
 ## Status
 
-This project has the initial local WebSocket transport, Chrome extension page
-context response, and first MCP page-context resource in place. Safari Web
-Extension support with full Chrome feature parity is now implemented (ADR 0019),
-using shared logic from `@browserbridge/shared`. The current working milestone
-is:
+This project has the local WebSocket transport, Chrome extension page context
+and action handling, MCP resources and tools, and local pairing/presence routing
+in place. Safari Web Extension support with full Chrome feature parity is also
+implemented (ADR 0019), using shared logic from `@browserbridge/shared`. The
+current working milestone is:
 
 1. A local Chrome extension manually connects to the WebSocket server.
-2. The MCP server requests page context through the WebSocket server.
-3. The Chrome extension responds with the current tab URL and title.
-4. The Safari extension has the same capabilities as Chrome, using shared
-   logic and Safari-specific adapters.
+2. The extension authenticates with a local pairing token and announces browser
+   presence.
+3. The MCP server authenticates with the same token, lists online browser
+   instances, and routes explicit page reads or actions to one browser.
+4. The Safari extension has the same browser capabilities as Chrome, using
+   shared logic and Safari-specific adapters.
 
 Features beyond that milestone require an approved ADR before implementation.
 
@@ -149,9 +151,17 @@ sequenceDiagram
   participant Tab as Browser Tab
 
   User->>Ext: Start bridge
-  Ext->>WS: extension_connected
+  Ext->>WS: auth role=extension token
+  WS-->>Ext: auth_success
+  WS->>Ext: browser_presence_request
+  Ext-->>WS: browser_presence_announce
+  Agent->>MCP: tools/call list_browsers
+  MCP->>WS: auth role=mcp token
+  WS-->>MCP: auth_success
+  MCP->>WS: list_browsers
+  WS-->>MCP: browser_list
   Agent->>MCP: resources/read browser://page/current
-  MCP->>WS: get_page_context
+  MCP->>WS: get_page_context target optional
   WS->>Ext: get_page_context
   Ext->>Tab: Read active tab URL and title
   Tab-->>Ext: URL and title
@@ -162,8 +172,13 @@ sequenceDiagram
 
 ## Protocol Messages
 
-The initial message schema should cover:
+The current message schema covers:
 
+- `auth`
+- `auth_success`
+- `browser_presence_request`
+- `browser_presence_announce`
+- `browser_list`
 - `extension_connected`
 - `get_status`
 - `status_response`
@@ -185,6 +200,7 @@ The current MCP server exposes page resources:
 
 It also exposes tools for explicit page reads and discrete browser actions:
 
+- `list_browsers`
 - `read_current_page`
 - `click_element`
 - `fill_input`
@@ -231,9 +247,26 @@ The runtime profile also serves the local form test page over HTTP:
 http://127.0.0.1:${TEST_PAGE_PORT:-8080}/test.html
 ```
 
-The WebSocket server currently runs a temporary no-auth, single-channel
-peer-forwarding protocol. The Chrome extension and MCP server can use that
-local channel for the first page-context milestone.
+Generate a local pairing token before starting the runtime:
+
+```sh
+pnpm run token
+```
+
+Set the generated value as `BROWSERBRIDGE_PAIRING_TOKEN` for the WebSocket and
+MCP servers. Configure the same token in the Chrome extension setup page along
+with the local WebSocket URL.
+
+Generate a separate MCP HTTP bearer token and set it as
+`MCP_HTTP_AUTH_TOKEN`. MCP clients connect to:
+
+```text
+http://127.0.0.1:${MCP_HTTP_PORT:-8788}${MCP_HTTP_PATH:-/mcp}
+```
+
+The MCP HTTP token is for agent-to-MCP access. It is intentionally separate
+from `BROWSERBRIDGE_PAIRING_TOKEN`, which scopes private routing between the
+MCP server, WebSocket server, and browser extension.
 
 ### Testing The WebSocket Server With A CLI
 
@@ -249,15 +282,28 @@ In another terminal, connect with `wscat`:
 pnpm dlx wscat -c ws://127.0.0.1:8787
 ```
 
-Send a valid message:
+Send an auth message first:
 
 ```json
-{ "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
+{
+  "type": "message",
+  "id": "auth-1",
+  "payload": {
+    "type": "auth",
+    "role": "mcp",
+    "token": "your-local-token"
+  }
+}
 ```
 
-The sending terminal should not receive its own message. To test peer fan-out,
-open a second `wscat` terminal connected to the same URL, then send the message
-from either terminal. The other connected client should receive the message.
+Then send a valid MCP-scoped request:
+
+```json
+{ "type": "message", "id": "cli-1", "payload": { "type": "list_browsers" } }
+```
+
+The response lists browser instances that authenticated with the same pairing
+token and announced presence.
 
 To test structured error handling, send invalid JSON:
 
@@ -279,13 +325,24 @@ WEBSOCKET_HOST=127.0.0.1
 WEBSOCKET_PORT=8787
 BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
 BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
-BROWSERBRIDGE_TOKEN=local-dev-token
-MCP_SESSION_ID=local
+BROWSERBRIDGE_PAIRING_TOKEN=replace-with-generated-token
+BROWSERBRIDGE_BROWSER_INSTANCE_ID=
+MCP_HTTP_HOST=127.0.0.1
+MCP_HTTP_PORT=8788
+MCP_HTTP_PATH=/mcp
+MCP_HTTP_AUTH_TOKEN=replace-with-generated-mcp-token
+MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost
+MCP_HTTP_ALLOWED_ORIGINS=
 ```
 
-`BROWSERBRIDGE_TOKEN` is reserved for the later authenticated routing milestone;
-the current local WebSocket peer-forwarding server does not require
-authentication.
+`BROWSERBRIDGE_TOKEN` is accepted as a backward-compatible alias for
+`BROWSERBRIDGE_PAIRING_TOKEN`. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` is optional;
+when set, MCP tools target that browser by default. Tool calls can still pass a
+different `browserInstanceId`.
+
+`MCP_HTTP_AUTH_TOKEN` is required for the HTTP MCP server. `MCP_HTTP_ALLOWED_HOSTS`
+and `MCP_HTTP_ALLOWED_ORIGINS` constrain which HTTP Host and Origin headers can
+reach MCP handling.
 
 ## Security Model
 
@@ -303,6 +360,9 @@ Security expectations:
 - Minimal browser permissions.
 - Basic token handling for local development.
 - Authenticated routing between MCP and WebSocket components.
+- Bearer-token authentication for MCP HTTP clients.
+- Host and Origin validation on the MCP HTTP endpoint.
+- In-memory browser presence while the extension WebSocket is connected.
 - Request IDs and timeouts for all pending browser requests.
 - No continuous page streaming by default.
 - No page-content persistence unless a future approved feature requires it.
@@ -314,10 +374,13 @@ Chrome and Safari are the current supported extension targets.
 Chrome behavior:
 
 - User manually connects and disconnects from the extension action after setup.
-- The background service worker owns the WebSocket connection.
+- The background script owns the WebSocket connection.
+- The extension authenticates with the configured pairing token.
+- The extension announces browser instance presence after authentication and in
+  response to server presence requests.
 - The extension responds to MCP-originated requests.
-- The extension can read current tab URL and title, extract page context and
-  content, and perform DOM actions.
+- The extension can read current tab context/content and perform approved page
+  actions from explicit MCP requests.
 - Optional host permissions for regular pages are requested at runtime.
 
 Safari behavior:

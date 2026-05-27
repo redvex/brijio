@@ -9,6 +9,7 @@
 import {
   BrowserBridgeBackgroundController,
   createGlobalTimers,
+  type BridgeSettings,
   type BrowserBridgeSocket,
   type ClickActionTarget,
   type WriteTextActionTarget,
@@ -79,8 +80,8 @@ browser.browserAction.onClicked.addListener(() => {
 
 browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'get_settings') {
-    void controller.getWebSocketUrl().then((websocketUrl) => {
-      sendResponse({ ok: true, data: { websocketUrl } })
+    void controller.getBridgeSettings().then((settings) => {
+      sendResponse({ ok: true, data: { websocketUrl: settings?.websocketUrl } })
     })
     return true
   }
@@ -89,7 +90,7 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     message.type === 'save_settings' &&
     typeof message.websocketUrl === 'string'
   ) {
-    void controller.saveWebSocketUrl(message.websocketUrl).then(() => {
+    void saveRuntimeSettings(message.websocketUrl).then(() => {
       sendResponse({ ok: true })
     })
     return true
@@ -123,3 +124,24 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   })
   return undefined
 })
+
+async function saveRuntimeSettings (websocketUrl: string): Promise<void> {
+  const existing = await controller.getBridgeSettings()
+  const browserName = existing?.browserName ?? 'Safari'
+  const profileName = existing?.profileName ?? 'Default'
+  const settings: BridgeSettings = {
+    websocketUrl,
+    pairingToken: existing?.pairingToken ?? '',
+    browserInstanceId:
+      existing?.browserInstanceId ?? createBrowserInstanceId(),
+    browserName,
+    profileName,
+    label: existing?.label ?? `${browserName} ${profileName}`
+  }
+
+  await controller.saveBridgeSettings(settings)
+}
+
+function createBrowserInstanceId (): string {
+  return `safari-${crypto.randomUUID()}`
+}

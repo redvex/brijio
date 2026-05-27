@@ -32,6 +32,7 @@ export type BrowserBridgeToolResult<T> =
 export interface ReadCurrentPageInput {
   includeContent?: boolean
   maxContentChunks?: number
+  browserInstanceId?: unknown
 }
 
 export interface ReadCurrentPageData {
@@ -44,6 +45,12 @@ export interface ReadCurrentPageData {
 export type ReadCurrentPageResult =
   BrowserBridgeToolResult<ReadCurrentPageData>
 
+interface NormalizedReadCurrentPageInput {
+  includeContent: boolean
+  maxContentChunks: number
+  browserInstanceId?: string
+}
+
 export async function readCurrentPage (
   config: BrowserBridgePageContextConfig,
   input: ReadCurrentPageInput
@@ -54,7 +61,10 @@ export async function readCurrentPage (
     return normalizedInput
   }
 
-  const contextResult = await getCurrentPageContext(config)
+  const contextResult = await getCurrentPageContext(
+    config,
+    normalizedInput.data.browserInstanceId
+  )
 
   if (!contextResult.ok) {
     return contextResult
@@ -79,15 +89,19 @@ export async function readCurrentPage (
   return await readContentChunks(
     config,
     contextResult.data,
-    normalizedInput.data.maxContentChunks
+    normalizedInput.data.maxContentChunks,
+    normalizedInput.data.browserInstanceId
   )
 }
 
 function normalizeInput (
   input: ReadCurrentPageInput
-): BrowserBridgeToolResult<Required<ReadCurrentPageInput>> {
+): BrowserBridgeToolResult<NormalizedReadCurrentPageInput> {
   const includeContent = input.includeContent ?? true
   const maxContentChunks = input.maxContentChunks ?? defaultMaxContentChunks
+  const browserInstanceId = normalizeBrowserInstanceId(
+    input.browserInstanceId
+  )
 
   if (typeof includeContent !== 'boolean') {
     return invalidToolInputResponse('includeContent must be a boolean.')
@@ -103,11 +117,18 @@ function normalizeInput (
     )
   }
 
+  if (!browserInstanceId.ok) {
+    return browserInstanceId
+  }
+
   return {
     ok: true,
     data: {
       includeContent,
-      maxContentChunks
+      maxContentChunks,
+      ...(browserInstanceId.data !== undefined
+        ? { browserInstanceId: browserInstanceId.data }
+        : {})
     }
   }
 }
@@ -115,13 +136,18 @@ function normalizeInput (
 async function readContentChunks (
   config: BrowserBridgePageContextConfig,
   context: PageContext,
-  maxContentChunks: number
+  maxContentChunks: number,
+  browserInstanceId?: string
 ): Promise<ReadCurrentPageResult> {
   const content: PageContent[] = []
   let nextIndex = context.content.firstIndex
 
   for (let count = 0; count < maxContentChunks; count += 1) {
-    const contentResult = await getCurrentPageContent(config, nextIndex)
+    const contentResult = await getCurrentPageContent(
+      config,
+      nextIndex,
+      browserInstanceId
+    )
 
     if (!contentResult.ok) {
       return contentResult
@@ -155,6 +181,28 @@ async function readContentChunks (
       contentTruncated,
       nextContentIndex: contentTruncated ? nextIndex : null
     }
+  }
+}
+
+function normalizeBrowserInstanceId (
+  value: unknown
+): BrowserBridgeToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'browserInstanceId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 

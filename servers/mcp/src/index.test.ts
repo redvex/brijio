@@ -1,37 +1,132 @@
 import assert from 'node:assert/strict'
 import { type AddressInfo } from 'node:net'
 import { afterEach, describe, it } from 'node:test'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
+import {
+  startBrowserBridgeMcpHttpServer,
+  type BrowserBridgeMcpHttpRuntime
+} from './http-server.js'
 
-const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const currentPageResourceUri = 'browser://page/current'
 const currentPageContentTemplateUri = 'browser://page/current/content/{index}'
 const servers: WebSocketServer[] = []
+const mcpRuntimes: BrowserBridgeMcpHttpRuntime[] = []
 
 afterEach(async () => {
+  await Promise.all(mcpRuntimes.splice(0).map(async (runtime) => {
+    await runtime.close()
+  }))
   await Promise.all(servers.splice(0).map(closeServer))
 })
 
-void describe('BrowserBridge MCP stdio server', () => {
+void describe('BrowserBridge MCP HTTP server', () => {
+  void it('rejects unauthenticated MCP HTTP requests', async () => {
+    const runtime = await startTestMcpRuntime()
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('rejects disallowed origins before MCP handling', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedOrigins: ['http://trusted.example']
+    })
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          authorization: 'Bearer test-mcp-token',
+          'content-type': 'application/json',
+          origin: 'http://evil.example'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 403)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'forbidden_origin',
+          message: 'Origin is not allowed for BrowserBridge MCP HTTP.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('rejects disallowed hosts before MCP handling', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example']
+    })
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          authorization: 'Bearer test-mcp-token',
+          'content-type': 'application/json',
+          host: 'evil.example'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 403)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'forbidden_host',
+          message: 'Host is not allowed for BrowserBridge MCP HTTP.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
   void it('uses the official MCP lifecycle for initialize, resource discovery, and ping', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -84,6 +179,12 @@ void describe('BrowserBridge MCP stdio server', () => {
         })),
         [
           {
+            name: 'list_browsers',
+            title: 'List Browsers',
+            description:
+              'List BrowserBridge browser instances currently online for the configured pairing token.'
+          },
+          {
             name: 'read_current_page',
             title: 'Read Current Page',
             description:
@@ -129,7 +230,17 @@ void describe('BrowserBridge MCP stdio server', () => {
       )
       assert.deepEqual(tools.tools[0].inputSchema, {
         type: 'object',
+        properties: {},
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[1].inputSchema, {
+        type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           includeContent: {
             type: 'boolean',
             description:
@@ -144,9 +255,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[1].inputSchema, {
+      assert.deepEqual(tools.tools[2].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           id: {
             type: 'string',
             description:
@@ -162,9 +278,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[2].inputSchema, {
+      assert.deepEqual(tools.tools[3].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           controlId: {
             type: 'string',
             description:
@@ -184,9 +305,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[3].inputSchema, {
+      assert.deepEqual(tools.tools[4].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           id: {
             type: 'string',
             description:
@@ -202,9 +328,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[4].inputSchema, {
+      assert.deepEqual(tools.tools[5].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           checked: {
             type: 'boolean',
             description: 'Desired checked state.'
@@ -224,9 +355,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[5].inputSchema, {
+      assert.deepEqual(tools.tools[6].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           controlId: {
             type: 'string',
             description:
@@ -250,9 +386,14 @@ void describe('BrowserBridge MCP stdio server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[6].inputSchema, {
+      assert.deepEqual(tools.tools[7].inputSchema, {
         type: 'object',
         properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional BrowserBridge browser instance ID to target.'
+          },
           formId: {
             type: 'string',
             description:
@@ -288,12 +429,13 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('reads rich page context and paginated page content resources', async () => {
     const server = await startServer((socket) => {
-      socket.on('message', (data) => {
+      onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as {
           id: string
           payload: {
@@ -318,6 +460,33 @@ void describe('BrowserBridge MCP stdio server', () => {
                 type: 'page_context_response',
                 ok: true,
                 data: createRichPageContext()
+              }
+            })
+          )
+          return
+        }
+
+        if (request.payload.type === 'list_browsers') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'browser_list',
+                ok: true,
+                data: {
+                  browsers: [
+                    {
+                      browserInstanceId: 'chrome-default-test',
+                      browserName: 'Chrome',
+                      profileName: 'Default',
+                      label: 'Chrome Default on MacBook Pro',
+                      connectedAt: '2026-05-25T10:00:00.000Z',
+                      lastSeenAt: '2026-05-25T10:00:01.000Z',
+                      capabilities: ['page_context', 'page_actions']
+                    }
+                  ]
+                }
               }
             })
           )
@@ -439,20 +608,11 @@ void describe('BrowserBridge MCP stdio server', () => {
         )
       })
     })
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
+    const runtime = await startTestMcpRuntime({
+      websocketUrl: server.url
     })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: server.url,
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
-      },
-      stderr: 'pipe'
-    })
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -518,6 +678,31 @@ void describe('BrowserBridge MCP stdio server', () => {
           ],
           contentTruncated: false,
           nextContentIndex: null
+        }
+      })
+
+      const browserListResult = await client.callTool(
+        {
+          name: 'list_browsers',
+          arguments: {}
+        },
+        undefined,
+        { timeout: 1000 }
+      )
+      assert.deepEqual(JSON.parse(getOnlyToolText(browserListResult)), {
+        ok: true,
+        data: {
+          browsers: [
+            {
+              browserInstanceId: 'chrome-default-test',
+              browserName: 'Chrome',
+              profileName: 'Default',
+              label: 'Chrome Default on MacBook Pro',
+              connectedAt: '2026-05-25T10:00:00.000Z',
+              lastSeenAt: '2026-05-25T10:00:01.000Z',
+              capabilities: ['page_context', 'page_actions']
+            }
+          ]
         }
       })
 
@@ -660,24 +845,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured error for invalid page content resource indexes', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -701,24 +876,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured tool error for invalid page reading input', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -742,24 +907,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured tool error for invalid click input', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -784,24 +939,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured tool error for invalid fill input', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -827,9 +972,53 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 })
+
+async function startTestMcpRuntime (
+  options: {
+    websocketUrl?: string
+    allowedHosts?: string[]
+    allowedOrigins?: string[]
+  } = {}
+): Promise<BrowserBridgeMcpHttpRuntime> {
+  const runtime = await startBrowserBridgeMcpHttpServer({
+    host: '127.0.0.1',
+    port: 0,
+    path: '/mcp',
+    authToken: 'test-mcp-token',
+    allowedHosts: options.allowedHosts ?? ['127.0.0.1'],
+    allowedOrigins: options.allowedOrigins ?? [],
+    pageContextConfig: {
+      websocketUrl: options.websocketUrl ?? 'ws://127.0.0.1:1',
+      timeoutMs: 100,
+      pairingToken: 'local-token'
+    }
+  })
+
+  mcpRuntimes.push(runtime)
+
+  return runtime
+}
+
+function createHttpClient (): Client {
+  return new Client({
+    name: 'browserbridge-mcp-test',
+    version: '0.0.0'
+  })
+}
+
+function createHttpTransport (url: string): StreamableHTTPClientTransport {
+  return new StreamableHTTPClientTransport(new URL(url), {
+    requestInit: {
+      headers: {
+        authorization: 'Bearer test-mcp-token'
+      }
+    }
+  })
+}
 
 async function startServer (
   onConnection: (socket: WebSocket) => void
@@ -850,6 +1039,35 @@ async function startServer (
     server,
     url: `ws://127.0.0.1:${address.port}`
   }
+}
+
+function onAuthenticatedMessage (
+  socket: WebSocket,
+  onMessage: (data: RawData) => void
+): void {
+  socket.on('message', (data) => {
+    const request = JSON.parse(rawDataToString(data)) as {
+      id?: string
+      payload?: {
+        type?: string
+      }
+    }
+
+    if (request.payload?.type === 'auth') {
+      socket.send(
+        JSON.stringify({
+          type: 'message',
+          id: request.id,
+          payload: {
+            type: 'auth_success'
+          }
+        })
+      )
+      return
+    }
+
+    onMessage(data)
+  })
 }
 
 function getAddress (server: WebSocketServer): AddressInfo {
