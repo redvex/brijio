@@ -1,38 +1,132 @@
 import assert from 'node:assert/strict'
 import { type AddressInfo } from 'node:net'
 import { afterEach, describe, it } from 'node:test'
-import { fileURLToPath } from 'node:url'
-import { dirname, resolve } from 'node:path'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
+import {
+  startBrowserBridgeMcpHttpServer,
+  type BrowserBridgeMcpHttpRuntime
+} from './http-server.js'
 
-const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const currentPageResourceUri = 'browser://page/current'
 const currentPageContentTemplateUri = 'browser://page/current/content/{index}'
 const servers: WebSocketServer[] = []
+const mcpRuntimes: BrowserBridgeMcpHttpRuntime[] = []
 
 afterEach(async () => {
+  await Promise.all(mcpRuntimes.splice(0).map(async (runtime) => {
+    await runtime.close()
+  }))
   await Promise.all(servers.splice(0).map(closeServer))
 })
 
-void describe('BrowserBridge MCP stdio server', () => {
+void describe('BrowserBridge MCP HTTP server', () => {
+  void it('rejects unauthenticated MCP HTTP requests', async () => {
+    const runtime = await startTestMcpRuntime()
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('rejects disallowed origins before MCP handling', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedOrigins: ['http://trusted.example']
+    })
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          authorization: 'Bearer test-mcp-token',
+          'content-type': 'application/json',
+          origin: 'http://evil.example'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 403)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'forbidden_origin',
+          message: 'Origin is not allowed for BrowserBridge MCP HTTP.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('rejects disallowed hosts before MCP handling', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example']
+    })
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          authorization: 'Bearer test-mcp-token',
+          'content-type': 'application/json',
+          host: 'evil.example'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 403)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'forbidden_host',
+          message: 'Host is not allowed for BrowserBridge MCP HTTP.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
   void it('uses the official MCP lifecycle for initialize, resource discovery, and ping', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
-        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -335,6 +429,7 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
@@ -513,21 +608,11 @@ void describe('BrowserBridge MCP stdio server', () => {
         )
       })
     })
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
+    const runtime = await startTestMcpRuntime({
+      websocketUrl: server.url
     })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: server.url,
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
-        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
-      },
-      stderr: 'pipe'
-    })
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -760,25 +845,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured error for invalid page content resource indexes', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
-        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -802,25 +876,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured tool error for invalid page reading input', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
-        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -844,25 +907,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured tool error for invalid click input', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
-        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -887,25 +939,14 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 
   void it('returns a structured tool error for invalid fill input', async () => {
-    const client = new Client({
-      name: 'browserbridge-mcp-test',
-      version: '0.0.0'
-    })
-    const transport = new StdioClientTransport({
-      command: process.execPath,
-      args: ['--import', 'tsx', 'src/index.ts'],
-      cwd: packageRoot,
-      env: {
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:1',
-        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '100',
-        BROWSERBRIDGE_PAIRING_TOKEN: 'local-token'
-      },
-      stderr: 'pipe'
-    })
+    const runtime = await startTestMcpRuntime()
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
 
     try {
       await client.connect(transport, { timeout: 1000 })
@@ -931,9 +972,53 @@ void describe('BrowserBridge MCP stdio server', () => {
       })
     } finally {
       await client.close()
+      await runtime.close()
     }
   })
 })
+
+async function startTestMcpRuntime (
+  options: {
+    websocketUrl?: string
+    allowedHosts?: string[]
+    allowedOrigins?: string[]
+  } = {}
+): Promise<BrowserBridgeMcpHttpRuntime> {
+  const runtime = await startBrowserBridgeMcpHttpServer({
+    host: '127.0.0.1',
+    port: 0,
+    path: '/mcp',
+    authToken: 'test-mcp-token',
+    allowedHosts: options.allowedHosts ?? ['127.0.0.1'],
+    allowedOrigins: options.allowedOrigins ?? [],
+    pageContextConfig: {
+      websocketUrl: options.websocketUrl ?? 'ws://127.0.0.1:1',
+      timeoutMs: 100,
+      pairingToken: 'local-token'
+    }
+  })
+
+  mcpRuntimes.push(runtime)
+
+  return runtime
+}
+
+function createHttpClient (): Client {
+  return new Client({
+    name: 'browserbridge-mcp-test',
+    version: '0.0.0'
+  })
+}
+
+function createHttpTransport (url: string): StreamableHTTPClientTransport {
+  return new StreamableHTTPClientTransport(new URL(url), {
+    requestInit: {
+      headers: {
+        authorization: 'Bearer test-mcp-token'
+      }
+    }
+  })
+}
 
 async function startServer (
   onConnection: (socket: WebSocket) => void
