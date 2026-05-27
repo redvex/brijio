@@ -3,15 +3,12 @@ import {
   ContentResponse,
   defaultPageContentMaxPayloadBytes,
   type ActionResultErrorCode,
-  type ClickActionTarget,
   type BrowserBridgeSocket,
   type PageActionResult,
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
-  type PageReadResult,
-  type WriteTextActionTarget,
-  type WriteTextEditableTarget
+  type PageReadResult
 } from '@browserbridge/shared'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
@@ -65,11 +62,11 @@ export interface BrowserApi {
   tabs: {
     create: (properties: { url: string }) => Promise<unknown>
     query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<
-      Array<{
-        id?: number
-        title?: string
-        url?: string
-      }>
+    Array<{
+      id?: number
+      title?: string
+      url?: string
+    }>
     >
     sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   }
@@ -211,20 +208,20 @@ export class SafariWebSocketConnection implements BrowserBridgeSocket {
     this.socket = new WebSocket(this.url)
 
     if (this.openListener !== undefined) {
-      this.socket.onopen = () => { this.openListener!() }
+      this.socket.onopen = () => { (this.openListener as () => void)() }
     }
     if (this.messageListener !== undefined) {
       this.socket.onmessage = (event) => {
         if (typeof event.data === 'string') {
-          void this.messageListener!({ data: event.data })
+          void (this.messageListener as (event: { data: string }) => void)({ data: event.data })
         }
       }
     }
     if (this.closeListener !== undefined) {
-      this.socket.onclose = () => { this.closeListener!() }
+      this.socket.onclose = () => { (this.closeListener as () => void)() }
     }
     if (this.errorListener !== undefined) {
-      this.socket.onerror = () => { this.errorListener!() }
+      this.socket.onerror = () => { (this.errorListener as () => void)() }
     }
   }
 

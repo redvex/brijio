@@ -80,7 +80,7 @@ async function saveSettings (websocketUrl: string): Promise<void> {
     const response = await browser.runtime.sendMessage(createSaveSettingsMessage(websocketUrl))
     if (
       typeof response === 'object' && response !== null &&
-      'ok' in response && (response as { ok: boolean }).ok === true
+      'ok' in response && (response as { ok: boolean }).ok
     ) {
       statusMessage.textContent = 'Settings saved. Disconnected.'
     } else {
@@ -107,7 +107,7 @@ async function connect (): Promise<void> {
     const response = await browser.runtime.sendMessage(createConnectMessage())
     if (
       typeof response === 'object' && response !== null &&
-      'ok' in response && (response as { ok: boolean }).ok === true
+      'ok' in response && (response as { ok: boolean }).ok
     ) {
       statusMessage.textContent = 'Connecting...'
     } else {
@@ -124,7 +124,7 @@ async function disconnect (): Promise<void> {
     const response = await browser.runtime.sendMessage(createDisconnectMessage())
     if (
       typeof response === 'object' && response !== null &&
-      'ok' in response && (response as { ok: boolean }).ok === true
+      'ok' in response && (response as { ok: boolean }).ok
     ) {
       statusMessage.textContent = 'Disconnected.'
     } else {

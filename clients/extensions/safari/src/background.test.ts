@@ -18,10 +18,10 @@ import {
 
 // --- Mock browser.* API ---
 
-function createMockBrowser () {
+function createMockBrowser (): BrowserApi {
   const mockStorage = {
     local: {
-      data: {} as Record<string, unknown>,
+      data: {} as const,
       async get (keys: string[]): Promise<Record<string, unknown>> {
         const result: Record<string, unknown> = {}
         for (const key of keys) {
@@ -89,7 +89,7 @@ function createMockBrowser () {
       return mockRuntime.getURLResult + path
     },
     onMessage: {
-      listeners: [] as Array<unknown>,
+      listeners: [] as unknown[],
       addListener (callback: unknown) {
         mockRuntime.onMessage.listeners.push(callback)
       }

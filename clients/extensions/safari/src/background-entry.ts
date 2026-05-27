@@ -9,7 +9,11 @@
 import {
   BrowserBridgeBackgroundController,
   createGlobalTimers,
-  type BrowserBridgeSocket
+  type BrowserBridgeSocket,
+  type ClickActionTarget,
+  type WriteTextActionTarget,
+  type WriteTextEditableTarget,
+  type PageActionResult
 } from '@browserbridge/shared'
 import {
   SafariActionBadge,
@@ -20,17 +24,6 @@ import {
   performActiveTabAction,
   type BrowserApi
 } from './background.js'
-import {
-  hasRegularPageAccess,
-  isRegularPageUrl
-} from './permissions.js'
-
-import type {
-  ClickActionTarget,
-  WriteTextActionTarget,
-  WriteTextEditableTarget,
-  PageActionResult
-} from '@browserbridge/shared'
 
 declare const browser: BrowserApi
 

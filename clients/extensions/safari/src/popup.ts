@@ -58,7 +58,7 @@ export function parseSettingsResponse (response: unknown): string | undefined {
     'ok' in response && (response as SettingsResponse).ok === true &&
     typeof (response as SettingsResponse).data?.websocketUrl === 'string'
   ) {
-    return (response as SettingsResponse).data!.websocketUrl
+    return (response as SettingsResponse).data.websocketUrl as string
   }
   return undefined
 }
@@ -69,7 +69,7 @@ export function parseStatusResponse (response: unknown): boolean {
     'ok' in response && (response as StatusResponse).ok === true &&
     typeof (response as StatusResponse).data?.connected === 'boolean'
   ) {
-    return (response as StatusResponse).data!.connected!
+    return (response as StatusResponse).data.connected as boolean
   }
   return false
 }

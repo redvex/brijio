@@ -9,8 +9,7 @@
 import {
   handleContentRequest,
   type ContentRequest,
-  type ContentResponse,
-  type ContentEnvironment
+  type ContentResponse
 } from '@browserbridge/shared'
 
 type SendResponse = (response: ContentResponse) => void
