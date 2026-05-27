@@ -22,7 +22,7 @@ import type {
   SubmitFormActionResultData,
   WriteTextEditableTarget,
   WriteTextActionTarget
-} from '@browserbridge/shared'
+} from './protocol.js'
 
 void describe('BrowserBridge background controller', () => {
   void it('opens setup when action is clicked without a stored WebSocket URL', async () => {
@@ -871,9 +871,7 @@ class FakeActionAdapter implements ActionAdapter {
   }
 
   async setBadgeColor (_color: string): Promise<void> {}
-
   async setBadgeTextColor (_color: string): Promise<void> {}
-
   async setTitle (title: string): Promise<void> {
     this.title = title
   }

@@ -1,24 +1,23 @@
 import {
   BrowserBridgeBackgroundController,
-  type PageActionResult,
-  type PageReadResult,
-  type BrowserBridgeSocket
-} from './background-controller.js'
-import type { ContentRequest, ContentResponse } from './content.js'
-import {
   type ActionResultErrorCode,
   type ClickActionTarget,
+  createGlobalTimers,
   defaultPageContentMaxPayloadBytes,
+  type PageActionResult,
   type PageContentErrorCode,
+  type PageReadResult,
+  type BrowserBridgeSocket,
+  type TimersAdapter,
   type WriteTextEditableTarget,
   type WriteTextActionTarget
 } from '@browserbridge/shared'
+import type { ContentRequest, ContentResponse } from './content.js'
 import {
   hasRegularPageAccess,
   isRegularPageUrl,
   type ChromePermissionsApi
 } from './permissions.js'
-import { createGlobalTimers } from './timers.js'
 
 interface RuntimeMessage {
   type?: unknown
