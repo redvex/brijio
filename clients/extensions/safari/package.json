@@ -1,0 +1,24 @@
+{
+  "name": "@browserbridge/safari-extension",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BrowserBridge Safari extension.",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && esbuild src/content-script-entry.ts src/background.js --bundle --format=iife --platform=browser --target=safari17 --outdir=dist --external:browser && cp manifest.json dist/manifest.json && cp src/popup.html dist/popup.html && node scripts/verify-build-output.mjs",
+    "check": "tsc --noEmit",
+    "dev": "echo \"Safari extension dev workflow is not implemented yet\"",
+    "test": "node --import tsx --test 'src/**/*.test.ts'"
+  },
+  "dependencies": {
+    "@browserbridge/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "esbuild": "^0.28.0",
+    "linkedom": "^0.18.12",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
