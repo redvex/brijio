@@ -69,7 +69,7 @@ interface MockRuntime {
 }
 
 interface MockBrowser {
-  action: MockAction
+  browserAction: MockAction
   storage: MockStorage
   tabs: MockTabs
   scripting: MockScripting
@@ -154,7 +154,7 @@ function createMockBrowser (): MockBrowser {
     }
   }
 
-  return { storage, action, tabs, scripting, runtime }
+  return { storage, browserAction: action, tabs, scripting, runtime }
 }
 
 // --- SafariActionBadge tests ---
@@ -162,30 +162,30 @@ function createMockBrowser (): MockBrowser {
 void describe('SafariActionBadge', () => {
   const browser = createMockBrowser()
 
-  void it('setBadgeText delegates to browser.action.setBadgeText', async () => {
-    const badge = new SafariActionBadge(browser.action)
+  void it('setBadgeText delegates to browser.browserAction.setBadgeText', async () => {
+    const badge = new SafariActionBadge(browser.browserAction)
     await badge.setBadgeText('ON')
-    assert.equal(browser.action.lastBadgeText, 'ON')
+    assert.equal(browser.browserAction.lastBadgeText, 'ON')
   })
 
   void it('setBadgeColor is a no-op (Safari has no color API)', async () => {
-    const badge = new SafariActionBadge(browser.action)
+    const badge = new SafariActionBadge(browser.browserAction)
     // Should not throw and should resolve without error
     await badge.setBadgeColor('#ff0000')
     // lastBadgeColor remains unchanged — no-op
-    assert.equal(browser.action.lastBadgeColor, '')
+    assert.equal(browser.browserAction.lastBadgeColor, '')
   })
 
   void it('setBadgeTextColor is a no-op (Safari has no color API)', async () => {
-    const badge = new SafariActionBadge(browser.action)
+    const badge = new SafariActionBadge(browser.browserAction)
     await badge.setBadgeTextColor('#ffffff')
-    assert.equal(browser.action.lastBadgeTextColor, '')
+    assert.equal(browser.browserAction.lastBadgeTextColor, '')
   })
 
-  void it('setTitle delegates to browser.action.setTitle', async () => {
-    const badge = new SafariActionBadge(browser.action)
+  void it('setTitle delegates to browser.browserAction.setTitle', async () => {
+    const badge = new SafariActionBadge(browser.browserAction)
     await badge.setTitle('BrowserBridge connected')
-    assert.equal(browser.action.lastTitle, 'BrowserBridge connected')
+    assert.equal(browser.browserAction.lastTitle, 'BrowserBridge connected')
   })
 })
 
@@ -362,7 +362,7 @@ void describe('BrowserBridgeBackgroundController with Safari adapters', () => {
   void it('can be instantiated with all Safari adapter implementations', () => {
     const browser = createMockBrowser()
 
-    const action = new SafariActionBadge(browser.action)
+    const action = new SafariActionBadge(browser.browserAction)
     const storage = new SafariStorageAdapter(browser.storage)
     const setup = new SafariSetupAdapter()
     const pageReader = new SafariPageReaderAdapter(browser.tabs, browser.scripting)
