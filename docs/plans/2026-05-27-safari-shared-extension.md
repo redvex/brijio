@@ -17,6 +17,7 @@
 **Objective:** Set up `packages/shared` with working package.json, tsconfig, and test runner so it can export modules and run tests.
 
 **Files:**
+
 - Modify: `packages/shared/package.json`
 - Create: `packages/shared/tsconfig.json`
 - Create: `packages/shared/tsconfig.build.json`
@@ -26,10 +27,11 @@
 **Step 1: Write package.json with build, check, and test scripts**
 
 Update `packages/shared/package.json`:
+
 - Name: `@browserbridge/shared`
 - Type: `module`
 - Exports: `./src/index.ts` (for now, direct TS import via workspace)
-- Scripts: build (tsc + esbuild), check (tsc --noEmit), test (node --import tsx --test src/**/*.test.ts)
+- Scripts: build (tsc + esbuild), check (tsc --noEmit), test (node --import tsx --test src/\*_/_.test.ts)
 - Dependencies: none yet
 - DevDependencies: tsx, typescript, @types/node, linkedom (same versions as Chrome extension)
 
@@ -44,16 +46,17 @@ Extends tsconfig.json, sets `noEmit: false`, `outDir: dist`, includes only non-t
 **Step 4: Write a failing test that imports from the shared package**
 
 Create `packages/shared/src/shared.test.ts`:
-```typescript
-import { describe, it } from 'node:test'
-import assert from 'node:assert/strict'
 
-describe('@browserbridge/shared', () => {
-  it('exports a package version constant', () => {
+```typescript
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+
+describe("@browserbridge/shared", () => {
+  it("exports a package version constant", () => {
     // This will fail until we add exports
-    assert.ok(true, 'placeholder — will be replaced when real exports exist')
-  })
-})
+    assert.ok(true, "placeholder — will be replaced when real exports exist");
+  });
+});
 ```
 
 **Step 5: Run test to verify it passes (infrastructure test)**
@@ -77,6 +80,7 @@ git commit -m "feat(shared): add package scaffolding with build, check, and test
 **Objective:** Move `protocol.ts` from Chrome to shared, update imports, verify all Chrome tests still pass.
 
 **Files:**
+
 - Move: `clients/extensions/chrome/src/protocol.ts` → `packages/shared/src/protocol.ts`
 - Create: `packages/shared/src/protocol.test.ts` (copy from Chrome)
 - Modify: `packages/shared/src/index.ts` (re-export protocol)
@@ -98,7 +102,7 @@ Expected: All protocol tests PASS (they test pure functions, no DOM dependency)
 **Step 3: Update packages/shared/src/index.ts to re-export protocol**
 
 ```typescript
-export * from './protocol.js'
+export * from "./protocol.js";
 ```
 
 **Step 4: Update Chrome extension imports**
@@ -132,6 +136,7 @@ git commit -m "feat(shared): move protocol.ts from Chrome to shared package"
 **Objective:** Move `timers.ts` from Chrome to shared, update imports.
 
 **Files:**
+
 - Move: `clients/extensions/chrome/src/timers.ts` → `packages/shared/src/timers.ts`
 - Move: `clients/extensions/chrome/src/timers.test.ts` → `packages/shared/src/timers.test.ts`
 - Modify: `packages/shared/src/index.ts` (add timers re-export)
@@ -161,6 +166,7 @@ Wait, let me re-read the code. `timers.ts` imports `TimersAdapter` from `backgro
 **Best approach:** Extract the `TimersAdapter` interface into its own file in shared, OR move timers.ts and background-controller.ts together. Since background-controller.ts has many other imports from protocol.ts (which will already be in shared), let's move both together.
 
 Actually, let me reconsider the order. The ADR specifies:
+
 - protocol.ts (no deps)
 - timers.ts (depends on TimersAdapter from background-controller.ts)
 - background-controller.ts (depends on protocol.ts, timers.ts)
@@ -169,6 +175,7 @@ Actually, let me reconsider the order. The ADR specifies:
 - content-handler.ts (depends on protocol.ts, page-context.ts, page-content.ts)
 
 The cleanest extraction order considering dependencies:
+
 1. protocol.ts (no deps) ✓ (Task 2)
 2. page-content.ts (no deps — it only uses TextEncoder internally)
 3. timers.ts + background-controller.ts together (they reference each other)
@@ -182,6 +189,7 @@ Let me adjust the plan accordingly.
 **Objective:** Move `page-content.ts` from Chrome to shared. It has no dependencies on other Chrome files (uses only TextEncoder which is global).
 
 **Files:**
+
 - Move: `clients/extensions/chrome/src/page-content.ts` → `packages/shared/src/page-content.ts`
 - Move: `clients/extensions/chrome/src/page-content.test.ts` → `packages/shared/src/page-content.test.ts`
 - Modify: `packages/shared/src/index.ts`
@@ -219,6 +227,7 @@ git commit -m "feat(shared): move page-content.ts from Chrome to shared package"
 **Objective:** Move both files together since they reference each other (TimersAdapter defined in background-controller, used by timers.ts).
 
 **Files:**
+
 - Move: `clients/extensions/chrome/src/background-controller.ts` → `packages/shared/src/background-controller.ts`
 - Move: `clients/extensions/chrome/src/background-controller.test.ts` → `packages/shared/src/background-controller.test.ts`
 - Move: `clients/extensions/chrome/src/timers.ts` → `packages/shared/src/timers.ts`
@@ -241,6 +250,7 @@ Expected: All shared tests PASS
 **Step 3: Update Chrome background.ts imports**
 
 Change:
+
 - `from './background-controller.js'` → `from '@browserbridge/shared'`
 - `from './timers.js'` → `from '@browserbridge/shared'`
 - Types: `type BrowserBridgeBackgroundController`, `type BrowserBridgeSocket`, etc. from shared
@@ -264,6 +274,7 @@ git commit -m "feat(shared): move background-controller.ts and timers.ts from Ch
 **Objective:** Move `page-context.ts` from Chrome to shared.
 
 **Files:**
+
 - Move: `clients/extensions/chrome/src/page-context.ts` → `packages/shared/src/page-context.ts`
 - Move: `clients/extensions/chrome/src/page-context.test.ts` → `packages/shared/src/page-context.test.ts`
 - Modify: `packages/shared/src/index.ts`
@@ -290,6 +301,7 @@ Change `from './page-context.js'` → `from '@browserbridge/shared'`
 **Objective:** Extract the pure-logic `handleContentRequest` function and related types from `content.ts` into `packages/shared/src/content-handler.ts`, keeping the Chrome-specific `chrome.runtime.onMessage` listener in a thin `content-script-entry.ts`.
 
 **Files:**
+
 - Create: `packages/shared/src/content-handler.ts` (extracted from content.ts)
 - Create: `packages/shared/src/content-handler.test.ts` (extracted from content.test.ts)
 - Create: `clients/extensions/chrome/src/content-script-entry.ts` (thin Chrome wiring)
@@ -299,6 +311,7 @@ Change `from './page-context.js'` → `from '@browserbridge/shared'`
 **Step 1: Write content-handler.ts in shared**
 
 Extract from content.ts:
+
 - `ContentRequest` type
 - `ContentResponse` type
 - `ContentEnvironment` interface
@@ -307,6 +320,7 @@ Extract from content.ts:
 - Helper types and utility functions
 
 Do NOT extract:
+
 - `ChromeRuntimeApi` interface (Chrome-specific)
 - `chrome.runtime.onMessage.addListener(...)` call (Chrome-specific)
 
@@ -317,6 +331,7 @@ Extract from content.test.ts, updating imports to reference shared package.
 **Step 3: Create Chrome content-script-entry.ts**
 
 Thin file that:
+
 1. Imports `handleContentRequest` and `ContentRequest`/`ContentResponse` from `@browserbridge/shared`
 2. Registers `chrome.runtime.onMessage.addListener`
 3. Calls `handleContentRequest` with the environment object
@@ -379,6 +394,7 @@ pnpm --filter @browserbridge/chrome-extension build
 **Objective:** Set up `clients/extensions/safari` with package.json, tsconfig, manifest.json, and build scripts.
 
 **Files:**
+
 - Modify: `clients/extensions/safari/package.json` (replace placeholder)
 - Create: `clients/extensions/safari/tsconfig.json`
 - Create: `clients/extensions/safari/tsconfig.build.json`
@@ -439,41 +455,42 @@ Expected: PASS (even with placeholder)
 **Objective:** Write the Safari permissions module that always returns true for regular page access.
 
 **Files:**
+
 - Create: `clients/extensions/safari/src/permissions.ts`
 - Create: `clients/extensions/safari/src/permissions.test.ts`
 
 **Step 1: Write failing test**
 
 ```typescript
-import { describe, it } from 'node:test'
-import assert from 'node:assert/strict'
-import { isRegularPageUrl, hasRegularPageAccess } from './permissions.js'
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { isRegularPageUrl, hasRegularPageAccess } from "./permissions.js";
 
-describe('Safari permissions', () => {
-  describe('isRegularPageUrl', () => {
-    it('returns true for http:// URLs', () => {
-      assert.equal(isRegularPageUrl('http://example.com'), true)
-    })
+describe("Safari permissions", () => {
+  describe("isRegularPageUrl", () => {
+    it("returns true for http:// URLs", () => {
+      assert.equal(isRegularPageUrl("http://example.com"), true);
+    });
 
-    it('returns true for https:// URLs', () => {
-      assert.equal(isRegularPageUrl('https://example.com'), true)
-    })
+    it("returns true for https:// URLs", () => {
+      assert.equal(isRegularPageUrl("https://example.com"), true);
+    });
 
-    it('returns false for chrome:// URLs', () => {
-      assert.equal(isRegularPageUrl('chrome://extensions'), false)
-    })
+    it("returns false for chrome:// URLs", () => {
+      assert.equal(isRegularPageUrl("chrome://extensions"), false);
+    });
 
-    it('returns false for safari-extension:// URLs', () => {
-      assert.equal(isRegularPageUrl('safari-extension://abc'), false)
-    })
-  })
+    it("returns false for safari-extension:// URLs", () => {
+      assert.equal(isRegularPageUrl("safari-extension://abc"), false);
+    });
+  });
 
-  describe('hasRegularPageAccess', () => {
-    it('always returns true (Safari grants broad host permission at install)', async () => {
-      assert.equal(await hasRegularPageAccess(), true)
-    })
-  })
-})
+  describe("hasRegularPageAccess", () => {
+    it("always returns true (Safari grants broad host permission at install)", async () => {
+      assert.equal(await hasRegularPageAccess(), true);
+    });
+  });
+});
 ```
 
 **Step 2: Run test, verify RED**
@@ -481,17 +498,18 @@ describe('Safari permissions', () => {
 ```bash
 pnpm --filter @browserbridge/safari-extension test
 ```
+
 Expected: FAIL — module not found
 
 **Step 3: Implement permissions.ts**
 
 ```typescript
-export function isRegularPageUrl (url: string): boolean {
-  return url.startsWith('http://') || url.startsWith('https://')
+export function isRegularPageUrl(url: string): boolean {
+  return url.startsWith("http://") || url.startsWith("https://");
 }
 
-export async function hasRegularPageAccess (): Promise<boolean> {
-  return true
+export async function hasRegularPageAccess(): Promise<boolean> {
+  return true;
 }
 ```
 
@@ -504,12 +522,14 @@ export async function hasRegularPageAccess (): Promise<boolean> {
 **Objective:** Write the Safari background script that wires BrowserBridgeBackgroundController to `browser.*` APIs.
 
 **Files:**
+
 - Create: `clients/extensions/safari/src/background.ts`
 - Create: `clients/extensions/safari/src/background.test.ts`
 
 **Step 1: Write failing test for SafariBackgroundController or similar wiring**
 
 Tests should verify:
+
 - Badge text is set correctly for each state
 - Badge color methods are no-ops
 - WebSocket creation works
@@ -521,6 +541,7 @@ Since background.ts is primarily Chrome/Safari API wiring, the tests need to moc
 **Step 2: Implement Safari background.ts**
 
 This creates:
+
 - `SafariActionBadge` adapter (setBadgeText real, setBadgeColor/setBadgeTextColor no-ops)
 - `SafariStorageAdapter` (browser.storage.local)
 - `SafariSetupAdapter` (no-op or open popup — Safari uses popup, not setup page)
@@ -538,6 +559,7 @@ This creates:
 **Objective:** Create popup.html and popup.ts for Safari settings + connect/disconnect.
 
 **Files:**
+
 - Create: `clients/extensions/safari/src/popup.html`
 - Create: `clients/extensions/safari/src/popup.ts`
 - Create: `clients/extensions/safari/src/popup.test.ts`
@@ -545,6 +567,7 @@ This creates:
 **Step 1: Write failing test for popup message handlers**
 
 Test the message types:
+
 - `get_settings` request returns stored WebSocket URL
 - `save_settings` request saves and disconnects
 - Connect/disconnect toggle behavior
@@ -566,6 +589,7 @@ Simple HTML with input, buttons, status display.
 **Objective:** Thin entry file that registers browser.runtime.onMessage listener and delegates to shared handleContentRequest.
 
 **Files:**
+
 - Create: `clients/extensions/safari/src/content-script-entry.ts`
 
 **Step 1: Write content-script-entry.ts**
@@ -583,6 +607,7 @@ Since the `handleContentRequest` function is in `@browserbridge/shared`, the ent
 **Objective:** Create the `make safari` target and Safari build scripts.
 
 **Files:**
+
 - Create: `Makefile` at repo root (or modify root package.json scripts)
 - Create: `clients/extensions/safari/scripts/verify-build-output.mjs`
 
@@ -636,6 +661,7 @@ Add Safari to supported browsers, update architecture diagram.
 ### Task 17: Final verification
 
 Run full test suite, build, lint, and type-check everything:
+
 ```bash
 pnpm test && pnpm check && pnpm lint && pnpm build
 ```

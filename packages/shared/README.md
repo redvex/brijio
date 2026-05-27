@@ -9,14 +9,14 @@ browser-specific behavior is injected through adapter interfaces.
 
 ## What it contains
 
-| Module | Description |
-|---|---|
-| `protocol.ts` | WebSocket envelope types, request/response discriminated unions, type guards, and response constructors. All `get_page_context`, `page_context_response`, `get_page_content`, `page_content_response`, `perform_action`, `action_result`, `extension_keepalive`, and `error` message types. |
+| Module                     | Description                                                                                                                                                                                                                                                                                                   |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `protocol.ts`              | WebSocket envelope types, request/response discriminated unions, type guards, and response constructors. All `get_page_context`, `page_context_response`, `get_page_content`, `page_content_response`, `perform_action`, `action_result`, `extension_keepalive`, and `error` message types.                   |
 | `background-controller.ts` | `BrowserBridgeBackgroundController` — the adapter-driven background controller that manages WebSocket connections, badge state, and message routing. Browser extensions wire their own adapters (action badge, storage, setup, page reader, page actions, timers, WebSocket) and instantiate this controller. |
-| `page-context.ts` | Pure DOM page-context extraction (`extractPageContext`). Takes a `Document` and environment, returns structured page context (URL, title, selected text, preview, structure). No browser API dependencies. |
-| `page-content.ts` | Pure DOM page-content chunking. Takes a `Document` and parameters, returns paginated readable content. No browser API dependencies. |
-| `content-handler.ts` | `handleContentRequest` — the content-script request handler. Validates incoming `ContentRequest` messages and delegates to page-context or page-content extraction. Takes a `ContentEnvironment` (document, location, title, selected text, timestamp), not a browser API. |
-| `timers.ts` | `createGlobalTimers` factory — returns `setInterval`/`clearInterval`/`setTimeout`/`clearTimeout`. Browser extensions inject this to support test timers. |
+| `page-context.ts`          | Pure DOM page-context extraction (`extractPageContext`). Takes a `Document` and environment, returns structured page context (URL, title, selected text, preview, structure). No browser API dependencies.                                                                                                    |
+| `page-content.ts`          | Pure DOM page-content chunking. Takes a `Document` and parameters, returns paginated readable content. No browser API dependencies.                                                                                                                                                                           |
+| `content-handler.ts`       | `handleContentRequest` — the content-script request handler. Validates incoming `ContentRequest` messages and delegates to page-context or page-content extraction. Takes a `ContentEnvironment` (document, location, title, selected text, timestamp), not a browser API.                                    |
+| `timers.ts`                | `createGlobalTimers` factory — returns `setInterval`/`clearInterval`/`setTimeout`/`clearTimeout`. Browser extensions inject this to support test timers.                                                                                                                                                      |
 
 ## How browser extensions use it
 

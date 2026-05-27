@@ -32,14 +32,14 @@ clients/extensions/safari/src/
 
 ### Adapter mapping
 
-| Chrome concept | Safari adapter |
-|---|---|
-| `chrome.*` API namespace | `browser.*` namespace (WebExtension API) |
-| Service worker (MV3) | Persistent background script (MV2) |
-| `setBadgeBackgroundColor` / `setBadgeTextColor` | No-op (`SafariActionBadge`) |
-| `chrome.permissions.request()` | Not needed — broad host permissions at install time |
-| Setup page (`chrome.tabs.create`) | `popup.html` overlay |
-| `chrome.runtime.sendMessage` | `browser.runtime.sendMessage` |
+| Chrome concept                                  | Safari adapter                                      |
+| ----------------------------------------------- | --------------------------------------------------- |
+| `chrome.*` API namespace                        | `browser.*` namespace (WebExtension API)            |
+| Service worker (MV3)                            | Persistent background script (MV2)                  |
+| `setBadgeBackgroundColor` / `setBadgeTextColor` | No-op (`SafariActionBadge`)                         |
+| `chrome.permissions.request()`                  | Not needed — broad host permissions at install time |
+| Setup page (`chrome.tabs.create`)               | `popup.html` overlay                                |
+| `chrome.runtime.sendMessage`                    | `browser.runtime.sendMessage`                       |
 
 ## Key Safari differences from Chrome (ADR 0019)
 
@@ -51,7 +51,7 @@ clients/extensions/safari/src/
   workers. The background script runs in a persistent page context.
 
 - **Text-only badge**: Safari supports `browser.action.setBadgeText()` but
-  does *not* support `setBadgeBackgroundColor()` or `setBadgeTextColor()`.
+  does _not_ support `setBadgeBackgroundColor()` or `setBadgeTextColor()`.
   Connection state is shown through badge text only (`ON`, `OFF`, `ERR`).
   The `SafariActionBadge` adapter provides no-op implementations for color
   methods.
@@ -106,7 +106,7 @@ This runs two steps:
 1. `pnpm --filter @browserbridge/safari-extension build` — compiles and
    bundles the extension.
 2. `xcrun safari-web-extension-converter --force --project-location
-   clients/extensions/safari/BrowserBridge clients/extensions/safari/dist` —
+clients/extensions/safari/BrowserBridge clients/extensions/safari/dist` —
    converts the built extension into an Xcode project at
    `clients/extensions/safari/BrowserBridge/`.
 

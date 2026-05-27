@@ -48,24 +48,24 @@ adapter layer.
 
 Move the following files from the Chrome extension into `packages/shared/src/`:
 
-| Source (Chrome) | Target (shared) | Notes |
-|---|---|---|
-| `src/protocol.ts` | `protocol.ts` | WebSocket envelope types, request/response types, guards, response constructors. Already browser-agnostic — no Chrome/DOM dependencies. |
+| Source (Chrome)                | Target (shared)            | Notes                                                                                                                                                                                                                         |
+| ------------------------------ | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/protocol.ts`              | `protocol.ts`              | WebSocket envelope types, request/response types, guards, response constructors. Already browser-agnostic — no Chrome/DOM dependencies.                                                                                       |
 | `src/background-controller.ts` | `background-controller.ts` | Already behind adapters. Move as-is. The adapter interfaces (`StorageAdapter`, `ActionAdapter`, `PageReaderAdapter`, `PageActionAdapter`, `SetupAdapter`, `TimersAdapter`, `BrowserBridgeSocket`) become the shared contract. |
-| `src/page-context.ts` | `page-context.ts` | Pure DOM extraction. Takes a `Document` and environment — no Chrome API calls. |
-| `src/page-content.ts` | `page-content.ts` | Pure DOM content chunking. No Chrome API calls. |
-| `src/content.ts` | `content-handler.ts` | Content-script request handler. Takes a `ContentRequest` and `ContentEnvironment` — no Chrome API calls. The message listener registration stays browser-specific. |
-| `src/timers.ts` | `timers.ts` | `createGlobalTimers` factory. Browser-agnostic. |
+| `src/page-context.ts`          | `page-context.ts`          | Pure DOM extraction. Takes a `Document` and environment — no Chrome API calls.                                                                                                                                                |
+| `src/page-content.ts`          | `page-content.ts`          | Pure DOM content chunking. No Chrome API calls.                                                                                                                                                                               |
+| `src/content.ts`               | `content-handler.ts`       | Content-script request handler. Takes a `ContentRequest` and `ContentEnvironment` — no Chrome API calls. The message listener registration stays browser-specific.                                                            |
+| `src/timers.ts`                | `timers.ts`                | `createGlobalTimers` factory. Browser-agnostic.                                                                                                                                                                               |
 
 Files that remain Chrome-specific:
 
-| Chrome file | Reason to keep in Chrome |
-|---|---|
-| `src/background.ts` | Chrome `chrome.*` API wiring, `DomWebSocketAdapter`, `chrome.scripting.executeScript`, `chrome.tabs.sendMessage`. |
-| `src/permissions.ts` | Chrome `chrome.permissions` API. Safari handles permissions differently (see below). |
-| `src/setup.ts` | Chrome `chrome.runtime.sendMessage` and `chrome.permissions.request`. Safari needs its own setup UI. |
-| `src/setup.html` | Chrome-specific setup page. Safari needs its own popup or settings. |
-| `manifest.json` | Chrome Manifest V3 format. |
+| Chrome file          | Reason to keep in Chrome                                                                                          |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `src/background.ts`  | Chrome `chrome.*` API wiring, `DomWebSocketAdapter`, `chrome.scripting.executeScript`, `chrome.tabs.sendMessage`. |
+| `src/permissions.ts` | Chrome `chrome.permissions` API. Safari handles permissions differently (see below).                              |
+| `src/setup.ts`       | Chrome `chrome.runtime.sendMessage` and `chrome.permissions.request`. Safari needs its own setup UI.              |
+| `src/setup.html`     | Chrome-specific setup page. Safari needs its own popup or settings.                                               |
+| `manifest.json`      | Chrome Manifest V3 format.                                                                                        |
 
 The Chrome extension will import from `@browserbridge/shared` and remove the
 duplicated local copies. The Safari extension will likewise import from
@@ -77,26 +77,26 @@ The Safari extension will live at `clients/extensions/safari/` and consist of:
 
 **Safari-specific source files:**
 
-| File | Purpose |
-|---|---|
-| `src/background.ts` | Safari background script. Wires `BrowserBridgeBackgroundController` to Safari `browser.*` APIs. Creates `SafariWebSocketAdapter`. Handles `browser.action.onClicked`. |
-| `src/permissions.ts` | Safari permission model adapter. No runtime permission requests — broad host permissions are declared in the manifest (see below). Always returns `true` for regular page access checks. |
-| `src/popup.ts` + `popup.html` | A popup UI for WebSocket URL configuration. Safari does not have a convenient setup-page pattern like Chrome, so we use a popup instead. |
-| `manifest.json` | Safari Web Extension manifest (see below). |
+| File                          | Purpose                                                                                                                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/background.ts`           | Safari background script. Wires `BrowserBridgeBackgroundController` to Safari `browser.*` APIs. Creates `SafariWebSocketAdapter`. Handles `browser.action.onClicked`.                    |
+| `src/permissions.ts`          | Safari permission model adapter. No runtime permission requests — broad host permissions are declared in the manifest (see below). Always returns `true` for regular page access checks. |
+| `src/popup.ts` + `popup.html` | A popup UI for WebSocket URL configuration. Safari does not have a convenient setup-page pattern like Chrome, so we use a popup instead.                                                 |
+| `manifest.json`               | Safari Web Extension manifest (see below).                                                                                                                                               |
 
 **Safari manifest differences from Chrome:**
 
-| Aspect | Chrome | Safari |
-|---|---|---|
-| Manifest version | 3 | 2 (Safari converts MV3 manifests, but explicit MV2 is more compatible) |
-| Background | `"service_worker": "background.js"` | `"scripts": ["background.js"]` (Safari does not use service workers for extensions) |
-| Badge colors | `setBadgeBackgroundColor`, `setBadgeTextColor` | Not supported. Only `setBadgeText` is available. |
-| Badge text | `setBadgeText` | Supported but may truncate long text. |
-| Host permissions | `optional_host_permissions` | Not supported. Declared as required `permissions` with `"*://*/*"`. |
-| `chrome.permissions` API | `contains()`, `request()` | Not supported. |
-| `chrome.scripting.executeScript` | Supported | Supported via `browser.scripting.executeScript`. |
-| Popup | Not used (setup page instead) | Used as primary configuration UI. |
-| `chrome.action.onClicked` | Fires when no popup is set | Fires when no popup is set. Since we use a popup, we add `browser.runtime.onMessage` handlers for connect/disconnect toggling from the popup. |
+| Aspect                           | Chrome                                         | Safari                                                                                                                                        |
+| -------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Manifest version                 | 3                                              | 2 (Safari converts MV3 manifests, but explicit MV2 is more compatible)                                                                        |
+| Background                       | `"service_worker": "background.js"`            | `"scripts": ["background.js"]` (Safari does not use service workers for extensions)                                                           |
+| Badge colors                     | `setBadgeBackgroundColor`, `setBadgeTextColor` | Not supported. Only `setBadgeText` is available.                                                                                              |
+| Badge text                       | `setBadgeText`                                 | Supported but may truncate long text.                                                                                                         |
+| Host permissions                 | `optional_host_permissions`                    | Not supported. Declared as required `permissions` with `"*://*/*"`.                                                                           |
+| `chrome.permissions` API         | `contains()`, `request()`                      | Not supported.                                                                                                                                |
+| `chrome.scripting.executeScript` | Supported                                      | Supported via `browser.scripting.executeScript`.                                                                                              |
+| Popup                            | Not used (setup page instead)                  | Used as primary configuration UI.                                                                                                             |
+| `chrome.action.onClicked`        | Fires when no popup is set                     | Fires when no popup is set. Since we use a popup, we add `browser.runtime.onMessage` handlers for connect/disconnect toggling from the popup. |
 
 **Safari manifest (initial):**
 
@@ -113,13 +113,7 @@ The Safari extension will live at `clients/extensions/safari/` and consist of:
     "default_title": "BrowserBridge",
     "default_popup": "popup.html"
   },
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "storage",
-    "tabs",
-    "*://*/*"
-  ],
+  "permissions": ["activeTab", "scripting", "storage", "tabs", "*://*/*"],
   "content_scripts": []
 }
 ```
@@ -154,12 +148,12 @@ or `setBadgeTextColor()`. Safari renders badges with a fixed system style.
 
 Decision: use badge text for connection state, matching Chrome's text labels:
 
-| State | Badge text | Chrome background | Safari |
-|---|---|---|---|
-| Connected | `ON` | Green `#1f8f4d` | Text only, system badge style |
-| Connecting | `...` | Amber `#f59e0b` | Text only, system badge style |
-| Stopped | `OFF` | Gray `#666666` | Text only, system badge style |
-| Error | `ERR` | Red `#b42318` | Text only, system badge style |
+| State      | Badge text | Chrome background | Safari                        |
+| ---------- | ---------- | ----------------- | ----------------------------- |
+| Connected  | `ON`       | Green `#1f8f4d`   | Text only, system badge style |
+| Connecting | `...`      | Amber `#f59e0b`   | Text only, system badge style |
+| Stopped    | `OFF`      | Gray `#666666`    | Text only, system badge style |
+| Error      | `ERR`      | Red `#b42318`     | Text only, system badge style |
 
 Safari will skip `setBadgeBackgroundColor()` and `setBadgeTextColor()` calls.
 The `ActionAdapter` interface already abstracts these, so the Safari adapter
