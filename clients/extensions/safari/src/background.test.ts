@@ -13,15 +13,72 @@ import {
   SafariStorageAdapter,
   SafariSetupAdapter,
   SafariPageReaderAdapter,
-  SafariWebSocketConnection,
-  type BrowserApi
+  SafariWebSocketConnection
 } from './background.js'
 
 // --- Mock browser.* API ---
 
-function createMockBrowser (): BrowserApi {
+interface MockOnClicked {
+  listeners: Array<() => void | Promise<void>>
+  addListener: (callback: () => void | Promise<void>) => void
+}
+
+interface MockAction {
+  lastBadgeText: string
+  lastBadgeColor: string
+  lastBadgeTextColor: string
+  lastTitle: string
+  setBadgeText: (details: { text: string }) => Promise<void>
+  setBadgeBackgroundColor: (details: { color: string }) => Promise<void>
+  setBadgeTextColor: (details: { color: string }) => Promise<void>
+  setTitle: (details: { title: string }) => Promise<void>
+  onClicked: MockOnClicked
+}
+
+interface MockStorageLocal {
+  data: Record<string, unknown>
+  get: (keys: string[]) => Promise<Record<string, unknown>>
+  set: (items: Record<string, unknown>) => Promise<void>
+}
+
+interface MockStorage {
+  local: MockStorageLocal
+}
+
+interface MockTabs {
+  queryResult: Array<{ id?: number, title?: string, url?: string }>
+  sendMessageResult: unknown
+  createResult: unknown
+  query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
+  sendMessage: (tabId: number, message: unknown) => Promise<unknown>
+  create: (properties: { url: string }) => Promise<unknown>
+}
+
+interface MockScripting {
+  executeScript: (details: { target: { tabId: number }, files: string[] }) => Promise<void>
+}
+
+interface MockOnMessage {
+  listeners: unknown[]
+  addListener: (callback: unknown) => void
+}
+
+interface MockRuntime {
+  getURL: (path: string) => string
+  onMessage: MockOnMessage
+}
+
+interface MockBrowser {
+  action: MockAction
+  storage: MockStorage
+  tabs: MockTabs
+  scripting: MockScripting
+  runtime: MockRuntime
+}
+
+function createMockBrowser (): MockBrowser {
   const storageData: Record<string, unknown> = {}
-  const mockStorage = {
+  const storage: MockStorage = {
     local: {
       data: storageData,
       async get (keys: string[]): Promise<Record<string, unknown>> {
@@ -39,13 +96,13 @@ function createMockBrowser (): BrowserApi {
     }
   }
 
-  const mockAction = {
+  const action: MockAction = {
     lastBadgeText: '',
     lastBadgeColor: '',
     lastBadgeTextColor: '',
     lastTitle: '',
     async setBadgeText (details: { text: string }) {
-      mockAction.lastBadgeText = details.text
+      action.lastBadgeText = details.text
     },
     async setBadgeBackgroundColor (_details: { color: string }) {
       // Safari does not support badge background color — no-op
@@ -54,51 +111,50 @@ function createMockBrowser (): BrowserApi {
       // Safari does not support badge text color — no-op
     },
     async setTitle (details: { title: string }) {
-      mockAction.lastTitle = details.title
+      action.lastTitle = details.title
     },
     onClicked: {
       listeners: [] as Array<() => void | Promise<void>>,
       addListener (callback: () => void | Promise<void>) {
-        mockAction.onClicked.listeners.push(callback)
+        action.onClicked.listeners.push(callback)
       }
     }
   }
 
-  const mockTabs = {
+  const tabs: MockTabs = {
     queryResult: [] as Array<{ id?: number, title?: string, url?: string }>,
     async query (_queryInfo: { active: boolean, currentWindow: boolean }) {
-      return mockTabs.queryResult
+      return tabs.queryResult
     },
     sendMessageResult: {} as unknown,
     async sendMessage (_tabId: number, _message: unknown) {
-      return mockTabs.sendMessageResult
+      return tabs.sendMessageResult
     },
     createResult: {} as unknown,
     async create (_properties: { url: string }) {
-      return mockTabs.createResult
+      return tabs.createResult
     }
   }
 
-  const mockScripting = {
+  const scripting: MockScripting = {
     async executeScript (_details: { target: { tabId: number }, files: string[] }) {
       // no-op for tests
     }
   }
 
-  const mockRuntime = {
-    getURLResult: 'safari-extension://abc/',
+  const runtime: MockRuntime = {
     getURL (path: string) {
-      return mockRuntime.getURLResult + path
+      return 'safari-extension://abc/' + path
     },
     onMessage: {
       listeners: [] as unknown[],
       addListener (callback: unknown) {
-        mockRuntime.onMessage.listeners.push(callback)
+        runtime.onMessage.listeners.push(callback)
       }
     }
   }
 
-  return { storage: mockStorage, action: mockAction, tabs: mockTabs, scripting: mockScripting, runtime: mockRuntime }
+  return { storage, action, tabs, scripting, runtime }
 }
 
 // --- SafariActionBadge tests ---
@@ -136,7 +192,7 @@ void describe('SafariActionBadge', () => {
 // --- SafariStorageAdapter tests ---
 
 void describe('SafariStorageAdapter', () => {
-  let browser: ReturnType<typeof createMockBrowser>
+  let browser: MockBrowser
 
   beforeEach(() => {
     browser = createMockBrowser()
@@ -176,7 +232,7 @@ void describe('SafariSetupAdapter', () => {
 // --- SafariPageReaderAdapter tests ---
 
 void describe('SafariPageReaderAdapter', () => {
-  let browser: ReturnType<typeof createMockBrowser>
+  let browser: MockBrowser
 
   beforeEach(() => {
     browser = createMockBrowser()
