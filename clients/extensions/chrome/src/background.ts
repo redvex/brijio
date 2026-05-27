@@ -30,6 +30,15 @@ interface RuntimeMessage {
   label?: unknown
 }
 
+interface SetupSettings {
+  websocketUrl?: string
+  pairingToken?: string
+  browserInstanceId?: string
+  browserName: string
+  profileName: string
+  label: string
+}
+
 type SendResponse = (response: unknown) => void
 type MessageListener = (event: { data: string }) => void | Promise<void>
 
@@ -518,7 +527,7 @@ chrome.action.onClicked.addListener(() => {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'get_settings') {
-    void controller.getBridgeSettings().then((settings) => {
+    void getRuntimeSettings().then((settings) => {
       sendResponse({ ok: true, data: settings })
     })
     return true
@@ -561,6 +570,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   return undefined
 })
 
+async function getRuntimeSettings (): Promise<SetupSettings> {
+  const values = await chrome.storage.local.get(bridgeSettingsKeys)
+
+  return normalizeSetupSettings(values)
+}
+
 async function saveRuntimeSettings (message: RuntimeMessage): Promise<void> {
   const existing = await controller.getBridgeSettings()
   const websocketUrl = requireString(message.websocketUrl, 'WebSocket URL')
@@ -582,6 +597,26 @@ async function saveRuntimeSettings (message: RuntimeMessage): Promise<void> {
   }
 
   await controller.saveBridgeSettings(settings)
+}
+
+function normalizeSetupSettings (
+  values: Record<string, unknown>
+): SetupSettings {
+  const websocketUrl = stringValue(values.websocketUrl)
+  const pairingToken = stringValue(values.pairingToken)
+  const browserInstanceId = stringValue(values.browserInstanceId)
+  const browserName = stringValue(values.browserName) ?? 'Chrome'
+  const profileName = stringValue(values.profileName) ?? 'Default'
+  const label = stringValue(values.label) ?? `${browserName} ${profileName}`
+
+  return {
+    ...(websocketUrl !== undefined ? { websocketUrl } : {}),
+    ...(pairingToken !== undefined ? { pairingToken } : {}),
+    ...(browserInstanceId !== undefined ? { browserInstanceId } : {}),
+    browserName,
+    profileName,
+    label
+  }
 }
 
 function normalizeBridgeSettings (

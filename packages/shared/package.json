@@ -6,7 +6,8 @@
   "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./content-handler": "./src/content-handler.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && esbuild src/index.ts --bundle --format=esm --platform=neutral --target=es2022 --outfile=dist/index.js",
