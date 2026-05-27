@@ -3,7 +3,7 @@ import {
   renderMarkdownImage,
   renderMarkdownLink,
   renderMarkdownTable
-} from '@browserbridge/shared'
+} from './page-content.js'
 import {
   defaultPageContentMaxPayloadBytes,
   type PageAction,
@@ -16,7 +16,7 @@ import {
   type PageImage,
   type PageLandmark,
   type PageLink
-} from '@browserbridge/shared'
+} from './protocol.js'
 
 export interface ExtractPageContextOptions {
   document: Document

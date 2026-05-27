@@ -7,7 +7,6 @@
   "include": [
     "src/background.ts",
     "src/content.ts",
-    "src/page-context.ts",
     "src/protocol.ts",
     "src/setup.ts"
   ]

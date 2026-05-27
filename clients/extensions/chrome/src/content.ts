@@ -1,4 +1,4 @@
-import { extractPageContent, extractPageContext } from './page-context.js'
+import { extractPageContent, extractPageContext } from '@browserbridge/shared'
 import {
   type ActionResultData,
   type ActionResultErrorCode,
