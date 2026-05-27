@@ -1636,7 +1636,7 @@ Document the local setup:
 Generate a local pairing token:
 
 ```sh
-pnpm token
+pnpm run token
 ```
 ````
 

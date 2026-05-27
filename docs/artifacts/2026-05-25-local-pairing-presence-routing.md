@@ -16,7 +16,7 @@ and announces presence after auth and whenever the WebSocket server requests it.
 Generate a local pairing token:
 
 ```sh
-pnpm token
+pnpm run token
 ```
 
 Set the token for the server runtime:

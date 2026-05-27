@@ -52,7 +52,7 @@ The extension is transparent during normal use:
 1. Load the extension in Chrome.
 2. Click the BrowserBridge toolbar action the first time.
 3. Enter the local WebSocket URL, for example `ws://127.0.0.1:8787`.
-4. Enter the pairing token generated with `pnpm token`.
+4. Enter the pairing token generated with `pnpm run token`.
 5. Confirm the auto-generated browser identity or edit the profile/label fields.
 6. Optionally enable regular page access for HTTP and HTTPS pages.
 7. Click the toolbar action again to start the bridge.
