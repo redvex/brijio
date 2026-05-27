@@ -12,7 +12,7 @@ import {
   type WriteTextEditableTarget,
   type WriteTextActionTarget
 } from '@browserbridge/shared'
-import type { ContentRequest, ContentResponse } from './content.js'
+import type { ContentRequest, ContentResponse } from '@browserbridge/shared'
 import {
   hasRegularPageAccess,
   isRegularPageUrl,

@@ -6,7 +6,7 @@
   },
   "include": [
     "src/background.ts",
-    "src/content.ts",
+    "src/content-script-entry.ts",
     "src/protocol.ts",
     "src/setup.ts"
   ]
