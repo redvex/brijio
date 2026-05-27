@@ -12,14 +12,15 @@ import {
   createGetStatusMessage,
   parseSettingsResponse,
   parseStatusResponse,
-  parseErrorResponse
+  parseErrorResponse,
+  sendMessage
 } from './popup.js'
 
-interface BrowserRuntime {
-  sendMessage: (message: unknown) => Promise<unknown>
+export interface BrowserRuntime {
+  sendMessage: (message: unknown, options?: unknown, callback?: (response: unknown) => void) => void
 }
 
-interface BrowserApi {
+export interface BrowserApi {
   runtime: BrowserRuntime
 }
 
@@ -65,7 +66,7 @@ disconnectBtn.addEventListener('click', () => {
 
 async function loadSettings (): Promise<void> {
   try {
-    const response = await browser.runtime.sendMessage(createGetSettingsMessage())
+    const response = await sendMessage(browser, createGetSettingsMessage())
     const url = parseSettingsResponse(response)
     if (url !== undefined) {
       websocketUrlInput.value = url
@@ -77,7 +78,7 @@ async function loadSettings (): Promise<void> {
 
 async function saveSettings (websocketUrl: string): Promise<void> {
   try {
-    const response = await browser.runtime.sendMessage(createSaveSettingsMessage(websocketUrl))
+    const response = await sendMessage(browser, createSaveSettingsMessage(websocketUrl))
     if (
       typeof response === 'object' && response !== null &&
       'ok' in response && (response as { ok: boolean }).ok
@@ -101,10 +102,10 @@ async function connect (): Promise<void> {
   }
 
   // Save the URL first, then connect
-  await browser.runtime.sendMessage(createSaveSettingsMessage(websocketUrl))
+  await sendMessage(browser, createSaveSettingsMessage(websocketUrl))
 
   try {
-    const response = await browser.runtime.sendMessage(createConnectMessage())
+    const response = await sendMessage(browser, createConnectMessage())
     if (
       typeof response === 'object' && response !== null &&
       'ok' in response && (response as { ok: boolean }).ok
@@ -121,7 +122,7 @@ async function connect (): Promise<void> {
 
 async function disconnect (): Promise<void> {
   try {
-    const response = await browser.runtime.sendMessage(createDisconnectMessage())
+    const response = await sendMessage(browser, createDisconnectMessage())
     if (
       typeof response === 'object' && response !== null &&
       'ok' in response && (response as { ok: boolean }).ok
@@ -138,7 +139,7 @@ async function disconnect (): Promise<void> {
 
 async function updateConnectionStatus (): Promise<void> {
   try {
-    const response = await browser.runtime.sendMessage(createGetStatusMessage())
+    const response = await sendMessage(browser, createGetStatusMessage())
     const connected = parseStatusResponse(response)
     statusMessage.textContent = connected ? 'Status: Connected' : 'Status: Disconnected'
   } catch {

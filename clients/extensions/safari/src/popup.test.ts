@@ -8,10 +8,59 @@ import {
   createGetStatusMessage,
   parseSettingsResponse,
   parseStatusResponse,
-  parseErrorResponse
+  parseErrorResponse,
+  sendMessage
 } from './popup.js'
 
-// --- Message construction tests ---
+// --- sendMessage helper tests ---
+
+void describe('sendMessage', () => {
+  void it('resolves with the response when callback is called', async () => {
+    const browser = {
+      runtime: {
+        sendMessage (message: unknown, _opts: unknown, callback?: (response: unknown) => void): void {
+          if (callback != null) {
+            // eslint-disable-next-line n/no-callback-literal
+            callback({ ok: true, data: { websocketUrl: 'ws://test' } })
+          }
+        }
+      }
+    }
+    const result = await sendMessage(browser, createGetSettingsMessage())
+    assert.deepEqual(result, { ok: true, data: { websocketUrl: 'ws://test' } })
+  })
+
+  void it('resolves with undefined when callback receives undefined', async () => {
+    const browser = {
+      runtime: {
+        sendMessage (_message: unknown, _opts: unknown, callback?: (response: unknown) => void): void {
+          if (callback != null) {
+            callback(undefined)
+          }
+        }
+      }
+    }
+    const result = await sendMessage(browser, createGetSettingsMessage())
+    assert.equal(result, undefined)
+  })
+
+  void it('passes the message to sendMessage', async () => {
+    let captured: unknown = null
+    const browser = {
+      runtime: {
+        sendMessage (message: unknown, _opts: unknown, callback?: (response: unknown) => void): void {
+          captured = message
+          if (callback != null) {
+            // eslint-disable-next-line n/no-callback-literal
+            callback({ ok: true })
+          }
+        }
+      }
+    }
+    await sendMessage(browser, createConnectMessage())
+    assert.deepEqual(captured, { type: 'connect' })
+  })
+})
 
 void describe('createGetSettingsMessage', () => {
   void it('returns a message with type "get_settings"', () => {

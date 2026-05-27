@@ -24,7 +24,7 @@
     "256": "icons/icon-256.png",
     "512": "icons/icon-512.png"
   },
-  "permissions": ["*://*/*"],
+  "permissions": ["*://*/*", "scripting"],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
