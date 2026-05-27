@@ -250,12 +250,23 @@ http://127.0.0.1:${TEST_PAGE_PORT:-8080}/test.html
 Generate a local pairing token before starting the runtime:
 
 ```sh
-pnpm token
+pnpm run token
 ```
 
 Set the generated value as `BROWSERBRIDGE_PAIRING_TOKEN` for the WebSocket and
 MCP servers. Configure the same token in the Chrome extension setup page along
 with the local WebSocket URL.
+
+Generate a separate MCP HTTP bearer token and set it as
+`MCP_HTTP_AUTH_TOKEN`. MCP clients connect to:
+
+```text
+http://127.0.0.1:${MCP_HTTP_PORT:-8788}${MCP_HTTP_PATH:-/mcp}
+```
+
+The MCP HTTP token is for agent-to-MCP access. It is intentionally separate
+from `BROWSERBRIDGE_PAIRING_TOKEN`, which scopes private routing between the
+MCP server, WebSocket server, and browser extension.
 
 ### Testing The WebSocket Server With A CLI
 
@@ -316,12 +327,22 @@ BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
 BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
 BROWSERBRIDGE_PAIRING_TOKEN=replace-with-generated-token
 BROWSERBRIDGE_BROWSER_INSTANCE_ID=
+MCP_HTTP_HOST=127.0.0.1
+MCP_HTTP_PORT=8788
+MCP_HTTP_PATH=/mcp
+MCP_HTTP_AUTH_TOKEN=replace-with-generated-mcp-token
+MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost
+MCP_HTTP_ALLOWED_ORIGINS=
 ```
 
 `BROWSERBRIDGE_TOKEN` is accepted as a backward-compatible alias for
 `BROWSERBRIDGE_PAIRING_TOKEN`. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` is optional;
 when set, MCP tools target that browser by default. Tool calls can still pass a
 different `browserInstanceId`.
+
+`MCP_HTTP_AUTH_TOKEN` is required for the HTTP MCP server. `MCP_HTTP_ALLOWED_HOSTS`
+and `MCP_HTTP_ALLOWED_ORIGINS` constrain which HTTP Host and Origin headers can
+reach MCP handling.
 
 ## Security Model
 
@@ -339,6 +360,8 @@ Security expectations:
 - Minimal browser permissions.
 - Basic token handling for local development.
 - Authenticated routing between MCP and WebSocket components.
+- Bearer-token authentication for MCP HTTP clients.
+- Host and Origin validation on the MCP HTTP endpoint.
 - In-memory browser presence while the extension WebSocket is connected.
 - Request IDs and timeouts for all pending browser requests.
 - No continuous page streaming by default.
