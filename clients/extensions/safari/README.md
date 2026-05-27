@@ -132,7 +132,8 @@ The Safari manifest declares these permissions:
 - `activeTab` — access the active tab when the user interacts with the
   extension.
 - `scripting` — inject content scripts on demand.
-- `storage` — store the WebSocket URL.
+- `storage` — store the WebSocket URL, pairing token, profile name, browser
+  label, and stable browser instance ID.
 - `tabs` — read tab URLs and titles, send messages to tabs.
 - `*://*/*` — broad host access for regular HTTP and HTTPS pages.
 
@@ -146,18 +147,21 @@ for details.
    Preferences → Extensions).
 2. Click the BrowserBridge toolbar button to open the popup.
 3. Enter the local WebSocket URL (for example `ws://127.0.0.1:8787`).
-4. Click Connect to start the bridge.
-5. The badge shows `ON` while connected, `OFF` when stopped, and `ERR` on
+4. Enter the pairing token used by the local WebSocket and MCP servers.
+5. Confirm or edit the profile name and browser label used for browser
+   discovery.
+6. Click Save or Connect. Connect saves the current settings before starting the
+   bridge.
+7. The badge shows `ON` while connected, `OFF` when stopped, and `ERR` on
    error.
-6. Click Disconnect to stop the bridge.
+8. Click Disconnect to stop the bridge.
 
 No page context or page content is sent until the extension receives an
 explicit read request over the user-started WebSocket connection.
 
 ## Current limitations
 
-- This extension uses the unauthenticated local single-channel WebSocket
-  server from ADR 0002. Authenticated private routing and MCP content resources
-  require separate ADR approval.
+- The WebSocket server, MCP server, and Safari extension must be configured with
+  the same local pairing token.
 - Safari may suspend extension background pages under memory pressure. The
   keepalive mechanism (every 20 seconds) helps prevent unexpected suspension.
