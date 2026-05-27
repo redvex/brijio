@@ -2,16 +2,23 @@
   "name": "@browserbridge/shared",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared BrowserBridge protocol types and message schemas.",
+  "description": "Shared BrowserBridge protocol types, message schemas, and browser-agnostic logic.",
   "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "echo \"Shared package build is not implemented yet\"",
-    "check": "echo \"Shared package checks are not implemented yet\"",
+    "build": "tsc -p tsconfig.build.json && esbuild src/index.ts --bundle --format=esm --platform=neutral --target=es2022 --outfile=dist/index.js",
+    "check": "tsc --noEmit",
     "dev": "echo \"Shared package dev workflow is not implemented yet\"",
-    "test": "echo \"No tests defined for @browserbridge/shared yet\""
+    "test": "node --import tsx --test src/**/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "esbuild": "^0.28.0",
+    "linkedom": "^0.18.12",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }
