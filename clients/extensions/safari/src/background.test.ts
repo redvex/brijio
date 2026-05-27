@@ -13,7 +13,8 @@ import {
   SafariStorageAdapter,
   SafariSetupAdapter,
   SafariPageReaderAdapter,
-  SafariWebSocketConnection
+  SafariWebSocketConnection,
+  type BrowserApi
 } from './background.js'
 
 // --- Mock browser.* API ---
@@ -21,7 +22,7 @@ import {
 function createMockBrowser (): BrowserApi {
   const mockStorage = {
     local: {
-      data: {} as const,
+      data: {} as Record<string, unknown>,
       async get (keys: string[]): Promise<Record<string, unknown>> {
         const result: Record<string, unknown> = {}
         for (const key of keys) {

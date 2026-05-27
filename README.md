@@ -17,12 +17,16 @@ holders.
 ## Status
 
 This project has the initial local WebSocket transport, Chrome extension page
-context response, and first MCP page-context resource in place. The current working
-milestone is:
+context response, and first MCP page-context resource in place. Safari Web
+Extension support with full Chrome feature parity is now implemented (ADR 0019),
+using shared logic from `@browserbridge/shared`. The current working milestone
+is:
 
 1. A local Chrome extension manually connects to the WebSocket server.
 2. The MCP server requests page context through the WebSocket server.
 3. The Chrome extension responds with the current tab URL and title.
+4. The Safari extension has the same capabilities as Chrome, using shared
+   logic and Safari-specific adapters.
 
 Features beyond that milestone require an approved ADR before implementation.
 
@@ -34,6 +38,8 @@ Features beyond that milestone require an approved ADR before implementation.
 - Make browser state available only through explicit MCP resource reads.
 - Support local and future cloud deployment.
 - Keep the protocol typed, structured, and shared across packages.
+- Share browser-agnostic logic in `@browserbridge/shared` across Chrome and
+  Safari extensions.
 
 ## Planned Repository Layout
 
@@ -46,8 +52,14 @@ Features beyond that milestone require an approved ADR before implementation.
 /packages
   /shared
     /src
-      messages.ts
-      types.ts
+      protocol.ts
+      page-context.ts
+      page-content.ts
+      background-controller.ts
+      content-handler.ts
+      timers.ts
+    package.json
+    README.md
 /servers
   /websocket
     /src
@@ -68,12 +80,23 @@ Features beyond that milestone require an approved ADR before implementation.
     /chrome
       /src
         background.ts
-        content.ts
-        popup.ts
+        content-script-entry.ts
+        setup.ts
+        permissions.ts
       manifest.json
       package.json
       README.md
     /safari
+      /src
+        background.ts
+        background-entry.ts
+        content-script-entry.ts
+        popup.ts
+        popup-entry.ts
+        popup.html
+        permissions.ts
+      manifest.json
+      package.json
       README.md
     /firefox
       README.md
@@ -92,8 +115,11 @@ BrowserBridge has three active runtime parts:
 - **MCP server**: exposes browser resources to AI agents and routes resource
   reads to the active browser session.
 
-Shared protocol types live in `packages/shared` so the extension, WebSocket
-server, and MCP server all use the same message definitions.
+Shared protocol types and browser-agnostic logic live in `packages/shared` so
+the Chrome and Safari extensions, the WebSocket server, and the MCP server all
+use the same message definitions, background controller, and extraction code.
+Each browser extension imports from `@browserbridge/shared` and provides only
+browser-specific adapters and entry-point wiring.
 
 ```mermaid
 flowchart LR
@@ -283,19 +309,30 @@ Security expectations:
 
 ## Browser Extension Scope
 
-Chrome is the first supported extension target.
+Chrome and Safari are the current supported extension targets.
 
-Initial Chrome behavior:
+Chrome behavior:
 
 - User manually connects and disconnects from the extension action after setup.
-- The background script owns the WebSocket connection.
+- The background service worker owns the WebSocket connection.
 - The extension responds to MCP-originated requests.
-- The extension can read current tab URL and title.
-- It does not extract page body text or perform DOM actions in the current
-  milestone.
+- The extension can read current tab URL and title, extract page context and
+  content, and perform DOM actions.
+- Optional host permissions for regular pages are requested at runtime.
 
-Safari and Firefox are planned placeholders until their extension packaging and
-permission models are designed.
+Safari behavior:
+
+- User connects and disconnects through a popup overlay.
+- A persistent background script owns the WebSocket connection.
+- The extension has full feature parity with Chrome (page context, content
+  extraction, DOM actions).
+- Broad host permissions (`*://*/*`) are granted at install time — no runtime
+  permission prompts.
+- Badge state is text-only (no background color API).
+- See ADR 0019 for Safari-specific design decisions.
+
+Firefox is a planned placeholder until its extension packaging and permission
+model are designed.
 
 ## Development Process
 
@@ -320,8 +357,10 @@ For feature or behavioral changes:
   results.
 - Add Docker Compose local development support.
 - Document the first working milestone.
+- Extract shared logic into `@browserbridge/shared` (ADR 0019).
+- Build the Safari Web Extension with full Chrome feature parity (ADR 0019).
 - Design cloud deployment around private user/session/channel routing.
-- Add Safari, Firefox, and app clients after separate ADR approval.
+- Add Firefox and app clients after separate ADR approval.
 
 ## License
 
