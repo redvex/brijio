@@ -2,17 +2,17 @@ import {
   BrowserBridgeBackgroundController,
   type ActionResultErrorCode,
   type ClickActionTarget,
+  ContentRequest,
+  ContentResponse,
   createGlobalTimers,
   defaultPageContentMaxPayloadBytes,
   type PageActionResult,
   type PageContentErrorCode,
   type PageReadResult,
   type BrowserBridgeSocket,
-  type TimersAdapter,
   type WriteTextEditableTarget,
   type WriteTextActionTarget
 } from '@browserbridge/shared'
-import type { ContentRequest, ContentResponse } from '@browserbridge/shared'
 import {
   hasRegularPageAccess,
   isRegularPageUrl,
