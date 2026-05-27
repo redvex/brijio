@@ -4,7 +4,7 @@
 // the browser.* namespace (not chrome.*), and text-only badges (no color API).
 //
 // This file instantiates the controller with Safari-specific adapters and
-// registers the browser.action.onClicked and browser.runtime.onMessage listeners.
+// registers the browser.browserAction.onClicked and browser.runtime.onMessage listeners.
 
 import {
   BrowserBridgeBackgroundController,
@@ -27,7 +27,7 @@ import {
 
 declare const browser: BrowserApi
 
-const action = new SafariActionBadge(browser.action)
+const action = new SafariActionBadge(browser.browserAction)
 const storage = new SafariStorageAdapter(browser.storage)
 const setup = new SafariSetupAdapter()
 const pageReader = new SafariPageReaderAdapter(browser.tabs, browser.scripting)
@@ -73,7 +73,7 @@ const controller = new BrowserBridgeBackgroundController({
   timers: createGlobalTimers()
 })
 
-browser.action.onClicked.addListener(() => {
+browser.browserAction.onClicked.addListener(() => {
   void controller.handleActionClicked()
 })
 

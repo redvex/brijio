@@ -79,7 +79,7 @@ The Safari extension will live at `clients/extensions/safari/` and consist of:
 
 | File                          | Purpose                                                                                                                                                                                  |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/background.ts`           | Safari background script. Wires `BrowserBridgeBackgroundController` to Safari `browser.*` APIs. Creates `SafariWebSocketAdapter`. Handles `browser.action.onClicked`.                    |
+| `src/background.ts`           | Safari background script. Wires `BrowserBridgeBackgroundController` to Safari `browser.*` APIs. Creates `SafariWebSocketAdapter`. Handles the toolbar action click API.                  |
 | `src/permissions.ts`          | Safari permission model adapter. No runtime permission requests — broad host permissions are declared in the manifest (see below). Always returns `true` for regular page access checks. |
 | `src/popup.ts` + `popup.html` | A popup UI for WebSocket URL configuration. Safari does not have a convenient setup-page pattern like Chrome, so we use a popup instead.                                                 |
 | `manifest.json`               | Safari Web Extension manifest (see below).                                                                                                                                               |
@@ -143,8 +143,9 @@ Consequences:
 
 ### Part 4: Badge and connection state
 
-Safari supports `browser.action.setBadgeText()` but not `setBadgeBackgroundColor()`
-or `setBadgeTextColor()`. Safari renders badges with a fixed system style.
+Safari's MV2 `browser_action` uses `browser.browserAction.setBadgeText()`, but
+Safari does not support `setBadgeBackgroundColor()` or `setBadgeTextColor()`.
+Safari renders badges with a fixed system style.
 
 Decision: use badge text for connection state, matching Chrome's text labels:
 

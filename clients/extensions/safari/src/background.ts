@@ -26,7 +26,7 @@ type SendResponse = (response: unknown) => void
 type MessageListener = (event: { data: string }) => void | Promise<void>
 
 export interface BrowserApi {
-  action: {
+  browserAction: {
     onClicked: {
       addListener: (callback: () => void | Promise<void>) => void
     }
@@ -79,10 +79,10 @@ const maxContentBytes = 120000
 // --- Safari-specific adapter classes ---
 
 export class SafariActionBadge {
-  constructor (private readonly action: BrowserApi['action']) {}
+  constructor (private readonly browserAction: BrowserApi['browserAction']) {}
 
   async setBadgeText (text: string): Promise<void> {
-    await this.action.setBadgeText({ text })
+    await this.browserAction.setBadgeText({ text })
   }
 
   async setBadgeColor (_color: string): Promise<void> {
@@ -96,7 +96,7 @@ export class SafariActionBadge {
   }
 
   async setTitle (title: string): Promise<void> {
-    await this.action.setTitle({ title })
+    await this.browserAction.setTitle({ title })
   }
 }
 

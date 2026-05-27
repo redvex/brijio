@@ -50,7 +50,8 @@ clients/extensions/safari/src/
   (`"scripts": ["background.js"]` in the manifest), not Manifest V3 service
   workers. The background script runs in a persistent page context.
 
-- **Text-only badge**: Safari supports `browser.action.setBadgeText()` but
+- **Text-only badge**: Safari's MV2 `browser_action` uses
+  `browser.browserAction.setBadgeText()` but
   does _not_ support `setBadgeBackgroundColor()` or `setBadgeTextColor()`.
   Connection state is shown through badge text only (`ON`, `OFF`, `ERR`).
   The `SafariActionBadge` adapter provides no-op implementations for color
