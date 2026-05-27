@@ -20,9 +20,10 @@ import {
 // --- Mock browser.* API ---
 
 function createMockBrowser (): BrowserApi {
+  const storageData: Record<string, unknown> = {}
   const mockStorage = {
     local: {
-      data: {} as Record<string, unknown>,
+      data: storageData,
       async get (keys: string[]): Promise<Record<string, unknown>> {
         const result: Record<string, unknown> = {}
         for (const key of keys) {
