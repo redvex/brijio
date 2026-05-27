@@ -6,7 +6,7 @@
   "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && esbuild src/content-script-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/content.js --external:browser && esbuild src/background-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/background.js --external:browser && cp manifest.json dist/manifest.json && cp src/popup.html dist/popup.html && node scripts/verify-build-output.mjs",
+    "build": "tsc -p tsconfig.build.json && esbuild src/content-script-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/content.js --external:browser && esbuild src/background-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/background.js --external:browser && esbuild src/popup-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/popup.js --external:browser && cp manifest.json dist/manifest.json && cp src/popup.html dist/popup.html && node scripts/verify-build-output.mjs",
     "check": "tsc --noEmit",
     "dev": "echo \"Safari extension dev workflow is not implemented yet\"",
     "test": "node --import tsx --test 'src/**/*.test.ts'"

@@ -8,6 +8,8 @@
     "src/background.ts",
     "src/background-entry.ts",
     "src/content-script-entry.ts",
-    "src/placeholder.ts"
+    "src/placeholder.ts",
+    "src/popup.ts",
+    "src/popup-entry.ts"
   ]
 }
