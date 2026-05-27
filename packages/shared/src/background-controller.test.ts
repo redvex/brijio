@@ -871,9 +871,7 @@ class FakeActionAdapter implements ActionAdapter {
   }
 
   async setBadgeColor (_color: string): Promise<void> {}
-
   async setBadgeTextColor (_color: string): Promise<void> {}
-
   async setTitle (title: string): Promise<void> {
     this.title = title
   }

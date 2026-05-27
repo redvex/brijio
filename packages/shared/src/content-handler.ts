@@ -1,5 +1,3 @@
-import { chunkReadableContent } from './page-content.js'
-import { extractPageContent, extractPageContext } from './page-context.js'
 import {
   type ActionResultData,
   type ActionResultErrorCode,
@@ -10,10 +8,13 @@ import {
   type SelectOptionsActionResultData,
   type SetCheckedActionResultData,
   type SubmitFormActionResultData,
-  type WriteTextEditableTarget,
   type WriteTextActionResultData,
-  type WriteTextActionTarget
+  type WriteTextActionTarget,
+  type WriteTextEditableTarget
 } from './protocol.js'
+
+import { extractPageContent, extractPageContext } from './page-context.js'
+import { chunkReadableContent } from './page-content.js'
 
 export type ContentRequest =
   | {
@@ -80,24 +81,6 @@ export interface ContentEnvironment {
   selectedText: string
   now: () => string
 }
-
-type SendResponse = (response: ContentResponse) => void
-
-interface ChromeRuntimeApi {
-  runtime: {
-    onMessage: {
-      addListener: (
-        callback: (
-          message: ContentRequest,
-          sender: unknown,
-          sendResponse: SendResponse,
-        ) => boolean,
-      ) => void
-    }
-  }
-}
-
-declare const chrome: ChromeRuntimeApi | undefined
 
 export function handleContentRequest (
   request: ContentRequest,
@@ -693,7 +676,6 @@ function isSupportedTextControl (element: Element): boolean {
   }
 
   const type = (element.getAttribute('type') ?? 'text').toLowerCase()
-
   return [
     'text',
     'search',
@@ -791,20 +773,4 @@ function isSkippedElement (element: Element): boolean {
 
 function escapeAttributeValue (value: string): string {
   return value.replaceAll('\\', '\\\\').replaceAll('"', '\\"')
-}
-
-if (typeof chrome !== 'undefined') {
-  chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-    sendResponse(
-      handleContentRequest(message, {
-        document: globalThis.document,
-        locationHref: globalThis.location.href,
-        title: globalThis.document.title,
-        selectedText: globalThis.getSelection?.()?.toString() ?? '',
-        now: () => new Date().toISOString()
-      })
-    )
-
-    return false
-  })
 }

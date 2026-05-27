@@ -6,8 +6,10 @@
   },
   "include": [
     "src/background.ts",
+    "src/background-entry.ts",
     "src/content-script-entry.ts",
-    "src/protocol.ts",
-    "src/setup.ts"
+    "src/placeholder.ts",
+    "src/popup.ts",
+    "src/popup-entry.ts"
   ]
 }
