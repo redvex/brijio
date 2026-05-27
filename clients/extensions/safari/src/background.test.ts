@@ -217,6 +217,57 @@ void describe('SafariStorageAdapter', () => {
     await storage.setWebSocketUrl('wss://example.com/ws')
     assert.equal(browser.storage.local.data.websocketUrl, 'wss://example.com/ws')
   })
+
+  void it('getBridgeSettings returns complete stored bridge settings', async () => {
+    browser.storage.local.data = {
+      websocketUrl: 'wss://example.com',
+      pairingToken: 'local-token',
+      browserInstanceId: 'safari-default-test',
+      browserName: 'Safari',
+      profileName: 'Default',
+      label: 'Safari Default'
+    }
+    const storage = new SafariStorageAdapter(browser.storage)
+
+    assert.deepEqual(await storage.getBridgeSettings(), {
+      websocketUrl: 'wss://example.com',
+      pairingToken: 'local-token',
+      browserInstanceId: 'safari-default-test',
+      browserName: 'Safari',
+      profileName: 'Default',
+      label: 'Safari Default'
+    })
+  })
+
+  void it('getBridgeSettings returns undefined when required values are missing', async () => {
+    browser.storage.local.data = {
+      websocketUrl: 'wss://example.com'
+    }
+    const storage = new SafariStorageAdapter(browser.storage)
+
+    assert.equal(await storage.getBridgeSettings(), undefined)
+  })
+
+  void it('setBridgeSettings delegates complete settings to browser.storage.local.set', async () => {
+    const storage = new SafariStorageAdapter(browser.storage)
+    await storage.setBridgeSettings({
+      websocketUrl: 'wss://example.com',
+      pairingToken: 'local-token',
+      browserInstanceId: 'safari-default-test',
+      browserName: 'Safari',
+      profileName: 'Default',
+      label: 'Safari Default'
+    })
+
+    assert.deepEqual(browser.storage.local.data, {
+      websocketUrl: 'wss://example.com',
+      pairingToken: 'local-token',
+      browserInstanceId: 'safari-default-test',
+      browserName: 'Safari',
+      profileName: 'Default',
+      label: 'Safari Default'
+    })
+  })
 })
 
 // --- SafariSetupAdapter tests ---

@@ -3,6 +3,7 @@ import {
   ContentResponse,
   defaultPageContentMaxPayloadBytes,
   type ActionResultErrorCode,
+  type BridgeSettings,
   type BrowserBridgeSocket,
   type PageActionResult,
   type PageContent,
@@ -73,6 +74,14 @@ export interface BrowserApi {
 }
 
 const storageKey = 'websocketUrl'
+const bridgeSettingsKeys = [
+  'websocketUrl',
+  'pairingToken',
+  'browserInstanceId',
+  'browserName',
+  'profileName',
+  'label'
+]
 const previewMaxBytes = 4096
 const maxContentBytes = 120000
 
@@ -103,6 +112,22 @@ export class SafariActionBadge {
 export class SafariStorageAdapter {
   constructor (private readonly storage: BrowserApi['storage']) {}
 
+  async getBridgeSettings (): Promise<BridgeSettings | undefined> {
+    const values = await this.storage.local.get(bridgeSettingsKeys)
+    return normalizeBridgeSettings(values)
+  }
+
+  async setBridgeSettings (settings: BridgeSettings): Promise<void> {
+    await this.storage.local.set({
+      websocketUrl: settings.websocketUrl,
+      pairingToken: settings.pairingToken,
+      browserInstanceId: settings.browserInstanceId,
+      browserName: settings.browserName,
+      profileName: settings.profileName,
+      label: settings.label
+    })
+  }
+
   async getWebSocketUrl (): Promise<string | undefined> {
     const values = await this.storage.local.get([storageKey])
     const websocketUrl = values[storageKey]
@@ -112,6 +137,38 @@ export class SafariStorageAdapter {
   async setWebSocketUrl (url: string): Promise<void> {
     await this.storage.local.set({ [storageKey]: url })
   }
+}
+
+function normalizeBridgeSettings (
+  values: Record<string, unknown>
+): BridgeSettings | undefined {
+  const websocketUrl = stringValue(values.websocketUrl)
+  const pairingToken = stringValue(values.pairingToken)
+  const browserInstanceId = stringValue(values.browserInstanceId)
+  const browserName = stringValue(values.browserName) ?? 'Safari'
+  const profileName = stringValue(values.profileName) ?? 'Default'
+  const label = stringValue(values.label) ?? `${browserName} ${profileName}`
+
+  if (
+    websocketUrl === undefined ||
+    pairingToken === undefined ||
+    browserInstanceId === undefined
+  ) {
+    return undefined
+  }
+
+  return {
+    websocketUrl,
+    pairingToken,
+    browserInstanceId,
+    browserName,
+    profileName,
+    label
+  }
+}
+
+function stringValue (value: unknown): string | undefined {
+  return typeof value === 'string' && value.trim() !== '' ? value : undefined
 }
 
 export class SafariSetupAdapter {
