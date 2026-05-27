@@ -131,6 +131,23 @@ void describe('WebSocket authenticated browser routing', () => {
     mcp.close()
   })
 
+  void it('routes browser responses back to the requesting MCP connection', async () => {
+    const server = await startTestServer()
+    const extension = await authenticatedExtension(server.url)
+    const mcp = await authenticatedMcp(server.url)
+
+    const routed = waitForJsonMessage(extension)
+    mcp.send(JSON.stringify(pageContextMessage()))
+    await routed
+
+    const response = waitForJsonMessage(mcp)
+    extension.send(JSON.stringify(pageContextResponseMessage()))
+
+    assert.deepEqual(await response, pageContextResponseMessage())
+    extension.close()
+    mcp.close()
+  })
+
   void it('returns ambiguous_browser_target when multiple browsers are online', async () => {
     const server = await startTestServer()
     const first = await authenticatedExtension(
@@ -364,6 +381,36 @@ function pageContextMessage (browserInstanceId?: string): unknown {
       : { target: { browserInstanceId } }),
     payload: {
       type: 'get_page_context'
+    }
+  }
+}
+
+function pageContextResponseMessage (): unknown {
+  return {
+    type: 'message',
+    id: 'context-1',
+    payload: {
+      type: 'page_context_response',
+      ok: true,
+      data: {
+        url: 'https://example.com/',
+        title: 'Example',
+        timestamp: '2026-05-25T10:00:00.000Z',
+        selectedText: null,
+        preview: {
+          content: 'Example preview',
+          truncated: false,
+          maxBytes: 4096
+        },
+        structure: {
+          headings: [],
+          landmarks: [],
+          links: [],
+          images: [],
+          forms: [],
+          actions: []
+        }
+      }
     }
   }
 }

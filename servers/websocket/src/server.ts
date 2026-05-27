@@ -45,6 +45,7 @@ export async function createWebSocketServer (
   const pairingTokens = getPairingTokens(options)
   const now = options.now ?? (() => new Date())
   const presence = new Map<string, PresenceRecord>()
+  const pendingRequests = new Map<string, WebSocket>()
   const server = new WebSocketServer({ host, port })
 
   server.on('connection', (socket) => {
@@ -72,7 +73,14 @@ export async function createWebSocketServer (
         return
       }
 
-      handleAuthenticatedMessage(socket, state, result.message, presence, now)
+      handleAuthenticatedMessage(
+        socket,
+        state,
+        result.message,
+        presence,
+        pendingRequests,
+        now
+      )
     })
 
     socket.on('close', () => {
@@ -82,6 +90,8 @@ export async function createWebSocketServer (
       ) {
         presence.delete(presenceKey(state.scopeKey, state.browserInstanceId))
       }
+
+      cleanupPendingRequestsForSocket(pendingRequests, socket)
     })
   })
 
@@ -148,6 +158,7 @@ function handleAuthenticatedMessage (
   state: ConnectionState,
   message: BrowserBridgeEnvelope,
   presence: Map<string, PresenceRecord>,
+  pendingRequests: Map<string, WebSocket>,
   now: () => Date
 ): void {
   if (state.scopeKey === undefined || state.role === undefined) {
@@ -155,11 +166,18 @@ function handleAuthenticatedMessage (
   }
 
   if (state.role === 'extension') {
-    handleExtensionMessage(socket, state, message, presence, now)
+    handleExtensionMessage(
+      socket,
+      state,
+      message,
+      presence,
+      pendingRequests,
+      now
+    )
     return
   }
 
-  handleMcpMessage(socket, state.scopeKey, message, presence)
+  handleMcpMessage(socket, state.scopeKey, message, presence, pendingRequests)
 }
 
 function handleExtensionMessage (
@@ -167,25 +185,56 @@ function handleExtensionMessage (
   state: ConnectionState,
   message: BrowserBridgeEnvelope,
   presence: Map<string, PresenceRecord>,
+  pendingRequests: Map<string, WebSocket>,
   now: () => Date
 ): void {
-  if (!isBrowserPresenceAnnouncePayload(message.payload)) {
-    sendJson(
-      socket,
-      createErrorEnvelope(
-        'invalid_message',
-        'Extension messages must announce browser presence.'
-      )
+  if (isBrowserPresenceAnnouncePayload(message.payload)) {
+    if (state.scopeKey === undefined) {
+      return
+    }
+
+    state.browserInstanceId = message.payload.browserInstanceId
+    upsertPresence(socket, state.scopeKey, message.payload, presence, now)
+    return
+  }
+
+  if (state.scopeKey !== undefined && routeExtensionResponse(
+    state.scopeKey,
+    message,
+    pendingRequests
+  )) {
+    return
+  }
+
+  sendJson(
+    socket,
+    createErrorEnvelope(
+      'invalid_message',
+      'Extension messages must announce browser presence or respond to a pending request.'
     )
-    return
+  )
+}
+
+function routeExtensionResponse (
+  scopeKey: string,
+  message: BrowserBridgeEnvelope,
+  pendingRequests: Map<string, WebSocket>
+): boolean {
+  if (message.id === undefined) {
+    return false
   }
 
-  if (state.scopeKey === undefined) {
-    return
+  const key = pendingRequestKey(scopeKey, message.id)
+  const mcpSocket = pendingRequests.get(key)
+
+  if (mcpSocket === undefined) {
+    return false
   }
 
-  state.browserInstanceId = message.payload.browserInstanceId
-  upsertPresence(socket, state.scopeKey, message.payload, presence, now)
+  pendingRequests.delete(key)
+  sendJson(mcpSocket, message)
+
+  return true
 }
 
 function upsertPresence (
@@ -216,7 +265,8 @@ function handleMcpMessage (
   socket: WebSocket,
   scopeKey: string,
   message: BrowserBridgeEnvelope,
-  presence: Map<string, PresenceRecord>
+  presence: Map<string, PresenceRecord>,
+  pendingRequests: Map<string, WebSocket>
 ): void {
   if (isListBrowsersMessage(message.payload)) {
     sendJson(socket, {
@@ -241,6 +291,10 @@ function handleMcpMessage (
   if (!selected.ok) {
     sendJson(socket, selected.error)
     return
+  }
+
+  if (message.id !== undefined) {
+    pendingRequests.set(pendingRequestKey(scopeKey, message.id), socket)
   }
 
   sendJson(selected.record.socket, message)
@@ -325,6 +379,21 @@ function presenceForResponse (record: PresenceRecord): BrowserPresence {
 
 function presenceKey (scopeKey: string, browserInstanceId: string): string {
   return `${scopeKey}:${browserInstanceId}`
+}
+
+function pendingRequestKey (scopeKey: string, requestId: string): string {
+  return `${scopeKey}:${requestId}`
+}
+
+function cleanupPendingRequestsForSocket (
+  pendingRequests: Map<string, WebSocket>,
+  socket: WebSocket
+): void {
+  for (const [key, pendingSocket] of pendingRequests) {
+    if (pendingSocket === socket) {
+      pendingRequests.delete(key)
+    }
+  }
 }
 
 function isListBrowsersMessage (payload: unknown): boolean {
