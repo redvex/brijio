@@ -1,6 +1,6 @@
 {
   "name": "browserbridge",
-  "description": "BrowserBridge: control real browsers through authenticated sessions — form filling, data extraction, QA testing, and web navigation via MCP. Includes 4 workflow skills for guided browser interactions.",
+  "description": "BrowserBridge: control real browsers through authenticated sessions — form filling, data extraction, QA testing, and web navigation via MCP. Includes 10 workflow skills for guided browser interactions.",
   "version": "0.0.0",
   "author": {
     "name": "Redvex",

@@ -540,13 +540,43 @@ void describe('BrowserBridge MCP HTTP server', () => {
             mimeType: 'application/json'
           },
           {
+            uri: 'skill://browserbridge/accessibility',
+            name: 'accessibility',
+            mimeType: 'text/markdown'
+          },
+          {
+            uri: 'skill://browserbridge/comparison',
+            name: 'comparison',
+            mimeType: 'text/markdown'
+          },
+          {
             uri: 'skill://browserbridge/data-extraction',
             name: 'data-extraction',
             mimeType: 'text/markdown'
           },
           {
+            uri: 'skill://browserbridge/ecommerce',
+            name: 'ecommerce',
+            mimeType: 'text/markdown'
+          },
+          {
             uri: 'skill://browserbridge/form-filling',
             name: 'form-filling',
+            mimeType: 'text/markdown'
+          },
+          {
+            uri: 'skill://browserbridge/monitoring',
+            name: 'monitoring',
+            mimeType: 'text/markdown'
+          },
+          {
+            uri: 'skill://browserbridge/navigation',
+            name: 'navigation',
+            mimeType: 'text/markdown'
+          },
+          {
+            uri: 'skill://browserbridge/onboarding',
+            name: 'onboarding',
             mimeType: 'text/markdown'
           },
           {

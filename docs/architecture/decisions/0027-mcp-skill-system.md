@@ -79,7 +79,7 @@ by agent runtimes:
 
 All three reference `./servers/mcp/skills/` as the skills directory.
 
-### Tier 1 Skills
+### Tier 1 Skills — Essential
 
 | Skill                 | Purpose                                                                      |
 | --------------------- | ---------------------------------------------------------------------------- |
@@ -87,6 +87,22 @@ All three reference `./servers/mcp/skills/` as the skills directory.
 | `form-filling`        | Multi-step form completion on authenticated pages                            |
 | `data-extraction`     | Structured data extraction from pages behind login                           |
 | `web-qa`              | Exploratory testing and QA on authenticated pages                            |
+
+### Tier 2 Skills — Valuable, Medium Complexity
+
+| Skill           | Purpose                                                                          |
+| --------------- | -------------------------------------------------------------------------------- |
+| `navigation`    | Multi-step navigation: click-through flows, SPA routing, breadcrumb backtracking |
+| `comparison`    | Side-by-side page comparison: staging vs prod, mobile vs desktop, A/B variants   |
+| `accessibility` | Accessibility audit on authenticated pages: labels, headings, link text, ARIA    |
+
+### Tier 3 Skills — Nice-to-Have, Specialized
+
+| Skill        | Purpose                                                                                 |
+| ------------ | --------------------------------------------------------------------------------------- |
+| `ecommerce`  | E-commerce checkout automation: cart, shipping, coupons, payment (stop before submit)   |
+| `onboarding` | New account onboarding: registration, email verification, profile, preferences          |
+| `monitoring` | Periodic page monitoring via cron: extract data, compare to baseline, notify on changes |
 
 ### Implementation
 

@@ -34,12 +34,18 @@ Skills are MCP resources. Read a skill's full instructions with
 skill://browserbridge/{skill_name}
 ```
 
-| Skill Name            | URI                                         | When to Use                                              |
-| --------------------- | ------------------------------------------- | -------------------------------------------------------- |
-| `using-browserbridge` | `skill://browserbridge/using-browserbridge` | Every session — orientation and tool reference           |
-| `form-filling`        | `skill://browserbridge/form-filling`        | Any task involving filling out web forms                 |
-| `data-extraction`     | `skill://browserbridge/data-extraction`     | Any task involving extracting data from web pages        |
-| `web-qa`              | `skill://browserbridge/web-qa`              | Any task involving testing or verifying web app behavior |
+| Skill Name            | URI                                         | When to Use                                                     |
+| --------------------- | ------------------------------------------- | --------------------------------------------------------------- |
+| `using-browserbridge` | `skill://browserbridge/using-browserbridge` | Every session — orientation and tool reference                  |
+| `form-filling`        | `skill://browserbridge/form-filling`        | Any task involving filling out web forms                        |
+| `data-extraction`     | `skill://browserbridge/data-extraction`     | Any task involving extracting data from web pages               |
+| `web-qa`              | `skill://browserbridge/web-qa`              | Any task involving testing or verifying web app behavior        |
+| `navigation`          | `skill://browserbridge/navigation`          | Any task involving multi-step navigation or click-through flows |
+| `comparison`          | `skill://browserbridge/comparison`          | Comparing two pages or browser views side by side               |
+| `accessibility`       | `skill://browserbridge/accessibility`       | Auditing a page for accessibility issues                        |
+| `ecommerce`           | `skill://browserbridge/ecommerce`           | E-commerce checkout flows (cart, shipping, payment)             |
+| `onboarding`          | `skill://browserbridge/onboarding`          | New account registration and profile setup                      |
+| `monitoring`          | `skill://browserbridge/monitoring`          | Periodic page monitoring via cron jobs                          |
 
 ## Available Tools
 
@@ -94,12 +100,18 @@ subsequent tool calls.
 
 ## Step 3: Choose the Right Skill
 
-| User intent                                         | Skill to read                                        |
-| --------------------------------------------------- | ---------------------------------------------------- |
-| "Fill in this form" / "Apply" / "Sign up"           | `skill://browserbridge/form-filling`                 |
-| "Get this data" / "Extract the table" / "Scrape"    | `skill://browserbridge/data-extraction`              |
-| "Test this page" / "Check if X works" / "Find bugs" | `skill://browserbridge/web-qa`                       |
-| Any other browser task                              | Default to reading the page and using tools directly |
+| User intent                                              | Skill to read                                        |
+| -------------------------------------------------------- | ---------------------------------------------------- |
+| "Fill in this form" / "Apply" / "Sign up"                | `skill://browserbridge/form-filling`                 |
+| "Get this data" / "Extract the table" / "Scrape"         | `skill://browserbridge/data-extraction`              |
+| "Test this page" / "Check if X works" / "Find bugs"      | `skill://browserbridge/web-qa`                       |
+| "Go to Settings → Privacy" / "Navigate to admin"         | `skill://browserbridge/navigation`                   |
+| "Compare staging vs prod" / "Check mobile vs desktop"    | `skill://browserbridge/comparison`                   |
+| "Check accessibility" / "Audit a11y" / "WCAG check"      | `skill://browserbridge/accessibility`                |
+| "Buy this" / "Checkout" / "Apply coupon"                 | `skill://browserbridge/ecommerce`                    |
+| "Sign up for X" / "Create account" / "Onboard"           | `skill://browserbridge/onboarding`                   |
+| "Monitor this page" / "Alert on changes" / "Price watch" | `skill://browserbridge/monitoring`                   |
+| Any other browser task                                   | Default to reading the page and using tools directly |
 
 ## Red Flags
 
