@@ -81,11 +81,12 @@ All three reference `./servers/mcp/skills/` as the skills directory.
 
 ### Tier 1 Skills
 
-| Skill             | Purpose                                            |
-| ----------------- | -------------------------------------------------- |
-| `form-filling`    | Multi-step form completion on authenticated pages  |
-| `data-extraction` | Structured data extraction from pages behind login |
-| `web-qa`          | Exploratory testing and QA on authenticated pages  |
+| Skill                 | Purpose                                                                      |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `using-browserbridge` | Orientation: how to discover skills, which tools exist, and when to use each |
+| `form-filling`        | Multi-step form completion on authenticated pages                            |
+| `data-extraction`     | Structured data extraction from pages behind login                           |
+| `web-qa`              | Exploratory testing and QA on authenticated pages                            |
 
 ### Implementation
 
