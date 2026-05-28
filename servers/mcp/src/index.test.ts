@@ -1,10 +1,12 @@
 import assert from 'node:assert/strict'
+import { request as httpRequest } from 'node:http'
 import { type AddressInfo } from 'node:net'
 import { afterEach, describe, it } from 'node:test'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 import {
+  getMcpHttpServerOptionsFromEnv,
   startBrowserBridgeMcpHttpServer,
   type BrowserBridgeMcpHttpRuntime
 } from './http-server.js'
@@ -121,6 +123,394 @@ void describe('BrowserBridge MCP HTTP server', () => {
     } finally {
       await runtime.close()
     }
+  })
+
+  void it('allows Tailscale hosts when Tailscale host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example'],
+      allowTailscaleHosts: true
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'device.tailnet.ts.net',
+        {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('allows Tailscale hosts with ports when Tailscale host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example'],
+      allowTailscaleHosts: true
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'device.tailnet.ts.net:8788',
+        {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('rejects non-Tailscale hosts when only Tailscale host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example'],
+      allowTailscaleHosts: true
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'evil.example',
+        {
+          accept: 'application/json, text/event-stream',
+          authorization: 'Bearer test-mcp-token',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 403)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'forbidden_host',
+          message: 'Host is not allowed for BrowserBridge MCP HTTP.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('allows Tailscale origins when Tailscale host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowTailscaleHosts: true
+    })
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json',
+          origin: 'https://app.tailnet.ts.net'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('allows explicit wildcard Tailscale host entries', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['*.ts.net']
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'device.tailnet.ts.net',
+        {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('adds Tailscale wildcard entries from MCP_HTTP_ALLOW_TAILSCALE_HOSTS', () => {
+    const options = getMcpHttpServerOptionsFromEnv({
+      MCP_HTTP_AUTH_TOKEN: 'test-mcp-token',
+      MCP_HTTP_ALLOW_TAILSCALE_HOSTS: 'true'
+    })
+
+    assert.equal(options.allowTailscaleHosts, true)
+    assert.deepEqual(options.allowedHosts, ['127.0.0.1', 'localhost', '*.ts.net'])
+    assert.deepEqual(options.allowedOrigins, ['*.ts.net'])
+  })
+
+  void it('allows local hosts when local host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example'],
+      allowLocalHosts: true
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'browserbridge.local',
+        {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('allows local hosts with ports when local host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example'],
+      allowLocalHosts: true
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'browserbridge.local:8788',
+        {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('rejects non-local hosts when only local host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['trusted.example'],
+      allowLocalHosts: true
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'evil.example',
+        {
+          accept: 'application/json, text/event-stream',
+          authorization: 'Bearer test-mcp-token',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 403)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'forbidden_host',
+          message: 'Host is not allowed for BrowserBridge MCP HTTP.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('allows local origins when local host allowance is enabled', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowLocalHosts: true
+    })
+
+    try {
+      const response = await fetch(runtime.url, {
+        method: 'POST',
+        headers: {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json',
+          origin: 'https://app.local'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      })
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(await response.json(), {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('allows explicit wildcard local host entries', async () => {
+    const runtime = await startTestMcpRuntime({
+      allowedHosts: ['*.local']
+    })
+
+    try {
+      const response = await postMcpJsonWithHost(
+        runtime.url,
+        'browserbridge.local',
+        {
+          accept: 'application/json, text/event-stream',
+          'content-type': 'application/json'
+        },
+        {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        }
+      )
+
+      assert.equal(response.status, 401)
+      assert.deepEqual(response.body, {
+        ok: false,
+        error: {
+          code: 'unauthorized',
+          message: 'Missing or invalid MCP HTTP bearer token.'
+        }
+      })
+    } finally {
+      await runtime.close()
+    }
+  })
+
+  void it('adds local wildcard entries from MCP_HTTP_ALLOW_LOCAL_HOSTS', () => {
+    const options = getMcpHttpServerOptionsFromEnv({
+      MCP_HTTP_AUTH_TOKEN: 'test-mcp-token',
+      MCP_HTTP_ALLOW_LOCAL_HOSTS: 'true'
+    })
+
+    assert.equal(options.allowLocalHosts, true)
+    assert.deepEqual(options.allowedHosts, ['127.0.0.1', 'localhost', '*.local'])
+    assert.deepEqual(options.allowedOrigins, ['*.local'])
+  })
+
+  void it('can enable Tailscale and local host allowances together', () => {
+    const options = getMcpHttpServerOptionsFromEnv({
+      MCP_HTTP_AUTH_TOKEN: 'test-mcp-token',
+      MCP_HTTP_ALLOW_TAILSCALE_HOSTS: 'true',
+      MCP_HTTP_ALLOW_LOCAL_HOSTS: 'true'
+    })
+
+    assert.equal(options.allowTailscaleHosts, true)
+    assert.equal(options.allowLocalHosts, true)
+    assert.deepEqual(options.allowedHosts, [
+      '127.0.0.1',
+      'localhost',
+      '*.ts.net',
+      '*.local'
+    ])
+    assert.deepEqual(options.allowedOrigins, ['*.ts.net', '*.local'])
   })
 
   void it('uses the official MCP lifecycle for initialize, resource discovery, and ping', async () => {
@@ -982,6 +1372,8 @@ async function startTestMcpRuntime (
     websocketUrl?: string
     allowedHosts?: string[]
     allowedOrigins?: string[]
+    allowTailscaleHosts?: boolean
+    allowLocalHosts?: boolean
   } = {}
 ): Promise<BrowserBridgeMcpHttpRuntime> {
   const runtime = await startBrowserBridgeMcpHttpServer({
@@ -991,6 +1383,8 @@ async function startTestMcpRuntime (
     authToken: 'test-mcp-token',
     allowedHosts: options.allowedHosts ?? ['127.0.0.1'],
     allowedOrigins: options.allowedOrigins ?? [],
+    allowTailscaleHosts: options.allowTailscaleHosts ?? false,
+    allowLocalHosts: options.allowLocalHosts ?? false,
     pageContextConfig: {
       websocketUrl: options.websocketUrl ?? 'ws://127.0.0.1:1',
       timeoutMs: 100,
@@ -1017,6 +1411,49 @@ function createHttpTransport (url: string): StreamableHTTPClientTransport {
         authorization: 'Bearer test-mcp-token'
       }
     }
+  })
+}
+
+async function postMcpJsonWithHost (
+  url: string,
+  host: string,
+  headers: Record<string, string>,
+  body: unknown
+): Promise<{ status: number, body: unknown }> {
+  const endpoint = new URL(url)
+  const serializedBody = JSON.stringify(body)
+
+  return await new Promise((resolve, reject) => {
+    const request = httpRequest(
+      {
+        hostname: endpoint.hostname,
+        port: endpoint.port,
+        path: endpoint.pathname,
+        method: 'POST',
+        headers: {
+          ...headers,
+          host,
+          'content-length': Buffer.byteLength(serializedBody).toString()
+        }
+      },
+      (response) => {
+        const chunks: Buffer[] = []
+
+        response.on('data', (chunk: Buffer) => {
+          chunks.push(chunk)
+        })
+        response.on('end', () => {
+          const text = Buffer.concat(chunks).toString('utf8')
+          resolve({
+            status: response.statusCode ?? 0,
+            body: text === '' ? undefined : JSON.parse(text)
+          })
+        })
+      }
+    )
+
+    request.once('error', reject)
+    request.end(serializedBody)
   })
 }
 

@@ -18,6 +18,8 @@ export interface BrowserBridgeMcpHttpServerOptions {
   authToken: string
   allowedHosts: string[]
   allowedOrigins: string[]
+  allowTailscaleHosts?: boolean
+  allowLocalHosts?: boolean
   pageContextConfig?: BrowserBridgePageContextConfig
 }
 
@@ -46,13 +48,28 @@ export function getMcpHttpServerOptionsFromEnv (
     throw new Error('MCP_HTTP_AUTH_TOKEN is required for MCP HTTP transport.')
   }
 
+  const allowTailscaleHosts = parseBoolean(env.MCP_HTTP_ALLOW_TAILSCALE_HOSTS)
+  const allowLocalHosts = parseBoolean(env.MCP_HTTP_ALLOW_LOCAL_HOSTS)
+  const allowedHostSuffixes = getAllowedHostSuffixes({
+    allowTailscaleHosts,
+    allowLocalHosts
+  })
+
   return {
     host,
     port,
     path: normalizePath(env.MCP_HTTP_PATH ?? '/mcp'),
     authToken,
-    allowedHosts: parseList(env.MCP_HTTP_ALLOWED_HOSTS, defaultAllowedHosts(host)),
-    allowedOrigins: parseList(env.MCP_HTTP_ALLOWED_ORIGINS, []),
+    allowedHosts: withHostSuffixAllowances(
+      parseList(env.MCP_HTTP_ALLOWED_HOSTS, defaultAllowedHosts(host)),
+      allowedHostSuffixes
+    ),
+    allowedOrigins: withHostSuffixAllowances(
+      parseList(env.MCP_HTTP_ALLOWED_ORIGINS, []),
+      allowedHostSuffixes
+    ),
+    allowTailscaleHosts,
+    allowLocalHosts,
     pageContextConfig: getPageContextConfigFromEnv(env)
   }
 }
@@ -107,13 +124,25 @@ async function handleMcpHttpRequest (
     return
   }
 
-  const hostError = validateHost(request, options.allowedHosts)
+  const allowedHostSuffixes = getAllowedHostSuffixes({
+    allowTailscaleHosts: options.allowTailscaleHosts ?? false,
+    allowLocalHosts: options.allowLocalHosts ?? false
+  })
+  const allowedHosts = withHostSuffixAllowances(
+    options.allowedHosts,
+    allowedHostSuffixes
+  )
+  const hostError = validateHost(request, allowedHosts)
   if (hostError !== undefined) {
     writeJsonError(response, 403, hostError)
     return
   }
 
-  const originError = validateOrigin(request, options.allowedOrigins)
+  const allowedOrigins = withHostSuffixAllowances(
+    options.allowedOrigins,
+    allowedHostSuffixes
+  )
+  const originError = validateOrigin(request, allowedOrigins)
   if (originError !== undefined) {
     writeJsonError(response, 403, originError)
     return
@@ -205,6 +234,44 @@ function parseList (value: string | undefined, fallback: string[]): string[] {
     .filter((item) => item !== '')
 }
 
+function parseBoolean (value: string | undefined): boolean {
+  return value?.trim().toLowerCase() === 'true'
+}
+
+function getAllowedHostSuffixes (
+  options: {
+    allowTailscaleHosts: boolean
+    allowLocalHosts: boolean
+  }
+): string[] {
+  const suffixes: string[] = []
+
+  if (options.allowTailscaleHosts) {
+    suffixes.push('*.ts.net')
+  }
+
+  if (options.allowLocalHosts) {
+    suffixes.push('*.local')
+  }
+
+  return suffixes
+}
+
+function withHostSuffixAllowances (
+  values: string[],
+  allowedHostSuffixes: string[]
+): string[] {
+  const nextValues = [...values]
+
+  for (const suffix of allowedHostSuffixes) {
+    if (!nextValues.includes(suffix)) {
+      nextValues.push(suffix)
+    }
+  }
+
+  return nextValues
+}
+
 function defaultAllowedHosts (host: string): string[] {
   if (host === '127.0.0.1' || host === 'localhost') {
     return ['127.0.0.1', 'localhost']
@@ -241,10 +308,16 @@ function validateHost (
 }
 
 function isAllowedHost (hostHeader: string, allowedHosts: string[]): boolean {
-  const hostName = hostHeader.split(':')[0]
+  const hostName = stripPort(hostHeader)
 
   return allowedHosts.some((allowedHost) => {
-    return allowedHost === hostHeader || allowedHost === hostName
+    const allowedHostName = stripPort(allowedHost)
+
+    return (
+      allowedHost === hostHeader ||
+      allowedHostName === hostName ||
+      matchesWildcardHost(hostName, allowedHostName)
+    )
   })
 }
 
@@ -258,7 +331,7 @@ function validateOrigin (
     return undefined
   }
 
-  if (allowedOrigins.includes(origin)) {
+  if (isAllowedOrigin(origin, allowedOrigins)) {
     return undefined
   }
 
@@ -269,6 +342,38 @@ function validateOrigin (
       message: 'Origin is not allowed for BrowserBridge MCP HTTP.'
     }
   }
+}
+
+function isAllowedOrigin (origin: string, allowedOrigins: string[]): boolean {
+  return allowedOrigins.some((allowedOrigin) => {
+    if (allowedOrigin === origin) {
+      return true
+    }
+
+    if (!allowedOrigin.startsWith('*.')) {
+      return false
+    }
+
+    try {
+      return matchesWildcardHost(new URL(origin).hostname, allowedOrigin)
+    } catch {
+      return false
+    }
+  })
+}
+
+function stripPort (host: string): string {
+  return host.split(':')[0].toLowerCase()
+}
+
+function matchesWildcardHost (hostName: string, allowedHost: string): boolean {
+  if (!allowedHost.startsWith('*.')) {
+    return false
+  }
+
+  const suffix = allowedHost.slice(1).toLowerCase()
+
+  return hostName.toLowerCase().endsWith(suffix)
 }
 
 function isAuthorized (
