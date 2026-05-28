@@ -35,7 +35,7 @@ function parseFrontmatter (content: string): {
   body: string
 } {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/m.exec(content)
-  if (!match) return { frontmatter: {}, body: content }
+  if (match === null) return { frontmatter: {}, body: content }
 
   const rawFrontmatter = match[1]
   const rawBody = match[2]

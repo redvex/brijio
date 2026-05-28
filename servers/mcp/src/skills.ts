@@ -1,5 +1,5 @@
 import { readFile, readdir, stat } from 'node:fs/promises'
-import { join, basename } from 'node:path'
+import { join } from 'node:path'
 
 /**
  * Represents a BrowserBridge skill exposed via MCP resources, prompts,
@@ -85,7 +85,7 @@ export async function loadSkills (
       const title = extractTitle(body)
       const description = frontmatter.description ?? extractDescription(body)
 
-      return { name, title, description, content: body } as BrowserBridgeSkill
+      return { name, title, description, content: body } satisfies BrowserBridgeSkill
     })
   )
 
@@ -171,7 +171,7 @@ function parseFrontmatter (content: string): {
   body: string
 } {
   const match = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/m.exec(content)
-  if (!match) {
+  if (match === null) {
     return { frontmatter: {}, body: content }
   }
 

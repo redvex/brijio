@@ -74,25 +74,30 @@ Structure the QA report with clear categories:
 
 ```markdown
 # QA Report: [Page URL]
+
 Date: [timestamp]
 Browser: [Chrome/Safari/both]
 
 ## Navigation
+
 - ✅ Home link works
 - ❌ About link → 404 page
 - ✅ Contact link works
 
 ## Forms
+
 - ✅ Login form validates empty fields
 - ❌ Email field accepts "test@" (should reject invalid email)
 - ✅ Password field shows masking
 
 ## Accessibility
+
 - ⚠️ Logo image missing alt text
 - ✅ Form labels present for all inputs
 - ❌ Color contrast insufficient on secondary buttons
 
 ## Cross-Browser
+
 - ❌ Safari: dropdown options not rendering correctly
 - ✅ Chrome: all interactive elements functional
 ```

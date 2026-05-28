@@ -61,16 +61,16 @@ Locate the relevant form in the `forms` array. Each form has:
 
 Fill fields in a logical order (top-to-bottom) using the appropriate tool:
 
-| Field Type | Tool | Notes |
-|---|---|---|
-| Text input / Search | `fill_input` | Most common field type |
-| Email / URL / Tel | `fill_input` | Same tool, different semantic type |
-| Textarea | `fill_input` | Use `controlId` from the form |
-| Contenteditable | `fill_editable` | Standalone editable, not inside a `<form>` |
-| Checkbox | `set_checked(formId, controlId, true/false)` | Toggle checked state |
-| Radio button | `set_checked(formId, controlId, true)` | Select one option; cannot uncheck |
-| Select (single) | `select_options(formId, controlId, [value])` | Pass one value |
-| Select (multiple) | `select_options(formId, controlId, [v1, v2])` | Pass multiple values |
+| Field Type          | Tool                                          | Notes                                      |
+| ------------------- | --------------------------------------------- | ------------------------------------------ |
+| Text input / Search | `fill_input`                                  | Most common field type                     |
+| Email / URL / Tel   | `fill_input`                                  | Same tool, different semantic type         |
+| Textarea            | `fill_input`                                  | Use `controlId` from the form              |
+| Contenteditable     | `fill_editable`                               | Standalone editable, not inside a `<form>` |
+| Checkbox            | `set_checked(formId, controlId, true/false)`  | Toggle checked state                       |
+| Radio button        | `set_checked(formId, controlId, true)`        | Select one option; cannot uncheck          |
+| Select (single)     | `select_options(formId, controlId, [value])`  | Pass one value                             |
+| Select (multiple)   | `select_options(formId, controlId, [v1, v2])` | Pass multiple values                       |
 
 ### 5. Verify Before Submitting
 
