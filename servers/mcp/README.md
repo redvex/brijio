@@ -438,6 +438,8 @@ MCP_HTTP_PATH=/mcp
 MCP_HTTP_AUTH_TOKEN=replace-with-generated-mcp-token
 MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost
 MCP_HTTP_ALLOWED_ORIGINS=
+MCP_HTTP_ALLOW_TAILSCALE_HOSTS=false
+MCP_HTTP_ALLOW_LOCAL_HOSTS=false
 ```
 
 `WEBSOCKET_URL` is also accepted as a backward-compatible alias for
@@ -449,6 +451,14 @@ server and must not be reused as the BrowserBridge pairing token.
 `MCP_HTTP_ALLOWED_HOSTS` accepts comma-separated host names or host values.
 `MCP_HTTP_ALLOWED_ORIGINS` accepts comma-separated origins for browser-based
 MCP clients that send an `Origin` header.
+Both lists support wildcard DNS suffix entries such as `*.ts.net` and
+`*.local`.
+`MCP_HTTP_ALLOW_TAILSCALE_HOSTS=true` appends `*.ts.net` to both checks so
+Tailscale MagicDNS names are accepted while bearer-token authentication remains
+required.
+`MCP_HTTP_ALLOW_LOCAL_HOSTS=true` appends `*.local` to both checks for
+mDNS-style local network names while keeping bearer-token authentication
+required.
 
 ## Development
 

@@ -333,6 +333,8 @@ MCP_HTTP_PATH=/mcp
 MCP_HTTP_AUTH_TOKEN=replace-with-generated-mcp-token
 MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost
 MCP_HTTP_ALLOWED_ORIGINS=
+MCP_HTTP_ALLOW_TAILSCALE_HOSTS=false
+MCP_HTTP_ALLOW_LOCAL_HOSTS=false
 ```
 
 `BROWSERBRIDGE_TOKEN` is accepted as a backward-compatible alias for
@@ -343,6 +345,29 @@ different `browserInstanceId`.
 `MCP_HTTP_AUTH_TOKEN` is required for the HTTP MCP server. `MCP_HTTP_ALLOWED_HOSTS`
 and `MCP_HTTP_ALLOWED_ORIGINS` constrain which HTTP Host and Origin headers can
 reach MCP handling.
+
+For Tailscale-only development, bind the MCP HTTP server to a reachable
+interface and enable the Tailscale suffix allowance:
+
+```sh
+MCP_HTTP_HOST=0.0.0.0
+MCP_HTTP_ALLOW_TAILSCALE_HOSTS=true
+```
+
+This accepts MCP HTTP requests whose `Host` or browser `Origin` hostname ends
+in `.ts.net`. It does not replace `MCP_HTTP_AUTH_TOKEN`; every MCP HTTP request
+still needs the bearer token.
+
+For local network development using mDNS-style names such as
+`browserbridge.local`, enable the local suffix allowance:
+
+```sh
+MCP_HTTP_HOST=0.0.0.0
+MCP_HTTP_ALLOW_LOCAL_HOSTS=true
+```
+
+This accepts MCP HTTP requests whose `Host` or browser `Origin` hostname ends
+in `.local`. It also keeps bearer-token authentication required.
 
 ## Security Model
 
