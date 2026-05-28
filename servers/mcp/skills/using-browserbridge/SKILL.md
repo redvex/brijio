@@ -15,22 +15,14 @@ for connected browsers first.
 a skill applies means you should read it. If the skill turns out to be
 irrelevant, move on — but check first.
 
-```dot
-digraph skill_flow {
-    "User asks for browser action" [shape=doublecircle];
-    "Check connected browsers" [shape=box];
-    "Might a skill apply?" [shape=diamond];
-    "Read skill via read_resource" [shape=box];
-    "Follow skill instructions" [shape=box];
-    "Take browser action" [shape=doublecircle];
-
-    "User asks for browser action" -> "Check connected browsers";
-    "Check connected browsers" -> "Might a skill apply?";
-    "Might a skill apply?" -> "Read skill via read_resource" [label="yes, even 1%"];
-    "Might a skill apply?" -> "Take browser action" [label="definitely not"];
-    "Read skill via read_resource" -> "Follow skill instructions";
-    "Follow skill instructions" -> "Take browser action";
-}
+```mermaid
+flowchart TD
+    A[["User asks for browser action"]] --> B["Check connected browsers"]
+    B --> C{"Might a skill apply?"}
+    C -->|"yes, even 1%"| D["Read skill via read_resource"]
+    C -->|"definitely not"| F[["Take browser action"]]
+    D --> E["Follow skill instructions"]
+    E --> F
 ```
 
 ## Available Skills
