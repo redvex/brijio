@@ -550,6 +550,11 @@ void describe('BrowserBridge MCP HTTP server', () => {
             mimeType: 'text/markdown'
           },
           {
+            uri: 'skill://browserbridge/using-browserbridge',
+            name: 'using-browserbridge',
+            mimeType: 'text/markdown'
+          },
+          {
             uri: 'skill://browserbridge/web-qa',
             name: 'web-qa',
             mimeType: 'text/markdown'
