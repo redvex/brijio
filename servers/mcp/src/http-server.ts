@@ -170,7 +170,7 @@ async function handleMcpHttpRequest (
     return
   }
 
-  const mcpServer = createBrowserBridgeMcpServer(options.pageContextConfig)
+  const mcpServer = await createBrowserBridgeMcpServer(options.pageContextConfig)
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true

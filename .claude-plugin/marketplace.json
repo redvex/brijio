@@ -1,0 +1,20 @@
+{
+  "name": "browserbridge-dev",
+  "description": "Development marketplace for BrowserBridge skills plugin",
+  "owner": {
+    "name": "Redvex",
+    "url": "https://github.com/redvex"
+  },
+  "plugins": [
+    {
+      "name": "browserbridge",
+      "description": "Control real browsers through authenticated sessions — form filling, data extraction, QA testing, and web navigation via MCP. Includes 4 workflow skills for guided browser interactions.",
+      "version": "0.0.0",
+      "source": "./",
+      "author": {
+        "name": "Redvex",
+        "url": "https://github.com/redvex"
+      }
+    }
+  ]
+}
