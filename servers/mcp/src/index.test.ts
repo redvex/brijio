@@ -538,6 +538,21 @@ void describe('BrowserBridge MCP HTTP server', () => {
             uri: currentPageResourceUri,
             name: 'current-page-context',
             mimeType: 'application/json'
+          },
+          {
+            uri: 'skill://browserbridge/data-extraction',
+            name: 'data-extraction',
+            mimeType: 'text/markdown'
+          },
+          {
+            uri: 'skill://browserbridge/form-filling',
+            name: 'form-filling',
+            mimeType: 'text/markdown'
+          },
+          {
+            uri: 'skill://browserbridge/web-qa',
+            name: 'web-qa',
+            mimeType: 'text/markdown'
           }
         ]
       )

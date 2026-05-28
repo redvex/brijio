@@ -20,14 +20,20 @@ import {
   submitForm
 } from './form-action-tools.js'
 import { readCurrentPage } from './page-reading-tool.js'
+import {
+  buildContextMessage,
+  loadSkills,
+  resolveSkillsDir,
+  skillResourceUri
+} from './skills.js'
 
 const currentPageResourceUri = 'browser://page/current'
 const currentPageContentResourceTemplateUri =
   'browser://page/current/content/{index}'
 
-export function createBrowserBridgeMcpServer (
+export async function createBrowserBridgeMcpServer (
   pageContextConfig: BrowserBridgePageContextConfig = getPageContextConfigFromEnv()
-): McpServer {
+): Promise<McpServer> {
   const server = new McpServer({
     name: 'browserbridge-mcp',
     version: '0.0.0'
@@ -327,6 +333,73 @@ export function createBrowserBridgeMcpServer (
             uri: uri.href,
             mimeType: 'application/json',
             text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  // ── Skill Resources ─────────────────────────────────────────────────────
+  //
+  // Each skill markdown file in the `skills/` directory is exposed as an MCP
+  // resource so that any MCP client (not just Hermes) can discover and read
+  // the full workflow instructions. This follows the pattern established by
+  // the Superpowers MCP server.
+
+  const skillsDir = resolveSkillsDir()
+  const skills = await loadSkills(skillsDir)
+
+  for (const skill of skills) {
+    const uri = skillResourceUri(skill.name)
+
+    server.registerResource(
+      skill.name,
+      uri,
+      {
+        title: skill.title,
+        description: skill.description,
+        mimeType: 'text/markdown'
+      },
+      async () => ({
+        contents: [
+          {
+            uri,
+            mimeType: 'text/markdown',
+            text: skill.content
+          }
+        ]
+      })
+    )
+  }
+
+  // ── Session-Start Prompt ───────────────────────────────────────────────
+  //
+  // The `browserbridge-context` prompt injects a summary of connected
+  // browsers, available skills, and key pitfalls into the agent's context.
+  // MCP clients can call this prompt at the start of a session to get
+  // oriented.
+
+  server.registerPrompt(
+    'browserbridge-context',
+    {
+      title: 'BrowserBridge Context',
+      description:
+        'Inject BrowserBridge context: connected browsers, available skills, pitfalls.'
+    },
+    async () => {
+      const skillSummaries = skills.map((s) => ({
+        name: s.name,
+        title: s.title,
+        description: s.description
+      }))
+
+      const message = buildContextMessage(skillSummaries)
+
+      return {
+        messages: [
+          {
+            role: 'user',
+            content: { type: 'text', text: message }
           }
         ]
       }
