@@ -1,9 +1,7 @@
-import { randomBytes } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
+import { generatePairingToken } from './token-utils.mjs'
 
-export function generatePairingToken () {
-  return randomBytes(32).toString('base64url')
-}
+export { generatePairingToken }
 
 function printToken () {
   const token = generatePairingToken()

@@ -107,6 +107,14 @@ async function handleMcpHttpRequest (
   response: ServerResponse,
   options: BrowserBridgeMcpHttpServerOptions
 ): Promise<void> {
+  const url = new URL(request.url ?? '/', 'http://browserbridge.local')
+
+  if (url.pathname === '/health' && request.method === 'GET') {
+    response.writeHead(200, { 'content-type': 'application/json' })
+    response.end(JSON.stringify({ status: 'ok' }))
+    return
+  }
+
   if (!matchesPath(request, options.path)) {
     writeJsonError(response, 404, {
       ok: false,
