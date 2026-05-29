@@ -1,6 +1,5 @@
 import {
   ContentRequest,
-  ContentResponse,
   defaultPageContentMaxPayloadBytes,
   type ActionResultErrorCode,
   type BridgeSettings,
@@ -9,7 +8,11 @@ import {
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
-  type PageReadResult
+  type PageReadResult,
+  normalizeBridgeSettings,
+  isContentResponse,
+  contentScriptUnavailable,
+  actionContentScriptUnavailable
 } from '@browserbridge/shared'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
@@ -119,7 +122,7 @@ export class SafariStorageAdapter {
 
   async getBridgeSettings (): Promise<BridgeSettings | undefined> {
     const values = await this.storage.local.get(bridgeSettingsKeys)
-    return normalizeBridgeSettings(values)
+    return normalizeBridgeSettings(values, 'Safari')
   }
 
   async setBridgeSettings (settings: BridgeSettings): Promise<void> {
@@ -142,38 +145,6 @@ export class SafariStorageAdapter {
   async setWebSocketUrl (url: string): Promise<void> {
     await this.storage.local.set({ [storageKey]: url })
   }
-}
-
-function normalizeBridgeSettings (
-  values: Record<string, unknown>
-): BridgeSettings | undefined {
-  const websocketUrl = stringValue(values.websocketUrl)
-  const pairingToken = stringValue(values.pairingToken)
-  const browserInstanceId = stringValue(values.browserInstanceId)
-  const browserName = stringValue(values.browserName) ?? 'Safari'
-  const profileName = stringValue(values.profileName) ?? 'Default'
-  const label = stringValue(values.label) ?? `${browserName} ${profileName}`
-
-  if (
-    websocketUrl === undefined ||
-    pairingToken === undefined ||
-    browserInstanceId === undefined
-  ) {
-    return undefined
-  }
-
-  return {
-    websocketUrl,
-    pairingToken,
-    browserInstanceId,
-    browserName,
-    profileName,
-    label
-  }
-}
-
-function stringValue (value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() !== '' ? value : undefined
 }
 
 export class SafariSetupAdapter {
@@ -458,68 +429,4 @@ function actionRegularPagePermissionRequired (): PageActionResult {
         'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
     }
   }
-}
-
-function contentScriptUnavailable<T> (): PageReadResult<T> {
-  return {
-    ok: false,
-    error: {
-      code: 'content_script_unavailable',
-      message: 'Unable to reach the page content script.'
-    }
-  }
-}
-
-function actionContentScriptUnavailable (): PageActionResult {
-  return {
-    ok: false,
-    error: {
-      code: 'content_script_unavailable',
-      message: 'Unable to reach the page content script.'
-    }
-  }
-}
-
-function isContentResponse (value: unknown): value is ContentResponse {
-  if (!isRecord(value) || typeof value.ok !== 'boolean') {
-    return false
-  }
-
-  if (value.ok) {
-    return Object.hasOwn(value, 'data')
-  }
-
-  return (
-    isRecord(value.error) &&
-    isPageContentErrorCode(value.error.code) &&
-    typeof value.error.message === 'string'
-  )
-}
-
-function isPageContentErrorCode (
-  value: unknown
-): value is PageContentErrorCode | ActionResultErrorCode {
-  return (
-    value === 'no_active_tab' ||
-    value === 'unsupported_page' ||
-    value === 'regular_page_permission_required' ||
-    value === 'content_script_unavailable' ||
-    value === 'extraction_failed' ||
-    value === 'invalid_index' ||
-    value === 'unsupported_request' ||
-    value === 'unsupported_action' ||
-    value === 'invalid_action_target' ||
-    value === 'target_not_found' ||
-    value === 'target_disabled' ||
-    value === 'target_readonly' ||
-    value === 'unsupported_control' ||
-    value === 'invalid_control_value' ||
-    value === 'option_not_found' ||
-    value === 'target_option_disabled' ||
-    value === 'action_failed'
-  )
-}
-
-function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }

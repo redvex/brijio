@@ -4,7 +4,6 @@ import {
   type ActionResultErrorCode,
   type ClickActionTarget,
   ContentRequest,
-  ContentResponse,
   createGlobalTimers,
   defaultPageContentMaxPayloadBytes,
   type PageActionResult,
@@ -12,7 +11,14 @@ import {
   type PageReadResult,
   type BrowserBridgeSocket,
   type WriteTextEditableTarget,
-  type WriteTextActionTarget
+  type WriteTextActionTarget,
+  stringValue,
+  requireString,
+  createBrowserInstanceId,
+  normalizeBridgeSettings,
+  isContentResponse,
+  contentScriptUnavailable,
+  actionContentScriptUnavailable
 } from '@browserbridge/shared'
 import { isRegularPageUrl } from './permissions.js'
 
@@ -113,7 +119,7 @@ const controller = new BrowserBridgeBackgroundController({
     async getBridgeSettings () {
       const values = await chrome.storage.local.get(bridgeSettingsKeys)
 
-      return normalizeBridgeSettings(values)
+      return normalizeBridgeSettings(values, 'Chrome')
     },
     async setBridgeSettings (settings) {
       await chrome.storage.local.set({ ...settings })
@@ -332,69 +338,6 @@ async function performActiveTabAction (
   }
 }
 
-function contentScriptUnavailable<T> (): PageReadResult<T> {
-  return {
-    ok: false,
-    error: {
-      code: 'content_script_unavailable',
-      message: 'Unable to reach the page content script.'
-    }
-  }
-}
-
-function actionContentScriptUnavailable (): PageActionResult {
-  return {
-    ok: false,
-    error: {
-      code: 'content_script_unavailable',
-      message: 'Unable to reach the page content script.'
-    }
-  }
-}
-
-function isContentResponse (value: unknown): value is ContentResponse {
-  if (!isRecord(value) || typeof value.ok !== 'boolean') {
-    return false
-  }
-
-  if (value.ok) {
-    return Object.hasOwn(value, 'data')
-  }
-
-  return (
-    isRecord(value.error) &&
-    isPageContentErrorCode(value.error.code) &&
-    typeof value.error.message === 'string'
-  )
-}
-
-function isPageContentErrorCode (
-  value: unknown
-): value is PageContentErrorCode | ActionResultErrorCode {
-  return (
-    value === 'no_active_tab' ||
-    value === 'unsupported_page' ||
-    value === 'content_script_unavailable' ||
-    value === 'extraction_failed' ||
-    value === 'invalid_index' ||
-    value === 'unsupported_request' ||
-    value === 'unsupported_action' ||
-    value === 'invalid_action_target' ||
-    value === 'target_not_found' ||
-    value === 'target_disabled' ||
-    value === 'target_readonly' ||
-    value === 'unsupported_control' ||
-    value === 'invalid_control_value' ||
-    value === 'option_not_found' ||
-    value === 'target_option_disabled' ||
-    value === 'action_failed'
-  )
-}
-
-function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
 class DomWebSocketAdapter implements BrowserBridgeSocket {
   private openListener: (() => void) | undefined
 
@@ -596,7 +539,7 @@ async function saveRuntimeSettings (ctrl: BrowserBridgeBackgroundController, mes
     browserInstanceId:
       stringValue(message.browserInstanceId) ??
       existing?.browserInstanceId ??
-      createBrowserInstanceId(),
+      createBrowserInstanceId('Chrome'),
     browserName:
       stringValue(message.browserName) ?? existing?.browserName ?? 'Chrome',
     profileName,
@@ -604,50 +547,4 @@ async function saveRuntimeSettings (ctrl: BrowserBridgeBackgroundController, mes
   }
 
   await ctrl.saveBridgeSettings(settings)
-}
-
-function normalizeBridgeSettings (
-  values: Record<string, unknown>
-): BridgeSettings | undefined {
-  const websocketUrl = stringValue(values.websocketUrl)
-  const pairingToken = stringValue(values.pairingToken)
-  const browserInstanceId = stringValue(values.browserInstanceId)
-  const browserName = stringValue(values.browserName) ?? 'Chrome'
-  const profileName = stringValue(values.profileName) ?? 'Default'
-  const label = stringValue(values.label) ?? `${browserName} ${profileName}`
-
-  if (
-    websocketUrl === undefined ||
-    pairingToken === undefined ||
-    browserInstanceId === undefined
-  ) {
-    return undefined
-  }
-
-  return {
-    websocketUrl,
-    pairingToken,
-    browserInstanceId,
-    browserName,
-    profileName,
-    label
-  }
-}
-
-function createBrowserInstanceId (): string {
-  return `chrome-${crypto.randomUUID()}`
-}
-
-function stringValue (value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() !== '' ? value : undefined
-}
-
-function requireString (value: unknown, label: string): string {
-  const normalized = stringValue(value)
-
-  if (normalized === undefined) {
-    throw new Error(`${label} is required.`)
-  }
-
-  return normalized
 }

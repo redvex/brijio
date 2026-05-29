@@ -14,7 +14,10 @@ import {
   type ClickActionTarget,
   type WriteTextActionTarget,
   type WriteTextEditableTarget,
-  type PageActionResult
+  type PageActionResult,
+  stringValue,
+  requireString,
+  createBrowserInstanceId
 } from '@browserbridge/shared'
 import {
   SafariActionBadge,
@@ -158,7 +161,7 @@ async function saveRuntimeSettings (message: {
     browserInstanceId:
       stringValue(message.browserInstanceId) ??
       existing?.browserInstanceId ??
-      createBrowserInstanceId(),
+      createBrowserInstanceId('Safari'),
     browserName:
       stringValue(message.browserName) ?? existing?.browserName ?? 'Safari',
     profileName,
@@ -166,22 +169,4 @@ async function saveRuntimeSettings (message: {
   }
 
   await controller.saveBridgeSettings(settings)
-}
-
-function createBrowserInstanceId (): string {
-  return `safari-${crypto.randomUUID()}`
-}
-
-function stringValue (value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() !== '' ? value : undefined
-}
-
-function requireString (value: unknown, label: string): string {
-  const normalized = stringValue(value)
-
-  if (normalized === undefined) {
-    throw new Error(`${label} is required.`)
-  }
-
-  return normalized
 }
