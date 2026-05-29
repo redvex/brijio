@@ -14,11 +14,7 @@ import {
   type WriteTextEditableTarget,
   type WriteTextActionTarget
 } from '@browserbridge/shared'
-import {
-  hasRegularPageAccess,
-  isRegularPageUrl,
-  type ChromePermissionsApi
-} from './permissions.js'
+import { isRegularPageUrl } from './permissions.js'
 
 interface RuntimeMessage {
   type?: unknown
@@ -33,11 +29,8 @@ interface RuntimeMessage {
 type SendResponse = (response: unknown) => void
 type MessageListener = (event: { data: string }) => void | Promise<void>
 
-interface ChromeApi {
+export interface ChromeApi {
   action: {
-    onClicked: {
-      addListener: (callback: () => void | Promise<void>) => void
-    }
     setBadgeText: (details: { text: string }) => Promise<void>
     setBadgeBackgroundColor: (details: { color: string }) => Promise<void>
     setBadgeTextColor: (details: { color: string }) => Promise<void>
@@ -55,7 +48,6 @@ interface ChromeApi {
       ) => void
     }
   }
-  permissions: ChromePermissionsApi
   storage: {
     local: {
       get: (keys: string[]) => Promise<Record<string, unknown>>
@@ -114,7 +106,7 @@ const controller = new BrowserBridgeBackgroundController({
   },
   setup: {
     async openSetupPage () {
-      await chrome.tabs.create({ url: chrome.runtime.getURL('setup.html') })
+      await chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') })
     }
   },
   storage: {
@@ -220,10 +212,6 @@ async function readActiveTabPage<T> (
       }
     }
   } catch {
-    if (!(await hasRegularPageAccess(chrome.permissions))) {
-      return regularPagePermissionRequired()
-    }
-
     return contentScriptUnavailable()
   }
 }
@@ -340,33 +328,7 @@ async function performActiveTabAction (
       }
     }
   } catch {
-    if (!(await hasRegularPageAccess(chrome.permissions))) {
-      return actionRegularPagePermissionRequired()
-    }
-
     return actionContentScriptUnavailable()
-  }
-}
-
-function regularPagePermissionRequired<T> (): PageReadResult<T> {
-  return {
-    ok: false,
-    error: {
-      code: 'regular_page_permission_required',
-      message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
-    }
-  }
-}
-
-function actionRegularPagePermissionRequired (): PageActionResult {
-  return {
-    ok: false,
-    error: {
-      code: 'regular_page_permission_required',
-      message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
-    }
   }
 }
 
@@ -412,7 +374,6 @@ function isPageContentErrorCode (
   return (
     value === 'no_active_tab' ||
     value === 'unsupported_page' ||
-    value === 'regular_page_permission_required' ||
     value === 'content_script_unavailable' ||
     value === 'extraction_failed' ||
     value === 'invalid_index' ||
@@ -512,57 +473,117 @@ class DomWebSocketAdapter implements BrowserBridgeSocket {
   }
 }
 
-chrome.action.onClicked.addListener(() => {
-  void controller.handleActionClicked()
-})
+// --- Message handler (exported for testing) ---
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'get_settings') {
-    void controller.getBridgeSettings().then((settings) => {
-      sendResponse({ ok: true, data: settings })
-    })
-    return true
-  }
-
-  if (
-    message.type === 'save_settings' &&
-    typeof message.websocketUrl === 'string' &&
-    typeof message.pairingToken === 'string' &&
-    typeof message.profileName === 'string' &&
-    typeof message.label === 'string'
-  ) {
-    void saveRuntimeSettings(message).then(
-      () => {
-        sendResponse({ ok: true })
-      },
-      (error: unknown) => {
-        sendResponse({
-          ok: false,
-          error: {
-            code: 'invalid_settings',
-            message:
-              error instanceof Error
-                ? error.message
-                : 'Unable to save settings.'
-          }
-        })
-      }
-    )
-    return true
-  }
-
-  sendResponse({
-    ok: false,
-    error: {
-      code: 'unsupported_message',
-      message: 'Unsupported setup message.'
+export function createMessageHandler (
+  ctrl: BrowserBridgeBackgroundController
+): (
+  message: RuntimeMessage,
+  sender: unknown,
+  sendResponse: SendResponse
+) => boolean | undefined {
+  return (message, _sender, sendResponse) => {
+    if (message.type === 'get_settings') {
+      void ctrl.getBridgeSettings().then((settings) => {
+        sendResponse({ ok: true, data: settings })
+      })
+      return true
     }
-  })
-  return undefined
-})
 
-async function saveRuntimeSettings (message: RuntimeMessage): Promise<void> {
-  const existing = await controller.getBridgeSettings()
+    if (
+      message.type === 'save_settings' &&
+      typeof message.websocketUrl === 'string' &&
+      typeof message.pairingToken === 'string' &&
+      typeof message.profileName === 'string' &&
+      typeof message.label === 'string'
+    ) {
+      void saveRuntimeSettings(ctrl, message).then(
+        () => {
+          sendResponse({ ok: true })
+        },
+        (error: unknown) => {
+          sendResponse({
+            ok: false,
+            error: {
+              code: 'invalid_settings',
+              message:
+                error instanceof Error
+                  ? error.message
+                  : 'Unable to save settings.'
+            }
+          })
+        }
+      )
+      return true
+    }
+
+    if (message.type === 'get_status') {
+      const status = ctrl.getConnectionStatus()
+      sendResponse({ ok: true, data: status })
+      return undefined
+    }
+
+    if (message.type === 'connect') {
+      void ctrl.requestConnect().then(
+        () => {
+          sendResponse({ ok: true })
+        },
+        (error: unknown) => {
+          sendResponse({
+            ok: false,
+            error: {
+              code: 'connect_failed',
+              message:
+                error instanceof Error
+                  ? error.message
+                  : 'Unable to connect.'
+            }
+          })
+        }
+      )
+      return true
+    }
+
+    if (message.type === 'disconnect') {
+      void ctrl.requestDisconnect().then(
+        () => {
+          sendResponse({ ok: true })
+        },
+        (error: unknown) => {
+          sendResponse({
+            ok: false,
+            error: {
+              code: 'disconnect_failed',
+              message:
+                error instanceof Error
+                  ? error.message
+                  : 'Unable to disconnect.'
+            }
+          })
+        }
+      )
+      return true
+    }
+
+    sendResponse({
+      ok: false,
+      error: {
+        code: 'unsupported_message',
+        message: 'Unsupported extension message.'
+      }
+    })
+    return undefined
+  }
+}
+
+// Register the message listener only in the Chrome extension runtime.
+// In test environments, chrome.runtime is not available.
+if (typeof globalThis.chrome?.runtime?.onMessage?.addListener === 'function') {
+  globalThis.chrome.runtime.onMessage.addListener(createMessageHandler(controller))
+}
+
+async function saveRuntimeSettings (ctrl: BrowserBridgeBackgroundController, message: RuntimeMessage): Promise<void> {
+  const existing = await ctrl.getBridgeSettings()
   const websocketUrl = requireString(message.websocketUrl, 'WebSocket URL')
   const pairingToken = requireString(message.pairingToken, 'Pairing token')
   const profileName = requireString(message.profileName, 'Profile name')
@@ -581,7 +602,7 @@ async function saveRuntimeSettings (message: RuntimeMessage): Promise<void> {
     label
   }
 
-  await controller.saveBridgeSettings(settings)
+  await ctrl.saveBridgeSettings(settings)
 }
 
 function normalizeBridgeSettings (
