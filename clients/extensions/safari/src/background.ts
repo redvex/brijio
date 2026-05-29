@@ -1,18 +1,13 @@
 import {
-  ContentRequest,
   defaultPageContentMaxPayloadBytes,
-  type ActionResultErrorCode,
   type BridgeSettings,
   type BrowserBridgeSocket,
-  type PageActionResult,
   type PageContent,
-  type PageContentErrorCode,
   type PageContext,
   type PageReadResult,
   normalizeBridgeSettings,
-  isContentResponse,
-  contentScriptUnavailable,
-  actionContentScriptUnavailable
+  readActiveTabPage as sharedReadActiveTabPage,
+  type ActiveTabDeps
 } from '@browserbridge/shared'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
@@ -51,8 +46,8 @@ export interface BrowserApi {
         callback: (
           message: RuntimeMessage,
           sender: unknown,
-          sendResponse: SendResponse
-        ) => boolean | undefined
+          sendResponse: SendResponse,
+        ) => boolean | undefined,
       ) => void
     }
   }
@@ -159,21 +154,36 @@ export class SafariPageReaderAdapter {
     private readonly scripting: BrowserApi['scripting']
   ) {}
 
+  private get deps (): ActiveTabDeps {
+    return {
+      tabs: this.tabs,
+      scripting: this.scripting,
+      isRegularPageUrl,
+      onCatchPermissionCheck: hasRegularPageAccess
+    }
+  }
+
   async getPageContext (): Promise<PageReadResult<PageContext>> {
-    return await readActiveTabPage({
-      type: 'extract_page_context',
-      previewMaxBytes,
-      defaultMaxPayloadBytes: defaultPageContentMaxPayloadBytes
-    }, this.tabs, this.scripting)
+    return await sharedReadActiveTabPage(
+      {
+        type: 'extract_page_context',
+        previewMaxBytes,
+        defaultMaxPayloadBytes: defaultPageContentMaxPayloadBytes
+      },
+      this.deps
+    )
   }
 
   async getPageContent (index: number): Promise<PageReadResult<PageContent>> {
-    return await readActiveTabPage({
-      type: 'extract_page_content',
-      index,
-      maxContentBytes,
-      maxPayloadBytes: defaultPageContentMaxPayloadBytes
-    }, this.tabs, this.scripting)
+    return await sharedReadActiveTabPage(
+      {
+        type: 'extract_page_content',
+        index,
+        maxContentBytes,
+        maxPayloadBytes: defaultPageContentMaxPayloadBytes
+      },
+      this.deps
+    )
   }
 }
 
@@ -193,7 +203,12 @@ export class SafariWebSocketConnection implements BrowserBridgeSocket {
   set onopen (listener: (() => void) | undefined) {
     this.openListener = listener
     if (this.socket !== undefined) {
-      this.socket.onopen = listener === undefined ? null : () => { listener() }
+      this.socket.onopen =
+        listener === undefined
+          ? null
+          : () => {
+              listener()
+            }
     }
   }
 
@@ -222,7 +237,12 @@ export class SafariWebSocketConnection implements BrowserBridgeSocket {
   set onclose (listener: (() => void) | undefined) {
     this.closeListener = listener
     if (this.socket !== undefined) {
-      this.socket.onclose = listener === undefined ? null : () => { listener() }
+      this.socket.onclose =
+        listener === undefined
+          ? null
+          : () => {
+              listener()
+            }
     }
   }
 
@@ -233,7 +253,12 @@ export class SafariWebSocketConnection implements BrowserBridgeSocket {
   set onerror (listener: (() => void) | undefined) {
     this.errorListener = listener
     if (this.socket !== undefined) {
-      this.socket.onerror = listener === undefined ? null : () => { listener() }
+      this.socket.onerror =
+        listener === undefined
+          ? null
+          : () => {
+              listener()
+            }
     }
   }
 
@@ -241,20 +266,28 @@ export class SafariWebSocketConnection implements BrowserBridgeSocket {
     this.socket = new WebSocket(this.url)
 
     if (this.openListener !== undefined) {
-      this.socket.onopen = () => { (this.openListener as () => void)() }
+      this.socket.onopen = () => {
+        (this.openListener as () => void)()
+      }
     }
     if (this.messageListener !== undefined) {
       this.socket.onmessage = (event) => {
         if (typeof event.data === 'string') {
-          void (this.messageListener as (event: { data: string }) => void)({ data: event.data })
+          void (this.messageListener as (event: { data: string }) => void)({
+            data: event.data
+          })
         }
       }
     }
     if (this.closeListener !== undefined) {
-      this.socket.onclose = () => { (this.closeListener as () => void)() }
+      this.socket.onclose = () => {
+        (this.closeListener as () => void)()
+      }
     }
     if (this.errorListener !== undefined) {
-      this.socket.onerror = () => { (this.errorListener as () => void)() }
+      this.socket.onerror = () => {
+        (this.errorListener as () => void)()
+      }
     }
   }
 
@@ -269,164 +302,5 @@ export class SafariWebSocketConnection implements BrowserBridgeSocket {
 
   close (): void {
     this.disconnect()
-  }
-}
-
-// --- Helper functions ---
-
-async function readActiveTabPage<T> (
-  message: ContentRequest,
-  tabs: BrowserApi['tabs'],
-  scripting: BrowserApi['scripting']
-): Promise<PageReadResult<T>> {
-  const [activeTab] = await tabs.query({
-    active: true,
-    currentWindow: true
-  })
-
-  if (activeTab?.id === undefined || activeTab.url === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: 'no_active_tab',
-        message: 'No active tab with a URL is available.'
-      }
-    }
-  }
-
-  if (!isRegularPageUrl(activeTab.url)) {
-    return {
-      ok: false,
-      error: {
-        code: 'unsupported_page',
-        message:
-          'BrowserBridge can read page content only from HTTP and HTTPS tabs.'
-      }
-    }
-  }
-
-  try {
-    await scripting.executeScript({
-      target: { tabId: activeTab.id },
-      files: ['content.js']
-    })
-
-    const response = await tabs.sendMessage(activeTab.id, message)
-
-    if (!isContentResponse(response)) {
-      return contentScriptUnavailable()
-    }
-
-    if (response.ok) {
-      return {
-        ok: true,
-        data: response.data as T
-      }
-    }
-
-    return {
-      ok: false,
-      error: {
-        code: response.error.code as PageContentErrorCode,
-        message: response.error.message
-      }
-    }
-  } catch {
-    if (!(await hasRegularPageAccess())) {
-      return regularPagePermissionRequired()
-    }
-
-    return contentScriptUnavailable()
-  }
-}
-
-async function performActiveTabAction (
-  message: ContentRequest,
-  tabs: BrowserApi['tabs'],
-  scripting: BrowserApi['scripting']
-): Promise<PageActionResult> {
-  const [activeTab] = await tabs.query({
-    active: true,
-    currentWindow: true
-  })
-
-  if (activeTab?.id === undefined || activeTab.url === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: 'no_active_tab',
-        message: 'No active tab with a URL is available.'
-      }
-    }
-  }
-
-  if (!isRegularPageUrl(activeTab.url)) {
-    return {
-      ok: false,
-      error: {
-        code: 'unsupported_page',
-        message:
-          'BrowserBridge can perform actions only on HTTP and HTTPS tabs.'
-      }
-    }
-  }
-
-  try {
-    await scripting.executeScript({
-      target: { tabId: activeTab.id },
-      files: ['content.js']
-    })
-
-    const response = await tabs.sendMessage(activeTab.id, message)
-
-    if (!isContentResponse(response)) {
-      return actionContentScriptUnavailable()
-    }
-
-    if (response.ok) {
-      return {
-        ok: true,
-        data: response.data as PageActionResult extends { ok: true, data: infer T } ? T : never
-      }
-    }
-
-    return {
-      ok: false,
-      error: {
-        code: response.error.code as ActionResultErrorCode,
-        message: response.error.message
-      }
-    }
-  } catch {
-    if (!(await hasRegularPageAccess())) {
-      return actionRegularPagePermissionRequired()
-    }
-
-    return actionContentScriptUnavailable()
-  }
-}
-
-// Re-export helpers for page reader and action adapter wiring
-export { readActiveTabPage, performActiveTabAction }
-
-function regularPagePermissionRequired<T> (): PageReadResult<T> {
-  return {
-    ok: false,
-    error: {
-      code: 'regular_page_permission_required',
-      message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
-    }
-  }
-}
-
-function actionRegularPagePermissionRequired (): PageActionResult {
-  return {
-    ok: false,
-    error: {
-      code: 'regular_page_permission_required',
-      message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
-    }
   }
 }
