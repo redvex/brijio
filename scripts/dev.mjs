@@ -191,6 +191,10 @@ export function printBanner (config, stdout = process.stdout, stderr = process.s
   const pairingToken = config.BROWSERBRIDGE_PAIRING_TOKEN || ''
   const authToken = config.MCP_HTTP_AUTH_TOKEN || ''
 
+  // Display localhost instead of 0.0.0.0 for readability
+  const displayWsHost = wsHost === '0.0.0.0' ? 'localhost' : wsHost
+  const displayMcpHost = mcpHost === '0.0.0.0' ? 'localhost' : mcpHost
+
   const displayPairing = maskTokens ? maskToken(pairingToken) : pairingToken
   const displayAuth = maskTokens ? maskToken(authToken) : authToken
 
@@ -198,8 +202,8 @@ export function printBanner (config, stdout = process.stdout, stderr = process.s
     '',
     '🚀 BrowserBridge dev servers ready!',
     '',
-    `  WebSocket:    ws://${wsHost}:${wsPort}`,
-    `  MCP:         http://${mcpHost}:${mcpPort}${mcpPath}`,
+    `  WebSocket:    ws://${displayWsHost}:${wsPort}`,
+    `  MCP:         http://${displayMcpHost}:${mcpPort}${mcpPath}`,
     '',
     `  Pairing Token:    ${displayPairing}`,
     `  MCP Auth Token:   ${displayAuth}`,
@@ -283,7 +287,12 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
     // Show current config with masked tokens
     console.log('')
     console.log('Found existing .env configuration:')
-    printBanner(env, process.stdout, process.stderr, true)
+    const displayWsHost = (env.WEBSOCKET_HOST || '127.0.0.1') === '0.0.0.0' ? 'localhost' : (env.WEBSOCKET_HOST || '127.0.0.1')
+    const displayMcpHost = (env.MCP_HTTP_HOST || '127.0.0.1') === '0.0.0.0' ? 'localhost' : (env.MCP_HTTP_HOST || '127.0.0.1')
+    console.log(`  WebSocket:    ws://${displayWsHost}:${env.WEBSOCKET_PORT || '8787'}`)
+    console.log(`  MCP:         http://${displayMcpHost}:${env.MCP_HTTP_PORT || '8788'}${env.MCP_HTTP_PATH || '/mcp'}`)
+    console.log(`  Pairing Token:    ${maskToken(env.BROWSERBRIDGE_PAIRING_TOKEN || '')}`)
+    console.log(`  MCP Auth Token:   ${maskToken(env.MCP_HTTP_AUTH_TOKEN || '')}`)
 
     if (nonInteractive) {
       regenerateTokens = false

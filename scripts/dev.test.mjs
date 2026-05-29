@@ -351,6 +351,27 @@ void describe('printBanner', () => {
     assert.match(output, /Ctrl\+C/)
   })
 
+  void it('displays localhost instead of 0.0.0.0', () => {
+    const lines = []
+    const mockStdout = { write: (s) => { lines.push(s) } }
+    const mockStderr = { write: (s) => { lines.push(s) } }
+
+    printBanner({
+      WEBSOCKET_HOST: '0.0.0.0',
+      MCP_HTTP_HOST: '0.0.0.0',
+      WEBSOCKET_PORT: '8787',
+      MCP_HTTP_PORT: '8788',
+      MCP_HTTP_PATH: '/mcp',
+      BROWSERBRIDGE_PAIRING_TOKEN: 'pair-abc123',
+      MCP_HTTP_AUTH_TOKEN: 'auth-xyz789'
+    }, mockStdout, mockStderr)
+
+    const output = lines.join('')
+    assert.match(output, /ws:\/\/localhost:8787/)
+    assert.match(output, /http:\/\/localhost:8788\/mcp/)
+    assert.doesNotMatch(output, /0\.0\.0\.0/)
+  })
+
   void it('masks tokens when maskTokens is true', () => {
     const lines = []
     const mockStdout = { write: (s) => { lines.push(s) } }
