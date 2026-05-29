@@ -9,8 +9,9 @@
     "type": "module"
   },
   "action": {
+    "default_popup": "popup.html",
     "default_title": "BrowserBridge"
   },
   "permissions": ["activeTab", "scripting", "storage", "tabs"],
-  "optional_host_permissions": ["http://*/*", "https://*/*"]
+  "host_permissions": ["http://*/*", "https://*/*"]
 }
