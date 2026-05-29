@@ -9,6 +9,7 @@ import {
   readEnv,
   writeEnv,
   isPlaceholderToken,
+  classifyEnv,
   deriveHosts,
   generateConfig,
   healthCheck,
@@ -470,5 +471,39 @@ void describe('promptUser', () => {
 
     assert.equal(result.allowLocalHosts, 'false')
     assert.equal(result.allowTailscaleHosts, 'false')
+  })
+})
+
+// ─── classifyEnv ─────────────────────────────────────────────────────────────
+
+void describe('classifyEnv', () => {
+  void it('returns "placeholders" when tokens are placeholder values', () => {
+    const env = {
+      BROWSERBRIDGE_PAIRING_TOKEN: 'replace-with-generated-token',
+      MCP_HTTP_AUTH_TOKEN: 'replace-with-generated-mcp-token'
+    }
+    assert.equal(classifyEnv(env), 'placeholders')
+  })
+
+  void it('returns "configured" when tokens are real values', () => {
+    const env = {
+      BROWSERBRIDGE_PAIRING_TOKEN: 'real-pairing-token-value',
+      MCP_HTTP_AUTH_TOKEN: 'real-mcp-auth-token-value'
+    }
+    assert.equal(classifyEnv(env), 'configured')
+  })
+
+  void it('returns "incomplete" when tokens are empty or missing', () => {
+    assert.equal(classifyEnv({}), 'incomplete')
+    assert.equal(classifyEnv({ BROWSERBRIDGE_PAIRING_TOKEN: '', MCP_HTTP_AUTH_TOKEN: '' }), 'incomplete')
+    assert.equal(classifyEnv({ BROWSERBRIDGE_PAIRING_TOKEN: 'real-token' }), 'incomplete')
+  })
+
+  void it('returns "placeholders" if one token is placeholder and other is real', () => {
+    const env = {
+      BROWSERBRIDGE_PAIRING_TOKEN: 'replace-with-generated-token',
+      MCP_HTTP_AUTH_TOKEN: 'real-token'
+    }
+    assert.equal(classifyEnv(env), 'placeholders')
   })
 })
