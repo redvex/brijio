@@ -514,7 +514,7 @@ void describe('initPopup', () => {
     assert.ok(disconnectMsg !== undefined)
   })
 
-  void it('shows Connecting... when connect succeeds', async () => {
+  void it('updates status to Connecting after connect succeeds', async () => {
     const { document } = parseHTML(popupHtml())
     const sendMessage: SendMessageFn = async (message: unknown): Promise<unknown> => {
       const msg = message as { type: string }
@@ -522,7 +522,7 @@ void describe('initPopup', () => {
         return { ok: true, data: { websocketUrl: 'ws://test:8787', pairingToken: 'tok', profileName: 'Default', label: 'My Browser' } }
       }
       if (msg.type === 'get_status') {
-        return { ok: true, data: { state: 'disconnected' } }
+        return { ok: true, data: { state: 'connecting' } }
       }
       if (msg.type === 'save_settings') {
         return { ok: true }
@@ -540,6 +540,7 @@ void describe('initPopup', () => {
     await flushMicrotasks()
 
     const status = document.querySelector<HTMLElement>('#status')
+    // Immediately after connect, shows "Connecting..." before the poll runs
     assert.equal(status?.textContent, 'Connecting...')
   })
 
@@ -598,7 +599,7 @@ void describe('initPopup', () => {
     assert.equal(status?.textContent, 'Disconnected.')
   })
 
-  void it('connect does not call updateConnectionStatus after', async () => {
+  void it('polls connection status after connect succeeds', async () => {
     const { document } = parseHTML(popupHtml())
     let getStatusCallCount = 0
     const sendMessage: SendMessageFn = async (message: unknown): Promise<unknown> => {
@@ -608,7 +609,7 @@ void describe('initPopup', () => {
       }
       if (msg.type === 'get_status') {
         getStatusCallCount++
-        return { ok: true, data: { state: 'disconnected' } }
+        return { ok: true, data: { state: 'connecting' } }
       }
       if (msg.type === 'save_settings') {
         return { ok: true }
@@ -620,15 +621,63 @@ void describe('initPopup', () => {
     }
 
     await initPopup(document, sendMessage)
-    // Only one get_status call from initial load
     const initialStatusCalls = getStatusCallCount
 
     const connectBtn = qs<HTMLButtonElement>(document, '#connect-button')
     connectBtn.click()
     await flushMicrotasks()
 
-    // Connect should NOT call updateConnectionStatus (no extra get_status call)
-    assert.equal(getStatusCallCount, initialStatusCalls)
+    // Status should say "Connecting..." immediately
+    const status = document.querySelector<HTMLElement>('#status')
+    assert.equal(status?.textContent, 'Connecting...')
+
+    // After 500ms delay, the poll fires and updates status to "Connecting..."
+    await new Promise((resolve) => setTimeout(resolve, 600))
+    await flushMicrotasks()
+
+    assert.equal(getStatusCallCount, initialStatusCalls + 1)
+    assert.equal(status?.textContent, 'Status: Connecting...')
+  })
+
+  void it('shows Status: Connected when poll reaches connected state', async () => {
+    const { document } = parseHTML(popupHtml())
+    let statusCallNumber = 0
+    const sendMessage: SendMessageFn = async (message: unknown): Promise<unknown> => {
+      const msg = message as { type: string }
+      if (msg.type === 'get_settings') {
+        return { ok: true, data: { websocketUrl: 'ws://test:8787', pairingToken: 'tok', profileName: 'Default', label: 'Default' } }
+      }
+      if (msg.type === 'get_status') {
+        statusCallNumber++
+        // Initial load returns disconnected, then after connect returns connected
+        if (statusCallNumber <= 1) {
+          return { ok: true, data: { state: 'disconnected' } }
+        }
+        return { ok: true, data: { state: 'connected' } }
+      }
+      if (msg.type === 'save_settings') {
+        return { ok: true }
+      }
+      if (msg.type === 'connect') {
+        return { ok: true }
+      }
+      return { ok: true }
+    }
+
+    await initPopup(document, sendMessage)
+
+    const connectBtn = qs<HTMLButtonElement>(document, '#connect-button')
+    connectBtn.click()
+    await flushMicrotasks()
+
+    const status = document.querySelector<HTMLElement>('#status')
+    assert.equal(status?.textContent, 'Connecting...')
+
+    // Wait for poll to fire and detect connected state
+    await new Promise((resolve) => setTimeout(resolve, 600))
+    await flushMicrotasks()
+
+    assert.equal(status?.textContent, 'Status: Connected')
   })
 
   void it('shows Enter a WebSocket URL before connecting when connect clicked with empty URL', async () => {

@@ -176,6 +176,7 @@ async function connect (
     const response = await sendMessage(createConnectMessage())
     if (isOkResponse(response)) {
       elements.statusMessage.textContent = 'Connecting...'
+      void pollConnectionStatus(elements, sendMessage)
     } else {
       elements.statusMessage.textContent = parseErrorResponse(response)
     }
@@ -233,6 +234,57 @@ async function updateConnectionStatus (
   } catch {
     // Status update is non-critical; leave current text.
   }
+}
+
+/**
+ * Poll connection status after a connect request.
+ * Waits 500ms then checks if the state has moved past "connecting".
+ * Retries up to 10 times (5 seconds total) while the state is still "connecting".
+ */
+async function pollConnectionStatus (
+  elements: PopupElements,
+  sendMessage: SendMessageFn,
+  maxAttempts: number = 10,
+  delayMs: number = 500
+): Promise<void> {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, delayMs))
+
+    try {
+      const response = await sendMessage(createGetStatusMessage())
+      const statusResult = parseStatusResponse(response)
+      if (statusResult === undefined) {
+        elements.statusMessage.textContent = 'Status: Unknown'
+        return
+      }
+
+      if (statusResult.state === 'connecting') {
+        elements.statusMessage.textContent = 'Status: Connecting...'
+        continue
+      }
+
+      // Reached a terminal state — update and stop polling.
+      switch (statusResult.state) {
+        case 'connected':
+          elements.statusMessage.textContent = 'Status: Connected'
+          break
+        case 'error':
+          elements.statusMessage.textContent = statusResult.lastError !== undefined
+            ? `Status: Error — ${statusResult.lastError}`
+            : 'Status: Error'
+          break
+        case 'disconnected':
+          elements.statusMessage.textContent = 'Status: Disconnected'
+          break
+        default:
+          elements.statusMessage.textContent = `Status: ${statusResult.state}`
+      }
+      return
+    } catch {
+      // Retry on transient errors.
+    }
+  }
+  // If we exhausted retries while still "connecting", just leave the current text.
 }
 
 export async function initPopup (
