@@ -217,7 +217,6 @@ export function printBanner (config, stdout = process.stdout, stderr = process.s
 
   const output = lines.join('\n')
   stdout.write(output + '\n')
-  stderr.write(output + '\n')
 }
 
 // ─── Args parsing ──────────────────────────────────────────────────────────────
