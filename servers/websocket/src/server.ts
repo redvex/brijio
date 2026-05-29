@@ -1,3 +1,4 @@
+import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 import {
   createAuthSuccessEnvelope,
@@ -46,7 +47,10 @@ export async function createWebSocketServer (
   const now = options.now ?? (() => new Date())
   const presence = new Map<string, PresenceRecord>()
   const pendingRequests = new Map<string, WebSocket>()
-  const server = new WebSocketServer({ host, port })
+  const httpServer = createServer(handleHealthRequest)
+  const server = new WebSocketServer({ server: httpServer })
+
+  httpServer.listen(port, host)
 
   server.on('connection', (socket) => {
     const state: ConnectionState = {
@@ -95,11 +99,11 @@ export async function createWebSocketServer (
     })
   })
 
-  await waitForListening(server)
+  await waitForListening(httpServer)
 
   return {
-    url: `ws://${host}:${getPort(server)}`,
-    close: async () => await closeServer(server)
+    url: `ws://${host}:${getPort(httpServer)}`,
+    close: async () => await closeBoth(server, httpServer)
   }
 }
 
@@ -424,8 +428,8 @@ function rawDataToString (data: RawData): string {
   return Buffer.from(data).toString('utf8')
 }
 
-async function waitForListening (server: WebSocketServer): Promise<void> {
-  if (server.address() !== null) {
+async function waitForListening (server: import('node:http').Server): Promise<void> {
+  if (server.listening) {
     return await Promise.resolve()
   }
 
@@ -435,11 +439,11 @@ async function waitForListening (server: WebSocketServer): Promise<void> {
   })
 }
 
-function getPort (server: WebSocketServer): number {
+function getPort (server: import('node:http').Server): number {
   const address = server.address()
 
   if (address === null || typeof address === 'string') {
-    throw new Error('WebSocket server is not listening on a TCP port.')
+    throw new Error('HTTP server is not listening on a TCP port.')
   }
 
   return address.port
@@ -460,4 +464,33 @@ async function closeServer (server: WebSocketServer): Promise<void> {
       resolve()
     })
   })
+}
+
+async function closeHttpServer (server: import('node:http').Server): Promise<void> {
+  return await new Promise((resolve, reject) => {
+    server.close((error) => {
+      if (error != null) {
+        reject(error)
+        return
+      }
+
+      resolve()
+    })
+  })
+}
+
+async function closeBoth (wsServer: WebSocketServer, httpServer: import('node:http').Server): Promise<void> {
+  await closeServer(wsServer)
+  await closeHttpServer(httpServer)
+}
+
+function handleHealthRequest (req: IncomingMessage, res: ServerResponse): void {
+  if (req.method === 'GET' && req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ status: 'ok' }))
+    return
+  }
+
+  res.writeHead(404)
+  res.end()
 }

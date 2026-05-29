@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { afterEach, describe, it } from 'node:test'
+import http from 'node:http'
 import WebSocket from 'ws'
 import { createWebSocketServer } from './server.js'
 
@@ -11,6 +12,24 @@ const servers: Array<{ close: () => Promise<void> }> = []
 
 afterEach(async () => {
   await Promise.all(servers.splice(0).map(async (server) => await server.close()))
+})
+
+void describe('GET /health', () => {
+  void it('returns 200 with {"status":"ok"}', async () => {
+    const server = await startTestServer()
+    const url = new URL(server.url)
+    const healthUrl = `http://${url.hostname}:${url.port}/health`
+
+    const response = await new Promise<http.IncomingMessage>((resolve, reject) => {
+      http.get(healthUrl, (res) => {
+        resolve(res)
+      }).on('error', reject)
+    })
+
+    assert.equal(response.statusCode, 200)
+    const body = await collectBody(response)
+    assert.deepEqual(JSON.parse(body) as JsonObject, { status: 'ok' })
+  })
 })
 
 void describe('WebSocket authenticated browser routing', () => {
@@ -492,6 +511,19 @@ async function waitForClose (client: WebSocket): Promise<void> {
 
   return await new Promise((resolve) => {
     client.once('close', () => resolve())
+  })
+}
+
+async function collectBody (response: http.IncomingMessage): Promise<string> {
+  return await new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    response.on('data', (chunk: Buffer) => {
+      chunks.push(chunk)
+    })
+    response.on('end', () => {
+      resolve(Buffer.concat(chunks).toString('utf8'))
+    })
+    response.on('error', reject)
   })
 }
 
