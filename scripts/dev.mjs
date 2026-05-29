@@ -233,7 +233,7 @@ export async function promptUser (questions, createInterface = null) {
   const results = {}
 
   if (!createInterface) {
-    const { createInterface: rlCreate } = await import('node:readline')
+    const { createInterface: rlCreate } = await import('node:readline/promises')
     const { stdin, stdout } = process
     createInterface = (opts) => rlCreate({ input: stdin, output: stdout, ...opts })
   }
