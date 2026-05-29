@@ -1,8 +1,8 @@
 // Safari popup DOM entry point.
 //
-// Per ADR 0019, Safari uses a popup overlay (popup.html) instead of
-// Chrome's setup page (opened as a new tab). This file wires up the DOM
-// elements and delegates message construction/parsing to popup.ts.
+// Per ADR 0031, Safari uses shared popup helpers from @browserbridge/shared.
+// This file wires up DOM elements and delegates message construction/parsing
+// to popup.ts (browser-specific sendMessage) and shared parsers.
 
 import {
   createGetSettingsMessage,
@@ -62,16 +62,48 @@ void updateConnectionStatus()
 
 settingsForm.addEventListener('submit', (event) => {
   event.preventDefault()
+  const validationError = validateForm(readSettingsForm())
+  if (validationError !== undefined) {
+    statusMessage.textContent = validationError
+    return
+  }
   void saveSettings(readSettingsForm())
 })
 
 connectBtn.addEventListener('click', () => {
-  void connect()
+  const settings = readSettingsForm()
+  const validationError = validateForm(settings)
+  if (validationError !== undefined) {
+    statusMessage.textContent = validationError
+    return
+  }
+  void connect(settings)
 })
 
 disconnectBtn.addEventListener('click', () => {
   void disconnect()
 })
+
+function validateForm (settings: {
+  websocketUrl: string
+  pairingToken: string
+  profileName: string
+  label: string
+}): string | undefined {
+  if (settings.websocketUrl.trim() === '') {
+    return 'WebSocket URL is required.'
+  }
+  if (settings.pairingToken.trim() === '') {
+    return 'Pairing token is required.'
+  }
+  if (settings.profileName.trim() === '') {
+    return 'Profile name is required.'
+  }
+  if (settings.label.trim() === '') {
+    return 'Browser label is required.'
+  }
+  return undefined
+}
 
 async function loadSettings (): Promise<void> {
   try {
@@ -113,17 +145,14 @@ async function saveSettings (settings: {
   } catch {
     statusMessage.textContent = 'Failed to save settings.'
   }
-  void updateConnectionStatus()
 }
 
-async function connect (): Promise<void> {
-  const settings = readSettingsForm()
-
-  if (settings.websocketUrl.trim() === '') {
-    statusMessage.textContent = 'Enter a WebSocket URL before connecting.'
-    return
-  }
-
+async function connect (settings: {
+  websocketUrl: string
+  pairingToken: string
+  profileName: string
+  label: string
+}): Promise<void> {
   // Save current settings first, then connect.
   const saveResponse = await sendMessage(browser, createSaveSettingsMessage(settings))
   if (
@@ -149,7 +178,6 @@ async function connect (): Promise<void> {
   } catch {
     statusMessage.textContent = 'Failed to connect.'
   }
-  void updateConnectionStatus()
 }
 
 function readSettingsForm (): {
@@ -180,14 +208,32 @@ async function disconnect (): Promise<void> {
   } catch {
     statusMessage.textContent = 'Failed to disconnect.'
   }
-  void updateConnectionStatus()
 }
 
 async function updateConnectionStatus (): Promise<void> {
   try {
     const response = await sendMessage(browser, createGetStatusMessage())
-    const connected = parseStatusResponse(response)
-    statusMessage.textContent = connected ? 'Status: Connected' : 'Status: Disconnected'
+    const statusResult = parseStatusResponse(response)
+    if (statusResult !== undefined) {
+      switch (statusResult.state) {
+        case 'connected':
+          statusMessage.textContent = 'Status: Connected'
+          break
+        case 'connecting':
+          statusMessage.textContent = 'Status: Connecting...'
+          break
+        case 'error':
+          statusMessage.textContent = statusResult.lastError !== undefined
+            ? `Status: Error — ${statusResult.lastError}`
+            : 'Status: Error'
+          break
+        case 'disconnected':
+          statusMessage.textContent = 'Status: Disconnected'
+          break
+        default:
+          statusMessage.textContent = `Status: ${statusResult.state}`
+      }
+    }
   } catch {
     // Status update is non-critical; leave current text.
   }

@@ -189,44 +189,50 @@ void describe('parseSettingsResponse', () => {
 })
 
 void describe('parseStatusResponse', () => {
-  void it('returns true when response indicates connected', () => {
-    const response = { ok: true, data: { connected: true } }
-    const connected = parseStatusResponse(response)
-    assert.equal(connected, true)
+  void it('returns state and lastError from valid connected response', () => {
+    const response = { ok: true, data: { state: 'connected' } }
+    const result = parseStatusResponse(response)
+    assert.deepStrictEqual(result, { state: 'connected', lastError: undefined })
   })
 
-  void it('returns false when response indicates disconnected', () => {
-    const response = { ok: true, data: { connected: false } }
-    const connected = parseStatusResponse(response)
-    assert.equal(connected, false)
+  void it('returns state with lastError from error response', () => {
+    const response = { ok: true, data: { state: 'error', lastError: 'Connection refused' } }
+    const result = parseStatusResponse(response)
+    assert.deepStrictEqual(result, { state: 'error', lastError: 'Connection refused' })
   })
 
-  void it('returns false when response ok is false', () => {
+  void it('returns disconnected state', () => {
+    const response = { ok: true, data: { state: 'disconnected' } }
+    const result = parseStatusResponse(response)
+    assert.deepStrictEqual(result, { state: 'disconnected', lastError: undefined })
+  })
+
+  void it('returns undefined when response ok is false', () => {
     const response = { ok: false, error: { message: 'Error' } }
-    const connected = parseStatusResponse(response)
-    assert.equal(connected, false)
+    const result = parseStatusResponse(response)
+    assert.equal(result, undefined)
   })
 
-  void it('returns false when data is missing', () => {
+  void it('returns undefined when data is missing', () => {
     const response = { ok: true }
-    const connected = parseStatusResponse(response)
-    assert.equal(connected, false)
+    const result = parseStatusResponse(response)
+    assert.equal(result, undefined)
   })
 
-  void it('returns false when connected is not a boolean', () => {
-    const response = { ok: true, data: { connected: 'yes' } }
-    const connected = parseStatusResponse(response)
-    assert.equal(connected, false)
+  void it('returns undefined when state is not a string', () => {
+    const response = { ok: true, data: { state: 42 } }
+    const result = parseStatusResponse(response)
+    assert.equal(result, undefined)
   })
 
-  void it('returns false for null response', () => {
-    const connected = parseStatusResponse(null)
-    assert.equal(connected, false)
+  void it('returns undefined for null response', () => {
+    const result = parseStatusResponse(null)
+    assert.equal(result, undefined)
   })
 
-  void it('returns false for non-object response', () => {
-    const connected = parseStatusResponse('ok')
-    assert.equal(connected, false)
+  void it('returns undefined for non-object response', () => {
+    const result = parseStatusResponse('ok')
+    assert.equal(result, undefined)
   })
 })
 

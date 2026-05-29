@@ -124,7 +124,7 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'get_status') {
-    sendResponse({ ok: true, data: { connected: controller.isConnected() } })
+    sendResponse({ ok: true, data: controller.getConnectionStatus() })
     return undefined
   }
 
