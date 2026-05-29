@@ -252,7 +252,7 @@ export async function promptUser (questions, createInterface = null) {
 
 // ─── Classify existing .env ────────────────────────────────────────────────────
 
-function classifyEnv (env) {
+export function classifyEnv (env) {
   const pairing = env.BROWSERBRIDGE_PAIRING_TOKEN || ''
   const mcpAuth = env.MCP_HTTP_AUTH_TOKEN || ''
 
@@ -278,8 +278,11 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
   const env = readEnv(envPath)
   const state = classifyEnv(env)
 
-  let allowLocalHosts = false
-  let allowTailscaleHosts = false
+  // Infer current network settings from existing env so we preserve them
+  const currentAllowLocalHosts = env.MCP_HTTP_ALLOW_LOCAL_HOSTS === 'true'
+  const currentAllowTailscaleHosts = env.MCP_HTTP_ALLOW_TAILSCALE_HOSTS === 'true'
+  let allowLocalHosts = currentAllowLocalHosts
+  let allowTailscaleHosts = currentAllowTailscaleHosts
   let regenerateTokens = true
 
   if (state === 'configured') {
@@ -292,18 +295,20 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
     console.log(`  MCP:         http://${displayMcpHost}:${env.MCP_HTTP_PORT || '8788'}${env.MCP_HTTP_PATH || '/mcp'}`)
     console.log(`  Pairing Token:    ${maskToken(env.BROWSERBRIDGE_PAIRING_TOKEN || '')}`)
     console.log(`  MCP Auth Token:   ${maskToken(env.MCP_HTTP_AUTH_TOKEN || '')}`)
+    console.log(`  Network:     ${currentAllowLocalHosts ? 'local-net' : ''}${currentAllowLocalHosts && currentAllowTailscaleHosts ? ', ' : ''}${currentAllowTailscaleHosts ? 'tailscale' : ''}${!currentAllowLocalHosts && !currentAllowTailscaleHosts ? 'localhost-only' : ''}`)
 
     if (nonInteractive) {
-      regenerateTokens = false
-    } else {
-      const answer = await promptUser([
-        { name: 'regen', message: 'Re-generate tokens? (y/N)', default: 'N' }
-      ])
-      regenerateTokens = answer.regen.toLowerCase() === 'y' || answer.regen.toLowerCase() === 'yes'
+      console.log('Non-interactive mode: keeping existing tokens and network settings.')
+      return env
     }
 
+    const answer = await promptUser([
+      { name: 'regen', message: 'Re-generate tokens? (y/N)', default: 'N' }
+    ])
+    regenerateTokens = answer.regen.toLowerCase() === 'y' || answer.regen.toLowerCase() === 'yes'
+
     if (!regenerateTokens) {
-      console.log('Keeping existing tokens.')
+      console.log('Keeping existing configuration.')
       return env
     }
   } else if (state === 'placeholders') {
@@ -312,13 +317,11 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
     console.log('Found incomplete .env.')
   }
 
-  // Ask network questions
-  if (nonInteractive) {
-    // Defaults: localhost-only
-  } else {
+  // Ask network questions (skip in non-interactive — keep inferred/defaults)
+  if (!nonInteractive) {
     const answers = await promptUser([
-      { name: 'allowLocalHosts', message: 'Allow local network connections (*.local)? (true/false)', default: 'false' },
-      { name: 'allowTailscaleHosts', message: 'Allow Tailscale connections? (true/false)', default: 'false' }
+      { name: 'allowLocalHosts', message: `Allow local network connections (*.local)? (true/false)`, default: String(currentAllowLocalHosts) },
+      { name: 'allowTailscaleHosts', message: 'Allow Tailscale connections? (true/false)', default: String(currentAllowTailscaleHosts) }
     ])
     allowLocalHosts = answers.allowLocalHosts === 'true'
     allowTailscaleHosts = answers.allowTailscaleHosts === 'true'
