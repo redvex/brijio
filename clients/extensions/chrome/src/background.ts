@@ -578,8 +578,9 @@ export function createMessageHandler (
 
 // Register the message listener only in the Chrome extension runtime.
 // In test environments, chrome.runtime is not available.
-if (typeof globalThis.chrome?.runtime?.onMessage?.addListener === 'function') {
-  globalThis.chrome.runtime.onMessage.addListener(createMessageHandler(controller))
+const chromeGlobal = globalThis as unknown as { chrome?: { runtime?: { onMessage?: { addListener?: (callback: unknown) => void } } } }
+if (typeof chromeGlobal.chrome?.runtime?.onMessage?.addListener === 'function') {
+  chromeGlobal.chrome.runtime.onMessage.addListener(createMessageHandler(controller))
 }
 
 async function saveRuntimeSettings (ctrl: BrowserBridgeBackgroundController, message: RuntimeMessage): Promise<void> {

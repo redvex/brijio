@@ -6,7 +6,7 @@
   "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json && esbuild src/content-script-entry.ts --bundle --format=iife --platform=browser --target=chrome116 --outfile=dist/content.js && cp manifest.json dist/manifest.json && cp src/setup.html dist/setup.html && node scripts/verify-build-output.mjs",
+    "build": "tsc -p tsconfig.build.json && esbuild src/content-script-entry.ts --bundle --format=iife --platform=browser --target=chrome116 --outfile=dist/content.js && esbuild src/popup-entry.ts --bundle --format=iife --platform=browser --target=chrome116 --outfile=dist/popup-entry.js && cp manifest.json dist/manifest.json && cp src/popup.html dist/popup.html && node scripts/verify-build-output.mjs",
     "check": "tsc --noEmit",
     "dev": "echo \"Chrome extension dev workflow is not implemented yet\"",
     "test": "node --import tsx --test src/**/*.test.ts"
