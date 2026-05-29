@@ -453,11 +453,9 @@ async function main () {
   // Setup .env
   const envConfig = await setupEnv(envPath, templatePath, isNonInteractive)
 
-  // Build env for child processes
-  const childEnv = {
-    BROWSERBRIDGE_PAIRING_TOKEN: envConfig.BROWSERBRIDGE_PAIRING_TOKEN,
-    MCP_HTTP_AUTH_TOKEN: envConfig.MCP_HTTP_AUTH_TOKEN
-  }
+  // Build env for child processes — pass all .env values so servers
+  // get correct host/port/network settings, not just tokens
+  const childEnv = { ...envConfig }
 
   // Spawn servers
   console.log('Starting servers...')
