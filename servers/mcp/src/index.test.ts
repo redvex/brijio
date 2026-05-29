@@ -24,6 +24,21 @@ afterEach(async () => {
 })
 
 void describe('BrowserBridge MCP HTTP server', () => {
+  void it('returns ok status from the health endpoint', async () => {
+    const runtime = await startTestMcpRuntime()
+    const healthUrl = runtime.url.replace('/mcp', '/health')
+
+    try {
+      const response = await fetch(healthUrl)
+
+      assert.equal(response.status, 200)
+      assert.equal(response.headers.get('content-type'), 'application/json')
+      assert.deepEqual(await response.json(), { status: 'ok' })
+    } finally {
+      await runtime.close()
+    }
+  })
+
   void it('rejects unauthenticated MCP HTTP requests', async () => {
     const runtime = await startTestMcpRuntime()
 
