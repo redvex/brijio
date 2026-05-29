@@ -478,10 +478,10 @@ class DomWebSocketAdapter implements BrowserBridgeSocket {
 export function createMessageHandler (
   ctrl: BrowserBridgeBackgroundController
 ): (
-  message: RuntimeMessage,
-  sender: unknown,
-  sendResponse: SendResponse
-) => boolean | undefined {
+    message: RuntimeMessage,
+    sender: unknown,
+    sendResponse: SendResponse
+  ) => boolean | undefined {
   return (message, _sender, sendResponse) => {
     if (message.type === 'get_settings') {
       void ctrl.getBridgeSettings().then((settings) => {

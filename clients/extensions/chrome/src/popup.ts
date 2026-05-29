@@ -34,12 +34,12 @@ export function createGetSettingsMessage (): { type: 'get_settings' } {
 export function createSaveSettingsMessage (
   settings: RequiredEditableBridgeSettings
 ): {
-  type: 'save_settings'
-  websocketUrl: string
-  pairingToken: string
-  profileName: string
-  label: string
-} {
+    type: 'save_settings'
+    websocketUrl: string
+    pairingToken: string
+    profileName: string
+    label: string
+  } {
   return {
     type: 'save_settings',
     websocketUrl: settings.websocketUrl,

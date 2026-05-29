@@ -51,8 +51,8 @@ Add a `getConnectionStatus()` method to the shared `BrowserBridgeBackgroundContr
 
 ```typescript
 interface ConnectionStatus {
-  state: 'disconnected' | 'connecting' | 'connected' | 'error'
-  lastError?: string
+  state: "disconnected" | "connecting" | "connected" | "error";
+  lastError?: string;
 }
 ```
 

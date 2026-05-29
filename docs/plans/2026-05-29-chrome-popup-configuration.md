@@ -17,6 +17,7 @@
 **Objective:** Expose rich connection state from the shared background controller so the popup can display it.
 
 **Files:**
+
 - Modify: `packages/shared/src/background-controller.ts`
 - Modify: `packages/shared/src/background-controller.test.ts`
 - Modify: `packages/shared/src/index.ts`
@@ -26,50 +27,50 @@
 Add to `packages/shared/src/background-controller.test.ts`:
 
 ```typescript
-void it('returns disconnected status when not connected', async () => {
-  const harness = createHarness()
+void it("returns disconnected status when not connected", async () => {
+  const harness = createHarness();
 
-  const status = harness.controller.getConnectionStatus()
+  const status = harness.controller.getConnectionStatus();
 
-  assert.equal(status.state, 'disconnected')
-  assert.equal(status.lastError, undefined)
-})
+  assert.equal(status.state, "disconnected");
+  assert.equal(status.lastError, undefined);
+});
 
-void it('returns connecting status after connect is called', async () => {
-  const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+void it("returns connecting status after connect is called", async () => {
+  const harness = createHarness({ websocketUrl: "ws://127.0.0.1:8787" });
 
-  await harness.controller.handleActionClicked()
+  await harness.controller.handleActionClicked();
 
-  const status = harness.controller.getConnectionStatus()
+  const status = harness.controller.getConnectionStatus();
 
-  assert.equal(status.state, 'connecting')
-  assert.equal(status.lastError, undefined)
-})
+  assert.equal(status.state, "connecting");
+  assert.equal(status.lastError, undefined);
+});
 
-void it('returns connected status after socket opens', async () => {
-  const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+void it("returns connected status after socket opens", async () => {
+  const harness = createHarness({ websocketUrl: "ws://127.0.0.1:8787" });
 
-  await harness.controller.handleActionClicked()
-  harness.sockets.created[0].open()
-  await new Promise((resolve) => setImmediate(resolve))
+  await harness.controller.handleActionClicked();
+  harness.sockets.created[0].open();
+  await new Promise((resolve) => setImmediate(resolve));
 
-  const status = harness.controller.getConnectionStatus()
+  const status = harness.controller.getConnectionStatus();
 
-  assert.equal(status.state, 'connected')
-  assert.equal(status.lastError, undefined)
-})
+  assert.equal(status.state, "connected");
+  assert.equal(status.lastError, undefined);
+});
 
-void it('returns error status with last error message when socket errors', async () => {
-  const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+void it("returns error status with last error message when socket errors", async () => {
+  const harness = createHarness({ websocketUrl: "ws://127.0.0.1:8787" });
 
-  await harness.controller.handleActionClicked()
-  harness.sockets.created[0].error()
+  await harness.controller.handleActionClicked();
+  harness.sockets.created[0].error();
 
-  const status = harness.controller.getConnectionStatus()
+  const status = harness.controller.getConnectionStatus();
 
-  assert.equal(status.state, 'error')
-  assert.equal(status.lastError, 'BrowserBridge connection error')
-})
+  assert.equal(status.state, "error");
+  assert.equal(status.lastError, "BrowserBridge connection error");
+});
 ```
 
 **Step 2: Run test to verify failure**
@@ -83,8 +84,8 @@ Add to `packages/shared/src/background-controller.ts`:
 
 ```typescript
 export interface ConnectionStatus {
-  state: 'disconnected' | 'connecting' | 'connected' | 'error'
-  lastError?: string
+  state: "disconnected" | "connecting" | "connected" | "error";
+  lastError?: string;
 }
 ```
 
@@ -123,6 +124,7 @@ git commit -m "feat: add getConnectionStatus to shared background controller"
 **Objective:** Make `ConnectionStatus` type available to Chrome and Safari extensions.
 
 **Files:**
+
 - Modify: `packages/shared/src/index.ts`
 
 **Step 1: Write the export**
@@ -152,6 +154,7 @@ git commit -m "chore: verify ConnectionStatus export from shared package"
 **Objective:** Create message creation and response parsing helpers for the Chrome popup, adapted from Safari's `popup.ts` but using Chrome's promise-based `chrome.runtime.sendMessage`.
 
 **Files:**
+
 - Create: `clients/extensions/chrome/src/popup.ts`
 - Create: `clients/extensions/chrome/src/popup.test.ts`
 
@@ -160,8 +163,8 @@ git commit -m "chore: verify ConnectionStatus export from shared package"
 Create `clients/extensions/chrome/src/popup.test.ts`:
 
 ```typescript
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import {
   createGetSettingsMessage,
   createSaveSettingsMessage,
@@ -171,134 +174,134 @@ import {
   parseSettingsResponse,
   parseStatusResponse,
   parseErrorResponse,
-  type ChromeRuntime
-} from './popup.js'
+  type ChromeRuntime,
+} from "./popup.js";
 
-void describe('createGetSettingsMessage', () => {
+void describe("createGetSettingsMessage", () => {
   void it('returns a message with type "get_settings"', () => {
-    const message = createGetSettingsMessage()
-    assert.equal(message.type, 'get_settings')
-  })
-})
+    const message = createGetSettingsMessage();
+    assert.equal(message.type, "get_settings");
+  });
+});
 
-void describe('createSaveSettingsMessage', () => {
+void describe("createSaveSettingsMessage", () => {
   void it('returns a message with type "save_settings" and complete pairing settings', () => {
     const message = createSaveSettingsMessage({
-      websocketUrl: 'ws://127.0.0.1:8787',
-      pairingToken: 'local-token',
-      profileName: 'Default',
-      label: 'Chrome Default'
-    })
-    assert.equal(message.type, 'save_settings')
-    assert.equal(message.websocketUrl, 'ws://127.0.0.1:8787')
-    assert.equal(message.pairingToken, 'local-token')
-    assert.equal(message.profileName, 'Default')
-    assert.equal(message.label, 'Chrome Default')
-  })
-})
+      websocketUrl: "ws://127.0.0.1:8787",
+      pairingToken: "local-token",
+      profileName: "Default",
+      label: "Chrome Default",
+    });
+    assert.equal(message.type, "save_settings");
+    assert.equal(message.websocketUrl, "ws://127.0.0.1:8787");
+    assert.equal(message.pairingToken, "local-token");
+    assert.equal(message.profileName, "Default");
+    assert.equal(message.label, "Chrome Default");
+  });
+});
 
-void describe('createConnectMessage', () => {
+void describe("createConnectMessage", () => {
   void it('returns a message with type "connect"', () => {
-    const message = createConnectMessage()
-    assert.equal(message.type, 'connect')
-  })
-})
+    const message = createConnectMessage();
+    assert.equal(message.type, "connect");
+  });
+});
 
-void describe('createDisconnectMessage', () => {
+void describe("createDisconnectMessage", () => {
   void it('returns a message with type "disconnect"', () => {
-    const message = createDisconnectMessage()
-    assert.equal(message.type, 'disconnect')
-  })
-})
+    const message = createDisconnectMessage();
+    assert.equal(message.type, "disconnect");
+  });
+});
 
-void describe('createGetStatusMessage', () => {
+void describe("createGetStatusMessage", () => {
   void it('returns a message with type "get_status"', () => {
-    const message = createGetStatusMessage()
-    assert.equal(message.type, 'get_status')
-  })
-})
+    const message = createGetStatusMessage();
+    assert.equal(message.type, "get_status");
+  });
+});
 
-void describe('parseSettingsResponse', () => {
-  void it('returns editable pairing settings when response is successful', () => {
+void describe("parseSettingsResponse", () => {
+  void it("returns editable pairing settings when response is successful", () => {
     const response = {
       ok: true,
       data: {
-        websocketUrl: 'ws://127.0.0.1:8787',
-        pairingToken: 'local-token',
-        profileName: 'Default',
-        label: 'Chrome Default'
-      }
-    }
-    const settings = parseSettingsResponse(response)
+        websocketUrl: "ws://127.0.0.1:8787",
+        pairingToken: "local-token",
+        profileName: "Default",
+        label: "Chrome Default",
+      },
+    };
+    const settings = parseSettingsResponse(response);
     assert.deepEqual(settings, {
-      websocketUrl: 'ws://127.0.0.1:8787',
-      pairingToken: 'local-token',
-      profileName: 'Default',
-      label: 'Chrome Default'
-    })
-  })
+      websocketUrl: "ws://127.0.0.1:8787",
+      pairingToken: "local-token",
+      profileName: "Default",
+      label: "Chrome Default",
+    });
+  });
 
-  void it('returns undefined when response ok is false', () => {
-    const response = { ok: false, error: { message: 'Error' } }
-    const settings = parseSettingsResponse(response)
-    assert.equal(settings, undefined)
-  })
+  void it("returns undefined when response ok is false", () => {
+    const response = { ok: false, error: { message: "Error" } };
+    const settings = parseSettingsResponse(response);
+    assert.equal(settings, undefined);
+  });
 
-  void it('returns undefined when data is missing', () => {
-    const response = { ok: true }
-    const settings = parseSettingsResponse(response)
-    assert.equal(settings, undefined)
-  })
+  void it("returns undefined when data is missing", () => {
+    const response = { ok: true };
+    const settings = parseSettingsResponse(response);
+    assert.equal(settings, undefined);
+  });
 
-  void it('returns undefined for null response', () => {
-    const settings = parseSettingsResponse(null)
-    assert.equal(settings, undefined)
-  })
-})
+  void it("returns undefined for null response", () => {
+    const settings = parseSettingsResponse(null);
+    assert.equal(settings, undefined);
+  });
+});
 
-void describe('parseStatusResponse', () => {
-  void it('returns status object when response is successful', () => {
-    const response = { ok: true, data: { state: 'connected' } }
-    const status = parseStatusResponse(response)
-    assert.equal(status?.state, 'connected')
-  })
+void describe("parseStatusResponse", () => {
+  void it("returns status object when response is successful", () => {
+    const response = { ok: true, data: { state: "connected" } };
+    const status = parseStatusResponse(response);
+    assert.equal(status?.state, "connected");
+  });
 
-  void it('returns undefined when response ok is false', () => {
-    const response = { ok: false, error: { message: 'Error' } }
-    const status = parseStatusResponse(response)
-    assert.equal(status, undefined)
-  })
+  void it("returns undefined when response ok is false", () => {
+    const response = { ok: false, error: { message: "Error" } };
+    const status = parseStatusResponse(response);
+    assert.equal(status, undefined);
+  });
 
-  void it('returns undefined when data is missing', () => {
-    const response = { ok: true }
-    const status = parseStatusResponse(response)
-    assert.equal(status, undefined)
-  })
+  void it("returns undefined when data is missing", () => {
+    const response = { ok: true };
+    const status = parseStatusResponse(response);
+    assert.equal(status, undefined);
+  });
 
-  void it('returns undefined for null response', () => {
-    const status = parseStatusResponse(null)
-    assert.equal(status, undefined)
-  })
-})
+  void it("returns undefined for null response", () => {
+    const status = parseStatusResponse(null);
+    assert.equal(status, undefined);
+  });
+});
 
-void describe('parseErrorResponse', () => {
-  void it('returns the error message from the response', () => {
-    const response = { ok: false, error: { message: 'Something went wrong' } }
-    const message = parseErrorResponse(response)
-    assert.equal(message, 'Something went wrong')
-  })
+void describe("parseErrorResponse", () => {
+  void it("returns the error message from the response", () => {
+    const response = { ok: false, error: { message: "Something went wrong" } };
+    const message = parseErrorResponse(response);
+    assert.equal(message, "Something went wrong");
+  });
 
-  void it('returns a default message when error message is missing', () => {
-    const response = { ok: false, error: {} }
-    const message = parseErrorResponse(response)
-    assert.equal(message, 'An unknown error occurred.')
-  })
+  void it("returns a default message when error message is missing", () => {
+    const response = { ok: false, error: {} };
+    const message = parseErrorResponse(response);
+    assert.equal(message, "An unknown error occurred.");
+  });
 
-  void it('returns a default message for null response', () => {
-    const message = parseErrorResponse(null)
-    assert.equal(message, 'An unknown error occurred.')
-  })
-})
+  void it("returns a default message for null response", () => {
+    const message = parseErrorResponse(null);
+    assert.equal(message, "An unknown error occurred.");
+  });
+});
 ```
 
 **Step 2: Run test to verify failure**
@@ -312,118 +315,133 @@ Create `clients/extensions/chrome/src/popup.ts`:
 
 ```typescript
 export interface EditableBridgeSettings {
-  websocketUrl?: string
-  pairingToken?: string
-  profileName?: string
-  label?: string
+  websocketUrl?: string;
+  pairingToken?: string;
+  profileName?: string;
+  label?: string;
 }
 
 export interface RequiredEditableBridgeSettings {
-  websocketUrl: string
-  pairingToken: string
-  profileName: string
-  label: string
+  websocketUrl: string;
+  pairingToken: string;
+  profileName: string;
+  label: string;
 }
 
 export interface ChromeRuntime {
-  sendMessage: (message: unknown) => Promise<unknown>
+  sendMessage: (message: unknown) => Promise<unknown>;
 }
 
-export function createGetSettingsMessage (): { type: 'get_settings' } {
-  return { type: 'get_settings' }
+export function createGetSettingsMessage(): { type: "get_settings" } {
+  return { type: "get_settings" };
 }
 
-export function createSaveSettingsMessage (
-  settings: RequiredEditableBridgeSettings
+export function createSaveSettingsMessage(
+  settings: RequiredEditableBridgeSettings,
 ): {
-  type: 'save_settings'
-  websocketUrl: string
-  pairingToken: string
-  profileName: string
-  label: string
+  type: "save_settings";
+  websocketUrl: string;
+  pairingToken: string;
+  profileName: string;
+  label: string;
 } {
   return {
-    type: 'save_settings',
+    type: "save_settings",
     websocketUrl: settings.websocketUrl,
     pairingToken: settings.pairingToken,
     profileName: settings.profileName,
-    label: settings.label
-  }
+    label: settings.label,
+  };
 }
 
-export function createConnectMessage (): { type: 'connect' } {
-  return { type: 'connect' }
+export function createConnectMessage(): { type: "connect" } {
+  return { type: "connect" };
 }
 
-export function createDisconnectMessage (): { type: 'disconnect' } {
-  return { type: 'disconnect' }
+export function createDisconnectMessage(): { type: "disconnect" } {
+  return { type: "disconnect" };
 }
 
-export function createGetStatusMessage (): { type: 'get_status' } {
-  return { type: 'get_status' }
+export function createGetStatusMessage(): { type: "get_status" } {
+  return { type: "get_status" };
 }
 
-export function parseSettingsResponse (response: unknown): EditableBridgeSettings | undefined {
+export function parseSettingsResponse(
+  response: unknown,
+): EditableBridgeSettings | undefined {
   if (
-    typeof response === 'object' && response !== null &&
-    'ok' in response && Boolean((response as { ok: boolean }).ok) &&
-    'data' in response &&
-    typeof (response as { data: unknown }).data === 'object' &&
+    typeof response === "object" &&
+    response !== null &&
+    "ok" in response &&
+    Boolean((response as { ok: boolean }).ok) &&
+    "data" in response &&
+    typeof (response as { data: unknown }).data === "object" &&
     (response as { data: unknown }).data !== null
   ) {
-    const data = (response as { data: Record<string, unknown> }).data
-    const settings: EditableBridgeSettings = {}
+    const data = (response as { data: Record<string, unknown> }).data;
+    const settings: EditableBridgeSettings = {};
 
-    if (typeof data.websocketUrl === 'string') {
-      settings.websocketUrl = data.websocketUrl
+    if (typeof data.websocketUrl === "string") {
+      settings.websocketUrl = data.websocketUrl;
     }
 
-    if (typeof data.pairingToken === 'string') {
-      settings.pairingToken = data.pairingToken
+    if (typeof data.pairingToken === "string") {
+      settings.pairingToken = data.pairingToken;
     }
 
-    if (typeof data.profileName === 'string') {
-      settings.profileName = data.profileName
+    if (typeof data.profileName === "string") {
+      settings.profileName = data.profileName;
     }
 
-    if (typeof data.label === 'string') {
-      settings.label = data.label
+    if (typeof data.label === "string") {
+      settings.label = data.label;
     }
 
     if (Object.keys(settings).length > 0) {
-      return settings
+      return settings;
     }
   }
-  return undefined
+  return undefined;
 }
 
-export function parseStatusResponse (response: unknown): { state: string, lastError?: string } | undefined {
+export function parseStatusResponse(
+  response: unknown,
+): { state: string; lastError?: string } | undefined {
   if (
-    typeof response === 'object' && response !== null &&
-    'ok' in response && Boolean((response as { ok: boolean }).ok) &&
-    'data' in response &&
-    typeof (response as { data: unknown }).data === 'object' &&
+    typeof response === "object" &&
+    response !== null &&
+    "ok" in response &&
+    Boolean((response as { ok: boolean }).ok) &&
+    "data" in response &&
+    typeof (response as { data: unknown }).data === "object" &&
     (response as { data: unknown }).data !== null &&
-    typeof (response as { data: { state: unknown } }).data.state === 'string'
+    typeof (response as { data: { state: unknown } }).data.state === "string"
   ) {
-    const data = (response as { data: { state: string, lastError?: string } }).data
-    return { state: data.state, lastError: data.lastError }
+    const data = (response as { data: { state: string; lastError?: string } })
+      .data;
+    return { state: data.state, lastError: data.lastError };
   }
-  return undefined
+  return undefined;
 }
 
-export function parseErrorResponse (response: unknown): string {
+export function parseErrorResponse(response: unknown): string {
   if (
-    typeof response === 'object' && response !== null &&
-    'error' in response && typeof ((response as { error: { message: string } }).error?.message) === 'string'
+    typeof response === "object" &&
+    response !== null &&
+    "error" in response &&
+    typeof (response as { error: { message: string } }).error?.message ===
+      "string"
   ) {
-    return (response as { error: { message: string } }).error.message
+    return (response as { error: { message: string } }).error.message;
   }
-  return 'An unknown error occurred.'
+  return "An unknown error occurred.";
 }
 
-export async function sendMessage (chromeRuntime: ChromeRuntime, message: unknown): Promise<unknown> {
-  return await chromeRuntime.sendMessage(message)
+export async function sendMessage(
+  chromeRuntime: ChromeRuntime,
+  message: unknown,
+): Promise<unknown> {
+  return await chromeRuntime.sendMessage(message);
 }
 ```
 
@@ -446,6 +464,7 @@ git commit -m "feat: add Chrome popup message helpers and tests"
 **Objective:** Wire DOM elements to message helpers — form submit → save, connect/disconnect buttons → send messages, load settings and status on popup open.
 
 **Files:**
+
 - Create: `clients/extensions/chrome/src/popup-entry.ts`
 - Create: `clients/extensions/chrome/src/popup-entry.test.ts`
 
@@ -454,120 +473,140 @@ git commit -m "feat: add Chrome popup message helpers and tests"
 Create `clients/extensions/chrome/src/popup-entry.test.ts` using `linkedom` to test DOM wiring. Follow the Safari `popup-entry.ts` structure but with Chrome's promise-based API:
 
 ```typescript
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
-import { parseHTML } from 'linkedom'
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { parseHTML } from "linkedom";
 import {
   createGetSettingsMessage,
   createSaveSettingsMessage,
   createConnectMessage,
   createDisconnectMessage,
   createGetStatusMessage,
-  sendMessage
-} from './popup.js'
-import type { ChromeRuntime } from './popup.js'
+  sendMessage,
+} from "./popup.js";
+import type { ChromeRuntime } from "./popup.js";
 
-void describe('Chrome popup entry', () => {
-  void it('loads settings into form fields on open', async () => {
-    const { document } = parseHTML(popupHtml())
+void describe("Chrome popup entry", () => {
+  void it("loads settings into form fields on open", async () => {
+    const { document } = parseHTML(popupHtml());
     const runtime = createFakeChromeRuntime({
       [JSON.stringify(createGetSettingsMessage())]: {
         ok: true,
-        data: { websocketUrl: 'ws://test:8787', pairingToken: 'tok', profileName: 'Default', label: 'Chrome Default' }
+        data: {
+          websocketUrl: "ws://test:8787",
+          pairingToken: "tok",
+          profileName: "Default",
+          label: "Chrome Default",
+        },
       },
-      [JSON.stringify(createGetStatusMessage())]: { ok: true, data: { state: 'disconnected' } }
-    })
+      [JSON.stringify(createGetStatusMessage())]: {
+        ok: true,
+        data: { state: "disconnected" },
+      },
+    });
 
-    await initPopup(document, runtime)
+    await initPopup(document, runtime);
 
-    const urlInput = document.querySelector<HTMLInputElement>('#websocket-url')
-    assert.equal(urlInput?.value, 'ws://test:8787')
-  })
+    const urlInput = document.querySelector<HTMLInputElement>("#websocket-url");
+    assert.equal(urlInput?.value, "ws://test:8787");
+  });
 
-  void it('sends save_settings on form submit', async () => {
-    const { document } = parseHTML(popupHtml())
-    const messages: unknown[] = []
+  void it("sends save_settings on form submit", async () => {
+    const { document } = parseHTML(popupHtml());
+    const messages: unknown[] = [];
     const runtime: ChromeRuntime = {
-      async sendMessage (message: unknown): Promise<unknown> {
-        messages.push(message)
-        return { ok: true }
-      }
-    }
+      async sendMessage(message: unknown): Promise<unknown> {
+        messages.push(message);
+        return { ok: true };
+      },
+    };
 
-    await initPopup(document, runtime)
+    await initPopup(document, runtime);
 
-    const form = document.querySelector<HTMLFormElement>('#settings-form')
-    form?.dispatchEvent(new Event('submit'))
+    const form = document.querySelector<HTMLFormElement>("#settings-form");
+    form?.dispatchEvent(new Event("submit"));
 
-    assert.equal(messages.length >= 1, true)
-  })
+    assert.equal(messages.length >= 1, true);
+  });
 
-  void it('sends connect message when connect button is clicked', async () => {
-    const { document } = parseHTML(popupHtml())
-    const messages: unknown[] = []
+  void it("sends connect message when connect button is clicked", async () => {
+    const { document } = parseHTML(popupHtml());
+    const messages: unknown[] = [];
     const runtime: ChromeRuntime = {
-      async sendMessage (message: unknown): Promise<unknown> {
-        messages.push(message)
-        return { ok: true, data: { state: 'connecting' } }
-      }
-    }
+      async sendMessage(message: unknown): Promise<unknown> {
+        messages.push(message);
+        return { ok: true, data: { state: "connecting" } };
+      },
+    };
 
-    await initPopup(document, runtime)
+    await initPopup(document, runtime);
 
-    const connectBtn = document.querySelector<HTMLButtonElement>('#connect-button')
-    connectBtn?.click()
+    const connectBtn =
+      document.querySelector<HTMLButtonElement>("#connect-button");
+    connectBtn?.click();
 
-    const connectMsg = messages.find(m => (m as { type: string }).type === 'connect')
-    assert.equal(connectMsg !== undefined, true)
-  })
+    const connectMsg = messages.find(
+      (m) => (m as { type: string }).type === "connect",
+    );
+    assert.equal(connectMsg !== undefined, true);
+  });
 
-  void it('sends disconnect message when disconnect button is clicked', async () => {
-    const { document } = parseHTML(popupHtml())
-    const messages: unknown[] = []
+  void it("sends disconnect message when disconnect button is clicked", async () => {
+    const { document } = parseHTML(popupHtml());
+    const messages: unknown[] = [];
     const runtime: ChromeRuntime = {
-      async sendMessage (message: unknown): Promise<unknown> {
-        messages.push(message)
-        return { ok: true }
-      }
-    }
+      async sendMessage(message: unknown): Promise<unknown> {
+        messages.push(message);
+        return { ok: true };
+      },
+    };
 
-    await initPopup(document, runtime)
+    await initPopup(document, runtime);
 
-    const disconnectBtn = document.querySelector<HTMLButtonElement>('#disconnect-button')
-    disconnectBtn?.click()
+    const disconnectBtn =
+      document.querySelector<HTMLButtonElement>("#disconnect-button");
+    disconnectBtn?.click();
 
-    const disconnectMsg = messages.find(m => (m as { type: string }).type === 'disconnect')
-    assert.equal(disconnectMsg !== undefined, true)
-  })
+    const disconnectMsg = messages.find(
+      (m) => (m as { type: string }).type === "disconnect",
+    );
+    assert.equal(disconnectMsg !== undefined, true);
+  });
 
-  void it('shows connection status from status response', async () => {
-    const { document } = parseHTML(popupHtml())
+  void it("shows connection status from status response", async () => {
+    const { document } = parseHTML(popupHtml());
     const runtime = createFakeChromeRuntime({
       [JSON.stringify(createGetSettingsMessage())]: { ok: true, data: {} },
-      [JSON.stringify(createGetStatusMessage())]: { ok: true, data: { state: 'connected' } }
-    })
+      [JSON.stringify(createGetStatusMessage())]: {
+        ok: true,
+        data: { state: "connected" },
+      },
+    });
 
-    await initPopup(document, runtime)
+    await initPopup(document, runtime);
 
-    const status = document.querySelector<HTMLElement>('#status')
-    assert.equal(status?.textContent?.includes('Connected'), true)
-  })
+    const status = document.querySelector<HTMLElement>("#status");
+    assert.equal(status?.textContent?.includes("Connected"), true);
+  });
 
-  void it('shows error status from status response', async () => {
-    const { document } = parseHTML(popupHtml())
+  void it("shows error status from status response", async () => {
+    const { document } = parseHTML(popupHtml());
     const runtime = createFakeChromeRuntime({
       [JSON.stringify(createGetSettingsMessage())]: { ok: true, data: {} },
-      [JSON.stringify(createGetStatusMessage())]: { ok: true, data: { state: 'error', lastError: 'Connection refused' } }
-    })
+      [JSON.stringify(createGetStatusMessage())]: {
+        ok: true,
+        data: { state: "error", lastError: "Connection refused" },
+      },
+    });
 
-    await initPopup(document, runtime)
+    await initPopup(document, runtime);
 
-    const status = document.querySelector<HTMLElement>('#status')
-    assert.equal(status?.textContent?.includes('Connection refused'), true)
-  })
-})
+    const status = document.querySelector<HTMLElement>("#status");
+    assert.equal(status?.textContent?.includes("Connection refused"), true);
+  });
+});
 
-function popupHtml (): string {
+function popupHtml(): string {
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8" /><title>BrowserBridge</title></head><body>
 <h1>BrowserBridge</h1>
@@ -581,20 +620,22 @@ function popupHtml (): string {
   <button id="disconnect-button" type="button">Disconnect</button>
 </form>
 <div id="status" role="status"></div>
-</body></html>`
+</body></html>`;
 }
 
-function createFakeChromeRuntime (responses: Record<string, unknown>): ChromeRuntime {
+function createFakeChromeRuntime(
+  responses: Record<string, unknown>,
+): ChromeRuntime {
   return {
-    async sendMessage (message: unknown): Promise<unknown> {
-      const key = JSON.stringify(message)
-      return responses[key] ?? { ok: true }
-    }
-  }
+    async sendMessage(message: unknown): Promise<unknown> {
+      const key = JSON.stringify(message);
+      return responses[key] ?? { ok: true };
+    },
+  };
 }
 
-function createEvent (type: string): Event {
-  return new Event(type, { bubbles: true, cancelable: true })
+function createEvent(type: string): Event {
+  return new Event(type, { bubbles: true, cancelable: true });
 }
 ```
 
@@ -619,25 +660,27 @@ import {
   parseSettingsResponse,
   parseStatusResponse,
   parseErrorResponse,
-  sendMessage
-} from './popup.js'
+  sendMessage,
+} from "./popup.js";
 
 export interface ChromeApi {
   runtime: {
-    sendMessage: (message: unknown) => Promise<unknown>
-  }
+    sendMessage: (message: unknown) => Promise<unknown>;
+  };
 }
 
-declare const chrome: ChromeApi
+declare const chrome: ChromeApi;
 
-const form = document.querySelector<HTMLFormElement>('#settings-form')
-const input = document.querySelector<HTMLInputElement>('#websocket-url')
-const tokenInput = document.querySelector<HTMLInputElement>('#pairing-token')
-const profileInput = document.querySelector<HTMLInputElement>('#profile-name')
-const labelInput = document.querySelector<HTMLInputElement>('#browser-label')
-const connectButton = document.querySelector<HTMLButtonElement>('#connect-button')
-const disconnectButton = document.querySelector<HTMLButtonElement>('#disconnect-button')
-const status = document.querySelector<HTMLElement>('#status')
+const form = document.querySelector<HTMLFormElement>("#settings-form");
+const input = document.querySelector<HTMLInputElement>("#websocket-url");
+const tokenInput = document.querySelector<HTMLInputElement>("#pairing-token");
+const profileInput = document.querySelector<HTMLInputElement>("#profile-name");
+const labelInput = document.querySelector<HTMLInputElement>("#browser-label");
+const connectButton =
+  document.querySelector<HTMLButtonElement>("#connect-button");
+const disconnectButton =
+  document.querySelector<HTMLButtonElement>("#disconnect-button");
+const status = document.querySelector<HTMLElement>("#status");
 
 if (
   form === null ||
@@ -649,162 +692,175 @@ if (
   disconnectButton === null ||
   status === null
 ) {
-  throw new Error('BrowserBridge popup is missing required elements.')
+  throw new Error("BrowserBridge popup is missing required elements.");
 }
 
-const settingsForm = form
-const websocketUrlInput = input
-const pairingTokenInput = tokenInput
-const profileNameInput = profileInput
-const browserLabelInput = labelInput
-const connectBtn = connectButton
-const disconnectBtn = disconnectButton
-const statusMessage = status
+const settingsForm = form;
+const websocketUrlInput = input;
+const pairingTokenInput = tokenInput;
+const profileNameInput = profileInput;
+const browserLabelInput = labelInput;
+const connectBtn = connectButton;
+const disconnectBtn = disconnectButton;
+const statusMessage = status;
 
-void loadSettings()
-void updateConnectionStatus()
+void loadSettings();
+void updateConnectionStatus();
 
-settingsForm.addEventListener('submit', (event) => {
-  event.preventDefault()
-  void saveSettings(readSettingsForm())
-})
+settingsForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  void saveSettings(readSettingsForm());
+});
 
-connectBtn.addEventListener('click', () => {
-  void connect()
-})
+connectBtn.addEventListener("click", () => {
+  void connect();
+});
 
-disconnectBtn.addEventListener('click', () => {
-  void disconnect()
-})
+disconnectBtn.addEventListener("click", () => {
+  void disconnect();
+});
 
-async function loadSettings (): Promise<void> {
+async function loadSettings(): Promise<void> {
   try {
-    const response = await sendMessage(chrome, createGetSettingsMessage())
-    const settings = parseSettingsResponse(response)
+    const response = await sendMessage(chrome, createGetSettingsMessage());
+    const settings = parseSettingsResponse(response);
     if (settings?.websocketUrl !== undefined) {
-      websocketUrlInput.value = settings.websocketUrl
+      websocketUrlInput.value = settings.websocketUrl;
     }
     if (settings?.pairingToken !== undefined) {
-      pairingTokenInput.value = settings.pairingToken
+      pairingTokenInput.value = settings.pairingToken;
     }
     if (settings?.profileName !== undefined) {
-      profileNameInput.value = settings.profileName
+      profileNameInput.value = settings.profileName;
     }
     if (settings?.label !== undefined) {
-      browserLabelInput.value = settings.label
+      browserLabelInput.value = settings.label;
     }
   } catch {
-    statusMessage.textContent = 'Failed to load settings.'
+    statusMessage.textContent = "Failed to load settings.";
   }
 }
 
-async function saveSettings (settings: {
-  websocketUrl: string
-  pairingToken: string
-  profileName: string
-  label: string
+async function saveSettings(settings: {
+  websocketUrl: string;
+  pairingToken: string;
+  profileName: string;
+  label: string;
 }): Promise<void> {
   try {
-    const response = await sendMessage(chrome, createSaveSettingsMessage(settings))
+    const response = await sendMessage(
+      chrome,
+      createSaveSettingsMessage(settings),
+    );
     if (
-      typeof response === 'object' && response !== null &&
-      'ok' in response && (response as { ok: boolean }).ok
+      typeof response === "object" &&
+      response !== null &&
+      "ok" in response &&
+      (response as { ok: boolean }).ok
     ) {
-      statusMessage.textContent = 'Settings saved.'
+      statusMessage.textContent = "Settings saved.";
     } else {
-      statusMessage.textContent = parseErrorResponse(response)
+      statusMessage.textContent = parseErrorResponse(response);
     }
   } catch {
-    statusMessage.textContent = 'Failed to save settings.'
+    statusMessage.textContent = "Failed to save settings.";
   }
-  void updateConnectionStatus()
+  void updateConnectionStatus();
 }
 
-async function connect (): Promise<void> {
-  const settings = readSettingsForm()
+async function connect(): Promise<void> {
+  const settings = readSettingsForm();
 
-  if (settings.websocketUrl.trim() === '') {
-    statusMessage.textContent = 'Enter a WebSocket URL before connecting.'
-    return
+  if (settings.websocketUrl.trim() === "") {
+    statusMessage.textContent = "Enter a WebSocket URL before connecting.";
+    return;
   }
 
-  const saveResponse = await sendMessage(chrome, createSaveSettingsMessage(settings))
+  const saveResponse = await sendMessage(
+    chrome,
+    createSaveSettingsMessage(settings),
+  );
   if (
-    typeof saveResponse !== 'object' ||
+    typeof saveResponse !== "object" ||
     saveResponse === null ||
-    !('ok' in saveResponse) ||
+    !("ok" in saveResponse) ||
     !(saveResponse as { ok: boolean }).ok
   ) {
-    statusMessage.textContent = parseErrorResponse(saveResponse)
-    return
+    statusMessage.textContent = parseErrorResponse(saveResponse);
+    return;
   }
 
   try {
-    const response = await sendMessage(chrome, createConnectMessage())
+    const response = await sendMessage(chrome, createConnectMessage());
     if (
-      typeof response === 'object' && response !== null &&
-      'ok' in response && (response as { ok: boolean }).ok
+      typeof response === "object" &&
+      response !== null &&
+      "ok" in response &&
+      (response as { ok: boolean }).ok
     ) {
-      statusMessage.textContent = 'Connecting...'
+      statusMessage.textContent = "Connecting...";
     } else {
-      statusMessage.textContent = parseErrorResponse(response)
+      statusMessage.textContent = parseErrorResponse(response);
     }
   } catch {
-    statusMessage.textContent = 'Failed to connect.'
+    statusMessage.textContent = "Failed to connect.";
   }
-  void updateConnectionStatus()
+  void updateConnectionStatus();
 }
 
-function readSettingsForm (): {
-  websocketUrl: string
-  pairingToken: string
-  profileName: string
-  label: string
+function readSettingsForm(): {
+  websocketUrl: string;
+  pairingToken: string;
+  profileName: string;
+  label: string;
 } {
   return {
     websocketUrl: websocketUrlInput.value,
     pairingToken: pairingTokenInput.value,
     profileName: profileNameInput.value,
-    label: browserLabelInput.value
-  }
+    label: browserLabelInput.value,
+  };
 }
 
-async function disconnect (): Promise<void> {
+async function disconnect(): Promise<void> {
   try {
-    const response = await sendMessage(chrome, createDisconnectMessage())
+    const response = await sendMessage(chrome, createDisconnectMessage());
     if (
-      typeof response === 'object' && response !== null &&
-      'ok' in response && (response as { ok: boolean }).ok
+      typeof response === "object" &&
+      response !== null &&
+      "ok" in response &&
+      (response as { ok: boolean }).ok
     ) {
-      statusMessage.textContent = 'Disconnected.'
+      statusMessage.textContent = "Disconnected.";
     } else {
-      statusMessage.textContent = parseErrorResponse(response)
+      statusMessage.textContent = parseErrorResponse(response);
     }
   } catch {
-    statusMessage.textContent = 'Failed to disconnect.'
+    statusMessage.textContent = "Failed to disconnect.";
   }
-  void updateConnectionStatus()
+  void updateConnectionStatus();
 }
 
-async function updateConnectionStatus (): Promise<void> {
+async function updateConnectionStatus(): Promise<void> {
   try {
-    const response = await sendMessage(chrome, createGetStatusMessage())
-    const statusResult = parseStatusResponse(response)
+    const response = await sendMessage(chrome, createGetStatusMessage());
+    const statusResult = parseStatusResponse(response);
     if (statusResult === undefined) {
-      statusMessage.textContent = 'Status: Unknown'
-      return
+      statusMessage.textContent = "Status: Unknown";
+      return;
     }
 
-    if (statusResult.state === 'connected') {
-      statusMessage.textContent = 'Status: Connected'
-    } else if (statusResult.state === 'connecting') {
-      statusMessage.textContent = 'Status: Connecting...'
-    } else if (statusResult.state === 'error') {
-      statusMessage.textContent = statusResult.lastError !== undefined
-        ? `Status: Error — ${statusResult.lastError}`
-        : 'Status: Error'
+    if (statusResult.state === "connected") {
+      statusMessage.textContent = "Status: Connected";
+    } else if (statusResult.state === "connecting") {
+      statusMessage.textContent = "Status: Connecting...";
+    } else if (statusResult.state === "error") {
+      statusMessage.textContent =
+        statusResult.lastError !== undefined
+          ? `Status: Error — ${statusResult.lastError}`
+          : "Status: Error";
     } else {
-      statusMessage.textContent = 'Status: Disconnected'
+      statusMessage.textContent = "Status: Disconnected";
     }
   } catch {
     // Status update is non-critical; leave current text.
@@ -831,6 +887,7 @@ git commit -m "feat: add Chrome popup DOM wiring and tests"
 **Objective:** Create the popup HTML with dark theme matching Safari's popup styling, settings form, Connect/Disconnect buttons, and status area.
 
 **Files:**
+
 - Create: `clients/extensions/chrome/src/popup.html`
 
 **Step 1: Create popup.html**
@@ -967,12 +1024,7 @@ Create `clients/extensions/chrome/src/popup.html` (adapted from Safari's `popup.
         type="url"
       />
       <label for="pairing-token">Pairing token</label>
-      <input
-        id="pairing-token"
-        name="pairingToken"
-        required
-        type="password"
-      />
+      <input id="pairing-token" name="pairingToken" required type="password" />
       <label for="profile-name">Profile name</label>
       <input
         id="profile-name"
@@ -991,8 +1043,12 @@ Create `clients/extensions/chrome/src/popup.html` (adapted from Safari's `popup.
       />
       <div class="actions">
         <button id="save-button" type="submit">Save</button>
-        <button class="secondary" id="connect-button" type="button">Connect</button>
-        <button class="danger" id="disconnect-button" type="button">Disconnect</button>
+        <button class="secondary" id="connect-button" type="button">
+          Connect
+        </button>
+        <button class="danger" id="disconnect-button" type="button">
+          Disconnect
+        </button>
       </div>
     </form>
     <div id="status" role="status"></div>
@@ -1015,6 +1071,7 @@ git commit -m "feat: add Chrome popup HTML with dark theme"
 **Objective:** Switch permissions to the Safari model where regular page access is always granted (no runtime permission request needed since host_permissions are now required in manifest).
 
 **Files:**
+
 - Modify: `clients/extensions/chrome/src/permissions.ts`
 - Modify: `clients/extensions/chrome/src/permissions.test.ts`
 
@@ -1023,28 +1080,25 @@ git commit -m "feat: add Chrome popup HTML with dark theme"
 Update `clients/extensions/chrome/src/permissions.test.ts`:
 
 ```typescript
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
-import {
-  hasRegularPageAccess,
-  isRegularPageUrl
-} from './permissions.js'
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { hasRegularPageAccess, isRegularPageUrl } from "./permissions.js";
 
-void describe('Chrome regular page permissions', () => {
-  void it('recognizes regular HTTP and HTTPS page URLs', () => {
-    assert.equal(isRegularPageUrl('http://example.com/'), true)
-    assert.equal(isRegularPageUrl('https://example.com/docs'), true)
-    assert.equal(isRegularPageUrl('chrome://extensions'), false)
-    assert.equal(isRegularPageUrl('chrome-extension://abc/setup.html'), false)
-    assert.equal(isRegularPageUrl('file:///Users/example/report.html'), false)
-  })
+void describe("Chrome regular page permissions", () => {
+  void it("recognizes regular HTTP and HTTPS page URLs", () => {
+    assert.equal(isRegularPageUrl("http://example.com/"), true);
+    assert.equal(isRegularPageUrl("https://example.com/docs"), true);
+    assert.equal(isRegularPageUrl("chrome://extensions"), false);
+    assert.equal(isRegularPageUrl("chrome-extension://abc/setup.html"), false);
+    assert.equal(isRegularPageUrl("file:///Users/example/report.html"), false);
+  });
 
-  void it('always has regular page access because broad host permission is granted at install time', async () => {
-    const granted = await hasRegularPageAccess()
+  void it("always has regular page access because broad host permission is granted at install time", async () => {
+    const granted = await hasRegularPageAccess();
 
-    assert.equal(granted, true)
-  })
-})
+    assert.equal(granted, true);
+  });
+});
 ```
 
 **Step 2: Run test to verify failure**
@@ -1064,13 +1118,13 @@ Update `clients/extensions/chrome/src/permissions.ts`:
 // no runtime permission request flow, so hasRegularPageAccess
 // always resolves to true.
 
-export function isRegularPageUrl (url: string): boolean {
-  return url.startsWith('http://') || url.startsWith('https://')
+export function isRegularPageUrl(url: string): boolean {
+  return url.startsWith("http://") || url.startsWith("https://");
 }
 
-export async function hasRegularPageAccess (): Promise<boolean> {
+export async function hasRegularPageAccess(): Promise<boolean> {
   // Broad host permission is granted at install time — always true.
-  return true
+  return true;
 }
 ```
 
@@ -1093,11 +1147,13 @@ git commit -m "feat: simplify Chrome permissions to always-true model"
 **Objective:** Remove the `chrome.action.onClicked` listener (replaced by popup). Add `get_status`, `connect`, and `disconnect` message handlers. Remove permission-related imports and error paths.
 
 **Files:**
+
 - Modify: `clients/extensions/chrome/src/background.ts`
 
 **Step 1: Update background.ts**
 
 Key changes:
+
 1. Remove `import { hasRegularPageAccess, isRegularPageUrl, type ChromePermissionsApi } from './permissions.js'` — keep `isRegularPageUrl` but remove `hasRegularPageAccess` and `ChromePermissionsApi`
 2. Remove `chrome.action.onClicked.addListener(...)` block
 3. Remove `chrome.permissions` from `ChromeApi` interface
@@ -1108,52 +1164,56 @@ Key changes:
 Add to `chrome.runtime.onMessage.addListener`:
 
 ```typescript
-if (message.type === 'get_status') {
-  const status = controller.getConnectionStatus()
-  sendResponse({ ok: true, data: status })
-  return undefined
+if (message.type === "get_status") {
+  const status = controller.getConnectionStatus();
+  sendResponse({ ok: true, data: status });
+  return undefined;
 }
 
-if (message.type === 'connect') {
+if (message.type === "connect") {
   void controller.requestConnect().then(
     () => {
-      sendResponse({ ok: true })
+      sendResponse({ ok: true });
     },
     (error: unknown) => {
       sendResponse({
         ok: false,
         error: {
-          message: error instanceof Error ? error.message : 'Failed to connect.'
-        }
-      })
-    }
-  )
-  return true
+          message:
+            error instanceof Error ? error.message : "Failed to connect.",
+        },
+      });
+    },
+  );
+  return true;
 }
 
-if (message.type === 'disconnect') {
+if (message.type === "disconnect") {
   void controller.requestDisconnect().then(
     () => {
-      sendResponse({ ok: true })
+      sendResponse({ ok: true });
     },
     (error: unknown) => {
       sendResponse({
         ok: false,
         error: {
-          message: error instanceof Error ? error.message : 'Failed to disconnect.'
-        }
-      })
-    }
-  )
-  return true
+          message:
+            error instanceof Error ? error.message : "Failed to disconnect.",
+        },
+      });
+    },
+  );
+  return true;
 }
 ```
 
 Remove from `readActiveTabPage` and `performActiveTabAction`:
+
 - The `hasRegularPageAccess` check in the catch block
 - The `regularPagePermissionRequired()` / `actionRegularPagePermissionRequired()` calls
 
 Replace those catch blocks with just:
+
 ```typescript
 } catch {
   return contentScriptUnavailable()
@@ -1179,6 +1239,7 @@ git commit -m "feat: add get_status/connect/disconnect handlers, remove onClicke
 **Objective:** Add `default_popup` to manifest, move host permissions from optional to required.
 
 **Files:**
+
 - Modify: `clients/extensions/chrome/manifest.json`
 
 **Step 1: Update manifest.json**
@@ -1217,6 +1278,7 @@ git commit -m "feat: add default_popup and required host_permissions to Chrome m
 **Objective:** Update the build to copy `popup.html` instead of `setup.html`, include new source files in the TypeScript build, and bundle the popup entry.
 
 **Files:**
+
 - Modify: `clients/extensions/chrome/package.json`
 - Modify: `clients/extensions/chrome/tsconfig.build.json`
 
@@ -1272,6 +1334,7 @@ git commit -m "build: update Chrome build for popup instead of setup page"
 **Objective:** Remove the full-tab configuration page that was replaced by the popup.
 
 **Files:**
+
 - Delete: `clients/extensions/chrome/src/setup.ts`
 - Delete: `clients/extensions/chrome/src/setup.html`
 
@@ -1339,11 +1402,13 @@ git commit -m "chore: lint fixes for Chrome popup feature"
 **Objective:** Document the popup UI, permission change, and removal of setup page.
 
 **Files:**
+
 - Modify: `clients/extensions/chrome/README.md`
 
 **Step 1: Update README**
 
 Key changes:
+
 - Document popup UI (settings, connect/disconnect, status)
 - Document that regular page access is granted at install time (no setup page needed)
 - Remove references to `setup.html`

@@ -5,8 +5,7 @@ import {
   type BrowserBridgeBackgroundController
 } from '@browserbridge/shared'
 import {
-  createMessageHandler,
-  type ChromeApi
+  createMessageHandler
 } from './background.js'
 
 // --- Test helpers ---
