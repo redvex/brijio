@@ -850,6 +850,66 @@ void describe('BrowserBridge background controller', () => {
 
     assert.equal(harness.controller.isConnected(), false)
   })
+
+  // --- getConnectionStatus ---
+
+  void it('returns disconnected status when not connected', () => {
+    const harness = createHarness()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'disconnected')
+    assert.equal(status.lastError, undefined)
+  })
+
+  void it('returns connecting status after connect is called', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'connecting')
+    assert.equal(status.lastError, undefined)
+  })
+
+  void it('returns connected status after socket opens', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'connected')
+    assert.equal(status.lastError, undefined)
+  })
+
+  void it('returns error status with last error message when socket errors', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].fail()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'error')
+    assert.equal(status.lastError, 'BrowserBridge connection error')
+  })
+
+  void it('returns disconnected status after disconnect', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.controller.handleActionClicked()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'disconnected')
+    assert.equal(status.lastError, undefined)
+  })
 })
 
 interface HarnessOptions {

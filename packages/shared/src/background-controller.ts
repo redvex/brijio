@@ -27,6 +27,11 @@ import {
   type WriteTextActionTarget
 } from './protocol.js'
 
+export interface ConnectionStatus {
+  state: 'disconnected' | 'connecting' | 'connected' | 'error'
+  lastError?: string
+}
+
 export interface BridgeSettings {
   websocketUrl: string
   pairingToken: string
@@ -130,6 +135,8 @@ export class BrowserBridgeBackgroundController {
   private keepaliveTimerId: number | undefined
   private socket: BrowserBridgeSocket | undefined
   private settings: BridgeSettings | undefined
+  private connectionState: 'disconnected' | 'connecting' | 'connected' | 'error' = 'disconnected'
+  private lastErrorMessage: string | undefined
 
   constructor (
     private readonly options: BrowserBridgeBackgroundControllerOptions
@@ -177,6 +184,13 @@ export class BrowserBridgeBackgroundController {
 
   isConnected (): boolean {
     return this.socket !== undefined
+  }
+
+  getConnectionStatus (): ConnectionStatus {
+    if (this.connectionState === 'error') {
+      return { state: 'error', lastError: this.lastErrorMessage }
+    }
+    return { state: this.connectionState }
   }
 
   private async connect (settings: BridgeSettings): Promise<void> {
@@ -466,6 +480,8 @@ export class BrowserBridgeBackgroundController {
   }
 
   private async setConnectedState (): Promise<void> {
+    this.connectionState = 'connected'
+    this.lastErrorMessage = undefined
     await this.options.action.setBadgeText('ON')
     await this.options.action.setBadgeColor('#1f8f4d')
     await this.options.action.setBadgeTextColor('#ffffff')
@@ -473,6 +489,8 @@ export class BrowserBridgeBackgroundController {
   }
 
   private async setConnectingState (): Promise<void> {
+    this.connectionState = 'connecting'
+    this.lastErrorMessage = undefined
     await this.options.action.setBadgeText('...')
     await this.options.action.setBadgeColor('#f59e0b')
     await this.options.action.setBadgeTextColor('#ffffff')
@@ -480,6 +498,8 @@ export class BrowserBridgeBackgroundController {
   }
 
   private async setStoppedState (): Promise<void> {
+    this.connectionState = 'disconnected'
+    this.lastErrorMessage = undefined
     await this.options.action.setBadgeText('OFF')
     await this.options.action.setBadgeColor('#666666')
     await this.options.action.setBadgeTextColor('#ffffff')
@@ -487,6 +507,8 @@ export class BrowserBridgeBackgroundController {
   }
 
   private async setErrorState (): Promise<void> {
+    this.connectionState = 'error'
+    this.lastErrorMessage = 'BrowserBridge connection error'
     await this.options.action.setBadgeText('ERR')
     await this.options.action.setBadgeColor('#b42318')
     await this.options.action.setBadgeTextColor('#ffffff')
