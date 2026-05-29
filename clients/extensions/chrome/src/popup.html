@@ -117,14 +117,14 @@
   </head>
   <body>
     <h1>BrowserBridge</h1>
-    <form id="settings-form">
+    <form id="settings-form" novalidate>
       <label for="websocket-url">WebSocket URL</label>
       <input
         id="websocket-url"
         name="websocketUrl"
         placeholder="ws://127.0.0.1:8787"
         required
-        type="url"
+        type="text"
       />
       <label for="pairing-token">Pairing token</label>
       <input

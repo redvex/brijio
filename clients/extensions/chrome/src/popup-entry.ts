@@ -72,6 +72,27 @@ export async function initPopup (
     void disconnect()
   })
 
+  function validateForm (settings: {
+    websocketUrl: string
+    pairingToken: string
+    profileName: string
+    label: string
+  }): string | undefined {
+    if (settings.websocketUrl.trim() === '') {
+      return 'WebSocket URL is required.'
+    }
+    if (settings.pairingToken.trim() === '') {
+      return 'Pairing token is required.'
+    }
+    if (settings.profileName.trim() === '') {
+      return 'Profile name is required.'
+    }
+    if (settings.label.trim() === '') {
+      return 'Browser label is required.'
+    }
+    return undefined
+  }
+
   async function loadSettings (): Promise<void> {
     try {
       const response = await sendMessage(chromeRuntime, createGetSettingsMessage())
@@ -99,6 +120,12 @@ export async function initPopup (
     profileName: string
     label: string
   }): Promise<void> {
+    const validationError = validateForm(settings)
+    if (validationError !== undefined) {
+      statusMessage.textContent = validationError
+      return
+    }
+
     try {
       const response = await sendMessage(chromeRuntime, createSaveSettingsMessage(settings))
       if (
@@ -112,7 +139,6 @@ export async function initPopup (
     } catch {
       statusMessage.textContent = 'Failed to save settings.'
     }
-    void updateConnectionStatus()
   }
 
   async function connect (): Promise<void> {
