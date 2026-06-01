@@ -43,3 +43,12 @@ services:
       - ./test.html:/usr/share/nginx/html/test.html:ro
     profiles:
       - runtime
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      NODE_ENV: test
+    profiles:
+      - test
