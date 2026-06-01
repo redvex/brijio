@@ -20,7 +20,7 @@ may obtain a separate commercial license from the project maintainers.
 
 For commercial licensing inquiries:
 
-contact@browserbridge.dev
+redvex@me.com
 
 ## Dual Licensing Model
 

@@ -34,7 +34,7 @@ They may remove comments, issues, pull requests, or participation that violates 
 
 Report concerns privately to:
 
-conduct@browserbridge.dev
+redvex@me.com
 
 ## Attribution
 
