@@ -30,4 +30,4 @@ You can use BrowserBridge under AGPLv3, which carries copyleft obligations inclu
 
 ## Where can I get help with licensing questions?
 
-Contact contact@browserbridge.dev for commercial licensing inquiries.
+Contact redvex@me.com for commercial licensing inquiries.
