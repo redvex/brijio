@@ -74,10 +74,12 @@ Use a pnpm TypeScript monorepo.
   /mcp
     /src
       index.ts
+      integration.test.ts
       tools.ts
       websocket-client.ts
     package.json
     README.md
+/Dockerfile.test
 /clients
   /extensions
     /chrome
@@ -233,6 +235,10 @@ Include Docker support for local development. Docker should make it easy to run
 the WebSocket server and MCP server together, while still allowing package-level
 development through pnpm.
 
+Run `docker compose --profile test` to validate the full test suite in a
+container. This builds from `Dockerfile.test`, installs dependencies for both
+the `websocket` and `mcp` workspaces, and runs `pnpm test`.
+
 ## Coding Standards
 
 - Use TypeScript everywhere.
@@ -242,6 +248,12 @@ development through pnpm.
 - Keep shared protocol definitions in `packages/shared`.
 - Avoid unnecessary frameworks until the problem calls for them.
 - Add tests around protocol handling, routing, and tool behavior.
+- Integration tests (`servers/mcp/src/integration.test.ts`) exercise the full
+  WS → WS server → MCP HTTP server → MCP SDK client stack. They start a real
+  WebSocket server and MCP HTTP server, connect a mock browser extension over
+  raw WebSocket, and make real MCP tool calls. Run them as part of `pnpm test`.
+- Docker CI validation uses `docker compose --profile test` which builds a
+  test image from `Dockerfile.test` and runs the full test suite in a container.
 - Keep browser permissions minimal and document why each permission is needed.
 
 ## Security Model
