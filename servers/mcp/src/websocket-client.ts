@@ -32,6 +32,9 @@ import {
   type SubmitFormTarget,
   timeoutResponse
 } from './protocol.js'
+import { createLogger } from '@browserbridge/shared'
+
+const wsLogger = createLogger('mcp-ws')
 
 export interface PageContextRequestOptions {
   websocketUrl: string
@@ -368,12 +371,15 @@ async function requestBrowserBridge<T> (options: {
     return authRequiredResponse()
   }
 
+  wsLogger.debug('ws_connecting', { url: options.websocketUrl })
+
   return await new Promise((resolve) => {
     const socket = new WebSocket(options.websocketUrl)
     let settled = false
     let authenticated = false
 
     const timeout = setTimeout(() => {
+      wsLogger.warn('ws_timeout', { url: options.websocketUrl })
       settle(timeoutResponse(options.timeoutMessage))
     }, options.timeoutMs)
 
@@ -401,6 +407,7 @@ async function requestBrowserBridge<T> (options: {
       if (!authenticated) {
         if (isAuthSuccessEnvelope(parsed)) {
           authenticated = true
+          wsLogger.debug('ws_authenticated', { url: options.websocketUrl })
           socket.send(JSON.stringify(targetEnvelope(options)))
           return
         }
@@ -418,11 +425,15 @@ async function requestBrowserBridge<T> (options: {
       settle(result)
     })
 
-    socket.once('error', () => {
+    socket.once('error', (error) => {
+      wsLogger.error('ws_error', { url: options.websocketUrl, message: error.message })
       settle(connectionFailedResponse(options.websocketUrl))
     })
 
     socket.once('close', () => {
+      if (!settled) {
+        wsLogger.warn('ws_closed_unexpectedly', { url: options.websocketUrl })
+      }
       settle(connectionFailedResponse(options.websocketUrl))
     })
 

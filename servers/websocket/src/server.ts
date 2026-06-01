@@ -241,6 +241,11 @@ function handleExtensionMessage (
     }
 
     state.browserInstanceId = message.payload.browserInstanceId
+    logger.info('presence_announce', {
+      role: state.role,
+      browserInstanceId: message.payload.browserInstanceId,
+      label: message.payload.label
+    })
     upsertPresence(socket, state.scopeKey, message.payload, presence, now)
     return
   }
@@ -250,9 +255,11 @@ function handleExtensionMessage (
     message,
     pendingRequests
   )) {
+    logger.debug('extension_response_routed', { role: state.role, messageId: message.id })
     return
   }
 
+  logger.warn('invalid_message', { role: state.role, messageType: (message.payload as Record<string, unknown>)?.type })
   sendJson(
     socket,
     createErrorEnvelope(
@@ -316,6 +323,8 @@ function handleMcpMessage (
   pendingRequests: Map<string, WebSocket>
 ): void {
   if (isListBrowsersMessage(message.payload)) {
+    const count = listRecordsForScope(presence, scopeKey).length
+    logger.info('list_browsers', { scopeKey: scopeKey.slice(0, 8), browserCount: count })
     sendJson(socket, {
       type: 'message',
       id: message.id,
@@ -336,14 +345,22 @@ function handleMcpMessage (
   )
 
   if (!selected.ok) {
+    logger.warn('mcp_request_no_browser', { scopeKey: scopeKey.slice(0, 8), error: selected.error.error.code })
     sendJson(socket, selected.error)
     return
   }
 
+  const payload = message.payload as Record<string, unknown>
   if (message.id !== undefined) {
     pendingRequests.set(pendingRequestKey(scopeKey, message.id), socket)
   }
 
+  logger.info('mcp_request_routed', {
+    scopeKey: scopeKey.slice(0, 8),
+    type: payload.type,
+    browserInstanceId: selected.record.browserInstanceId,
+    label: selected.record.label
+  })
   sendJson(selected.record.socket, message)
 }
 

@@ -217,6 +217,8 @@ async function handleMcpHttpRequest (
     enableJsonResponse: true
   })
 
+  logger.info('mcp_request', { method: request.method, path: url.pathname })
+
   try {
     await mcpServer.connect(transport)
     await transport.handleRequest(request, response)
