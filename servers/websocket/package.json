@@ -5,6 +5,10 @@
   "description": "BrowserBridge WebSocket session router.",
   "license": "AGPL-3.0-only",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts"
+  },
   "scripts": {
     "build": "tsc --noEmit",
     "check": "tsc --noEmit",
