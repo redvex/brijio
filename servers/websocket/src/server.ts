@@ -1,4 +1,5 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
+import { readFileSync } from 'node:fs'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 import {
   createAuthSuccessEnvelope,
@@ -13,6 +14,12 @@ import {
   type BrowserPresence,
   type BrowserPresenceAnnouncePayload
 } from './protocol.js'
+import { createLogger } from '@browserbridge/shared'
+
+const version: string = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8')
+).version
+const logger = createLogger('websocket')
 
 export interface WebSocketServerOptions {
   host?: string
@@ -22,8 +29,19 @@ export interface WebSocketServerOptions {
   now?: () => Date
 }
 
+export interface WebSocketHealthStatus {
+  status: 'ok'
+  version: string
+  uptimeSeconds: number
+  extensions: {
+    count: number
+    browsers: Array<{ browserInstanceId: string; label: string }>
+  }
+}
+
 export interface BrowserBridgeWebSocketServer {
   url: string
+  getStatus: () => WebSocketHealthStatus
   close: () => Promise<void>
 }
 
@@ -45,9 +63,30 @@ export async function createWebSocketServer (
   const port = options.port ?? 8787
   const pairingTokens = getPairingTokens(options)
   const now = options.now ?? (() => new Date())
+  const startTime = Date.now()
   const presence = new Map<string, PresenceRecord>()
   const pendingRequests = new Map<string, WebSocket>()
-  const httpServer = createServer(handleHealthRequest)
+
+  function getStatus (): WebSocketHealthStatus {
+    const browsers = Array.from(presence.values())
+      .filter((record) => record.socket.readyState === record.socket.OPEN)
+      .map((record) => ({
+        browserInstanceId: record.browserInstanceId,
+        label: record.label
+      }))
+
+    return {
+      status: 'ok',
+      version,
+      uptimeSeconds: Math.floor((Date.now() - startTime) / 1000),
+      extensions: {
+        count: browsers.length,
+        browsers
+      }
+    }
+  }
+
+  const httpServer = createServer((req, res) => handleHealthRequest(req, res, getStatus))
   const server = new WebSocketServer({ server: httpServer })
 
   httpServer.listen(port, host)
@@ -93,6 +132,7 @@ export async function createWebSocketServer (
         state.browserInstanceId !== undefined
       ) {
         presence.delete(presenceKey(state.scopeKey, state.browserInstanceId))
+        logger.info('client_disconnected', { role: state.role, browserInstanceId: state.browserInstanceId })
       }
 
       cleanupPendingRequestsForSocket(pendingRequests, socket)
@@ -103,6 +143,7 @@ export async function createWebSocketServer (
 
   return {
     url: `ws://${host}:${getPort(httpServer)}`,
+    getStatus,
     close: async () => await closeBoth(server, httpServer)
   }
 }
@@ -138,6 +179,7 @@ function handleUnauthenticatedMessage (
   }
 
   if (!pairingTokens.has(message.payload.token)) {
+    logger.warn('auth_failed', { role: message.payload.role })
     sendJson(
       socket,
       createErrorEnvelope(
@@ -151,6 +193,7 @@ function handleUnauthenticatedMessage (
   state.role = message.payload.role
   state.scopeKey = createScopeKey(message.payload.token)
   sendJson(socket, createAuthSuccessEnvelope(message.id))
+  logger.info('client_authenticated', { role: state.role, scopeKey: state.scopeKey })
 
   if (state.role === 'extension') {
     sendJson(socket, createBrowserPresenceRequestEnvelope('presence-1'))
@@ -484,10 +527,12 @@ async function closeBoth (wsServer: WebSocketServer, httpServer: import('node:ht
   await closeHttpServer(httpServer)
 }
 
-function handleHealthRequest (req: IncomingMessage, res: ServerResponse): void {
+function handleHealthRequest (req: IncomingMessage, res: ServerResponse, getStatus: () => WebSocketHealthStatus): void {
   if (req.method === 'GET' && req.url === '/health') {
+    const status = getStatus()
+    logger.debug('health_check', { extensions: status.extensions.count })
     res.writeHead(200, { 'Content-Type': 'application/json' })
-    res.end(JSON.stringify({ status: 'ok' }))
+    res.end(JSON.stringify(status))
     return
   }
 
