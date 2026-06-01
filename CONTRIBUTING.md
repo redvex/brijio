@@ -1,26 +1,25 @@
 # Contributing
 
-BrowserBridge accepts contributions under an inbound-equals-outbound model.
+BrowserBridge accepts contributions under the AGPLv3 license.
 
-By contributing code, you agree that your contribution is provided under the
-same public code license used by the repository: PolyForm Noncommercial License
-1.0.0.
+## License Grant
 
-By contributing documentation, diagrams, examples, or other non-code written
-materials, you agree that your contribution is provided under the repository
-documentation license: Creative Commons Attribution-NonCommercial 4.0
-International, unless the file says otherwise.
+By contributing code, you agree that your contribution is provided under the same license used by the repository: ero General Public License v3.0 (AGPLv3).
 
-You keep copyright in your contributions. You are not assigning copyright to the
-project owner, and you are not granting automatic commercial relicensing rights.
+You keep copyright in your contributions. You are not assigning copyright to the project owner.
 
-Commercial use of contributor-owned work requires separate written permission
-from the relevant contributor.
-
-Before opening a pull request:
+## Before Opening a Pull Request
 
 - Keep changes focused and reviewable.
 - Include tests for behavior changes.
 - Update documentation for completed project areas.
 - Follow the ADR-first workflow in `AGENTS.md` for feature or behavior changes.
 - Do not include code or content you do not have the right to contribute.
+
+## Code of Conduct
+
+All contributors are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security Vulnerabilities
+
+Do not report security vulnerabilities in public issues. See [SECURITY.md](SECURITY.md) for the responsible disclosure process.

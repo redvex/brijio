@@ -8,7 +8,8 @@ const packageJsonPaths = [
   'packages/shared/package.json',
   'servers/websocket/package.json',
   'servers/mcp/package.json',
-  'clients/extensions/chrome/package.json'
+  'clients/extensions/chrome/package.json',
+  'clients/extensions/safari/package.json'
 ]
 
 async function readJson (path) {
@@ -87,36 +88,35 @@ describe('repository tooling', () => {
     assert.match(compose, /BROWSERBRIDGE_WEBSOCKET_URL: ws:\/\/websocket:8787/)
   })
 
-  it('uses source-available package license metadata', async () => {
+  it('uses AGPLv3 package license metadata', async () => {
     for (const path of packageJsonPaths) {
       const packageJson = await readJson(path)
 
       assert.equal(
         packageJson.license,
-        'PolyForm-Noncommercial-1.0.0',
-        `${path} should use the PolyForm Noncommercial SPDX identifier`
+        'AGPL-3.0-only',
+        `${path} should use the AGPLv3 SPDX identifier`
       )
     }
   })
 
-  it('documents the non-commercial repository license policy', async () => {
+  it('documents the AGPLv3 repository license policy', async () => {
     const readme = await readFile('README.md', 'utf8')
     const license = await readFile('LICENSE', 'utf8')
-    const docsLicense = await readFile('LICENSE-DOCS.md', 'utf8')
+    const licensing = await readFile('LICENSING.md', 'utf8')
+    const licenseFaq = await readFile('LICENSE-FAQ.md', 'utf8')
     const commercialLicensing = await readFile('COMMERCIAL-LICENSING.md', 'utf8')
     const contributing = await readFile('CONTRIBUTING.md', 'utf8')
 
-    assert.match(license, /PolyForm Noncommercial License 1\.0\.0/)
-    assert.match(
-      docsLicense,
-      /Creative Commons Attribution-NonCommercial 4\.0 International/
-    )
+    assert.match(license, /GNU AFFERO GENERAL PUBLIC LICENSE/)
+    assert.match(licensing, /AGPLv3/)
+    assert.match(licenseFaq, /licensed under AGPLv3/)
     assert.match(
       commercialLicensing,
-      /Commercial use requires separate written permission/
+      /may obtain a separate commercial license/
     )
-    assert.match(contributing, /inbound-equals-outbound/)
-    assert.match(readme, /source-available and free for non-commercial use/)
-    assert.doesNotMatch(readme, /AGPL|GNU Affero|Affero General Public License/)
+    assert.match(contributing, /contributions under the AGPLv3 license/)
+    assert.match(readme, /open source under AGPLv3/)
+    assert.match(readme, /GNU Affero General Public\s+License v3\.0 \(AGPLv3\)/)
   })
 })

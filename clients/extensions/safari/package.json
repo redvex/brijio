@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "BrowserBridge Safari extension.",
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.build.json && esbuild src/content-script-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/content.js --external:browser && esbuild src/background-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/background.js --external:browser && esbuild src/popup-entry.ts --bundle --format=iife --platform=browser --target=safari17 --outfile=dist/popup.js --external:browser && cp manifest.json dist/manifest.json && cp src/popup.html dist/popup.html && cp -r icons dist/icons && node scripts/verify-build-output.mjs",
