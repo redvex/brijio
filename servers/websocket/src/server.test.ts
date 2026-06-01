@@ -312,6 +312,24 @@ void describe('WebSocket authenticated browser routing', () => {
     mcp.close()
   })
 
+  void it('accepts extension keepalive without error', async () => {
+    const server = await startTestServer()
+    const extension = await authenticatedExtension(server.url)
+    const mcp = await authenticatedMcp(server.url)
+
+    // Keepalive should be silently accepted (no error sent back)
+    const noMessage = waitForNoMessage(extension)
+    extension.send(JSON.stringify(keepaliveMessage()))
+    await noMessage
+
+    // MCP client should not receive anything either
+    const noMcpMessage = waitForNoMessage(mcp)
+    await noMcpMessage
+
+    extension.close()
+    mcp.close()
+  })
+
   void it('removes browser presence after disconnect', async () => {
     const server = await startTestServer()
     const extension = await authenticatedExtension(server.url)
@@ -437,6 +455,15 @@ function pageContextMessage (browserInstanceId?: string): unknown {
       : { target: { browserInstanceId } }),
     payload: {
       type: 'get_page_context'
+    }
+  }
+}
+
+function keepaliveMessage (): unknown {
+  return {
+    type: 'message',
+    payload: {
+      type: 'extension_keepalive'
     }
   }
 }

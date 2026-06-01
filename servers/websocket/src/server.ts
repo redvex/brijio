@@ -250,6 +250,11 @@ function handleExtensionMessage (
     return
   }
 
+  if (isKeepalivePayload(message.payload)) {
+    logger.debug('extension_keepalive', { role: state.role, browserInstanceId: state.browserInstanceId })
+    return
+  }
+
   if (state.scopeKey !== undefined && routeExtensionResponse(
     state.scopeKey,
     message,
@@ -458,6 +463,16 @@ function cleanupPendingRequestsForSocket (
       pendingRequests.delete(key)
     }
   }
+}
+
+function isKeepalivePayload (payload: unknown): boolean {
+  return (
+    typeof payload === 'object' &&
+    payload !== null &&
+    !Array.isArray(payload) &&
+    'type' in payload &&
+    (payload as Record<string, unknown>).type === 'extension_keepalive'
+  )
 }
 
 function isListBrowsersMessage (payload: unknown): boolean {
