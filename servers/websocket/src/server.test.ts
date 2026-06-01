@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { afterEach, describe, it } from 'node:test'
 import http from 'node:http'
 import WebSocket from 'ws'
-import { createWebSocketServer } from './server.js'
+import { createWebSocketServer, type BrowserBridgeWebSocketServer } from './server.js'
 
 type JsonObject = Record<string, unknown>
 
@@ -15,7 +15,7 @@ afterEach(async () => {
 })
 
 void describe('GET /health', () => {
-  void it('returns 200 with {"status":"ok"}', async () => {
+  void it('returns 200 with enriched health data', async () => {
     const server = await startTestServer()
     const url = new URL(server.url)
     const healthUrl = `http://${url.hostname}:${url.port}/health`
@@ -28,7 +28,44 @@ void describe('GET /health', () => {
 
     assert.equal(response.statusCode, 200)
     const body = await collectBody(response)
-    assert.deepEqual(JSON.parse(body) as JsonObject, { status: 'ok' })
+    const health = JSON.parse(body) as JsonObject
+
+    assert.equal(health.status, 'ok')
+    assert.equal(typeof health.version, 'string')
+    assert.equal(typeof health.uptimeSeconds, 'number')
+    assert.ok(health.extensions != null)
+    const extensions = health.extensions as JsonObject
+    assert.equal(typeof extensions.count, 'number')
+    assert.ok(Array.isArray(extensions.browsers))
+  })
+
+  void it('includes connected extensions via getStatus', async () => {
+    const server = await startTestServer()
+    const extension = await authenticatedExtension(server.url)
+    // Allow event loop to settle after presence registration
+    await new Promise((resolve) => setTimeout(resolve, 10))
+
+    const status = server.getStatus()
+
+    assert.equal(status.extensions.count, 1)
+    assert.equal(status.extensions.browsers[0]?.browserInstanceId, 'chrome-default')
+    assert.equal(status.extensions.browsers[0]?.label, 'Chrome Default')
+
+    extension.close()
+  })
+
+  void it('excludes disconnected extensions from getStatus', async () => {
+    const server = await startTestServer()
+    const extension = await authenticatedExtension(server.url)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+
+    extension.close()
+    await waitForClose(extension)
+
+    const status = server.getStatus()
+
+    assert.equal(status.extensions.count, 0)
+    assert.deepEqual(status.extensions.browsers, [])
   })
 })
 
@@ -304,7 +341,7 @@ void describe('WebSocket authenticated browser routing', () => {
   })
 })
 
-async function startTestServer (): Promise<{ url: string }> {
+async function startTestServer (): Promise<BrowserBridgeWebSocketServer> {
   const server = await createWebSocketServer({
     host: '127.0.0.1',
     port: 0,
@@ -313,7 +350,7 @@ async function startTestServer (): Promise<{ url: string }> {
     now: () => new Date('2026-05-25T10:00:00.000Z')
   })
   servers.push(server)
-  return { url: server.url }
+  return server
 }
 
 async function authenticatedExtension (

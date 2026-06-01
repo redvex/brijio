@@ -1,4 +1,7 @@
 import { createWebSocketServer } from './server.js'
+import { createLogger } from '@browserbridge/shared'
+
+const logger = createLogger('websocket')
 
 const host = process.env.WEBSOCKET_HOST ?? '127.0.0.1'
 const port = Number.parseInt(process.env.WEBSOCKET_PORT ?? '8787', 10)
@@ -9,4 +12,4 @@ if (Number.isNaN(port)) {
 
 const server = await createWebSocketServer({ host, port })
 
-console.log(`BrowserBridge WebSocket server listening on ${server.url}`)
+logger.info('server_started', { url: server.url })
