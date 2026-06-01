@@ -14,3 +14,11 @@ assert.doesNotMatch(
   /^\s*export\s/m,
   'dist/content.js must not contain ES module exports.'
 )
+
+const backgroundScript = await readFile(new URL('../dist/background.js', import.meta.url), 'utf8')
+
+assert.doesNotMatch(
+  backgroundScript,
+  /@browserbridge\/shared/,
+  'dist/background.js must not contain unresolved workspace imports.'
+)

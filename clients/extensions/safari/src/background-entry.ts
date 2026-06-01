@@ -14,7 +14,12 @@ import {
   type ClickActionTarget,
   type WriteTextActionTarget,
   type WriteTextEditableTarget,
-  type PageActionResult
+  type PageActionResult,
+  stringValue,
+  requireString,
+  createBrowserInstanceId,
+  performActiveTabAction as sharedPerformActiveTabAction,
+  type ActiveTabDeps
 } from '@browserbridge/shared'
 import {
   SafariActionBadge,
@@ -22,9 +27,9 @@ import {
   SafariSetupAdapter,
   SafariPageReaderAdapter,
   SafariWebSocketConnection,
-  performActiveTabAction,
   type BrowserApi
 } from './background.js'
+import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
 declare const browser: BrowserApi
 
@@ -33,30 +38,52 @@ const storage = new SafariStorageAdapter(browser.storage)
 const setup = new SafariSetupAdapter()
 const pageReader = new SafariPageReaderAdapter(browser.tabs, browser.scripting)
 
+const safariDeps: ActiveTabDeps = {
+  tabs: browser.tabs,
+  scripting: browser.scripting,
+  isRegularPageUrl,
+  onCatchPermissionCheck: hasRegularPageAccess
+}
+
 const pageActions = {
   async click (target: ClickActionTarget): Promise<PageActionResult> {
-    return await performActiveTabAction({ type: 'perform_click', target }, browser.tabs, browser.scripting)
+    return await sharedPerformActiveTabAction(
+      { type: 'perform_click', target },
+      safariDeps
+    )
   },
   async writeText (
     target: WriteTextActionTarget | WriteTextEditableTarget,
     text: string
   ): Promise<PageActionResult> {
-    return await performActiveTabAction({ type: 'perform_write_text', target, text }, browser.tabs, browser.scripting)
+    return await sharedPerformActiveTabAction(
+      { type: 'perform_write_text', target, text },
+      safariDeps
+    )
   },
   async setChecked (
     target: WriteTextActionTarget,
     checked: boolean
   ): Promise<PageActionResult> {
-    return await performActiveTabAction({ type: 'perform_set_checked', target, checked }, browser.tabs, browser.scripting)
+    return await sharedPerformActiveTabAction(
+      { type: 'perform_set_checked', target, checked },
+      safariDeps
+    )
   },
   async selectOptions (
     target: WriteTextActionTarget,
     values: string[]
   ): Promise<PageActionResult> {
-    return await performActiveTabAction({ type: 'perform_select_options', target, values }, browser.tabs, browser.scripting)
+    return await sharedPerformActiveTabAction(
+      { type: 'perform_select_options', target, values },
+      safariDeps
+    )
   },
   async submitForm (target: { formId: string }): Promise<PageActionResult> {
-    return await performActiveTabAction({ type: 'perform_submit_form', target }, browser.tabs, browser.scripting)
+    return await sharedPerformActiveTabAction(
+      { type: 'perform_submit_form', target },
+      safariDeps
+    )
   }
 }
 
@@ -86,9 +113,7 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return true
   }
 
-  if (
-    message.type === 'save_settings'
-  ) {
+  if (message.type === 'save_settings') {
     void saveRuntimeSettings(message).then(
       () => {
         sendResponse({ ok: true })
@@ -124,7 +149,7 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'get_status') {
-    sendResponse({ ok: true, data: { connected: controller.isConnected() } })
+    sendResponse({ ok: true, data: controller.getConnectionStatus() })
     return undefined
   }
 
@@ -158,7 +183,7 @@ async function saveRuntimeSettings (message: {
     browserInstanceId:
       stringValue(message.browserInstanceId) ??
       existing?.browserInstanceId ??
-      createBrowserInstanceId(),
+      createBrowserInstanceId('Safari'),
     browserName:
       stringValue(message.browserName) ?? existing?.browserName ?? 'Safari',
     profileName,
@@ -166,22 +191,4 @@ async function saveRuntimeSettings (message: {
   }
 
   await controller.saveBridgeSettings(settings)
-}
-
-function createBrowserInstanceId (): string {
-  return `safari-${crypto.randomUUID()}`
-}
-
-function stringValue (value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() !== '' ? value : undefined
-}
-
-function requireString (value: unknown, label: string): string {
-  const normalized = stringValue(value)
-
-  if (normalized === undefined) {
-    throw new Error(`${label} is required.`)
-  }
-
-  return normalized
 }

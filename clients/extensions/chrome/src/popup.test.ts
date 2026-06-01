@@ -9,58 +9,53 @@ import {
   parseSettingsResponse,
   parseStatusResponse,
   parseErrorResponse,
-  sendMessage
+  sendMessage,
+  type ChromeRuntime
 } from './popup.js'
 
 // --- sendMessage helper tests ---
 
 void describe('sendMessage', () => {
-  void it('resolves with the response when callback is called', async () => {
-    const browser = {
+  void it('resolves with the response from chrome.runtime.sendMessage', async () => {
+    const chromeRuntime: ChromeRuntime = {
       runtime: {
-        sendMessage (message: unknown, _opts: unknown, callback?: (response: unknown) => void): void {
-          if (callback != null) {
-            // eslint-disable-next-line n/no-callback-literal
-            callback({ ok: true, data: { websocketUrl: 'ws://test' } })
-          }
+        async sendMessage (message: unknown): Promise<unknown> {
+          return { ok: true, data: { websocketUrl: 'ws://test' } }
         }
       }
     }
-    const result = await sendMessage(browser, createGetSettingsMessage())
+    const result = await sendMessage(chromeRuntime, createGetSettingsMessage())
     assert.deepEqual(result, { ok: true, data: { websocketUrl: 'ws://test' } })
   })
 
-  void it('resolves with undefined when callback receives undefined', async () => {
-    const browser = {
-      runtime: {
-        sendMessage (_message: unknown, _opts: unknown, callback?: (response: unknown) => void): void {
-          if (callback != null) {
-            callback(undefined)
-          }
-        }
-      }
-    }
-    const result = await sendMessage(browser, createGetSettingsMessage())
-    assert.equal(result, undefined)
-  })
-
-  void it('passes the message to sendMessage', async () => {
+  void it('passes the message to chrome.runtime.sendMessage', async () => {
     let captured: unknown = null
-    const browser = {
+    const chromeRuntime: ChromeRuntime = {
       runtime: {
-        sendMessage (message: unknown, _opts: unknown, callback?: (response: unknown) => void): void {
+        async sendMessage (message: unknown): Promise<unknown> {
           captured = message
-          if (callback != null) {
-            // eslint-disable-next-line n/no-callback-literal
-            callback({ ok: true })
-          }
+          return { ok: true }
         }
       }
     }
-    await sendMessage(browser, createConnectMessage())
+    await sendMessage(chromeRuntime, createConnectMessage())
     assert.deepEqual(captured, { type: 'connect' })
   })
+
+  void it('resolves with undefined when sendMessage returns undefined', async () => {
+    const chromeRuntime: ChromeRuntime = {
+      runtime: {
+        async sendMessage (_message: unknown): Promise<unknown> {
+          return undefined
+        }
+      }
+    }
+    const result = await sendMessage(chromeRuntime, createGetSettingsMessage())
+    assert.equal(result, undefined)
+  })
 })
+
+// --- Message creation tests ---
 
 void describe('createGetSettingsMessage', () => {
   void it('returns a message with type "get_settings"', () => {
@@ -75,13 +70,13 @@ void describe('createSaveSettingsMessage', () => {
       websocketUrl: 'ws://127.0.0.1:8787',
       pairingToken: 'local-token',
       profileName: 'Default',
-      label: 'Safari Default'
+      label: 'Chrome Default'
     })
     assert.equal(message.type, 'save_settings')
     assert.equal(message.websocketUrl, 'ws://127.0.0.1:8787')
     assert.equal(message.pairingToken, 'local-token')
     assert.equal(message.profileName, 'Default')
-    assert.equal(message.label, 'Safari Default')
+    assert.equal(message.label, 'Chrome Default')
   })
 
   void it('preserves the exact settings strings without modification', () => {
@@ -89,7 +84,7 @@ void describe('createSaveSettingsMessage', () => {
       websocketUrl: 'wss://example.com:443/ws',
       pairingToken: '  local-token  ',
       profileName: 'Work',
-      label: 'Safari Work'
+      label: 'Chrome Work'
     }
     const message = createSaveSettingsMessage(settings)
     assert.equal(message.websocketUrl, settings.websocketUrl)
@@ -130,7 +125,7 @@ void describe('parseSettingsResponse', () => {
         websocketUrl: 'ws://127.0.0.1:8787',
         pairingToken: 'local-token',
         profileName: 'Default',
-        label: 'Safari Default'
+        label: 'Chrome Default'
       }
     }
     const settings = parseSettingsResponse(response)
@@ -138,7 +133,7 @@ void describe('parseSettingsResponse', () => {
       websocketUrl: 'ws://127.0.0.1:8787',
       pairingToken: 'local-token',
       profileName: 'Default',
-      label: 'Safari Default'
+      label: 'Chrome Default'
     })
   })
 
@@ -161,13 +156,13 @@ void describe('parseSettingsResponse', () => {
         websocketUrl: 123,
         pairingToken: 'local-token',
         profileName: false,
-        label: 'Safari Default'
+        label: 'Chrome Default'
       }
     }
     const settings = parseSettingsResponse(response)
     assert.deepEqual(settings, {
       pairingToken: 'local-token',
-      label: 'Safari Default'
+      label: 'Chrome Default'
     })
   })
 
@@ -189,50 +184,58 @@ void describe('parseSettingsResponse', () => {
 })
 
 void describe('parseStatusResponse', () => {
-  void it('returns state and lastError from valid connected response', () => {
+  void it('returns status object when response indicates connected', () => {
     const response = { ok: true, data: { state: 'connected' } }
-    const result = parseStatusResponse(response)
-    assert.deepStrictEqual(result, { state: 'connected', lastError: undefined, reconnectAttempt: undefined, pendingRequests: undefined })
+    const status = parseStatusResponse(response)
+    assert.equal(status?.state, 'connected')
+    assert.equal(status?.lastError, undefined)
   })
 
-  void it('returns state with lastError from error response', () => {
+  void it('returns status object with lastError when response indicates error', () => {
     const response = { ok: true, data: { state: 'error', lastError: 'Connection refused' } }
-    const result = parseStatusResponse(response)
-    assert.deepStrictEqual(result, { state: 'error', lastError: 'Connection refused', reconnectAttempt: undefined, pendingRequests: undefined })
+    const status = parseStatusResponse(response)
+    assert.equal(status?.state, 'error')
+    assert.equal(status?.lastError, 'Connection refused')
   })
 
-  void it('returns disconnected state', () => {
+  void it('returns status object for connecting state', () => {
+    const response = { ok: true, data: { state: 'connecting' } }
+    const status = parseStatusResponse(response)
+    assert.equal(status?.state, 'connecting')
+  })
+
+  void it('returns status object for disconnected state', () => {
     const response = { ok: true, data: { state: 'disconnected' } }
-    const result = parseStatusResponse(response)
-    assert.deepStrictEqual(result, { state: 'disconnected', lastError: undefined, reconnectAttempt: undefined, pendingRequests: undefined })
+    const status = parseStatusResponse(response)
+    assert.equal(status?.state, 'disconnected')
   })
 
   void it('returns undefined when response ok is false', () => {
     const response = { ok: false, error: { message: 'Error' } }
-    const result = parseStatusResponse(response)
-    assert.equal(result, undefined)
+    const status = parseStatusResponse(response)
+    assert.equal(status, undefined)
   })
 
   void it('returns undefined when data is missing', () => {
     const response = { ok: true }
-    const result = parseStatusResponse(response)
-    assert.equal(result, undefined)
+    const status = parseStatusResponse(response)
+    assert.equal(status, undefined)
   })
 
   void it('returns undefined when state is not a string', () => {
     const response = { ok: true, data: { state: 42 } }
-    const result = parseStatusResponse(response)
-    assert.equal(result, undefined)
+    const status = parseStatusResponse(response)
+    assert.equal(status, undefined)
   })
 
   void it('returns undefined for null response', () => {
-    const result = parseStatusResponse(null)
-    assert.equal(result, undefined)
+    const status = parseStatusResponse(null)
+    assert.equal(status, undefined)
   })
 
   void it('returns undefined for non-object response', () => {
-    const result = parseStatusResponse('ok')
-    assert.equal(result, undefined)
+    const status = parseStatusResponse('ok')
+    assert.equal(status, undefined)
   })
 })
 

@@ -1,24 +1,22 @@
 import {
   BrowserBridgeBackgroundController,
   type BridgeSettings,
-  type ActionResultErrorCode,
   type ClickActionTarget,
-  ContentRequest,
-  ContentResponse,
   createGlobalTimers,
   defaultPageContentMaxPayloadBytes,
   type PageActionResult,
-  type PageContentErrorCode,
-  type PageReadResult,
   type BrowserBridgeSocket,
   type WriteTextEditableTarget,
-  type WriteTextActionTarget
+  type WriteTextActionTarget,
+  stringValue,
+  requireString,
+  createBrowserInstanceId,
+  normalizeBridgeSettings,
+  readActiveTabPage as sharedReadActiveTabPage,
+  performActiveTabAction as sharedPerformActiveTabAction,
+  type ActiveTabDeps
 } from '@browserbridge/shared'
-import {
-  hasRegularPageAccess,
-  isRegularPageUrl,
-  type ChromePermissionsApi
-} from './permissions.js'
+import { isRegularPageUrl } from './permissions.js'
 
 interface RuntimeMessage {
   type?: unknown
@@ -33,11 +31,8 @@ interface RuntimeMessage {
 type SendResponse = (response: unknown) => void
 type MessageListener = (event: { data: string }) => void | Promise<void>
 
-interface ChromeApi {
+export interface ChromeApi {
   action: {
-    onClicked: {
-      addListener: (callback: () => void | Promise<void>) => void
-    }
     setBadgeText: (details: { text: string }) => Promise<void>
     setBadgeBackgroundColor: (details: { color: string }) => Promise<void>
     setBadgeTextColor: (details: { color: string }) => Promise<void>
@@ -55,7 +50,6 @@ interface ChromeApi {
       ) => void
     }
   }
-  permissions: ChromePermissionsApi
   storage: {
     local: {
       get: (keys: string[]) => Promise<Record<string, unknown>>
@@ -82,6 +76,16 @@ interface ChromeApi {
 }
 
 declare const chrome: ChromeApi
+
+const chromeDeps: ActiveTabDeps = {
+  get tabs () {
+    return chrome.tabs
+  },
+  get scripting () {
+    return chrome.scripting
+  },
+  isRegularPageUrl
+}
 
 const bridgeSettingsKeys = [
   'websocketUrl',
@@ -114,14 +118,14 @@ const controller = new BrowserBridgeBackgroundController({
   },
   setup: {
     async openSetupPage () {
-      await chrome.tabs.create({ url: chrome.runtime.getURL('setup.html') })
+      await chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') })
     }
   },
   storage: {
     async getBridgeSettings () {
       const values = await chrome.storage.local.get(bridgeSettingsKeys)
 
-      return normalizeBridgeSettings(values)
+      return normalizeBridgeSettings(values, 'Chrome')
     },
     async setBridgeSettings (settings) {
       await chrome.storage.local.set({ ...settings })
@@ -129,19 +133,25 @@ const controller = new BrowserBridgeBackgroundController({
   },
   pageReader: {
     async getPageContext () {
-      return await readActiveTabPage({
-        type: 'extract_page_context',
-        previewMaxBytes,
-        defaultMaxPayloadBytes: defaultPageContentMaxPayloadBytes
-      })
+      return await sharedReadActiveTabPage(
+        {
+          type: 'extract_page_context',
+          previewMaxBytes,
+          defaultMaxPayloadBytes: defaultPageContentMaxPayloadBytes
+        },
+        chromeDeps
+      )
     },
     async getPageContent (index) {
-      return await readActiveTabPage({
-        type: 'extract_page_content',
-        index,
-        maxContentBytes,
-        maxPayloadBytes: defaultPageContentMaxPayloadBytes
-      })
+      return await sharedReadActiveTabPage(
+        {
+          type: 'extract_page_content',
+          index,
+          maxContentBytes,
+          maxPayloadBytes: defaultPageContentMaxPayloadBytes
+        },
+        chromeDeps
+      )
     }
   },
   pageActions: {
@@ -164,274 +174,70 @@ const controller = new BrowserBridgeBackgroundController({
   timers: createGlobalTimers()
 })
 
-async function readActiveTabPage<T> (
-  message: ContentRequest
-): Promise<PageReadResult<T>> {
-  const [activeTab] = await chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  })
-
-  if (activeTab?.id === undefined || activeTab.url === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: 'no_active_tab',
-        message: 'No active tab with a URL is available.'
-      }
-    }
-  }
-
-  if (!isRegularPageUrl(activeTab.url)) {
-    return {
-      ok: false,
-      error: {
-        code: 'unsupported_page',
-        message:
-          'BrowserBridge can read page content only from HTTP and HTTPS tabs.'
-      }
-    }
-  }
-
-  try {
-    await chrome.scripting.executeScript({
-      target: { tabId: activeTab.id },
-      files: ['content.js']
-    })
-
-    const response = await chrome.tabs.sendMessage(activeTab.id, message)
-
-    if (!isContentResponse(response)) {
-      return contentScriptUnavailable()
-    }
-
-    if (response.ok) {
-      return {
-        ok: true,
-        data: response.data as T
-      }
-    }
-
-    return {
-      ok: false,
-      error: {
-        code: response.error.code as PageContentErrorCode,
-        message: response.error.message
-      }
-    }
-  } catch {
-    if (!(await hasRegularPageAccess(chrome.permissions))) {
-      return regularPagePermissionRequired()
-    }
-
-    return contentScriptUnavailable()
-  }
-}
-
 async function performActiveTabClick (
   target: ClickActionTarget
 ): Promise<PageActionResult> {
-  return await performActiveTabAction({
-    type: 'perform_click',
-    target
-  })
+  return await sharedPerformActiveTabAction(
+    {
+      type: 'perform_click',
+      target
+    },
+    chromeDeps
+  )
 }
 
 async function performActiveTabWriteText (
   target: WriteTextActionTarget | WriteTextEditableTarget,
   text: string
 ): Promise<PageActionResult> {
-  return await performActiveTabAction({
-    type: 'perform_write_text',
-    target,
-    text
-  })
+  return await sharedPerformActiveTabAction(
+    {
+      type: 'perform_write_text',
+      target,
+      text
+    },
+    chromeDeps
+  )
 }
 
 async function performActiveTabSetChecked (
   target: WriteTextActionTarget,
   checked: boolean
 ): Promise<PageActionResult> {
-  return await performActiveTabAction({
-    type: 'perform_set_checked',
-    target,
-    checked
-  })
+  return await sharedPerformActiveTabAction(
+    {
+      type: 'perform_set_checked',
+      target,
+      checked
+    },
+    chromeDeps
+  )
 }
 
 async function performActiveTabSelectOptions (
   target: WriteTextActionTarget,
   values: string[]
 ): Promise<PageActionResult> {
-  return await performActiveTabAction({
-    type: 'perform_select_options',
-    target,
-    values
-  })
+  return await sharedPerformActiveTabAction(
+    {
+      type: 'perform_select_options',
+      target,
+      values
+    },
+    chromeDeps
+  )
 }
 
 async function performActiveTabSubmitForm (target: {
   formId: string
 }): Promise<PageActionResult> {
-  return await performActiveTabAction({
-    type: 'perform_submit_form',
-    target
-  })
-}
-
-async function performActiveTabAction (
-  message: ContentRequest
-): Promise<PageActionResult> {
-  const [activeTab] = await chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  })
-
-  if (activeTab?.id === undefined || activeTab.url === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: 'no_active_tab',
-        message: 'No active tab with a URL is available.'
-      }
-    }
-  }
-
-  if (!isRegularPageUrl(activeTab.url)) {
-    return {
-      ok: false,
-      error: {
-        code: 'unsupported_page',
-        message:
-          'BrowserBridge can perform actions only on HTTP and HTTPS tabs.'
-      }
-    }
-  }
-
-  try {
-    await chrome.scripting.executeScript({
-      target: { tabId: activeTab.id },
-      files: ['content.js']
-    })
-
-    const response = await chrome.tabs.sendMessage(activeTab.id, message)
-
-    if (!isContentResponse(response)) {
-      return actionContentScriptUnavailable()
-    }
-
-    if (response.ok) {
-      return {
-        ok: true,
-        data: response.data as PageActionResult extends {
-          ok: true
-          data: infer T
-        }
-          ? T
-          : never
-      }
-    }
-
-    return {
-      ok: false,
-      error: {
-        code: response.error.code as ActionResultErrorCode,
-        message: response.error.message
-      }
-    }
-  } catch {
-    if (!(await hasRegularPageAccess(chrome.permissions))) {
-      return actionRegularPagePermissionRequired()
-    }
-
-    return actionContentScriptUnavailable()
-  }
-}
-
-function regularPagePermissionRequired<T> (): PageReadResult<T> {
-  return {
-    ok: false,
-    error: {
-      code: 'regular_page_permission_required',
-      message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
-    }
-  }
-}
-
-function actionRegularPagePermissionRequired (): PageActionResult {
-  return {
-    ok: false,
-    error: {
-      code: 'regular_page_permission_required',
-      message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
-    }
-  }
-}
-
-function contentScriptUnavailable<T> (): PageReadResult<T> {
-  return {
-    ok: false,
-    error: {
-      code: 'content_script_unavailable',
-      message: 'Unable to reach the page content script.'
-    }
-  }
-}
-
-function actionContentScriptUnavailable (): PageActionResult {
-  return {
-    ok: false,
-    error: {
-      code: 'content_script_unavailable',
-      message: 'Unable to reach the page content script.'
-    }
-  }
-}
-
-function isContentResponse (value: unknown): value is ContentResponse {
-  if (!isRecord(value) || typeof value.ok !== 'boolean') {
-    return false
-  }
-
-  if (value.ok) {
-    return Object.hasOwn(value, 'data')
-  }
-
-  return (
-    isRecord(value.error) &&
-    isPageContentErrorCode(value.error.code) &&
-    typeof value.error.message === 'string'
+  return await sharedPerformActiveTabAction(
+    {
+      type: 'perform_submit_form',
+      target
+    },
+    chromeDeps
   )
-}
-
-function isPageContentErrorCode (
-  value: unknown
-): value is PageContentErrorCode | ActionResultErrorCode {
-  return (
-    value === 'no_active_tab' ||
-    value === 'unsupported_page' ||
-    value === 'regular_page_permission_required' ||
-    value === 'content_script_unavailable' ||
-    value === 'extraction_failed' ||
-    value === 'invalid_index' ||
-    value === 'unsupported_request' ||
-    value === 'unsupported_action' ||
-    value === 'invalid_action_target' ||
-    value === 'target_not_found' ||
-    value === 'target_disabled' ||
-    value === 'target_readonly' ||
-    value === 'unsupported_control' ||
-    value === 'invalid_control_value' ||
-    value === 'option_not_found' ||
-    value === 'target_option_disabled' ||
-    value === 'action_failed'
-  )
-}
-
-function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
 class DomWebSocketAdapter implements BrowserBridgeSocket {
@@ -512,57 +318,127 @@ class DomWebSocketAdapter implements BrowserBridgeSocket {
   }
 }
 
-chrome.action.onClicked.addListener(() => {
-  void controller.handleActionClicked()
-})
+// --- Message handler (exported for testing) ---
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'get_settings') {
-    void controller.getBridgeSettings().then((settings) => {
-      sendResponse({ ok: true, data: settings })
-    })
-    return true
-  }
-
-  if (
-    message.type === 'save_settings' &&
-    typeof message.websocketUrl === 'string' &&
-    typeof message.pairingToken === 'string' &&
-    typeof message.profileName === 'string' &&
-    typeof message.label === 'string'
-  ) {
-    void saveRuntimeSettings(message).then(
-      () => {
-        sendResponse({ ok: true })
-      },
-      (error: unknown) => {
-        sendResponse({
-          ok: false,
-          error: {
-            code: 'invalid_settings',
-            message:
-              error instanceof Error
-                ? error.message
-                : 'Unable to save settings.'
-          }
-        })
-      }
-    )
-    return true
-  }
-
-  sendResponse({
-    ok: false,
-    error: {
-      code: 'unsupported_message',
-      message: 'Unsupported setup message.'
+export function createMessageHandler (
+  ctrl: BrowserBridgeBackgroundController
+): (
+    message: RuntimeMessage,
+    sender: unknown,
+    sendResponse: SendResponse,
+  ) => boolean | undefined {
+  return (message, _sender, sendResponse) => {
+    if (message.type === 'get_settings') {
+      void ctrl.getBridgeSettings().then((settings) => {
+        sendResponse({ ok: true, data: settings })
+      })
+      return true
     }
-  })
-  return undefined
-})
 
-async function saveRuntimeSettings (message: RuntimeMessage): Promise<void> {
-  const existing = await controller.getBridgeSettings()
+    if (
+      message.type === 'save_settings' &&
+      typeof message.websocketUrl === 'string' &&
+      typeof message.pairingToken === 'string' &&
+      typeof message.profileName === 'string' &&
+      typeof message.label === 'string'
+    ) {
+      void saveRuntimeSettings(ctrl, message).then(
+        () => {
+          sendResponse({ ok: true })
+        },
+        (error: unknown) => {
+          sendResponse({
+            ok: false,
+            error: {
+              code: 'invalid_settings',
+              message:
+                error instanceof Error
+                  ? error.message
+                  : 'Unable to save settings.'
+            }
+          })
+        }
+      )
+      return true
+    }
+
+    if (message.type === 'get_status') {
+      const status = ctrl.getConnectionStatus()
+      sendResponse({ ok: true, data: status })
+      return undefined
+    }
+
+    if (message.type === 'connect') {
+      void ctrl.requestConnect().then(
+        () => {
+          sendResponse({ ok: true })
+        },
+        (error: unknown) => {
+          sendResponse({
+            ok: false,
+            error: {
+              code: 'connect_failed',
+              message:
+                error instanceof Error ? error.message : 'Unable to connect.'
+            }
+          })
+        }
+      )
+      return true
+    }
+
+    if (message.type === 'disconnect') {
+      void ctrl.requestDisconnect().then(
+        () => {
+          sendResponse({ ok: true })
+        },
+        (error: unknown) => {
+          sendResponse({
+            ok: false,
+            error: {
+              code: 'disconnect_failed',
+              message:
+                error instanceof Error
+                  ? error.message
+                  : 'Unable to disconnect.'
+            }
+          })
+        }
+      )
+      return true
+    }
+
+    sendResponse({
+      ok: false,
+      error: {
+        code: 'unsupported_message',
+        message: 'Unsupported extension message.'
+      }
+    })
+    return undefined
+  }
+}
+
+// Register the message listener only in the Chrome extension runtime.
+// In test environments, chrome.runtime is not available.
+const chromeGlobal = globalThis as unknown as {
+  chrome?: {
+    runtime?: { onMessage?: { addListener?: (callback: unknown) => void } }
+  }
+}
+if (
+  typeof chromeGlobal.chrome?.runtime?.onMessage?.addListener === 'function'
+) {
+  chromeGlobal.chrome.runtime.onMessage.addListener(
+    createMessageHandler(controller)
+  )
+}
+
+async function saveRuntimeSettings (
+  ctrl: BrowserBridgeBackgroundController,
+  message: RuntimeMessage
+): Promise<void> {
+  const existing = await ctrl.getBridgeSettings()
   const websocketUrl = requireString(message.websocketUrl, 'WebSocket URL')
   const pairingToken = requireString(message.pairingToken, 'Pairing token')
   const profileName = requireString(message.profileName, 'Profile name')
@@ -574,58 +450,12 @@ async function saveRuntimeSettings (message: RuntimeMessage): Promise<void> {
     browserInstanceId:
       stringValue(message.browserInstanceId) ??
       existing?.browserInstanceId ??
-      createBrowserInstanceId(),
+      createBrowserInstanceId('Chrome'),
     browserName:
       stringValue(message.browserName) ?? existing?.browserName ?? 'Chrome',
     profileName,
     label
   }
 
-  await controller.saveBridgeSettings(settings)
-}
-
-function normalizeBridgeSettings (
-  values: Record<string, unknown>
-): BridgeSettings | undefined {
-  const websocketUrl = stringValue(values.websocketUrl)
-  const pairingToken = stringValue(values.pairingToken)
-  const browserInstanceId = stringValue(values.browserInstanceId)
-  const browserName = stringValue(values.browserName) ?? 'Chrome'
-  const profileName = stringValue(values.profileName) ?? 'Default'
-  const label = stringValue(values.label) ?? `${browserName} ${profileName}`
-
-  if (
-    websocketUrl === undefined ||
-    pairingToken === undefined ||
-    browserInstanceId === undefined
-  ) {
-    return undefined
-  }
-
-  return {
-    websocketUrl,
-    pairingToken,
-    browserInstanceId,
-    browserName,
-    profileName,
-    label
-  }
-}
-
-function createBrowserInstanceId (): string {
-  return `chrome-${crypto.randomUUID()}`
-}
-
-function stringValue (value: unknown): string | undefined {
-  return typeof value === 'string' && value.trim() !== '' ? value : undefined
-}
-
-function requireString (value: unknown, label: string): string {
-  const normalized = stringValue(value)
-
-  if (normalized === undefined) {
-    throw new Error(`${label} is required.`)
-  }
-
-  return normalized
+  await ctrl.saveBridgeSettings(settings)
 }

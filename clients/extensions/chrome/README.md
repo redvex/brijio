@@ -47,16 +47,23 @@ Current page action behavior:
 
 ## User Flow
 
-The extension is transparent during normal use:
+The extension uses a popup overlay for configuration and connection control:
 
 1. Load the extension in Chrome.
-2. Click the BrowserBridge toolbar action the first time.
+2. Click the BrowserBridge toolbar action to open the configuration popup.
 3. Enter the local WebSocket URL, for example `ws://127.0.0.1:8787`.
 4. Enter the pairing token generated with `pnpm token`.
 5. Confirm the auto-generated browser identity or edit the profile/label fields.
-6. Optionally enable regular page access for HTTP and HTTPS pages.
-7. Click the toolbar action again to start the bridge.
-8. Click the toolbar action while connected to stop the bridge.
+6. Click **Save** to store settings.
+7. Click **Connect** to start the bridge.
+8. Click **Disconnect** to stop the bridge.
+
+The popup shows real-time connection status:
+
+- **Connected**: bridge is active and authenticated.
+- **Connecting**: WebSocket handshake in progress.
+- **Disconnected**: bridge is inactive.
+- **Error**: connection failed (shows the error message).
 
 The extension shows connection state through the toolbar badge and title:
 
@@ -92,16 +99,15 @@ behavior:
 - `tabs`: reads the active tab URL and title and sends messages to the active
   tab.
 
-The manifest also declares optional host permissions for regular pages:
+The manifest also declares required host permissions for regular pages:
 
 - `http://*/*`
 - `https://*/*`
 
-These optional permissions are requested only from the setup page after user
-action. They let BrowserBridge read regular HTTP and HTTPS pages when the
-temporary `activeTab` grant is not available. The extension still rejects
-Chrome internal pages, extension pages, local files, and other unsupported
-schemes.
+These host permissions are granted at extension-install time. They let
+BrowserBridge read regular HTTP and HTTPS pages without a runtime permission
+prompt. The extension still rejects Chrome internal pages, extension pages,
+local files, and other unsupported schemes.
 
 Page DOM access remains tied to explicit reads while the user-controlled bridge
 is connected. The extension does not continuously stream or store page content.
@@ -246,8 +252,9 @@ The content response uses plain text with minimal Markdown:
 }
 ```
 
-If Chrome denies content script injection on a regular HTTP or HTTPS page and
-regular page access has not been enabled, the extension returns:
+If Chrome denies content script injection on a page that the extension cannot
+access (for example, a Chrome internal page or extension page), the extension
+returns:
 
 ```json
 {
@@ -257,8 +264,8 @@ regular page access has not been enabled, the extension returns:
     "type": "page_content_response",
     "ok": false,
     "error": {
-      "code": "regular_page_permission_required",
-      "message": "Regular page access is not enabled. Open BrowserBridge setup and enable regular page access."
+      "code": "unsupported_page",
+      "message": "BrowserBridge can read page content only from HTTP and HTTPS tabs."
     }
   }
 }

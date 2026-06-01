@@ -27,6 +27,13 @@ import {
   type WriteTextActionTarget
 } from './protocol.js'
 
+export interface ConnectionStatus {
+  state: 'disconnected' | 'connecting' | 'reconnecting' | 'connected' | 'error'
+  lastError?: string
+  reconnectAttempt?: number
+  pendingRequests: number
+}
+
 export interface BridgeSettings {
   websocketUrl: string
   pairingToken: string
@@ -55,6 +62,8 @@ export interface ActionAdapter {
 export interface TimersAdapter {
   setInterval: (callback: () => void, intervalMs: number) => number
   clearInterval: (timerId: number) => void
+  setTimeout: (callback: () => void, delayMs: number) => number
+  clearTimeout: (timerId: number) => void
 }
 
 export type PageReadResult<T> =
@@ -110,7 +119,7 @@ export interface PageActionAdapter {
 export interface BrowserBridgeSocket {
   onopen: (() => void) | undefined
   onmessage: ((event: { data: string }) => void | Promise<void>) | undefined
-  onclose: (() => void) | undefined
+  onclose: ((event: { code: number, reason: string }) => void) | undefined
   onerror: (() => void) | undefined
   send: (message: string) => void
   close: () => void
@@ -126,10 +135,41 @@ export interface BrowserBridgeBackgroundControllerOptions {
   timers: TimersAdapter
 }
 
+type ConnectionState = 'disconnected' | 'connecting' | 'reconnecting' | 'connected' | 'error'
+
+const INITIAL_RECONNECT_DELAY_MS = 1000
+const MAX_RECONNECT_DELAY_MS = 30000
+const RECONNECT_BACKOFF_MULTIPLIER = 2
+
+function describeCloseEvent (code: number, reason: string): string {
+  if (reason.trim() !== '') {
+    return `Connection closed (${code}): ${reason}`
+  }
+  switch (code) {
+    case 1000: return 'Connection closed normally'
+    case 1001: return 'Endpoint going away'
+    case 1005: return 'Connection closed without status code'
+    case 1006: return 'Connection lost (abnormal closure)'
+    case 1007: return 'Invalid frame payload data'
+    case 1008: return 'Policy violation'
+    case 1009: return 'Message too large'
+    case 1010: return 'Extension negotiation failed'
+    case 1011: return 'Internal server error'
+    case 1015: return 'TLS handshake failure'
+    default: return `Connection closed (${code})`
+  }
+}
+
 export class BrowserBridgeBackgroundController {
   private keepaliveTimerId: number | undefined
+  private reconnectTimerId: number | undefined
+  private reconnectAttempt: number = 0
   private socket: BrowserBridgeSocket | undefined
   private settings: BridgeSettings | undefined
+  private connectionState: ConnectionState = 'disconnected'
+  private lastErrorMessage: string | undefined
+  private manualDisconnect: boolean = false
+  private pendingRequestCount: number = 0
 
   constructor (
     private readonly options: BrowserBridgeBackgroundControllerOptions
@@ -161,11 +201,13 @@ export class BrowserBridgeBackgroundController {
   }
 
   async requestConnect (): Promise<void> {
+    this.cancelReconnect()
     const settings = await this.options.storage.getBridgeSettings()
     if (!isUsableSettings(settings)) {
       await this.options.setup.openSetupPage()
       return
     }
+    this.manualDisconnect = false
     await this.connect(settings)
   }
 
@@ -179,10 +221,27 @@ export class BrowserBridgeBackgroundController {
     return this.socket !== undefined
   }
 
+  getConnectionStatus (): ConnectionStatus {
+    const base: ConnectionStatus = {
+      state: this.connectionState,
+      pendingRequests: this.pendingRequestCount
+    }
+    if (this.connectionState === 'error' && this.lastErrorMessage !== undefined) {
+      base.lastError = this.lastErrorMessage
+    }
+    if (this.connectionState === 'reconnecting') {
+      base.reconnectAttempt = this.reconnectAttempt
+    }
+    return base
+  }
+
   private async connect (settings: BridgeSettings): Promise<void> {
+    this.cancelReconnect()
     const socket = this.options.createWebSocket(settings.websocketUrl)
     this.socket = socket
     this.settings = settings
+    this.manualDisconnect = false
+    this.reconnectAttempt = 0
 
     socket.onopen = () => {
       if (this.socket === socket) {
@@ -196,26 +255,44 @@ export class BrowserBridgeBackgroundController {
       await this.handleSocketMessage(event.data)
     }
 
-    socket.onclose = () => {
-      if (this.socket === socket) {
-        this.socket = undefined
-        this.stopKeepalive()
-        void this.setStoppedState()
+    socket.onclose = (event) => {
+      if (this.socket !== socket) {
+        return
       }
+      this.socket = undefined
+      this.stopKeepalive()
+      if (this.manualDisconnect) {
+        void this.setStoppedState()
+        return
+      }
+      const message = describeCloseEvent(event.code, event.reason)
+      this.lastErrorMessage = message
+      void this.scheduleReconnect()
     }
 
     socket.onerror = () => {
-      if (this.socket === socket) {
-        this.socket = undefined
-        this.stopKeepalive()
-        void this.setErrorState()
+      if (this.socket !== socket) {
+        return
       }
+      this.socket = undefined
+      this.stopKeepalive()
+      if (this.manualDisconnect) {
+        void this.setStoppedState()
+        return
+      }
+      const hadConnected = this.connectionState === 'connected' || this.reconnectAttempt > 0
+      this.lastErrorMessage = hadConnected
+        ? 'Connection lost unexpectedly'
+        : 'Failed to connect to WebSocket server'
+      void this.scheduleReconnect()
     }
 
     await this.setConnectingState()
   }
 
   private async disconnect (): Promise<void> {
+    this.manualDisconnect = true
+    this.cancelReconnect()
     const socket = this.socket
     this.socket = undefined
     this.settings = undefined
@@ -223,6 +300,39 @@ export class BrowserBridgeBackgroundController {
     this.stopKeepalive()
     socket?.close()
     await this.setStoppedState()
+  }
+
+  private async scheduleReconnect (): Promise<void> {
+    const delay = Math.min(
+      INITIAL_RECONNECT_DELAY_MS * Math.pow(RECONNECT_BACKOFF_MULTIPLIER, this.reconnectAttempt),
+      MAX_RECONNECT_DELAY_MS
+    )
+    const jitter = delay * 0.25 * (Math.random() * 2 - 1)
+    const actualDelay = Math.max(100, delay + jitter)
+
+    this.reconnectAttempt++
+    await this.setReconnectingState()
+
+    this.reconnectTimerId = this.options.timers.setTimeout(() => {
+      this.reconnectTimerId = undefined
+      if (this.manualDisconnect) {
+        return
+      }
+      const settings = this.settings
+      if (settings === undefined) {
+        void this.setErrorState('No saved settings for reconnect')
+        return
+      }
+      void this.connect(settings)
+    }, actualDelay)
+  }
+
+  private cancelReconnect (): void {
+    if (this.reconnectTimerId !== undefined) {
+      this.options.timers.clearTimeout(this.reconnectTimerId)
+      this.reconnectTimerId = undefined
+    }
+    this.reconnectAttempt = 0
   }
 
   private async handleSocketMessage (data: string): Promise<void> {
@@ -245,28 +355,48 @@ export class BrowserBridgeBackgroundController {
     }
 
     if (isGetPageContextEnvelope(message)) {
-      await this.handlePageContextRequest(message.id)
+      this.pendingRequestCount++
+      try {
+        await this.handlePageContextRequest(message.id)
+      } finally {
+        this.pendingRequestCount--
+      }
       return
     }
 
     if (isGetPageContentEnvelope(message)) {
-      await this.handlePageContentRequest(
-        message.id,
-        message.payload.index ?? 1
-      )
+      this.pendingRequestCount++
+      try {
+        await this.handlePageContentRequest(
+          message.id,
+          message.payload.index ?? 1
+        )
+      } finally {
+        this.pendingRequestCount--
+      }
       return
     }
 
     if (isPerformActionEnvelope(message)) {
-      await this.handlePerformActionRequest(message.id, message.payload.action)
+      this.pendingRequestCount++
+      try {
+        await this.handlePerformActionRequest(message.id, message.payload.action)
+      } finally {
+        this.pendingRequestCount--
+      }
       return
     }
 
     if (isPerformActionRequestEnvelope(message)) {
-      await this.handleInvalidPerformActionRequest(
-        message.id,
-        message.payload.action
-      )
+      this.pendingRequestCount++
+      try {
+        await this.handleInvalidPerformActionRequest(
+          message.id,
+          message.payload.action
+        )
+      } finally {
+        this.pendingRequestCount--
+      }
     }
   }
 
@@ -466,6 +596,9 @@ export class BrowserBridgeBackgroundController {
   }
 
   private async setConnectedState (): Promise<void> {
+    this.connectionState = 'connected'
+    this.lastErrorMessage = undefined
+    this.reconnectAttempt = 0
     await this.options.action.setBadgeText('ON')
     await this.options.action.setBadgeColor('#1f8f4d')
     await this.options.action.setBadgeTextColor('#ffffff')
@@ -473,24 +606,39 @@ export class BrowserBridgeBackgroundController {
   }
 
   private async setConnectingState (): Promise<void> {
+    this.connectionState = 'connecting'
+    this.lastErrorMessage = undefined
     await this.options.action.setBadgeText('...')
     await this.options.action.setBadgeColor('#f59e0b')
     await this.options.action.setBadgeTextColor('#ffffff')
     await this.options.action.setTitle('BrowserBridge connecting')
   }
 
+  private async setReconnectingState (): Promise<void> {
+    this.connectionState = 'reconnecting'
+    await this.options.action.setBadgeText('RCY')
+    await this.options.action.setBadgeColor('#f59e0b')
+    await this.options.action.setBadgeTextColor('#ffffff')
+    await this.options.action.setTitle(`BrowserBridge reconnecting (attempt ${this.reconnectAttempt})`)
+  }
+
   private async setStoppedState (): Promise<void> {
+    this.connectionState = 'disconnected'
+    this.lastErrorMessage = undefined
+    this.reconnectAttempt = 0
     await this.options.action.setBadgeText('OFF')
     await this.options.action.setBadgeColor('#666666')
     await this.options.action.setBadgeTextColor('#ffffff')
     await this.options.action.setTitle('BrowserBridge stopped')
   }
 
-  private async setErrorState (): Promise<void> {
+  private async setErrorState (message: string = 'BrowserBridge connection error'): Promise<void> {
+    this.connectionState = 'error'
+    this.lastErrorMessage = message
     await this.options.action.setBadgeText('ERR')
     await this.options.action.setBadgeColor('#b42318')
     await this.options.action.setBadgeTextColor('#ffffff')
-    await this.options.action.setTitle('BrowserBridge connection error')
+    await this.options.action.setTitle(`BrowserBridge error: ${message}`)
   }
 
   private startKeepalive (socket: BrowserBridgeSocket): void {

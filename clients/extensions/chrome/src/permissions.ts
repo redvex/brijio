@@ -1,26 +1,15 @@
-export const regularPageOrigins = ['http://*/*', 'https://*/*']
-
-export interface ChromePermissionsApi {
-  contains: (permissions: { origins: string[] }) => Promise<boolean>
-  request: (permissions: { origins: string[] }) => Promise<boolean>
-}
+// Chrome permissions module.
+//
+// Per ADR 0030, Chrome now grants the broad host permission at
+// extension-install time (host_permissions in manifest). There is
+// no runtime permission request flow, so hasRegularPageAccess
+// always resolves to true.
 
 export function isRegularPageUrl (url: string): boolean {
   return url.startsWith('http://') || url.startsWith('https://')
 }
 
-export async function hasRegularPageAccess (
-  permissions: ChromePermissionsApi
-): Promise<boolean> {
-  return await permissions.contains({
-    origins: regularPageOrigins
-  })
-}
-
-export async function requestRegularPageAccess (
-  permissions: ChromePermissionsApi
-): Promise<boolean> {
-  return await permissions.request({
-    origins: regularPageOrigins
-  })
+export async function hasRegularPageAccess (): Promise<boolean> {
+  // Broad host permission is granted at install time — always true.
+  return true
 }

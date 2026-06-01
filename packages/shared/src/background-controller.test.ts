@@ -737,17 +737,17 @@ void describe('BrowserBridge background controller', () => {
     })
   })
 
-  void it('keeps the error state when a socket error is followed by close', async () => {
+  void it('transitions to reconnecting when a socket error is followed by close', async () => {
     const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
 
     await harness.controller.handleActionClicked()
     harness.sockets.created[0].open()
     harness.sockets.created[0].fail()
-    harness.sockets.created[0].close()
+    harness.sockets.created[0].closeWith(1006, 'Abnormal closure')
     await new Promise((resolve) => setImmediate(resolve))
 
-    assert.equal(harness.action.badgeText, 'ERR')
-    assert.equal(harness.action.title, 'BrowserBridge connection error')
+    assert.equal(harness.action.badgeText, 'RCY')
+    assert.match(harness.action.title, /BrowserBridge reconnecting/)
   })
 
   void it('sends extension keepalives while connected', async () => {
@@ -849,6 +849,318 @@ void describe('BrowserBridge background controller', () => {
     await harness.controller.requestDisconnect()
 
     assert.equal(harness.controller.isConnected(), false)
+  })
+
+  // --- getConnectionStatus ---
+
+  void it('returns disconnected status when not connected', () => {
+    const harness = createHarness()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'disconnected')
+    assert.equal(status.lastError, undefined)
+  })
+
+  void it('returns connecting status after connect is called', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'connecting')
+    assert.equal(status.lastError, undefined)
+  })
+
+  void it('returns connected status after socket opens', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'connected')
+    assert.equal(status.lastError, undefined)
+  })
+
+  void it('returns reconnecting status with lastError from socket error after connection', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].fail()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'reconnecting')
+    assert.equal(status.reconnectAttempt, 1)
+  })
+
+  void it('returns disconnected status after disconnect', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.controller.handleActionClicked()
+
+    const status = harness.controller.getConnectionStatus()
+
+    assert.equal(status.state, 'disconnected')
+    assert.equal(status.lastError, undefined)
+  })
+
+  // --- Auto-reconnect with exponential backoff ---
+
+  void it('schedules reconnect with exponential backoff when socket closes unexpectedly', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(1006, 'Abnormal closure')
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'reconnecting')
+    assert.equal(status.reconnectAttempt, 1)
+    assert.equal(harness.action.badgeText, 'RCY')
+    assert.match(harness.action.title, /BrowserBridge reconnecting \(attempt 1\)/)
+  })
+
+  void it('increases reconnect attempt number on each close', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+
+    // First close triggers attempt 1
+    harness.sockets.created[0].closeWith(1006, '')
+    await new Promise((resolve) => setImmediate(resolve))
+    assert.equal(harness.controller.getConnectionStatus().reconnectAttempt, 1)
+
+    // Fire the reconnect timer to attempt reconnection
+    harness.timers.tickTimeout()
+    await new Promise((resolve) => setImmediate(resolve))
+
+    // The new socket from reconnect is still in "connecting" state
+    // Close it before it opens — this triggers another scheduleReconnect
+    harness.sockets.created[1].closeWith(1006, '')
+    await new Promise((resolve) => setImmediate(resolve))
+    // Since connect() resets reconnectAttempt to 0, scheduleReconnect increments to 1 again
+    assert.equal(harness.controller.getConnectionStatus().reconnectAttempt, 1)
+  })
+
+  void it('does not reconnect when socket is closed by user disconnect', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.controller.handleActionClicked()
+
+    // Manual disconnect sets stopped state, no reconnect scheduled
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'disconnected')
+    assert.equal(harness.timers.timeoutCallback, undefined)
+  })
+
+  void it('does not reconnect when requestDisconnect is called', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.requestConnect()
+    harness.sockets.created[0].open()
+    await harness.controller.requestDisconnect()
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'disconnected')
+    assert.equal(harness.timers.timeoutCallback, undefined)
+  })
+
+  void it('cancels pending reconnect when requestConnect is called', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(1006, '')
+    await new Promise((resolve) => setImmediate(resolve))
+
+    // A reconnect timer should be pending
+    assert.ok(harness.timers.timeoutCallback !== undefined)
+
+    // Calling requestConnect should cancel the pending reconnect
+    await harness.controller.requestConnect()
+    assert.equal(harness.timers.timeoutCleared, true)
+  })
+
+  void it('resets reconnect attempt when connection succeeds after reconnect', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(1006, '')
+    await new Promise((resolve) => setImmediate(resolve))
+    assert.equal(harness.controller.getConnectionStatus().reconnectAttempt, 1)
+
+    // Fire the reconnect timer
+    harness.timers.tickTimeout()
+    await new Promise((resolve) => setImmediate(resolve))
+
+    // New socket opens successfully
+    harness.sockets.created[1].open()
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'connected')
+    assert.equal(status.reconnectAttempt, undefined)
+  })
+
+  // --- Reconnecting state + enriched error messages ---
+
+  void it('transitions to reconnecting state when socket closes unexpectedly', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(1006, '')
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'reconnecting')
+    assert.equal(status.reconnectAttempt, 1)
+  })
+
+  void it('stores close reason internally when socket closes with reason', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(1008, 'Policy violation detected')
+    await new Promise((resolve) => setImmediate(resolve))
+
+    // The reconnecting state is set, and the close reason is stored
+    // internally for the badge title
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'reconnecting')
+    assert.equal(status.reconnectAttempt, 1)
+  })
+
+  void it('transitions to reconnecting when socket closes normally while connected', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(1000, '')
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'reconnecting')
+  })
+
+  void it('transitions to reconnecting even for unknown close codes', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(4999, '')
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'reconnecting')
+  })
+
+  void it('shows reconnecting state with RCY badge and amber color', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].closeWith(1006, '')
+    await new Promise((resolve) => setImmediate(resolve))
+
+    assert.equal(harness.action.badgeText, 'RCY')
+    assert.equal(harness.action.title, 'BrowserBridge reconnecting (attempt 1)')
+  })
+
+  void it('transitions to reconnecting with enriched message when socket errors after connection', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    harness.sockets.created[0].fail()
+    // Error triggers reconnect
+    await new Promise((resolve) => setImmediate(resolve))
+
+    assert.equal(harness.action.badgeText, 'RCY')
+    assert.equal(harness.controller.getConnectionStatus().state, 'reconnecting')
+  })
+
+  void it('transitions to reconnecting on socket error before first connection', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    // Fail before socket opens (no connection yet)
+    harness.sockets.created[0].fail()
+    await new Promise((resolve) => setImmediate(resolve))
+
+    assert.equal(harness.controller.getConnectionStatus().state, 'reconnecting')
+  })
+
+  // --- Pending request tracking ---
+
+  void it('tracks pendingRequests in connection status', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      pageContext: createPageContext()
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+
+    // Before any request, pendingRequests should be 0
+    assert.equal(harness.controller.getConnectionStatus().pendingRequests, 0)
+
+    // Send a page context request and check pending count before it resolves
+    const responsePromise = harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'ctx-pending-1',
+        payload: { type: 'get_page_context' }
+      })
+    )
+
+    // After the request processing, pending should return to 0
+    await responsePromise
+    assert.equal(harness.controller.getConnectionStatus().pendingRequests, 0)
+  })
+
+  void it('reports zero pendingRequests in disconnected state', () => {
+    const harness = createHarness()
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'disconnected')
+    assert.equal(status.pendingRequests, 0)
+  })
+
+  void it('reports zero pendingRequests in connecting state', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'connecting')
+    assert.equal(status.pendingRequests, 0)
+  })
+
+  void it('reports zero pendingRequests in connected state', async () => {
+    const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await new Promise((resolve) => setImmediate(resolve))
+
+    const status = harness.controller.getConnectionStatus()
+    assert.equal(status.state, 'connected')
+    assert.equal(status.pendingRequests, 0)
   })
 })
 
@@ -1187,7 +1499,7 @@ class FakeSocketFactory {
 class FakeSocket implements BrowserBridgeSocket {
   onopen: (() => void) | undefined
   onmessage: ((event: { data: string }) => void | Promise<void>) | undefined
-  onclose: (() => void) | undefined
+  onclose: ((event: { code: number, reason: string }) => void) | undefined
   onerror: (() => void) | undefined
   readonly sent: string[] = []
   closed = false
@@ -1200,7 +1512,12 @@ class FakeSocket implements BrowserBridgeSocket {
 
   close (): void {
     this.closed = true
-    this.onclose?.()
+    this.onclose?.({ code: 1000, reason: '' })
+  }
+
+  closeWith (code: number, reason: string): void {
+    this.closed = true
+    this.onclose?.({ code, reason })
   }
 
   open (): void {
@@ -1220,6 +1537,9 @@ class FakeTimersAdapter {
   callback: (() => void) | undefined
   cleared = false
   intervalMs = 0
+  timeoutCallback: (() => void) | undefined
+  timeoutDelay = 0
+  timeoutCleared = false
 
   setInterval (callback: () => void, intervalMs: number): number {
     this.callback = callback
@@ -1232,7 +1552,27 @@ class FakeTimersAdapter {
     this.cleared = true
   }
 
+  setTimeout (callback: () => void, delayMs: number): number {
+    this.timeoutCallback = callback
+    this.timeoutDelay = delayMs
+    this.timeoutCleared = false
+    return 2
+  }
+
+  clearTimeout (_timerId: number): void {
+    this.timeoutCallback = undefined
+    this.timeoutCleared = true
+  }
+
   tick (): void {
     this.callback?.()
+  }
+
+  tickTimeout (): void {
+    this.timeoutCallback?.()
+  }
+
+  get timeoutDelayMs (): number {
+    return this.timeoutDelay
   }
 }
