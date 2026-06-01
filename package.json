@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "User-controlled bridge between browser extensions and AI agents.",
-  "license": "PolyForm-Noncommercial-1.0.0",
+  "license": "AGPL-3.0-only",
   "packageManager": "pnpm@10.32.1",
   "scripts": {
     "browserbridge": "node scripts/browserbridge-token.mjs",

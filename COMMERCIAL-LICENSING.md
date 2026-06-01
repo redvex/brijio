@@ -1,23 +1,32 @@
 # Commercial Licensing
 
-Commercial use requires separate written permission from the relevant copyright
-holder or holders.
+BrowserBridge is available under the GNU Affero General Public License v3.0 (AGPLv3).
 
-BrowserBridge is source-available and free for non-commercial use. The public
-repository license does not grant commercial use rights.
+## Open Source Use
 
-For code and materials authored by the project owner, commercial permission can
-be granted by the project owner.
+You may use, modify, and distribute BrowserBridge under the terms of the AGPLv3.
 
-For third-party contributions, commercial use requires either:
+## Commercial Licensing
 
-- excluding the contribution from the commercial package; or
-- obtaining separate written permission from the contributor who owns the
-  relevant rights.
+Organizations that wish to:
 
-The official hosted BrowserBridge offering, including any cloud-hosted
-WebSocket server or cloud-hosted MCP server, will include only owner-authored
-materials or third-party contributions with separate commercial permission.
+- Embed BrowserBridge into proprietary products
+- Offer BrowserBridge-based services without AGPL obligations
+- Obtain commercial support, warranties, or custom licensing terms
 
-This document is a project policy notice, not legal advice. Review commercial
-terms with a qualified lawyer before relying on them for production use.
+may obtain a separate commercial license from the project maintainers.
+
+## Contact
+
+For commercial licensing inquiries:
+
+contact@browserbridge.dev
+
+## Dual Licensing Model
+
+BrowserBridge is offered under:
+
+1. AGPLv3 (open source)
+2. Commercial License (proprietary exceptions)
+
+You may choose either license, provided you comply with its terms.

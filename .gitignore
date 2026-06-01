@@ -4,3 +4,4 @@ node_modules
 dist
 clients/extensions/safari/BrowserBridge
 servers/mcp/src/.test-skills*
+docs/superpowers
