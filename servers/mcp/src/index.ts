@@ -2,15 +2,18 @@ import {
   getMcpHttpServerOptionsFromEnv,
   startBrowserBridgeMcpHttpServer
 } from './http-server.js'
+import { createLogger } from '@browserbridge/shared'
+
+const logger = createLogger('mcp')
 
 async function main (): Promise<void> {
   const options = getMcpHttpServerOptionsFromEnv()
   const runtime = await startBrowserBridgeMcpHttpServer(options)
 
-  console.error(`BrowserBridge MCP server listening at ${runtime.url}`)
+  logger.info('server_started', { url: runtime.url })
 }
 
 main().catch((error: unknown) => {
-  console.error('Fatal error in BrowserBridge MCP server:', error)
+  logger.error('fatal_error', { message: error instanceof Error ? error.message : String(error) })
   process.exit(1)
 })
