@@ -4,12 +4,19 @@ import {
   type Server,
   type ServerResponse
 } from 'node:http'
+import { readFileSync } from 'node:fs'
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import {
   type BrowserBridgePageContextConfig,
   getPageContextConfigFromEnv
 } from './page-context.js'
 import { createBrowserBridgeMcpServer } from './mcp-server.js'
+import { createLogger } from '@browserbridge/shared'
+
+const version: string = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8')
+).version
+const logger = createLogger('mcp')
 
 export interface BrowserBridgeMcpHttpServerOptions {
   host: string
@@ -27,6 +34,16 @@ export interface BrowserBridgeMcpHttpRuntime {
   server: Server
   url: string
   close: () => Promise<void>
+}
+
+export interface McpHealthStatus {
+  status: 'ok'
+  version: string
+  uptimeSeconds: number
+  websocket: {
+    url: string
+    status: 'reachable' | 'unknown'
+  }
 }
 
 interface HttpErrorBody {
@@ -77,8 +94,11 @@ export function getMcpHttpServerOptionsFromEnv (
 export async function startBrowserBridgeMcpHttpServer (
   options: BrowserBridgeMcpHttpServerOptions
 ): Promise<BrowserBridgeMcpHttpRuntime> {
+  const startTime = Date.now()
+  const wsUrl = options.pageContextConfig?.websocketUrl ?? ''
+
   const server = createServer((request, response) => {
-    void handleMcpHttpRequest(request, response, options)
+    void handleMcpHttpRequest(request, response, options, startTime, wsUrl)
   })
 
   await new Promise<void>((resolve, reject) => {
@@ -105,13 +125,25 @@ export async function startBrowserBridgeMcpHttpServer (
 async function handleMcpHttpRequest (
   request: IncomingMessage,
   response: ServerResponse,
-  options: BrowserBridgeMcpHttpServerOptions
+  options: BrowserBridgeMcpHttpServerOptions,
+  startTime: number,
+  wsUrl: string
 ): Promise<void> {
   const url = new URL(request.url ?? '/', 'http://browserbridge.local')
 
   if (url.pathname === '/health' && request.method === 'GET') {
+    const health: McpHealthStatus = {
+      status: 'ok',
+      version,
+      uptimeSeconds: Math.floor((Date.now() - startTime) / 1000),
+      websocket: {
+        url: wsUrl,
+        status: 'unknown'
+      }
+    }
+    logger.debug('health_check', { uptimeSeconds: health.uptimeSeconds })
     response.writeHead(200, { 'content-type': 'application/json' })
-    response.end(JSON.stringify({ status: 'ok' }))
+    response.end(JSON.stringify(health))
     return
   }
 
@@ -157,6 +189,7 @@ async function handleMcpHttpRequest (
   }
 
   if (!isAuthorized(request, options.authToken)) {
+    logger.warn('auth_unauthorized', { path: url.pathname })
     writeJsonError(response, 401, {
       ok: false,
       error: {
@@ -188,6 +221,7 @@ async function handleMcpHttpRequest (
     await mcpServer.connect(transport)
     await transport.handleRequest(request, response)
   } catch (error) {
+    logger.error('mcp_request_error', { message: error instanceof Error ? error.message : String(error) })
     if (!response.headersSent) {
       writeJsonError(response, 500, {
         ok: false,

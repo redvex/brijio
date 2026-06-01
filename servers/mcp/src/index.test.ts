@@ -24,7 +24,7 @@ afterEach(async () => {
 })
 
 void describe('BrowserBridge MCP HTTP server', () => {
-  void it('returns ok status from the health endpoint', async () => {
+  void it('returns enriched health data from the health endpoint', async () => {
     const runtime = await startTestMcpRuntime()
     const healthUrl = runtime.url.replace('/mcp', '/health')
 
@@ -33,7 +33,15 @@ void describe('BrowserBridge MCP HTTP server', () => {
 
       assert.equal(response.status, 200)
       assert.equal(response.headers.get('content-type'), 'application/json')
-      assert.deepEqual(await response.json(), { status: 'ok' })
+      const health = await response.json() as Record<string, unknown>
+
+      assert.equal(health.status, 'ok')
+      assert.equal(typeof health.version, 'string')
+      assert.equal(typeof health.uptimeSeconds, 'number')
+      assert.ok(health.websocket != null)
+      const ws = health.websocket as Record<string, unknown>
+      assert.equal(typeof ws.url, 'string')
+      assert.equal(typeof ws.status, 'string')
     } finally {
       await runtime.close()
     }
