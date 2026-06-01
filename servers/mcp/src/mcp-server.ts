@@ -26,6 +26,13 @@ import {
   resolveSkillsDir,
   skillResourceUri
 } from './skills.js'
+import { createLogger } from '@browserbridge/shared'
+
+const logger = createLogger('mcp')
+
+function logToolCall (name: string, input: Record<string, unknown>): void {
+  logger.info('tool_call', { tool: name, ...input })
+}
 
 const currentPageResourceUri = 'browser://page/current'
 const currentPageContentResourceTemplateUri =
@@ -58,6 +65,7 @@ export async function createBrowserBridgeMcpServer (
       inputSchema: {}
     },
     async () => {
+      logger.info('tool_call', { tool: 'list_browsers' })
       const result = await listBrowsers(pageContextConfig)
 
       return {
@@ -88,6 +96,7 @@ export async function createBrowserBridgeMcpServer (
       }
     },
     async (input) => {
+      logToolCall('read_current_page', input as Record<string, unknown>)
       const result = await readCurrentPage(pageContextConfig, input)
 
       return {
@@ -118,6 +127,7 @@ export async function createBrowserBridgeMcpServer (
       }
     },
     async (input) => {
+      logToolCall('click_element', input as Record<string, unknown>)
       const result = await clickElement(pageContextConfig, input)
 
       return {
@@ -151,6 +161,7 @@ export async function createBrowserBridgeMcpServer (
       }
     },
     async (input) => {
+      logToolCall('fill_input', input as Record<string, unknown>)
       const result = await fillInput(pageContextConfig, input)
 
       return {
@@ -181,6 +192,7 @@ export async function createBrowserBridgeMcpServer (
       }
     },
     async (input) => {
+      logToolCall('fill_editable', input as Record<string, unknown>)
       const result = await fillEditable(pageContextConfig, input)
 
       return {
@@ -212,6 +224,7 @@ export async function createBrowserBridgeMcpServer (
       }
     },
     async (input) => {
+      logToolCall('set_checked', input as Record<string, unknown>)
       const result = await setChecked(pageContextConfig, input)
 
       return {
@@ -245,6 +258,7 @@ export async function createBrowserBridgeMcpServer (
       }
     },
     async (input) => {
+      logToolCall('select_options', input as Record<string, unknown>)
       const result = await selectOptions(pageContextConfig, input)
 
       return {
@@ -272,6 +286,7 @@ export async function createBrowserBridgeMcpServer (
       }
     },
     async (input) => {
+      logToolCall('submit_form', input as Record<string, unknown>)
       const result = await submitForm(pageContextConfig, input)
 
       return {
@@ -295,6 +310,7 @@ export async function createBrowserBridgeMcpServer (
       mimeType: 'application/json'
     },
     async () => {
+      logger.info('resource_read', { resource: 'current-page-context' })
       const result = await getCurrentPageContext(pageContextConfig)
 
       return {
@@ -321,6 +337,7 @@ export async function createBrowserBridgeMcpServer (
       mimeType: 'application/json'
     },
     async (uri) => {
+      logger.info('resource_read', { resource: 'current-page-content', uri: uri.href })
       const index = parsePageContentResourceIndex(uri.href)
       const result =
         typeof index === 'number'
@@ -387,6 +404,7 @@ export async function createBrowserBridgeMcpServer (
         'Inject BrowserBridge context: connected browsers, available skills, pitfalls.'
     },
     async () => {
+      logger.info('prompt_called', { prompt: 'browserbridge-context' })
       const skillSummaries = skills.map((s) => ({
         name: s.name,
         title: s.title,
