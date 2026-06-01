@@ -68,17 +68,25 @@ void describe('parseStatusResponse', () => {
   void it('returns state and lastError from valid response', () => {
     const result = parseStatusResponse({
       ok: true,
-      data: { state: 'connected', lastError: undefined }
+      data: { state: 'connected', lastError: undefined, pendingRequests: 0 }
     })
-    assert.deepStrictEqual(result, { state: 'connected', lastError: undefined })
+    assert.deepStrictEqual(result, { state: 'connected', lastError: undefined, reconnectAttempt: undefined, pendingRequests: 0 })
   })
 
   void it('returns state with lastError when present', () => {
     const result = parseStatusResponse({
       ok: true,
-      data: { state: 'error', lastError: 'Connection refused' }
+      data: { state: 'error', lastError: 'Connection refused', pendingRequests: 2 }
     })
-    assert.deepStrictEqual(result, { state: 'error', lastError: 'Connection refused' })
+    assert.deepStrictEqual(result, { state: 'error', lastError: 'Connection refused', reconnectAttempt: undefined, pendingRequests: 2 })
+  })
+
+  void it('returns state with reconnectAttempt when present', () => {
+    const result = parseStatusResponse({
+      ok: true,
+      data: { state: 'reconnecting', lastError: undefined, reconnectAttempt: 3, pendingRequests: 1 }
+    })
+    assert.deepStrictEqual(result, { state: 'reconnecting', lastError: undefined, reconnectAttempt: 3, pendingRequests: 1 })
   })
 
   void it('returns undefined when ok is false', () => {

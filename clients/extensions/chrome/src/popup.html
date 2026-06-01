@@ -112,6 +112,41 @@
         font-size: 13px;
         min-height: 1.5em;
         padding: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      #status.state-connected {
+        color: var(--accent);
+      }
+
+      #status.state-error {
+        color: var(--danger);
+      }
+
+      #status.state-connecting,
+      #status.state-reconnecting {
+        color: #f59e0b;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        flex-shrink: 0;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .spinner.hidden {
+        display: none;
       }
     </style>
   </head>
@@ -155,7 +190,7 @@
         <button class="danger" id="disconnect-button" type="button">Disconnect</button>
       </div>
     </form>
-    <div id="status" role="status"></div>
+    <div id="status" role="status"><span class="spinner hidden" id="status-spinner"></span><span id="status-text"></span></div>
     <script type="module" src="popup-entry.js"></script>
   </body>
 </html>

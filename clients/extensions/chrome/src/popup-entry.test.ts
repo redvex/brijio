@@ -114,7 +114,7 @@ function popupHtml (): string {
   <button id="connect-button" type="button">Connect</button>
   <button id="disconnect-button" type="button">Disconnect</button>
 </form>
-<div id="status" role="status"></div>
+<div id="status" role="status"><span id="status-spinner" class="hidden"></span><span id="status-text"></span></div>
 </body></html>`
 }
 

@@ -39,7 +39,7 @@ export function parseSettingsResponse (response: unknown): EditableBridgeSetting
   return undefined
 }
 
-export function parseStatusResponse (response: unknown): { state: string, lastError?: string } | undefined {
+export function parseStatusResponse (response: unknown): { state: string, lastError?: string, reconnectAttempt?: number, pendingRequests?: number } | undefined {
   if (
     typeof response === 'object' && response !== null &&
     'ok' in response && Boolean((response as { ok: boolean }).ok) &&
@@ -48,8 +48,13 @@ export function parseStatusResponse (response: unknown): { state: string, lastEr
     (response as { data: unknown }).data !== null &&
     typeof (response as { data: { state: unknown } }).data.state === 'string'
   ) {
-    const data = (response as { data: { state: string, lastError?: string } }).data
-    return { state: data.state, lastError: data.lastError }
+    const data = (response as { data: { state: string, lastError?: string, reconnectAttempt?: number, pendingRequests?: number } }).data
+    return {
+      state: data.state,
+      lastError: data.lastError,
+      reconnectAttempt: data.reconnectAttempt,
+      pendingRequests: data.pendingRequests
+    }
   }
   return undefined
 }

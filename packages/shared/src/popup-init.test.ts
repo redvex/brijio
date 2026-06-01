@@ -6,6 +6,8 @@ import {
   validateForm,
   queryPopupElements,
   initPopup,
+  formatStatusText,
+  applyStatusUI,
   type BridgeSettingsForm,
   type SendMessageFn
 } from './popup-init.js'
@@ -35,7 +37,7 @@ function popupHtml (): string {
   <button id="connect-button" type="button">Connect</button>
   <button id="disconnect-button" type="button">Disconnect</button>
 </form>
-<div id="status" role="status"></div>
+<div id="status" role="status"><span id="status-spinner" class="hidden"></span><span id="status-text"></span></div>
 </body></html>`
 }
 
@@ -163,9 +165,13 @@ void describe('queryPopupElements', () => {
     assert.ok(elements.connectBtn !== null)
     assert.ok(elements.disconnectBtn !== null)
     assert.ok(elements.statusMessage !== null)
+    assert.ok(elements.statusSpinner !== null)
+    assert.ok(elements.statusText !== null)
     assert.equal(elements.settingsForm.id, 'settings-form')
     assert.equal(elements.websocketUrlInput.id, 'websocket-url')
     assert.equal(elements.connectBtn.id, 'connect-button')
+    assert.equal(elements.statusSpinner.id, 'status-spinner')
+    assert.equal(elements.statusText.id, 'status-text')
   })
 
   void it('throws when settings form is missing', () => {
@@ -175,7 +181,7 @@ void describe('queryPopupElements', () => {
 
   void it('throws when websocket-url input is missing', () => {
     const { document } = parseHTML(
-      '<html><body><form id="settings-form"></form><div id="status"></div></body></html>'
+      '<html><body><form id="settings-form"></form><div id="status"><span id="status-spinner"></span><span id="status-text"></span></div></body></html>'
     )
     assert.throws(() => queryPopupElements(document), /missing required elements/i)
   })
@@ -942,5 +948,180 @@ void describe('initPopup', () => {
 
     const urlInput = doc2.querySelector<HTMLInputElement>('#websocket-url')
     assert.equal(urlInput?.value, 'ws://updated:9090')
+  })
+})
+
+// --- formatStatusText tests ---
+
+void describe('formatStatusText', () => {
+  void it('returns "Connected" for connected state', () => {
+    assert.equal(formatStatusText('connected'), 'Connected')
+  })
+
+  void it('returns "Connecting..." for connecting state', () => {
+    assert.equal(formatStatusText('connecting'), 'Connecting...')
+  })
+
+  void it('returns "Reconnecting..." for reconnecting state without attempt', () => {
+    assert.equal(formatStatusText('reconnecting'), 'Reconnecting...')
+  })
+
+  void it('returns "Reconnecting (attempt N)..." for reconnecting state with attempt', () => {
+    assert.equal(formatStatusText('reconnecting', undefined, 3), 'Reconnecting (attempt 3)...')
+  })
+
+  void it('returns "Reconnecting (attempt 1)..." for reconnecting state with attempt 1', () => {
+    assert.equal(formatStatusText('reconnecting', undefined, 1), 'Reconnecting (attempt 1)...')
+  })
+
+  void it('returns "Error — message" for error state with lastError', () => {
+    assert.equal(formatStatusText('error', 'Connection refused'), 'Error — Connection refused')
+  })
+
+  void it('returns "Error" for error state without lastError', () => {
+    assert.equal(formatStatusText('error'), 'Error')
+  })
+
+  void it('returns "Disconnected" for disconnected state', () => {
+    assert.equal(formatStatusText('disconnected'), 'Disconnected')
+  })
+
+  void it('appends pending request count for connected state', () => {
+    assert.equal(formatStatusText('connected', undefined, undefined, 1), 'Connected (1 request in flight)')
+  })
+
+  void it('appends pending request count with plural for connected state', () => {
+    assert.equal(formatStatusText('connected', undefined, undefined, 3), 'Connected (3 requests in flight)')
+  })
+
+  void it('appends pending request count for connecting state', () => {
+    assert.equal(formatStatusText('connecting', undefined, undefined, 2), 'Connecting... (2 requests in flight)')
+  })
+
+  void it('appends pending request count for reconnecting state with attempt', () => {
+    assert.equal(formatStatusText('reconnecting', undefined, 2, 1), 'Reconnecting (attempt 2)... (1 request in flight)')
+  })
+
+  void it('does not append pending count when pendingRequests is 0', () => {
+    assert.equal(formatStatusText('connected', undefined, undefined, 0), 'Connected')
+  })
+
+  void it('does not append pending count when pendingRequests is undefined', () => {
+    assert.equal(formatStatusText('connected', undefined, undefined), 'Connected')
+  })
+
+  void it('returns state name for unknown state', () => {
+    assert.equal(formatStatusText('unknown_state'), 'unknown_state')
+  })
+
+  void it('returns "Error" with pending requests but no lastError', () => {
+    assert.equal(formatStatusText('error', undefined, undefined, 2), 'Error (2 requests in flight)')
+  })
+})
+
+// --- applyStatusUI tests ---
+
+void describe('applyStatusUI', () => {
+  function createElements (): { elements: ReturnType<typeof queryPopupElements>, document: Document } {
+    const { document } = parseHTML(popupHtml())
+    const elements = queryPopupElements(document)
+    return { elements, document }
+  }
+
+  void it('adds state-connected class for connected state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connected')
+    assert.ok(elements.statusMessage.classList.contains('state-connected'))
+    assert.ok(!elements.statusMessage.classList.contains('state-connecting'))
+  })
+
+  void it('adds state-connecting class for connecting state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connecting')
+    assert.ok(elements.statusMessage.classList.contains('state-connecting'))
+  })
+
+  void it('adds state-reconnecting class for reconnecting state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'reconnecting')
+    assert.ok(elements.statusMessage.classList.contains('state-reconnecting'))
+  })
+
+  void it('adds state-error class for error state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'error')
+    assert.ok(elements.statusMessage.classList.contains('state-error'))
+  })
+
+  void it('adds state-disconnected class for disconnected state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'disconnected')
+    assert.ok(elements.statusMessage.classList.contains('state-disconnected'))
+  })
+
+  void it('removes previous state class when applying a new one', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connecting')
+    assert.ok(elements.statusMessage.classList.contains('state-connecting'))
+    assert.ok(!elements.statusMessage.classList.contains('state-connected'))
+
+    applyStatusUI(elements, 'connected')
+    assert.ok(elements.statusMessage.classList.contains('state-connected'))
+    assert.ok(!elements.statusMessage.classList.contains('state-connecting'))
+  })
+
+  void it('shows spinner for connecting state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connecting')
+    assert.ok(!elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('shows spinner for reconnecting state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'reconnecting')
+    assert.ok(!elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('hides spinner for connected state with no pending requests', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connected')
+    assert.ok(elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('hides spinner for disconnected state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'disconnected')
+    assert.ok(elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('hides spinner for error state with no pending requests', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'error')
+    assert.ok(elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('shows spinner when pendingRequests > 0 regardless of state', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connected', 1)
+    assert.ok(!elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('shows spinner for connected state with multiple pending requests', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connected', 5)
+    assert.ok(!elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('hides spinner for connecting state with 0 pending requests (spinner is still visible from state)', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connecting', 0)
+    // Spinner should still be shown because state is 'connecting'
+    assert.ok(!elements.statusSpinner.classList.contains('hidden'))
+  })
+
+  void it('hides spinner for connected state with 0 pending requests', () => {
+    const { elements } = createElements()
+    applyStatusUI(elements, 'connected', 0)
+    assert.ok(elements.statusSpinner.classList.contains('hidden'))
   })
 })

@@ -28,6 +28,8 @@ export interface PopupElements {
   connectBtn: HTMLButtonElement
   disconnectBtn: HTMLButtonElement
   statusMessage: HTMLElement
+  statusSpinner: HTMLElement
+  statusText: HTMLElement
 }
 
 export type SendMessageFn = (message: unknown) => Promise<unknown>
@@ -72,6 +74,8 @@ export function queryPopupElements (document: Document): PopupElements {
   const connectBtn = document.querySelector<HTMLButtonElement>('#connect-button')
   const disconnectBtn = document.querySelector<HTMLButtonElement>('#disconnect-button')
   const statusMessage = document.querySelector<HTMLElement>('#status')
+  const statusSpinner = document.querySelector<HTMLElement>('#status-spinner')
+  const statusText = document.querySelector<HTMLElement>('#status-text')
 
   if (
     settingsForm === null ||
@@ -81,7 +85,9 @@ export function queryPopupElements (document: Document): PopupElements {
     browserLabelInput === null ||
     connectBtn === null ||
     disconnectBtn === null ||
-    statusMessage === null
+    statusMessage === null ||
+    statusSpinner === null ||
+    statusText === null
   ) {
     throw new Error('BrowserBridge popup is missing required elements.')
   }
@@ -94,7 +100,9 @@ export function queryPopupElements (document: Document): PopupElements {
     browserLabelInput,
     connectBtn,
     disconnectBtn,
-    statusMessage
+    statusMessage,
+    statusSpinner,
+    statusText
   }
 }
 
@@ -118,7 +126,7 @@ async function loadSettings (
       elements.browserLabelInput.value = settings.label
     }
   } catch {
-    elements.statusMessage.textContent = 'Failed to load settings.'
+    elements.statusText.textContent = 'Failed to load settings.'
   }
 }
 
@@ -129,19 +137,19 @@ async function saveSettings (
 ): Promise<void> {
   const validationError = validateForm(settings)
   if (validationError !== undefined) {
-    elements.statusMessage.textContent = validationError
+    elements.statusText.textContent = validationError
     return
   }
 
   try {
     const response = await sendMessage(createSaveSettingsMessage(settings))
     if (isOkResponse(response)) {
-      elements.statusMessage.textContent = 'Settings saved. Disconnected.'
+      elements.statusText.textContent = 'Settings saved. Disconnected.'
     } else {
-      elements.statusMessage.textContent = parseErrorResponse(response)
+      elements.statusText.textContent = parseErrorResponse(response)
     }
   } catch {
-    elements.statusMessage.textContent = 'Failed to save settings.'
+    elements.statusText.textContent = 'Failed to save settings.'
   }
 }
 
@@ -161,27 +169,28 @@ async function connect (
   const settings = readSettingsForm(elements)
 
   if (settings.websocketUrl.trim() === '') {
-    elements.statusMessage.textContent = 'Enter a WebSocket URL before connecting.'
+    elements.statusText.textContent = 'Enter a WebSocket URL before connecting.'
     return
   }
 
   // Save current settings first, then connect.
   const saveResponse = await sendMessage(createSaveSettingsMessage(settings))
   if (!isOkResponse(saveResponse)) {
-    elements.statusMessage.textContent = parseErrorResponse(saveResponse)
+    elements.statusText.textContent = parseErrorResponse(saveResponse)
     return
   }
 
   try {
     const response = await sendMessage(createConnectMessage())
     if (isOkResponse(response)) {
-      elements.statusMessage.textContent = 'Connecting...'
+      elements.statusText.textContent = 'Connecting...'
+      applyStatusUI(elements, 'connecting')
       void pollConnectionStatus(elements, sendMessage)
     } else {
-      elements.statusMessage.textContent = parseErrorResponse(response)
+      elements.statusText.textContent = parseErrorResponse(response)
     }
   } catch {
-    elements.statusMessage.textContent = 'Failed to connect.'
+    elements.statusText.textContent = 'Failed to connect.'
   }
 }
 
@@ -192,12 +201,66 @@ async function disconnect (
   try {
     const response = await sendMessage(createDisconnectMessage())
     if (isOkResponse(response)) {
-      elements.statusMessage.textContent = 'Disconnected.'
+      elements.statusText.textContent = 'Disconnected.'
     } else {
-      elements.statusMessage.textContent = parseErrorResponse(response)
+      elements.statusText.textContent = parseErrorResponse(response)
     }
   } catch {
-    elements.statusMessage.textContent = 'Failed to disconnect.'
+    elements.statusText.textContent = 'Failed to disconnect.'
+  }
+}
+
+export function formatStatusText (
+  state: string,
+  lastError?: string,
+  reconnectAttempt?: number,
+  pendingRequests?: number
+): string {
+  const pending = pendingRequests !== undefined && pendingRequests > 0
+    ? ` (${pendingRequests} request${pendingRequests > 1 ? 's' : ''} in flight)`
+    : ''
+  switch (state) {
+    case 'connected':
+      return `Connected${pending}`
+    case 'connecting':
+      return `Connecting...${pending}`
+    case 'reconnecting':
+      return reconnectAttempt !== undefined
+        ? `Reconnecting (attempt ${reconnectAttempt})...${pending}`
+        : `Reconnecting...${pending}`
+    case 'error':
+      return lastError !== undefined
+        ? `Error — ${lastError}`
+        : `Error${pending}`
+    case 'disconnected':
+      return 'Disconnected'
+    default:
+      return `${state}${pending}`
+  }
+}
+
+/** Apply state CSS class and spinner visibility based on status fields. */
+export function applyStatusUI (
+  elements: PopupElements,
+  state: string,
+  pendingRequests: number = 0
+): void {
+  // Remove any previous state-* classes
+  elements.statusMessage.classList.remove(
+    'state-connected', 'state-connecting', 'state-reconnecting',
+    'state-error', 'state-disconnected'
+  )
+  const stateClass = `state-${state}`
+  if (stateClass.startsWith('state-')) {
+    elements.statusMessage.classList.add(stateClass)
+  }
+
+  // Show spinner when connecting, reconnecting, or requests are in flight
+  const showSpinner = state === 'connecting' || state === 'reconnecting' || pendingRequests > 0
+  if (showSpinner) {
+    elements.statusSpinner.classList.remove('hidden')
+  } else {
+    elements.statusSpinner.classList.add('hidden')
   }
 }
 
@@ -209,28 +272,18 @@ async function updateConnectionStatus (
     const response = await sendMessage(createGetStatusMessage())
     const statusResult = parseStatusResponse(response)
     if (statusResult === undefined) {
-      elements.statusMessage.textContent = 'Status: Unknown'
+      elements.statusText.textContent = 'Status: Unknown'
       return
     }
 
-    switch (statusResult.state) {
-      case 'connected':
-        elements.statusMessage.textContent = 'Status: Connected'
-        break
-      case 'connecting':
-        elements.statusMessage.textContent = 'Status: Connecting...'
-        break
-      case 'error':
-        elements.statusMessage.textContent = statusResult.lastError !== undefined
-          ? `Status: Error — ${statusResult.lastError}`
-          : 'Status: Error'
-        break
-      case 'disconnected':
-        elements.statusMessage.textContent = 'Status: Disconnected'
-        break
-      default:
-        elements.statusMessage.textContent = `Status: ${statusResult.state}`
-    }
+    const text = formatStatusText(
+      statusResult.state,
+      statusResult.lastError,
+      statusResult.reconnectAttempt,
+      statusResult.pendingRequests
+    )
+    elements.statusText.textContent = `Status: ${text}`
+    applyStatusUI(elements, statusResult.state, statusResult.pendingRequests)
   } catch {
     // Status update is non-critical; leave current text.
   }
@@ -239,7 +292,8 @@ async function updateConnectionStatus (
 /**
  * Poll connection status after a connect request.
  * Waits 500ms then checks if the state has moved past "connecting".
- * Retries up to 10 times (5 seconds total) while the state is still "connecting".
+ * Retries up to 10 times (5 seconds total) while the state is still
+ * "connecting" or "reconnecting".
  */
 async function pollConnectionStatus (
   elements: PopupElements,
@@ -254,37 +308,30 @@ async function pollConnectionStatus (
       const response = await sendMessage(createGetStatusMessage())
       const statusResult = parseStatusResponse(response)
       if (statusResult === undefined) {
-        elements.statusMessage.textContent = 'Status: Unknown'
+        elements.statusText.textContent = 'Status: Unknown'
         return
       }
 
-      if (statusResult.state === 'connecting') {
-        elements.statusMessage.textContent = 'Status: Connecting...'
+      const text = formatStatusText(
+        statusResult.state,
+        statusResult.lastError,
+        statusResult.reconnectAttempt,
+        statusResult.pendingRequests
+      )
+      elements.statusText.textContent = `Status: ${text}`
+      applyStatusUI(elements, statusResult.state, statusResult.pendingRequests)
+
+      if (statusResult.state === 'connecting' || statusResult.state === 'reconnecting') {
         continue
       }
 
       // Reached a terminal state — update and stop polling.
-      switch (statusResult.state) {
-        case 'connected':
-          elements.statusMessage.textContent = 'Status: Connected'
-          break
-        case 'error':
-          elements.statusMessage.textContent = statusResult.lastError !== undefined
-            ? `Status: Error — ${statusResult.lastError}`
-            : 'Status: Error'
-          break
-        case 'disconnected':
-          elements.statusMessage.textContent = 'Status: Disconnected'
-          break
-        default:
-          elements.statusMessage.textContent = `Status: ${statusResult.state}`
-      }
       return
     } catch {
       // Retry on transient errors.
     }
   }
-  // If we exhausted retries while still "connecting", just leave the current text.
+  // If we exhausted retries while still "connecting"/"reconnecting", just leave the current text.
 }
 
 export async function initPopup (
