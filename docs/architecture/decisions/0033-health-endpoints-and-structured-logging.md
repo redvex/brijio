@@ -58,11 +58,11 @@ Create a minimal `Logger` type in `packages/shared/src/logger.ts`:
 
 ```typescript
 interface LogEntry {
-  timestamp: string    // ISO 8601
-  level: 'debug' | 'info' | 'warn' | 'error'
-  message: string
-  service: string      // 'websocket' | 'mcp'
-  [key: string]: unknown
+  timestamp: string; // ISO 8601
+  level: "debug" | "info" | "warn" | "error";
+  message: string;
+  service: string; // 'websocket' | 'mcp'
+  [key: string]: unknown;
 }
 ```
 

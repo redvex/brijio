@@ -15,7 +15,7 @@ void describe('createLogger', () => {
     logger.info('hello', { key: 'value' })
 
     assert.equal(lines.length, 1)
-    const entry = JSON.parse(lines[0]!) as Record<string, unknown>
+    const entry = JSON.parse(lines[0]) as Record<string, unknown>
     assert.equal(entry.level, 'info')
     assert.equal(entry.message, 'hello')
     assert.equal(entry.service, 'test')
@@ -29,7 +29,7 @@ void describe('createLogger', () => {
 
     logger.error('something failed', { code: 'E_AUTH' })
 
-    const entry = JSON.parse(lines[0]!) as Record<string, unknown>
+    const entry = JSON.parse(lines[0]) as Record<string, unknown>
     assert.equal(entry.level, 'error')
     assert.equal(entry.message, 'something failed')
     assert.equal(entry.code, 'E_AUTH')
@@ -41,7 +41,7 @@ void describe('createLogger', () => {
 
     logger.warn('deprecation notice')
 
-    const entry = JSON.parse(lines[0]!) as Record<string, unknown>
+    const entry = JSON.parse(lines[0]) as Record<string, unknown>
     assert.equal(entry.level, 'warn')
     assert.equal(entry.message, 'deprecation notice')
   })
@@ -52,7 +52,7 @@ void describe('createLogger', () => {
 
     logger.debug('trace detail', { requestId: 'abc123' })
 
-    const entry = JSON.parse(lines[0]!) as Record<string, unknown>
+    const entry = JSON.parse(lines[0]) as Record<string, unknown>
     assert.equal(entry.level, 'debug')
     assert.equal(entry.service, 'debug-svc')
     assert.equal(entry.requestId, 'abc123')
@@ -64,7 +64,7 @@ void describe('createLogger', () => {
 
     logger.info('startup')
 
-    const entry = JSON.parse(lines[0]!) as Record<string, unknown>
+    const entry = JSON.parse(lines[0]) as Record<string, unknown>
     assert.deepEqual(Object.keys(entry).sort(), ['level', 'message', 'service', 'timestamp'])
   })
 
@@ -76,8 +76,8 @@ void describe('createLogger', () => {
     logger.info('second')
 
     assert.equal(lines.length, 2)
-    assert.ok(lines[0]!.endsWith('\n'))
-    assert.ok(lines[1]!.endsWith('\n'))
+    assert.ok(lines[0].endsWith('\n'))
+    assert.ok(lines[1].endsWith('\n'))
   })
 
   void it('defaults to process.stderr when no sink is provided', () => {
@@ -93,7 +93,7 @@ void describe('createLogger', () => {
       logger.info('writes to stderr')
 
       assert.equal(captured.length, 1)
-      const entry = JSON.parse(captured[0]!) as Record<string, unknown>
+      const entry = JSON.parse(captured[0]) as Record<string, unknown>
       assert.equal(entry.service, 'stderr-test')
       assert.equal(entry.message, 'writes to stderr')
     } finally {

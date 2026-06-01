@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { afterEach, describe, it } from 'node:test'
 import http from 'node:http'
 import WebSocket from 'ws'
-import { createWebSocketServer } from './server.js'
+import { createWebSocketServer, type BrowserBridgeWebSocketServer } from './server.js'
 
 type JsonObject = Record<string, unknown>
 
@@ -341,7 +341,7 @@ void describe('WebSocket authenticated browser routing', () => {
   })
 })
 
-async function startTestServer () {
+async function startTestServer (): Promise<BrowserBridgeWebSocketServer> {
   const server = await createWebSocketServer({
     host: '127.0.0.1',
     port: 0,

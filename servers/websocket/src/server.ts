@@ -35,7 +35,7 @@ export interface WebSocketHealthStatus {
   uptimeSeconds: number
   extensions: {
     count: number
-    browsers: Array<{ browserInstanceId: string; label: string }>
+    browsers: Array<{ browserInstanceId: string, label: string }>
   }
 }
 
