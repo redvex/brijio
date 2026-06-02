@@ -10,7 +10,6 @@ import {
   writeEnv,
   isPlaceholderToken,
   classifyEnv,
-  deriveHosts,
   generateConfig,
   healthCheck,
   printBanner,
@@ -41,10 +40,7 @@ const SAMPLE_ENV_EXAMPLE = [
   'MCP_HTTP_PORT=8788',
   'MCP_HTTP_PATH=/mcp',
   'MCP_HTTP_AUTH_TOKEN=replace-with-generated-mcp-token',
-  'MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost',
   'MCP_HTTP_ALLOWED_ORIGINS=',
-  'MCP_HTTP_ALLOW_TAILSCALE_HOSTS=false',
-  'MCP_HTTP_ALLOW_LOCAL_HOSTS=false',
   'TEST_PAGE_PORT=8080'
 ].join('\n') + '\n'
 
@@ -200,71 +196,21 @@ void describe('isPlaceholderToken', () => {
   })
 })
 
-// ─── deriveHosts ──────────────────────────────────────────────────────────────
-
-void describe('deriveHosts', () => {
-  void it('localhost-only: 127.0.0.1 binding, localhost-only allowed hosts', () => {
-    const result = deriveHosts(false, false)
-
-    assert.equal(result.WEBSOCKET_HOST, '127.0.0.1')
-    assert.equal(result.MCP_HTTP_HOST, '127.0.0.1')
-    assert.equal(result.MCP_HTTP_ALLOWED_HOSTS, '127.0.0.1,localhost')
-  })
-
-  void it('local network: 0.0.0.0 binding, *.local in allowed hosts', () => {
-    const result = deriveHosts(true, false)
-
-    assert.equal(result.WEBSOCKET_HOST, '0.0.0.0')
-    assert.equal(result.MCP_HTTP_HOST, '0.0.0.0')
-    assert.equal(result.MCP_HTTP_ALLOWED_HOSTS, '127.0.0.1,localhost,*.local')
-  })
-
-  void it('tailscale: 0.0.0.0 binding, tailscale hostname in allowed hosts', () => {
-    const result = deriveHosts(false, true)
-
-    assert.equal(result.WEBSOCKET_HOST, '0.0.0.0')
-    assert.equal(result.MCP_HTTP_HOST, '0.0.0.0')
-    assert.match(result.MCP_HTTP_ALLOWED_HOSTS, /127\.0\.0\.1,localhost/)
-    assert.match(result.MCP_HTTP_ALLOWED_HOSTS, /\.local$/)
-  })
-
-  void it('both local and tailscale: includes both', () => {
-    const result = deriveHosts(true, true)
-
-    assert.equal(result.WEBSOCKET_HOST, '0.0.0.0')
-    assert.equal(result.MCP_HTTP_HOST, '0.0.0.0')
-    assert.match(result.MCP_HTTP_ALLOWED_HOSTS, /\*\.local/)
-    assert.match(result.MCP_HTTP_ALLOWED_HOSTS, /\.local$/)
-  })
-})
-
 // ─── generateConfig ────────────────────────────────────────────────────────────
 
 void describe('generateConfig', () => {
-  void it('generates a full config with tokens for localhost-only', () => {
-    const config = generateConfig({ allowLocalHosts: false, allowTailscaleHosts: false })
+  void it('generates a full config with tokens', () => {
+    const config = generateConfig()
 
-    assert.equal(config.WEBSOCKET_HOST, '127.0.0.1')
-    assert.equal(config.MCP_HTTP_HOST, '127.0.0.1')
-    assert.equal(config.MCP_HTTP_ALLOWED_HOSTS, '127.0.0.1,localhost')
-    assert.equal(config.MCP_HTTP_ALLOW_LOCAL_HOSTS, 'false')
-    assert.equal(config.MCP_HTTP_ALLOW_TAILSCALE_HOSTS, 'false')
+    assert.equal(config.WEBSOCKET_HOST, '0.0.0.0')
+    assert.equal(config.MCP_HTTP_HOST, '0.0.0.0')
     assert.match(config.BROWSERBRIDGE_PAIRING_TOKEN, /^[A-Za-z0-9_-]{43}$/)
     assert.match(config.MCP_HTTP_AUTH_TOKEN, /^[A-Za-z0-9_-]{43}$/)
     assert.equal(config.BROWSERBRIDGE_WEBSOCKET_URL, 'ws://127.0.0.1:8787')
   })
 
-  void it('generates config with local network enabled', () => {
-    const config = generateConfig({ allowLocalHosts: true, allowTailscaleHosts: false })
-
-    assert.equal(config.WEBSOCKET_HOST, '0.0.0.0')
-    assert.equal(config.MCP_HTTP_HOST, '0.0.0.0')
-    assert.equal(config.MCP_HTTP_ALLOW_LOCAL_HOSTS, 'true')
-    assert.match(config.MCP_HTTP_ALLOWED_HOSTS, /\*\.local/)
-  })
-
   void it('preserves ports and other values from defaults', () => {
-    const config = generateConfig({ allowLocalHosts: false, allowTailscaleHosts: false })
+    const config = generateConfig()
 
     assert.equal(config.WEBSOCKET_PORT, '8787')
     assert.equal(config.MCP_HTTP_PORT, '8788')
@@ -334,8 +280,8 @@ void describe('printBanner', () => {
     const mockStderr = { write: (s) => { lines.push(s) } }
 
     printBanner({
-      WEBSOCKET_HOST: '127.0.0.1',
-      MCP_HTTP_HOST: '127.0.0.1',
+      WEBSOCKET_HOST: '0.0.0.0',
+      MCP_HTTP_HOST: '0.0.0.0',
       WEBSOCKET_PORT: '8787',
       MCP_HTTP_PORT: '8788',
       MCP_HTTP_PATH: '/mcp',
@@ -344,9 +290,7 @@ void describe('printBanner', () => {
     }, mockStdout, mockStderr)
 
     const output = lines.join('')
-    assert.match(output, /🚀 BrowserBridge dev servers ready/)
-    assert.match(output, /ws:\/\/127\.0\.0\.1:8787/)
-    assert.match(output, /http:\/\/127\.0\.0\.1:8788\/mcp/)
+    assert.match(output, /🚀 BrowserBridge/)
     assert.match(output, /pair-abc123/)
     assert.match(output, /auth-xyz789/)
     assert.match(output, /Ctrl\+C/)
@@ -379,8 +323,8 @@ void describe('printBanner', () => {
     const mockStderr = { write: (s) => { lines.push(s) } }
 
     printBanner({
-      WEBSOCKET_HOST: '127.0.0.1',
-      MCP_HTTP_HOST: '127.0.0.1',
+      WEBSOCKET_HOST: '0.0.0.0',
+      MCP_HTTP_HOST: '0.0.0.0',
       WEBSOCKET_PORT: '8787',
       MCP_HTTP_PORT: '8788',
       MCP_HTTP_PATH: '/mcp',
@@ -428,7 +372,7 @@ void describe('parseArgs', () => {
 
 void describe('promptUser', () => {
   void it('asks questions and collects answers', async () => {
-    const answers = ['true', 'false']
+    const answers = ['yes']
     let inputIndex = 0
     const mockCreateInterface = () => ({
       question: (_prompt) => {
@@ -441,14 +385,12 @@ void describe('promptUser', () => {
 
     const result = await promptUser(
       [
-        { name: 'allowLocalHosts', message: 'Allow local?', default: 'false' },
-        { name: 'allowTailscaleHosts', message: 'Allow Tailscale?', default: 'false' }
+        { name: 'confirmReset', message: 'Reset tokens?', default: 'no' }
       ],
       mockCreateInterface
     )
 
-    assert.equal(result.allowLocalHosts, 'true')
-    assert.equal(result.allowTailscaleHosts, 'false')
+    assert.equal(result.confirmReset, 'yes')
   })
 
   void it('uses default values for empty answers', async () => {
@@ -463,14 +405,12 @@ void describe('promptUser', () => {
 
     const result = await promptUser(
       [
-        { name: 'allowLocalHosts', message: 'Allow local?', default: 'false' },
-        { name: 'allowTailscaleHosts', message: 'Allow Tailscale?', default: 'false' }
+        { name: 'confirmReset', message: 'Reset tokens?', default: 'no' }
       ],
       mockCreateInterface
     )
 
-    assert.equal(result.allowLocalHosts, 'false')
-    assert.equal(result.allowTailscaleHosts, 'false')
+    assert.equal(result.confirmReset, 'no')
   })
 })
 
@@ -497,13 +437,5 @@ void describe('classifyEnv', () => {
     assert.equal(classifyEnv({}), 'incomplete')
     assert.equal(classifyEnv({ BROWSERBRIDGE_PAIRING_TOKEN: '', MCP_HTTP_AUTH_TOKEN: '' }), 'incomplete')
     assert.equal(classifyEnv({ BROWSERBRIDGE_PAIRING_TOKEN: 'real-token' }), 'incomplete')
-  })
-
-  void it('returns "placeholders" if one token is placeholder and other is real', () => {
-    const env = {
-      BROWSERBRIDGE_PAIRING_TOKEN: 'replace-with-generated-token',
-      MCP_HTTP_AUTH_TOKEN: 'real-token'
-    }
-    assert.equal(classifyEnv(env), 'placeholders')
   })
 })

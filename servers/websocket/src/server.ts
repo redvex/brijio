@@ -59,7 +59,7 @@ interface PresenceRecord extends Required<BrowserPresence> {
 export async function createWebSocketServer (
   options: WebSocketServerOptions = {}
 ): Promise<BrowserBridgeWebSocketServer> {
-  const host = options.host ?? '127.0.0.1'
+  const host = options.host ?? '0.0.0.0'
   const port = options.port ?? 8787
   const pairingTokens = getPairingTokens(options)
   const now = options.now ?? (() => new Date())

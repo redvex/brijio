@@ -388,7 +388,6 @@ async function startIntegration (options: IntegrationOptions = {}): Promise<Inte
     port: 0,
     path: '/mcp',
     authToken: testMcpAuthToken,
-    allowedHosts: ['127.0.0.1'],
     allowedOrigins: [],
     pageContextConfig: {
       websocketUrl: wsServer.url,
