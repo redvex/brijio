@@ -85,7 +85,7 @@ describe('repository tooling', () => {
     const compose = await readFile('docker-compose.yml', 'utf8')
 
     assert.match(compose, /WEBSOCKET_HOST: 0\.0\.0\.0/)
-    assert.match(compose, /BROWSERBRIDGE_WEBSOCKET_URL: ws:\/\/websocket:8787/)
+    assert.match(compose, /MCP_HTTP_HOST: 0\.0\.0\.0/)
   })
 
   it('uses AGPLv3 package license metadata', async () => {
