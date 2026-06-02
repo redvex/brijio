@@ -3,7 +3,7 @@ import { createLogger } from '@browserbridge/shared'
 
 const logger = createLogger('websocket')
 
-const host = process.env.WEBSOCKET_HOST ?? '127.0.0.1'
+const host = process.env.WEBSOCKET_HOST ?? '0.0.0.0'
 const port = Number.parseInt(process.env.WEBSOCKET_PORT ?? '8787', 10)
 
 if (Number.isNaN(port)) {

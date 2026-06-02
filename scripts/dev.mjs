@@ -1,6 +1,5 @@
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { homedir, hostname } from 'node:os'
 import { spawn } from 'node:child_process'
 import http from 'node:http'
 import { generatePairingToken, generateAuthToken } from './token-utils.mjs'
@@ -83,59 +82,21 @@ export function isPlaceholderToken (value) {
   return value === PLACEHOLDER_PAIRING || value === PLACEHOLDER_MCP
 }
 
-// ─── Host derivation ──────────────────────────────────────────────────────────
-
-function getTailscaleHostname () {
-  // Try reading ~/.tailscale-hostname
-  const tsFile = join(homedir(), '.tailscale-hostname')
-  try {
-    const name = readFileSync(tsFile, 'utf8').trim()
-    if (name) return name
-  } catch {}
-
-  // Fall back to os.hostname() + .local
-  return hostname() + '.local'
-}
-
-export function deriveHosts (allowLocalHosts, allowTailscaleHosts) {
-  const useLocalhost = !allowLocalHosts && !allowTailscaleHosts
-  const bindingHost = useLocalhost ? '127.0.0.1' : '0.0.0.0'
-
-  const allowParts = ['127.0.0.1', 'localhost']
-  if (allowLocalHosts) {
-    allowParts.push('*.local')
-  }
-  if (allowTailscaleHosts) {
-    allowParts.push(getTailscaleHostname())
-  }
-
-  return {
-    WEBSOCKET_HOST: bindingHost,
-    MCP_HTTP_HOST: bindingHost,
-    MCP_HTTP_ALLOWED_HOSTS: allowParts.join(',')
-  }
-}
-
 // ─── Config generation ─────────────────────────────────────────────────────────
 
-export function generateConfig ({ allowLocalHosts = false, allowTailscaleHosts = false } = {}) {
-  const hosts = deriveHosts(allowLocalHosts, allowTailscaleHosts)
-
+export function generateConfig () {
   return {
-    WEBSOCKET_HOST: hosts.WEBSOCKET_HOST,
+    WEBSOCKET_HOST: '0.0.0.0',
     WEBSOCKET_PORT: '8787',
-    BROWSERBRIDGE_WEBSOCKET_URL: `ws://${hosts.WEBSOCKET_HOST}:8787`,
+    BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:8787',
     BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '5000',
     BROWSERBRIDGE_PAIRING_TOKEN: generatePairingToken(),
     BROWSERBRIDGE_BROWSER_INSTANCE_ID: '',
-    MCP_HTTP_HOST: hosts.MCP_HTTP_HOST,
+    MCP_HTTP_HOST: '0.0.0.0',
     MCP_HTTP_PORT: '8788',
     MCP_HTTP_PATH: '/mcp',
     MCP_HTTP_AUTH_TOKEN: generateAuthToken(),
-    MCP_HTTP_ALLOWED_HOSTS: hosts.MCP_HTTP_ALLOWED_HOSTS,
     MCP_HTTP_ALLOWED_ORIGINS: '',
-    MCP_HTTP_ALLOW_TAILSCALE_HOSTS: String(allowTailscaleHosts),
-    MCP_HTTP_ALLOW_LOCAL_HOSTS: String(allowLocalHosts),
     TEST_PAGE_PORT: '8080'
   }
 }
@@ -183,8 +144,8 @@ function maskToken (token) {
 }
 
 export function printBanner (config, stdout = process.stdout, stderr = process.stderr, maskTokens = false) {
-  const wsHost = config.WEBSOCKET_HOST || '127.0.0.1'
-  const mcpHost = config.MCP_HTTP_HOST || '127.0.0.1'
+  const wsHost = config.WEBSOCKET_HOST || '0.0.0.0'
+  const mcpHost = config.MCP_HTTP_HOST || '0.0.0.0'
   const wsPort = config.WEBSOCKET_PORT || '8787'
   const mcpPort = config.MCP_HTTP_PORT || '8788'
   const mcpPath = config.MCP_HTTP_PATH || '/mcp'
@@ -277,28 +238,21 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
 
   const env = readEnv(envPath)
   const state = classifyEnv(env)
-
-  // Infer current network settings from existing env so we preserve them
-  const currentAllowLocalHosts = env.MCP_HTTP_ALLOW_LOCAL_HOSTS === 'true'
-  const currentAllowTailscaleHosts = env.MCP_HTTP_ALLOW_TAILSCALE_HOSTS === 'true'
-  let allowLocalHosts = currentAllowLocalHosts
-  let allowTailscaleHosts = currentAllowTailscaleHosts
   let regenerateTokens = true
 
   if (state === 'configured') {
     // Show current config with masked tokens
     console.log('')
     console.log('Found existing .env configuration:')
-    const displayWsHost = (env.WEBSOCKET_HOST || '127.0.0.1') === '0.0.0.0' ? 'localhost' : (env.WEBSOCKET_HOST || '127.0.0.1')
-    const displayMcpHost = (env.MCP_HTTP_HOST || '127.0.0.1') === '0.0.0.0' ? 'localhost' : (env.MCP_HTTP_HOST || '127.0.0.1')
+    const displayWsHost = (env.WEBSOCKET_HOST || '0.0.0.0') === '0.0.0.0' ? 'localhost' : (env.WEBSOCKET_HOST || '0.0.0.0')
+    const displayMcpHost = (env.MCP_HTTP_HOST || '0.0.0.0') === '0.0.0.0' ? 'localhost' : (env.MCP_HTTP_HOST || '0.0.0.0')
     console.log(`  WebSocket:    ws://${displayWsHost}:${env.WEBSOCKET_PORT || '8787'}`)
     console.log(`  MCP:         http://${displayMcpHost}:${env.MCP_HTTP_PORT || '8788'}${env.MCP_HTTP_PATH || '/mcp'}`)
     console.log(`  Pairing Token:    ${maskToken(env.BROWSERBRIDGE_PAIRING_TOKEN || '')}`)
     console.log(`  MCP Auth Token:   ${maskToken(env.MCP_HTTP_AUTH_TOKEN || '')}`)
-    console.log(`  Network:     ${currentAllowLocalHosts ? 'local-net' : ''}${currentAllowLocalHosts && currentAllowTailscaleHosts ? ', ' : ''}${currentAllowTailscaleHosts ? 'tailscale' : ''}${!currentAllowLocalHosts && !currentAllowTailscaleHosts ? 'localhost-only' : ''}`)
 
     if (nonInteractive) {
-      console.log('Non-interactive mode: keeping existing tokens and network settings.')
+      console.log('Non-interactive mode: keeping existing tokens.')
       return env
     }
 
@@ -317,18 +271,8 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
     console.log('Found incomplete .env.')
   }
 
-  // Ask network questions (skip in non-interactive — keep inferred/defaults)
-  if (!nonInteractive) {
-    const answers = await promptUser([
-      { name: 'allowLocalHosts', message: `Allow local network connections (*.local)? (true/false)`, default: String(currentAllowLocalHosts) },
-      { name: 'allowTailscaleHosts', message: 'Allow Tailscale connections? (true/false)', default: String(currentAllowTailscaleHosts) }
-    ])
-    allowLocalHosts = answers.allowLocalHosts === 'true'
-    allowTailscaleHosts = answers.allowTailscaleHosts === 'true'
-  }
-
   // Generate config
-  const config = generateConfig({ allowLocalHosts, allowTailscaleHosts })
+  const config = generateConfig()
 
   // Merge with existing env preserving values we don't override
   const merged = { ...env, ...config }
@@ -465,8 +409,8 @@ async function main () {
   children.mcp = startServer('mcp', 'npx', ['tsx', 'watch', 'servers/mcp/src/index.ts'], childEnv, restartCount)
 
   // Health checks
-  const wsHost = envConfig.WEBSOCKET_HOST || '127.0.0.1'
-  const mcpHost = envConfig.MCP_HTTP_HOST || '127.0.0.1'
+  const wsHost = envConfig.WEBSOCKET_HOST || '0.0.0.0'
+  const mcpHost = envConfig.MCP_HTTP_HOST || '0.0.0.0'
 
   console.log('Waiting for servers to be ready...')
 
