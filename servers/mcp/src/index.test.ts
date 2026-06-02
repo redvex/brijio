@@ -5,7 +5,6 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 import {
-  getMcpHttpServerOptionsFromEnv,
   startBrowserBridgeMcpHttpServer,
   type BrowserBridgeMcpHttpRuntime
 } from './http-server.js'
