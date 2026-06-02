@@ -1,0 +1,23 @@
+{
+  "name": "browserbridge",
+  "displayName": "BrowserBridge",
+  "description": "Control real browsers through authenticated sessions — form filling, data extraction, QA testing, and web navigation via MCP. Includes 10 workflow skills.",
+  "version": "0.0.0",
+  "author": {
+    "name": "Redvex",
+    "url": "https://github.com/redvex"
+  },
+  "homepage": "https://github.com/redvex/browser-bridge",
+  "repository": "https://github.com/redvex/browser-bridge",
+  "license": "PolyForm-Noncommercial-1.0.0",
+  "keywords": [
+    "browser",
+    "mcp",
+    "form-filling",
+    "data-extraction",
+    "qa",
+    "web-automation",
+    "skills"
+  ],
+  "skills": "./servers/mcp/skills/"
+}

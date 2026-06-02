@@ -4,8 +4,9 @@ services:
       context: .
       dockerfile: servers/websocket/Dockerfile
     environment:
-      WEBSOCKET_HOST: ${WEBSOCKET_HOST:-0.0.0.0}
-      WEBSOCKET_PORT: ${WEBSOCKET_PORT:-8787}
+      WEBSOCKET_HOST: 0.0.0.0
+      WEBSOCKET_PORT: 8787
+      BROWSERBRIDGE_PAIRING_TOKEN: ${BROWSERBRIDGE_PAIRING_TOKEN:-replace-with-generated-token}
     ports:
       - "${WEBSOCKET_PORT:-8787}:8787"
     profiles:
@@ -16,10 +17,38 @@ services:
       context: .
       dockerfile: servers/mcp/Dockerfile
     environment:
-      WEBSOCKET_URL: ${WEBSOCKET_URL:-ws://websocket:8787}
-      BROWSERBRIDGE_TOKEN: ${BROWSERBRIDGE_TOKEN:-local-dev-token}
-      MCP_SESSION_ID: ${MCP_SESSION_ID:-local}
+      MCP_HTTP_HOST: 0.0.0.0
+      MCP_HTTP_PORT: 8788
+      MCP_HTTP_PATH: /mcp
+      MCP_HTTP_AUTH_TOKEN: ${MCP_HTTP_AUTH_TOKEN:-replace-with-generated-mcp-token}
+      MCP_HTTP_ALLOWED_HOSTS: ${MCP_HTTP_ALLOWED_HOSTS:-127.0.0.1,localhost,mcp}
+      MCP_HTTP_ALLOWED_ORIGINS: ${MCP_HTTP_ALLOWED_ORIGINS:-}
+      MCP_HTTP_ALLOW_TAILSCALE_HOSTS: ${MCP_HTTP_ALLOW_TAILSCALE_HOSTS:-false}
+      MCP_HTTP_ALLOW_LOCAL_HOSTS: ${MCP_HTTP_ALLOW_LOCAL_HOSTS:-false}
+      BROWSERBRIDGE_WEBSOCKET_URL: ws://websocket:8787
+      BROWSERBRIDGE_REQUEST_TIMEOUT_MS: ${BROWSERBRIDGE_REQUEST_TIMEOUT_MS:-5000}
+      BROWSERBRIDGE_PAIRING_TOKEN: ${BROWSERBRIDGE_PAIRING_TOKEN:-replace-with-generated-token}
+    ports:
+      - "${MCP_HTTP_PORT:-8788}:8788"
     depends_on:
       - websocket
     profiles:
       - runtime
+
+  test-page:
+    image: nginx:1.27-alpine
+    ports:
+      - "${TEST_PAGE_PORT:-8080}:80"
+    volumes:
+      - ./test.html:/usr/share/nginx/html/test.html:ro
+    profiles:
+      - runtime
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    environment:
+      NODE_ENV: test
+    profiles:
+      - test

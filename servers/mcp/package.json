@@ -1,17 +1,27 @@
 {
   "name": "@browserbridge/mcp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "BrowserBridge MCP server for AI agent browser tools.",
+  "description": "BrowserBridge MCP server for AI agent browser resources and tools.",
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "build": "echo \"MCP server build is not implemented yet\"",
-    "check": "echo \"MCP server checks are not implemented yet\"",
-    "dev": "echo \"MCP server dev workflow is not implemented yet\"",
-    "test": "echo \"No tests defined for @browserbridge/mcp yet\""
+    "build": "tsc --noEmit",
+    "check": "tsc --noEmit",
+    "dev": "tsx watch src/index.ts",
+    "test": "node --import tsx --test src/**/*.test.ts"
   },
   "dependencies": {
-    "@browserbridge/shared": "workspace:*"
+    "@browserbridge/shared": "workspace:*",
+    "@browserbridge/websocket": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "ws": "^8.18.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/ws": "^8.5.13",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }

@@ -1,107 +1,146 @@
 # BrowserBridge
 
-BrowserBridge is a user-controlled bridge between browser extensions and AI
-agents.
+> **Remote agents. Local browser. No shared credentials.**
 
-The browser extension connects to a WebSocket server only when the user
-explicitly starts it. An MCP server can then request browser state or ask the
-extension to perform approved browser actions through that WebSocket channel.
+BrowserBridge connects remote AI agents to the browser session you already control.
 
-BrowserBridge is designed for local-first development with a path to private
-cloud deployment.
+Instead of launching a separate browser, cloning sessions, exporting cookies, or streaming screenshots, BrowserBridge allows agents to collaborate with the browser you're already using.
 
-## Status
+The result is faster, safer, and more privacy-friendly access to the authenticated web.
 
-This project has the initial skeleton in place and a first local WebSocket
-transport milestone. The next product milestone remains:
+BrowserBridge is open source under AGPLv3. See [LICENSE](LICENSE) and [COMMERCIAL-LICENSING.md](COMMERCIAL-LICENSING.md).
 
-1. A local Chrome extension manually connects to the WebSocket server.
-2. The MCP server requests browser status through the WebSocket server.
-3. The Chrome extension responds with the current tab URL and title.
+---
 
-Features beyond that milestone require an approved ADR before implementation.
+## Why BrowserBridge?
 
-## Goals
+Most AI browser tools start with the assumption that the agent needs its own browser.
 
-- Keep the user in control of when browser access is active.
-- Avoid silent background surveillance.
-- Avoid continuous page streaming by default.
-- Make browser state available only through explicit MCP tool calls.
-- Support local and future cloud deployment.
-- Keep the protocol typed, structured, and shared across packages.
+But in the real world, you're already:
 
-## Planned Repository Layout
+- logged into Workday
+- logged into Jira
+- logged into GitHub
+- logged into Gmail
+- logged into your company's internal tools
 
-```text
-/package.json
-/pnpm-workspace.yaml
-/README.md
-/.env.example
-/docker-compose.yml
-/packages
-  /shared
-    /src
-      messages.ts
-      types.ts
-/servers
-  /websocket
-    /src
-      index.ts
-      sessions.ts
-      messages.ts
-    package.json
-    README.md
-  /mcp
-    /src
-      index.ts
-      tools.ts
-      websocket-client.ts
-    package.json
-    README.md
-/clients
-  /extensions
-    /chrome
-      /src
-        background.ts
-        content.ts
-        popup.ts
-      manifest.json
-      package.json
-      README.md
-    /safari
-      README.md
-    /firefox
-      README.md
-  /apps
-    README.md
-```
+The challenge isn't giving a browser to the agent.
+
+The challenge is allowing the agent to collaborate with the browser session you already control.
+
+That's what BrowserBridge solves.
+
+---
+
+## Key Principles
+
+### Authenticated Browser First
+
+Use the browser session you're already using.
+
+- No cookie export
+- No session replication
+- No browser cloning
+
+### Remote Agent Friendly
+
+Run agents wherever you want:
+
+- Claude Desktop
+- Codex
+- Gemini CLI
+- Hermes
+- OpenClaw
+- Cloud-hosted agents
+
+Your browser remains local.
+
+### Privacy By Design
+
+BrowserBridge is intentionally reactive.
+
+The browser does not continuously stream:
+
+- screenshots
+- page updates
+- DOM changes
+- browser history
+
+Agents must explicitly request information.
+
+### Progressive Disclosure
+
+Agents receive only the information they need.
+
+Instead of sending:
+
+- screenshots
+- massive DOM trees
+- full browser state
+
+BrowserBridge provides structured context first, then content when requested.
+
+### Human In Control
+
+The browser remains under user control.
+
+The agent only receives access through explicit requests.
+
+---
 
 ## Architecture
 
-BrowserBridge has three active runtime parts:
+```text
+Agent
+  ↓
+MCP Server
+  ↓
+BrowserBridge Relay
+  ↓
+Browser Extension
+ ↓
+Browser Session
+```
 
-- **Browser extension**: user-controlled client that connects only after the
-  user starts the bridge.
-- **WebSocket server**: session router between extensions and trusted server
-  components.
-- **MCP server**: exposes browser tools to AI agents and routes tool calls to
-  the active browser session.
-
-Shared protocol types live in `packages/shared` so the extension, WebSocket
-server, and MCP server all use the same message definitions.
+The browser remains the source of truth.
 
 ```mermaid
 flowchart LR
-  Agent[AI Agent] --> MCP[MCP Server]
-  MCP --> WS[WebSocket Server]
-  WS --> Ext[Browser Extension]
-  Ext --> Browser[Current Browser Tab]
+ Agent[AI Agent] --> MCP[MCP Server]
+ MCP --> WS[WebSocket Server]
+ WS --> Ext[Browser Extension]
+ Ext --> Browser[Current Browser Tab]
 
-  Browser --> Ext
-  Ext --> WS
-  WS --> MCP
-  MCP --> Agent
+ Browser --> Ext
+ Ext --> WS
+ WS --> MCP
+ MCP --> Agent
 ```
+
+---
+
+## Capability Matrix
+
+- Read page context ✅
+- Read page content ✅
+- Read selected text ✅
+- Fill forms ✅
+- Trigger actions ✅
+- Read page metadata ✅
+- Structured page understanding ✅
+- Remote agent access ✅
+- File uploads 🚧
+- End-to-end encryption 🚧
+- Multi-tab workflows 🚧
+- Fine-grained permissions 🚧
+- Cookie export ❌
+- Session cloning ❌
+- Continuous browser streaming ❌
+- Browser recording ❌
+
+See [docs/project/CAPABILITY_MATRIX.md](docs/project/CAPABILITY_MATRIX.md) for the full capability contract.
+
+---
 
 ## Communication Flow
 
@@ -110,53 +149,74 @@ specific results. It should not stream page state continuously.
 
 ```mermaid
 sequenceDiagram
-  participant User
-  participant Agent as AI Agent
-  participant MCP as MCP Server
-  participant WS as WebSocket Server
-  participant Ext as Browser Extension
-  participant Tab as Browser Tab
+ participant User
+ participant Agent as AI Agent
+ participant MCP as MCP Server
+ participant WS as WebSocket Server
+ participant Ext as Browser Extension
+ participant Tab as Browser Tab
 
-  User->>Ext: Start bridge
-  Ext->>WS: extension_connected
-  Agent->>MCP: get_browser_status
-  MCP->>WS: get_status
-  WS->>Ext: get_status
-  Ext->>Tab: Read active tab URL and title
-  Tab-->>Ext: URL and title
-  Ext-->>WS: status_response
-  WS-->>MCP: status_response
-  MCP-->>Agent: Structured tool result
+ User->>Ext: Start bridge
+ Ext->>WS: auth role=extension token
+ WS-->>Ext: auth_success
+ WS->>Ext: browser_presence_request
+ Ext-->>WS: browser_presence_announce
+ Agent->>MCP: tools/call list_browsers
+ MCP->>WS: auth role=mcp token
+ WS-->>MCP: auth_success
+ MCP->>WS: list_browsers
+ WS-->>MCP: browser_list
+ Agent->>MCP: resources/read browser://page/current
+ MCP->>WS: get_page_context target optional
+ WS->>Ext: get_page_context
+ Ext->>Tab: Read active tab URL and title
+ Tab-->>Ext: URL and title
+ Ext-->>WS: page_context_response
+ WS-->>MCP: page_context_response
+ MCP-->>Agent: Structured resource result
 ```
 
-## Protocol Messages
+---
 
-The initial message schema should cover:
+## Status
 
-- `extension_connected`
-- `get_status`
-- `status_response`
-- `get_page_context`
-- `page_context_response`
-- `perform_action`
-- `action_result`
-- `error`
+This project has the local WebSocket transport, Chrome extension page context
+and action handling, MCP resources and tools, and local pairing/presence routing
+in place. Safari Web Extension support with full Chrome feature parity is also
+implemented (ADR 0019), using shared logic from `@browserbridge/shared`. The
+current working milestone is:
 
-Every request/response pair should include a request ID so callers can match
-responses to tool calls and handle timeouts clearly.
+1. A local Chrome extension manually connects to the WebSocket server.
+2. The extension authenticates with a local pairing token and announces browser
+   presence.
+3. The MCP server authenticates with the same token, lists online browser
+   instances, and routes explicit page reads or actions to one browser.
+4. The Safari extension has the same browser capabilities as Chrome, using
+   shared logic and Safari-specific adapters.
 
-## MCP Tools
+Features beyond that milestone require an approved ADR before implementation.
 
-The initial MCP server should expose:
+---
 
-- `get_browser_status`
-- `get_current_page_context`
-- `navigate_to_url`
+## MCP Resources And Tools
+
+The current MCP server exposes page resources:
+
+- `browser://page/current`, named `current-page-context`
+- `browser://page/current/content/{index}`, named `current-page-content`
+
+It also exposes tools for explicit page reads and discrete browser actions:
+
+- `list_browsers`
+- `read_current_page`
 - `click_element`
 - `fill_input`
+- `fill_editable`
+- `set_checked`
+- `select_options`
 - `submit_form`
 
-Tool results should use predictable structured responses, for example:
+Resource and tool results use predictable structured responses:
 
 ```ts
 type ToolResult<T> =
@@ -164,16 +224,9 @@ type ToolResult<T> =
   | { ok: false; error: { code: string; message: string } };
 ```
 
+---
+
 ## Local Development
-
-The project is expected to use:
-
-- TypeScript
-- pnpm workspaces
-- Docker Compose for local server development
-- shared protocol packages for browser/server communication
-
-Once the skeleton exists, the local setup should follow this shape:
 
 ```sh
 pnpm install
@@ -181,15 +234,34 @@ cp .env.example .env
 pnpm dev
 ```
 
-Docker-based local development should start the server components together:
+Docker-based local development:
 
 ```sh
 docker compose --profile runtime up --build
 ```
 
-The WebSocket server currently runs a temporary no-auth, single-channel echo and
-pub/sub protocol. MCP routing and browser extension integration are not
-implemented yet.
+The runtime profile serves a local form test page over HTTP:
+
+```text
+http://127.0.0.1:${TEST_PAGE_PORT:-8080}/test.html
+```
+
+Generate a local pairing token before starting the runtime:
+
+```sh
+pnpm run token
+```
+
+Set the generated value as `BROWSERBRIDGE_PAIRING_TOKEN` for the WebSocket and
+MCP servers. Configure the same token in the Chrome extension setup page along
+with the local WebSocket URL.
+
+Generate a separate MCP HTTP bearer token and set it as
+`MCP_HTTP_AUTH_TOKEN`. MCP clients connect to:
+
+```text
+http://127.0.0.1:${MCP_HTTP_PORT:-8788}${MCP_HTTP_PATH:-/mcp}
+```
 
 ### Testing The WebSocket Server With A CLI
 
@@ -205,104 +277,116 @@ In another terminal, connect with `wscat`:
 pnpm dlx wscat -c ws://127.0.0.1:8787
 ```
 
-Send a valid message:
+Send an auth message first:
 
 ```json
-{ "type": "message", "id": "cli-1", "payload": { "text": "hello from cli" } }
+{
+  "type": "message",
+  "id": "auth-1",
+  "payload": {
+    "type": "auth",
+    "role": "mcp",
+    "token": "\*\*\*"
+  }
+}
 ```
 
-The server should echo the same JSON envelope back to that terminal. To test
-pub/sub fan-out, open a second `wscat` terminal connected to the same URL, then
-send the message from either terminal. Both connected clients should receive the
-message.
+Then send a valid MCP-scoped request:
 
-To test structured error handling, send invalid JSON:
-
-```text
-{not valid json
+```json
+{ "type": "message", "id": "cli-1", "payload": { "type": "list_browsers" } }
 ```
 
-The server should respond with an `invalid_json` error envelope.
-
-The Chrome extension should then be loaded from
-`clients/extensions/chrome/dist` or the documented build output path.
-
-## Environment Variables
-
-The initial `.env.example` should include values like:
+### Environment Variables
 
 ```sh
 WEBSOCKET_HOST=127.0.0.1
 WEBSOCKET_PORT=8787
-WEBSOCKET_URL=ws://127.0.0.1:8787
-BROWSERBRIDGE_TOKEN=local-dev-token
-MCP_SESSION_ID=local
+BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
+BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
+BROWSERBRIDGE_PAIRING_TOKEN=replac...oken
+BROWSERBRIDGE_BROWSER_INSTANCE_ID=
+MCP_HTTP_HOST=127.0.0.1
+MCP_HTTP_PORT=8788
+MCP_HTTP_PATH=/mcp
+MCP_HTTP_AUTH_TOKEN=replac...oken
+MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost
+MCP_HTTP_ALLOWED_ORIGINS=
+MCP_HTTP_ALLOW_TAILSCALE_HOSTS=false
+MCP_HTTP_ALLOW_LOCAL_HOSTS=false
 ```
 
-`BROWSERBRIDGE_TOKEN` is reserved for the later authenticated routing milestone;
-the current WebSocket echo/pub-sub server does not require authentication.
+`BROWSERBRIDGE_TOKEN` is accepted as a backward-compatible alias for
+`BROWSERBRIDGE_PAIRING_TOKEN`. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` is optional;
+when set, MCP tools target that browser by default.
 
-## Security Model
+For Tailscale-only development:
 
-BrowserBridge is not an ambient monitoring system.
+```sh
+MCP_HTTP_HOST=0.0.0.0
+MCP_HTTP_ALLOW_TAILSCALE_HOSTS=true
+```
 
-The extension should expose browser state only while the user has explicitly
-started the bridge. Requests should be made through explicit MCP tool calls and
-routed to a private user/session/channel.
+For local network development using mDNS-style names:
 
-Security expectations:
+```sh
+MCP_HTTP_HOST=0.0.0.0
+MCP_HTTP_ALLOW_LOCAL_HOSTS=true
+```
 
-- Manual connect/disconnect in the browser extension UI.
-- Clear user-facing connection state.
-- Minimal browser permissions.
-- Basic token handling for local development.
-- Authenticated routing between MCP and WebSocket components.
-- Request IDs and timeouts for all pending browser requests.
-- No continuous page streaming by default.
-- No page-content persistence unless a future approved feature requires it.
+---
 
-## Browser Extension Scope
+## Repository Layout
 
-Chrome is the first supported extension target.
+```text
+/package.json
+/pnpm-workspace.yaml
+/packages
+ /shared
+ /src
+ protocol.ts
+ page-context.ts
+ page-content.ts
+ background-controller.ts
+ content-handler.ts
+ timers.ts
+ package.json
+/servers
+ /websocket
+ /src
+ index.ts
+ sessions.ts
+ messages.ts
+ package.json
+ /mcp
+ /src
+ index.ts
+ page-context.ts
+ websocket-client.ts
+ package.json
+/clients
+ /extensions
+ /chrome
+ /safari
+ /firefox
+ /apps
+/docs
+ /architecture
+ ARCHITECTURE.md
+ /decisions
+ /security
+ /project
+```
 
-Initial Chrome behavior:
-
-- User manually connects and disconnects from the popup.
-- The background script owns the WebSocket connection.
-- The extension responds to MCP-originated requests.
-- The extension can read current tab URL and title.
-- The content script can extract basic page text and perform simple DOM actions
-  where possible.
-
-Safari and Firefox are planned placeholders until their extension packaging and
-permission models are designed.
-
-## Development Process
-
-Project changes should follow `AGENTS.md`.
-
-For feature or behavioral changes:
-
-1. Write an ADR in `docs/architecture/decisions`.
-2. Include Mermaid diagrams where they clarify architecture or flow.
-3. Wait for user approval.
-4. Use TDD.
-5. Document completed project areas in `docs/artifacts`.
-
-## Roadmap
-
-- Create the pnpm workspace skeleton.
-- Define shared protocol schemas and types.
-- Implement the WebSocket session router.
-- Implement the MCP server and first browser status tool.
-- Build the manually controlled Chrome extension.
-- Add tests around protocol validation, session routing, and MCP tool results.
-- Add Docker Compose local development support.
-- Document the first working milestone.
-- Design cloud deployment around private user/session/channel routing.
-- Add Safari, Firefox, and app clients after separate ADR approval.
+---
 
 ## License
 
-BrowserBridge is licensed under the GNU Affero General Public License v3.0. See
-`LICENSE` for details.
+BrowserBridge source code is licensed under the GNU Affero General Public
+License v3.0 (AGPLv3). See [LICENSE](LICENSE).
+
+Commercial licensing is available for organizations that require alternative
+terms. See [COMMERCIAL-LICENSING.md](COMMERCIAL-LICENSING.md).
+
+Contributions are accepted under the project license. Contributors retain
+copyright in their contributions. See [CONTRIBUTING.md](CONTRIBUTING.md).

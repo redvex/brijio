@@ -6,12 +6,19 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {
-    "build": "echo \"Chrome extension build is not implemented yet\"",
-    "check": "echo \"Chrome extension checks are not implemented yet\"",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && esbuild src/background.ts --bundle --format=esm --platform=browser --target=chrome116 --outfile=dist/background.js && esbuild src/content-script-entry.ts --bundle --format=iife --platform=browser --target=chrome116 --outfile=dist/content.js && esbuild src/popup-entry.ts --bundle --format=iife --platform=browser --target=chrome116 --outfile=dist/popup-entry.js && cp manifest.json dist/manifest.json && cp src/popup.html dist/popup.html && node scripts/verify-build-output.mjs",
+    "check": "tsc --noEmit",
     "dev": "echo \"Chrome extension dev workflow is not implemented yet\"",
-    "test": "echo \"No tests defined for @browserbridge/chrome-extension yet\""
+    "test": "node --import tsx --test src/**/*.test.ts"
   },
   "dependencies": {
     "@browserbridge/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "esbuild": "^0.28.0",
+    "linkedom": "^0.18.12",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
   }
 }

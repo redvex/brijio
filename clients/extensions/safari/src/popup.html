@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BrowserBridge</title>
+    <style>
+      :root {
+        --bg: #1a1a2e;
+        --surface: #16213e;
+        --border: #0f3460;
+        --text: #e0e0e0;
+        --muted: #9aa0a6;
+        --accent: #4ecca3;
+        --accent-hover: #3db892;
+        --danger: #e74c3c;
+        --danger-hover: #c0392b;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+        min-width: 320px;
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-block-end: 12px;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        font-size: 13px;
+        margin-block-end: 4px;
+      }
+
+      input {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        font: inherit;
+        margin-block-end: 12px;
+        padding: 8px 10px;
+        width: 100%;
+      }
+
+      input:focus {
+        border-color: var(--accent);
+        outline: none;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        margin-block-end: 12px;
+      }
+
+      button {
+        background: var(--accent);
+        border: 0;
+        border-radius: 6px;
+        color: var(--bg);
+        cursor: pointer;
+        font: inherit;
+        font-weight: 600;
+        padding: 8px 12px;
+      }
+
+      button:hover {
+        background: var(--accent-hover);
+      }
+
+      button.secondary {
+        background: var(--border);
+        color: var(--text);
+      }
+
+      button.secondary:hover {
+        background: var(--muted);
+      }
+
+      button.danger {
+        background: var(--danger);
+        color: #fff;
+      }
+
+      button.danger:hover {
+        background: var(--danger-hover);
+      }
+
+      #status {
+        background: var(--surface);
+        border-radius: 6px;
+        font-size: 13px;
+        min-height: 1.5em;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      #status.state-connected {
+        color: var(--accent);
+      }
+
+      #status.state-error {
+        color: var(--danger);
+      }
+
+      #status.state-connecting,
+      #status.state-reconnecting {
+        color: #f59e0b;
+      }
+
+      .spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        flex-shrink: 0;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .spinner.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>BrowserBridge</h1>
+    <form id="settings-form" novalidate>
+      <label for="websocket-url">WebSocket URL</label>
+      <input
+        id="websocket-url"
+        name="websocketUrl"
+        placeholder="ws://127.0.0.1:8787"
+        required
+        type="text"
+      />
+      <label for="pairing-token">Pairing token</label>
+      <input
+        id="pairing-token"
+        name="pairingToken"
+        required
+        type="password"
+      />
+      <label for="profile-name">Profile name</label>
+      <input
+        id="profile-name"
+        name="profileName"
+        required
+        type="text"
+        value="Default"
+      />
+      <label for="browser-label">Browser label</label>
+      <input
+        id="browser-label"
+        name="label"
+        required
+        type="text"
+        value="Safari Default"
+      />
+      <div class="actions">
+        <button id="save-button" type="submit">Save</button>
+        <button class="secondary" id="connect-button" type="button">Connect</button>
+        <button class="danger" id="disconnect-button" type="button">Disconnect</button>
+      </div>
+    </form>
+    <div id="status" role="status"><span class="spinner hidden" id="status-spinner"></span><span id="status-text"></span></div>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
