@@ -105,8 +105,8 @@ services:
   browserbridge:
     image: redvex/browserbridge:0.1.0
     ports:
-      - "8787:8787"  # WebSocket
-      - "8788:8788"  # MCP
+      - "8787:8787" # WebSocket
+      - "8788:8788" # MCP
     environment:
       BROWSERBRIDGE_PAIRING_TOKEN: ${BROWSERBRIDGE_PAIRING_TOKEN}
       MCP_HTTP_AUTH_TOKEN: ${MCP_HTTP_AUTH_TOKEN}
@@ -121,11 +121,14 @@ Create `bin/browserbridge.mjs` as the npm `bin` entry point:
 
 ```javascript
 #!/usr/bin/env node
-import { createWebSocketServer } from '@browserbridge/websocket/server'
-import { startBrowserBridgeMcpHttpServer, getMcpHttpServerOptionsFromEnv } from '../servers/mcp/src/http-server.js'
+import { createWebSocketServer } from "@browserbridge/websocket/server";
+import {
+  startBrowserBridgeMcpHttpServer,
+  getMcpHttpServerOptionsFromEnv,
+} from "../servers/mcp/src/http-server.js";
 
-const ws = await createWebSocketServer({ host, port, pairingToken })
-const mcp = await startBrowserBridgeMcpHttpServer(options)
+const ws = await createWebSocketServer({ host, port, pairingToken });
+const mcp = await startBrowserBridgeMcpHttpServer(options);
 // Log startup banner
 // SIGINT/SIGTERM → graceful shutdown both
 ```
@@ -154,18 +157,18 @@ The primary use case is **agent + MCP server + WebSocket companion + browser ext
 
 This means **`npx @browserbridge/mcp` and `docker run redvex/browserbridge` work with zero env vars**. For the local-single-machine case, sensible defaults cover everything:
 
-| Variable | Default | Rationale |
-|---|---|---|
-| `WEBSOCKET_HOST` | `127.0.0.1` | Loopback only; all on same machine |
-| `WEBSOCKET_PORT` | `8787` | Unlikely to conflict |
-| `BROWSERBRIDGE_PAIRING_TOKEN` | **auto-generated** | Printed to stdout at startup |
-| `BROWSERBRIDGE_WEBSOCKET_URL` | `ws://127.0.0.1:8787` | Same process namespace |
-| `MCP_HTTP_HOST` | `0.0.0.0` | Bind all interfaces; reachable on LAN/Tailscale |
-| `MCP_HTTP_PORT` | `8788` | Unlikely to conflict |
-| `MCP_HTTP_PATH` | `/mcp` | Standard MCP path |
-| `MCP_HTTP_AUTH_TOKEN` | **auto-generated** | Printed to stdout at startup |
-| `MCP_HTTP_ALLOWED_ORIGINS` | (empty) | No CORS restriction by default |
-| `BROWSERBRIDGE_REQUEST_TIMEOUT_MS` | `5000` | 5 seconds |
+| Variable                           | Default               | Rationale                                       |
+| ---------------------------------- | --------------------- | ----------------------------------------------- |
+| `WEBSOCKET_HOST`                   | `127.0.0.1`           | Loopback only; all on same machine              |
+| `WEBSOCKET_PORT`                   | `8787`                | Unlikely to conflict                            |
+| `BROWSERBRIDGE_PAIRING_TOKEN`      | **auto-generated**    | Printed to stdout at startup                    |
+| `BROWSERBRIDGE_WEBSOCKET_URL`      | `ws://127.0.0.1:8787` | Same process namespace                          |
+| `MCP_HTTP_HOST`                    | `0.0.0.0`             | Bind all interfaces; reachable on LAN/Tailscale |
+| `MCP_HTTP_PORT`                    | `8788`                | Unlikely to conflict                            |
+| `MCP_HTTP_PATH`                    | `/mcp`                | Standard MCP path                               |
+| `MCP_HTTP_AUTH_TOKEN`              | **auto-generated**    | Printed to stdout at startup                    |
+| `MCP_HTTP_ALLOWED_ORIGINS`         | (empty)               | No CORS restriction by default                  |
+| `BROWSERBRIDGE_REQUEST_TIMEOUT_MS` | `5000`                | 5 seconds                                       |
 
 **Remove `MCP_HTTP_ALLOWED_HOSTS`, `MCP_HTTP_ALLOW_TAILSCALE_HOSTS`, and `MCP_HTTP_ALLOW_LOCAL_HOSTS`.** Network-level reachability is the user's responsibility — firewalls, VPNs, and NAT handle it. BrowserBridge authenticates requests via `MCP_HTTP_AUTH_TOKEN` (and `BROWSERBRIDGE_PAIRING_TOKEN` for WebSocket). Host-whitelisting was redundant security theatre that complicated every deployment mode. If a request presents a valid auth token, it's authorised regardless of which interface it arrived on.
 
