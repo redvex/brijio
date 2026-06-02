@@ -13,6 +13,7 @@ browser extensions and AI agents via the Model Context Protocol.
 ### Added
 
 **WebSocket Relay Server** (`@browserbridge/websocket`)
+
 - Single-channel echo and pub/sub WebSocket server (ADR 0002)
 - Peer forwarding — routes MCP requests to connected browser extensions
   and relays responses back (ADR 0006)
@@ -23,6 +24,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - Per-request observability: request routing, browser targeting, error events
 
 **MCP Server** (`@browserbridge/mcp`)
+
 - MCP page context resource and reading tool (ADRs 0007, 0009, 0010)
 - Rich paginated page content extraction (ADRs 0008, 0009)
 - `read_current_page` tool — page context + optional content chunks
@@ -34,8 +36,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - `list_browsers` tool — answered by WS server from presence data, not
   forwarded to extensions
 - HTTP transport mode with Bearer auth (ADR 0023)
-- Tailscale-friendly and local-domain-friendly host allowances (ADRs 0025,
-  0026)
+- Tailscale-friendly and local-domain-friendly host allowances (ADRs 0025, 0026)
 - Tier 1/2/3 skill system with resources, prompts, and plugin manifests
   (ADRs 0027, 0028)
 - `GET /health` endpoint with version, uptime, and WebSocket reachability
@@ -44,6 +45,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - Per-request WebSocket connections to the relay server
 
 **Shared Package** (`@browserbridge/shared`)
+
 - Shared protocol types, message schemas, and envelope factories
 - Structured JSON logger (`createLogger`) writing to stderr
 - Token generation utilities
@@ -52,6 +54,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - Page reader and content handler helpers
 
 **Chrome Extension**
+
 - Chrome extension bridge client with popup configuration (ADRs 0005, 0030)
 - Page context extraction, DOM actions (click, fill, form controls)
 - Regular page host permissions model (ADR 0011)
@@ -59,6 +62,7 @@ browser extensions and AI agents via the Model Context Protocol.
   (ADR 0032)
 
 **Safari Extension**
+
 - Safari Web Extension package scaffolding (ADR 0019)
 - Permissions module with broad host access at install time
 - Content script, background script with Safari-specific adapters
@@ -66,6 +70,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - Shared extension code extraction between Chrome and Safari (ADR 0031)
 
 **Infrastructure & DX**
+
 - PR validation GitHub Actions: lint + build/test workflows (ADRs 0003, 0004)
 - TypeScript and Markdown lint tooling (`ts-standard`, Prettier)
 - One-command startup with dev orchestrator (ADR 0029)
