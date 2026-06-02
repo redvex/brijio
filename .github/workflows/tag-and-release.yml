@@ -1,0 +1,60 @@
+name: Tag and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog
+        id: changelog
+        run: |
+          # Extract the changelog section for this version
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          # Find the section between "## [VERSION]" and the next "## [" header
+          CHANGELOG=$(awk "/^## \[${VERSION}\]/,/^## \[/" CHANGELOG.md | head -n -1)
+          echo "BODY<<EOFMARKER" >> "$GITHUB_OUTPUT"
+          echo "$CHANGELOG" >> "$GITHUB_OUTPUT"
+          echo "EOFMARKER" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: BrowserBridge v${{ steps.version.outputs.VERSION }}
+          body: ${{ steps.changelog.outputs.BODY }}
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
