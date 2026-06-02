@@ -23,10 +23,7 @@ export interface BrowserBridgeMcpHttpServerOptions {
   port: number
   path: string
   authToken: string
-  allowedHosts: string[]
   allowedOrigins: string[]
-  allowTailscaleHosts?: boolean
-  allowLocalHosts?: boolean
   pageContextConfig?: BrowserBridgePageContextConfig
 }
 
@@ -57,7 +54,7 @@ interface HttpErrorBody {
 export function getMcpHttpServerOptionsFromEnv (
   env: NodeJS.ProcessEnv = process.env
 ): BrowserBridgeMcpHttpServerOptions {
-  const host = env.MCP_HTTP_HOST ?? '127.0.0.1'
+  const host = env.MCP_HTTP_HOST ?? '0.0.0.0'
   const port = parsePort(env.MCP_HTTP_PORT)
   const authToken = env.MCP_HTTP_AUTH_TOKEN ?? ''
 
@@ -65,28 +62,12 @@ export function getMcpHttpServerOptionsFromEnv (
     throw new Error('MCP_HTTP_AUTH_TOKEN is required for MCP HTTP transport.')
   }
 
-  const allowTailscaleHosts = parseBoolean(env.MCP_HTTP_ALLOW_TAILSCALE_HOSTS)
-  const allowLocalHosts = parseBoolean(env.MCP_HTTP_ALLOW_LOCAL_HOSTS)
-  const allowedHostSuffixes = getAllowedHostSuffixes({
-    allowTailscaleHosts,
-    allowLocalHosts
-  })
-
   return {
     host,
     port,
     path: normalizePath(env.MCP_HTTP_PATH ?? '/mcp'),
     authToken,
-    allowedHosts: withHostSuffixAllowances(
-      parseList(env.MCP_HTTP_ALLOWED_HOSTS, defaultAllowedHosts(host)),
-      allowedHostSuffixes
-    ),
-    allowedOrigins: withHostSuffixAllowances(
-      parseList(env.MCP_HTTP_ALLOWED_ORIGINS, []),
-      allowedHostSuffixes
-    ),
-    allowTailscaleHosts,
-    allowLocalHosts,
+    allowedOrigins: parseList(env.MCP_HTTP_ALLOWED_ORIGINS, []),
     pageContextConfig: getPageContextConfigFromEnv(env)
   }
 }
@@ -164,25 +145,7 @@ async function handleMcpHttpRequest (
     return
   }
 
-  const allowedHostSuffixes = getAllowedHostSuffixes({
-    allowTailscaleHosts: options.allowTailscaleHosts ?? false,
-    allowLocalHosts: options.allowLocalHosts ?? false
-  })
-  const allowedHosts = withHostSuffixAllowances(
-    options.allowedHosts,
-    allowedHostSuffixes
-  )
-  const hostError = validateHost(request, allowedHosts)
-  if (hostError !== undefined) {
-    writeJsonError(response, 403, hostError)
-    return
-  }
-
-  const allowedOrigins = withHostSuffixAllowances(
-    options.allowedOrigins,
-    allowedHostSuffixes
-  )
-  const originError = validateOrigin(request, allowedOrigins)
+  const originError = validateOrigin(request, options.allowedOrigins)
   if (originError !== undefined) {
     writeJsonError(response, 403, originError)
     return
@@ -278,91 +241,10 @@ function parseList (value: string | undefined, fallback: string[]): string[] {
     .filter((item) => item !== '')
 }
 
-function parseBoolean (value: string | undefined): boolean {
-  return value?.trim().toLowerCase() === 'true'
-}
-
-function getAllowedHostSuffixes (
-  options: {
-    allowTailscaleHosts: boolean
-    allowLocalHosts: boolean
-  }
-): string[] {
-  const suffixes: string[] = []
-
-  if (options.allowTailscaleHosts) {
-    suffixes.push('*.ts.net')
-  }
-
-  if (options.allowLocalHosts) {
-    suffixes.push('*.local')
-  }
-
-  return suffixes
-}
-
-function withHostSuffixAllowances (
-  values: string[],
-  allowedHostSuffixes: string[]
-): string[] {
-  const nextValues = [...values]
-
-  for (const suffix of allowedHostSuffixes) {
-    if (!nextValues.includes(suffix)) {
-      nextValues.push(suffix)
-    }
-  }
-
-  return nextValues
-}
-
-function defaultAllowedHosts (host: string): string[] {
-  if (host === '127.0.0.1' || host === 'localhost') {
-    return ['127.0.0.1', 'localhost']
-  }
-
-  return [host]
-}
-
 function matchesPath (request: IncomingMessage, expectedPath: string): boolean {
   const url = new URL(request.url ?? '/', 'http://browserbridge.local')
 
   return url.pathname === expectedPath
-}
-
-function validateHost (
-  request: IncomingMessage,
-  allowedHosts: string[]
-): HttpErrorBody | undefined {
-  if (allowedHosts.length === 0) {
-    return undefined
-  }
-
-  const host = request.headers.host
-
-  if (host === undefined || !isAllowedHost(host, allowedHosts)) {
-    return {
-      ok: false,
-      error: {
-        code: 'forbidden_host',
-        message: 'Host is not allowed for BrowserBridge MCP HTTP.'
-      }
-    }
-  }
-}
-
-function isAllowedHost (hostHeader: string, allowedHosts: string[]): boolean {
-  const hostName = stripPort(hostHeader)
-
-  return allowedHosts.some((allowedHost) => {
-    const allowedHostName = stripPort(allowedHost)
-
-    return (
-      allowedHost === hostHeader ||
-      allowedHostName === hostName ||
-      matchesWildcardHost(hostName, allowedHostName)
-    )
-  })
 }
 
 function validateOrigin (
@@ -404,10 +286,6 @@ function isAllowedOrigin (origin: string, allowedOrigins: string[]): boolean {
       return false
     }
   })
-}
-
-function stripPort (host: string): string {
-  return host.split(':')[0].toLowerCase()
 }
 
 function matchesWildcardHost (hostName: string, allowedHost: string): boolean {
