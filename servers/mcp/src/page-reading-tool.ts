@@ -1,75 +1,75 @@
 import {
   getCurrentPageContent,
   getCurrentPageContext,
-  type BrowserBridgePageContextConfig,
-} from "./page-context.js";
+  type BrowserBridgePageContextConfig
+} from './page-context.js'
 import {
   type BrowserBridgeErrorCode,
   type PageContent,
   type PageContext,
-  type StaleContextDetail,
-} from "./protocol.js";
+  type StaleContextDetail
+} from './protocol.js'
 
-const defaultMaxContentChunks = 1;
-const maxAllowedContentChunks = 5;
+const defaultMaxContentChunks = 1
+const maxAllowedContentChunks = 5
 
 export type BrowserBridgeToolErrorCode =
   | BrowserBridgeErrorCode
-  | "invalid_tool_input";
+  | 'invalid_tool_input'
 
 export type BrowserBridgeToolResult<T> =
   | {
-      ok: true;
-      data: T;
-    }
+    ok: true
+    data: T
+  }
   | {
-      ok: false;
-      error: {
-        code: BrowserBridgeToolErrorCode;
-        message: string;
-        detail?: StaleContextDetail;
-      };
-    };
+    ok: false
+    error: {
+      code: BrowserBridgeToolErrorCode
+      message: string
+      detail?: StaleContextDetail
+    }
+  }
 
 export interface ReadCurrentPageInput {
-  includeContent?: boolean;
-  maxContentChunks?: number;
-  browserInstanceId?: unknown;
+  includeContent?: boolean
+  maxContentChunks?: number
+  browserInstanceId?: unknown
 }
 
 export interface ReadCurrentPageData {
-  context: PageContext;
-  content: PageContent[];
-  contentTruncated: boolean;
-  nextContentIndex: number | null;
+  context: PageContext
+  content: PageContent[]
+  contentTruncated: boolean
+  nextContentIndex: number | null
 }
 
 export type ReadCurrentPageResult =
-  BrowserBridgeToolResult<ReadCurrentPageData>;
+  BrowserBridgeToolResult<ReadCurrentPageData>
 
 interface NormalizedReadCurrentPageInput {
-  includeContent: boolean;
-  maxContentChunks: number;
-  browserInstanceId?: string;
+  includeContent: boolean
+  maxContentChunks: number
+  browserInstanceId?: string
 }
 
-export async function readCurrentPage(
+export async function readCurrentPage (
   config: BrowserBridgePageContextConfig,
-  input: ReadCurrentPageInput,
+  input: ReadCurrentPageInput
 ): Promise<ReadCurrentPageResult> {
-  const normalizedInput = normalizeInput(input);
+  const normalizedInput = normalizeInput(input)
 
   if (!normalizedInput.ok) {
-    return normalizedInput;
+    return normalizedInput
   }
 
   const contextResult = await getCurrentPageContext(
     config,
-    normalizedInput.data.browserInstanceId,
-  );
+    normalizedInput.data.browserInstanceId
+  )
 
   if (!contextResult.ok) {
-    return contextResult;
+    return contextResult
   }
 
   if (
@@ -83,28 +83,28 @@ export async function readCurrentPage(
         context: contextResult.data,
         content: [],
         contentTruncated: false,
-        nextContentIndex: null,
-      },
-    };
+        nextContentIndex: null
+      }
+    }
   }
 
   return await readContentChunks(
     config,
     contextResult.data,
     normalizedInput.data.maxContentChunks,
-    normalizedInput.data.browserInstanceId,
-  );
+    normalizedInput.data.browserInstanceId
+  )
 }
 
-function normalizeInput(
-  input: ReadCurrentPageInput,
+function normalizeInput (
+  input: ReadCurrentPageInput
 ): BrowserBridgeToolResult<NormalizedReadCurrentPageInput> {
-  const includeContent = input.includeContent ?? true;
-  const maxContentChunks = input.maxContentChunks ?? defaultMaxContentChunks;
-  const browserInstanceId = normalizeBrowserInstanceId(input.browserInstanceId);
+  const includeContent = input.includeContent ?? true
+  const maxContentChunks = input.maxContentChunks ?? defaultMaxContentChunks
+  const browserInstanceId = normalizeBrowserInstanceId(input.browserInstanceId)
 
-  if (typeof includeContent !== "boolean") {
-    return invalidToolInputResponse("includeContent must be a boolean.");
+  if (typeof includeContent !== 'boolean') {
+    return invalidToolInputResponse('includeContent must be a boolean.')
   }
 
   if (
@@ -113,12 +113,12 @@ function normalizeInput(
     maxContentChunks > maxAllowedContentChunks
   ) {
     return invalidToolInputResponse(
-      "maxContentChunks must be an integer from 0 through 5.",
-    );
+      'maxContentChunks must be an integer from 0 through 5.'
+    )
   }
 
   if (!browserInstanceId.ok) {
-    return browserInstanceId;
+    return browserInstanceId
   }
 
   return {
@@ -128,32 +128,32 @@ function normalizeInput(
       maxContentChunks,
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
-        : {}),
-    },
-  };
+        : {})
+    }
+  }
 }
 
-async function readContentChunks(
+async function readContentChunks (
   config: BrowserBridgePageContextConfig,
   context: PageContext,
   maxContentChunks: number,
-  browserInstanceId?: string,
+  browserInstanceId?: string
 ): Promise<ReadCurrentPageResult> {
-  const content: PageContent[] = [];
-  let nextIndex = context.content.firstIndex;
+  const content: PageContent[] = []
+  let nextIndex = context.content.firstIndex
 
   for (let count = 0; count < maxContentChunks; count += 1) {
     const contentResult = await getCurrentPageContent(
       config,
       nextIndex,
-      browserInstanceId,
-    );
+      browserInstanceId
+    )
 
     if (!contentResult.ok) {
-      return contentResult;
+      return contentResult
     }
 
-    content.push(contentResult.data);
+    content.push(contentResult.data)
 
     if (!contentResult.data.truncated) {
       return {
@@ -162,16 +162,16 @@ async function readContentChunks(
           context,
           content,
           contentTruncated: false,
-          nextContentIndex: null,
-        },
-      };
+          nextContentIndex: null
+        }
+      }
     }
 
-    nextIndex += 1;
+    nextIndex += 1
   }
 
-  const lastContent = content[content.length - 1];
-  const contentTruncated = lastContent?.truncated ?? false;
+  const lastContent = content[content.length - 1]
+  const contentTruncated = lastContent?.truncated ?? false
 
   return {
     ok: true,
@@ -179,41 +179,41 @@ async function readContentChunks(
       context,
       content,
       contentTruncated,
-      nextContentIndex: contentTruncated ? nextIndex : null,
-    },
-  };
+      nextContentIndex: contentTruncated ? nextIndex : null
+    }
+  }
 }
 
-function normalizeBrowserInstanceId(
-  value: unknown,
+function normalizeBrowserInstanceId (
+  value: unknown
 ): BrowserBridgeToolResult<string | undefined> {
   if (value === undefined) {
     return {
       ok: true,
-      data: undefined,
-    };
+      data: undefined
+    }
   }
 
-  if (typeof value !== "string" || value.length === 0) {
+  if (typeof value !== 'string' || value.length === 0) {
     return invalidToolInputResponse(
-      "browserInstanceId must be a non-empty string when provided.",
-    );
+      'browserInstanceId must be a non-empty string when provided.'
+    )
   }
 
   return {
     ok: true,
-    data: value,
-  };
+    data: value
+  }
 }
 
-function invalidToolInputResponse(
-  message: string,
+function invalidToolInputResponse (
+  message: string
 ): BrowserBridgeToolResult<never> {
   return {
     ok: false,
     error: {
-      code: "invalid_tool_input",
-      message,
-    },
-  };
+      code: 'invalid_tool_input',
+      message
+    }
+  }
 }
