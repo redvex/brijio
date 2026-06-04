@@ -2,6 +2,10 @@
 
 > **Remote agents. Local browser. No shared credentials.**
 
+<p align="center">
+  <img src=".github/images/hero.png" alt="BrowserBridge — Remote agents. Local browser. No shared credentials." width="800" />
+</p>
+
 BrowserBridge connects remote AI agents to the browser session you already control.
 
 Instead of launching a separate browser, cloning sessions, exporting cookies, or streaming screenshots, BrowserBridge allows agents to collaborate with the browser you're already using.
@@ -226,6 +230,106 @@ type ToolResult<T> =
 
 ---
 
+## Running BrowserBridge
+
+### Option 1: npx (recommended for local use)
+
+```sh
+npx @redvex/browserbridge
+```
+
+This starts both the WebSocket server and the MCP server with zero config. On startup, auto-generated tokens are printed to the console:
+
+```text
+[BrowserBridge] WebSocket server listening on ws://0.0.0.0:8787
+[BrowserBridge] MCP server listening on http://0.0.0.0:8788/mcp
+[BrowserBridge] Pairing token [auto-generated]: dG9rZW4x
+[BrowserBridge] MCP auth token [auto-generated]: dG9rZW4y
+```
+
+Copy these tokens — they change on every restart unless you persist them. To persist tokens, create a `.env` file in the working directory:
+
+```sh
+BROWSERBRIDGE_PAIRING_TOKEN=your-secure-token-here
+MCP_HTTP_AUTH_TOKEN=your-mcp-token-here
+```
+
+Or set environment variables directly:
+
+```sh
+BROWSERBRIDGE_PAIRING_TOKEN=my-secret npx @redvex/browserbridge
+```
+
+The MCP endpoint is then available at `http://localhost:8788/mcp`.
+
+### Option 2: Docker
+
+```sh
+docker run -p 8787:8787 -p 8788:8788 \
+  -e BROWSERBRIDGE_PAIRING_TOKEN=my-pairing-token \
+  -e MCP_HTTP_AUTH_TOKEN=my-mcp-token \
+  redvex/browserbridge
+```
+
+Or with Docker Compose — copy `.env.example` to `.env`, fill in your tokens, then:
+
+```sh
+docker compose up
+```
+
+Both ports must be exposed: **8787** (WebSocket relay) and **8788** (MCP HTTP server). The Docker image bundles both services in a single container — no need to run separate images.
+
+### Connecting Your Browser
+
+1. Install the [BrowserBridge Chrome extension](https://github.com/redvex/browser-bridge)
+2. Click the BrowserBridge icon in your toolbar
+3. Enter the WebSocket URL (default: `ws://localhost:8787`) and the pairing token
+4. Click **Connect**
+
+### Connecting Your AI Agent
+
+Configure your MCP client (Claude Desktop, Hermes, etc.) to connect to the MCP server:
+
+```json
+{
+  "mcpServers": {
+    "browserbridge": {
+      "type": "streamableHttp",
+      "url": "http://localhost:8788/mcp",
+      "headers": {
+        "Authorization": "Bearer my-mcp-token"
+      }
+    }
+  }
+}
+```
+
+### Environment Variables
+
+| Variable                           | Default               | Description                       |
+| ---------------------------------- | --------------------- | --------------------------------- |
+| `WEBSOCKET_HOST`                   | `0.0.0.0`             | WebSocket server bind address     |
+| `WEBSOCKET_PORT`                   | `8787`                | WebSocket server port             |
+| `BROWSERBRIDGE_PAIRING_TOKEN`      | _auto-generated_      | Token for extension ↔ server auth |
+| `MCP_HTTP_HOST`                    | `0.0.0.0`             | MCP server bind address           |
+| `MCP_HTTP_PORT`                    | `8788`                | MCP server port                   |
+| `MCP_HTTP_PATH`                    | `/mcp`                | MCP server path                   |
+| `MCP_HTTP_AUTH_TOKEN`              | _auto-generated_      | Bearer token for MCP clients      |
+| `BROWSERBRIDGE_WEBSOCKET_URL`      | `ws://127.0.0.1:8787` | WS URL for MCP → relay connection |
+| `BROWSERBRIDGE_REQUEST_TIMEOUT_MS` | `5000`                | Timeout for forwarded requests    |
+
+Auto-generated tokens are ephemeral — they change on restart. For production or persistent setups, always set `BROWSERBRIDGE_PAIRING_TOKEN` and `MCP_HTTP_AUTH_TOKEN` explicitly.
+
+For Tailscale:
+
+```sh
+MCP_HTTP_HOST=0.0.0.0
+```
+
+No additional host allowlists are needed — auth tokens are the security boundary, not IP allowlists. See the security model below for details.
+
+---
+
 ## Local Development
 
 ```sh
@@ -286,7 +390,7 @@ Send an auth message first:
   "payload": {
     "type": "auth",
     "role": "mcp",
-    "token": "\*\*\*"
+    "token": "***"
   }
 }
 ```
@@ -297,42 +401,7 @@ Then send a valid MCP-scoped request:
 { "type": "message", "id": "cli-1", "payload": { "type": "list_browsers" } }
 ```
 
-### Environment Variables
-
-```sh
-WEBSOCKET_HOST=127.0.0.1
-WEBSOCKET_PORT=8787
-BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
-BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
-BROWSERBRIDGE_PAIRING_TOKEN=replac...oken
-BROWSERBRIDGE_BROWSER_INSTANCE_ID=
-MCP_HTTP_HOST=127.0.0.1
-MCP_HTTP_PORT=8788
-MCP_HTTP_PATH=/mcp
-MCP_HTTP_AUTH_TOKEN=replac...oken
-MCP_HTTP_ALLOWED_HOSTS=127.0.0.1,localhost
-MCP_HTTP_ALLOWED_ORIGINS=
-MCP_HTTP_ALLOW_TAILSCALE_HOSTS=false
-MCP_HTTP_ALLOW_LOCAL_HOSTS=false
-```
-
-`BROWSERBRIDGE_TOKEN` is accepted as a backward-compatible alias for
-`BROWSERBRIDGE_PAIRING_TOKEN`. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` is optional;
-when set, MCP tools target that browser by default.
-
-For Tailscale-only development:
-
-```sh
-MCP_HTTP_HOST=0.0.0.0
-MCP_HTTP_ALLOW_TAILSCALE_HOSTS=true
-```
-
-For local network development using mDNS-style names:
-
-```sh
-MCP_HTTP_HOST=0.0.0.0
-MCP_HTTP_ALLOW_LOCAL_HOSTS=true
-```
+> **Note:** `BROWSERBRIDGE_TOKEN` is accepted as a backward-compatible alias for `BROWSERBRIDGE_PAIRING_TOKEN`. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` is optional; when set, MCP tools target that browser by default.
 
 ---
 

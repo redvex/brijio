@@ -5,6 +5,25 @@ All notable changes to BrowserBridge are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Server packages and browser extensions use **independent versioning** — extension releases are tagged separately (`ext-chrome-v*`, `ext-safari-v*`) from server releases (`v*`).
+
+## [ext-chrome-v0.1.0] - 2026-06-03
+
+Initial Chrome Web Store submission.
+
+### Added
+
+**Chrome Extension** (`@browserbridge/chrome-extension`)
+
+- Extension icons (16, 32, 48, 128, 256, 512) for Chrome Web Store
+- Manifest production-ready with description, icons, and version
+- `pack` script for creating submission ZIP from dist/
+- Privacy policy for Chrome Web Store listing
+- Store listing description and assets
+- Independent versioning from server packages (ADR 0036)
+
+[ext-chrome-v0.1.0]: https://github.com/redvex/browser-bridge/releases/tag/ext-chrome-v0.1.0
+
 ## [0.1.0] - 2026-06-02
 
 First official release of BrowserBridge — a user-controlled bridge between
