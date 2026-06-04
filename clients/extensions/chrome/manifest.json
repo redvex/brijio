@@ -1,16 +1,30 @@
 {
   "manifest_version": 3,
   "name": "BrowserBridge",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "minimum_chrome_version": "116",
-  "description": "User-controlled bridge between Chrome and AI agents.",
+  "description": "Connect AI agents to the browser session you already control. Privacy-first, user-controlled, no shared credentials.",
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "action": {
     "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    },
     "default_title": "BrowserBridge"
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png",
+    "256": "icons/icon-256.png",
+    "512": "icons/icon-512.png"
   },
   "permissions": ["activeTab", "scripting", "storage", "tabs"],
   "host_permissions": ["http://*/*", "https://*/*"]
