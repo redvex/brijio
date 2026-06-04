@@ -71,9 +71,8 @@ jobs:
       - name: Create submission ZIP
         run: |
           cd clients/extensions/chrome/dist
-          zip -r ../../../browserbridge-chrome-extension.zip .
-          cd -
-          ls -lh browserbridge-chrome-extension.zip
+          zip -r "${GITHUB_WORKSPACE}/browserbridge-chrome-extension.zip" .
+          ls -lh "${GITHUB_WORKSPACE}/browserbridge-chrome-extension.zip"
 
       - name: Extract version from tag
         id: version
