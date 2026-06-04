@@ -44,7 +44,7 @@ jobs:
             echo "::error::dist/manifest.json not found after build"
             exit 1
           fi
-          VERSION=$(node -p "require('$MANIFEST').version")
+          VERSION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$MANIFEST','utf8')).version)")
           TAG_VERSION="${GITHUB_REF_NAME#ext-chrome-v}"
           if [ "$VERSION" != "$TAG_VERSION" ]; then
             echo "::error::Manifest version $VERSION does not match tag version $TAG_VERSION"
