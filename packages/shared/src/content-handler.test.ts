@@ -1,163 +1,166 @@
-import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
-import { parseHTML } from 'linkedom'
-import { handleContentRequest, type ContentEnvironment } from './content-handler.js'
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { parseHTML } from "linkedom";
+import {
+  handleContentRequest,
+  type ContentEnvironment,
+} from "./content-handler.js";
 
-void describe('content handler request handler', () => {
-  void it('handles extract_page_context requests', () => {
-    const { document } = parseHTML('<main><h1>Example</h1><p>Hello</p></main>')
+void describe("content handler request handler", () => {
+  void it("handles extract_page_context requests", () => {
+    const { document } = parseHTML("<main><h1>Example</h1><p>Hello</p></main>");
 
     const response = handleContentRequest(
       {
-        type: 'extract_page_context',
+        type: "extract_page_context",
         previewMaxBytes: 4096,
-        defaultMaxPayloadBytes: 131072
+        defaultMaxPayloadBytes: 131072,
       },
       {
         document,
-        locationHref: 'https://example.com/',
-        title: 'Example',
-        selectedText: '',
-        now: () => '2026-05-25T10:00:00.000Z'
-      }
-    )
+        locationHref: "https://example.com/",
+        title: "Example",
+        selectedText: "",
+        now: () => "2026-05-25T10:00:00.000Z",
+      },
+    );
 
-    assert.equal(response.ok, true)
-    if (!response.ok || !('url' in response.data)) {
-      assert.fail('Expected a successful page context response.')
+    assert.equal(response.ok, true);
+    if (!response.ok || !("url" in response.data)) {
+      assert.fail("Expected a successful page context response.");
     }
-    assert.equal(response.data.url, 'https://example.com/')
-  })
+    assert.equal(response.data.url, "https://example.com/");
+  });
 
-  void it('handles extract_page_content requests', () => {
-    const { document } = parseHTML('<main><h1>Example</h1><p>Hello</p></main>')
+  void it("handles extract_page_content requests", () => {
+    const { document } = parseHTML("<main><h1>Example</h1><p>Hello</p></main>");
 
     const response = handleContentRequest(
       {
-        type: 'extract_page_content',
+        type: "extract_page_content",
         index: 1,
         maxContentBytes: 120000,
-        maxPayloadBytes: 131072
+        maxPayloadBytes: 131072,
       },
       {
         document,
-        locationHref: 'https://example.com/',
-        title: 'Example',
-        selectedText: '',
-        now: () => '2026-05-25T10:01:00.000Z'
-      }
-    )
+        locationHref: "https://example.com/",
+        title: "Example",
+        selectedText: "",
+        now: () => "2026-05-25T10:01:00.000Z",
+      },
+    );
 
-    assert.equal(response.ok, true)
-    if (!response.ok || !('index' in response.data)) {
-      assert.fail('Expected a page content response.')
+    assert.equal(response.ok, true);
+    if (!response.ok || !("index" in response.data)) {
+      assert.fail("Expected a page content response.");
     }
-    assert.equal(response.data.index, 1)
-    assert.equal(response.data.content.includes('# Example'), true)
-  })
+    assert.equal(response.data.index, 1);
+    assert.equal(response.data.content.includes("# Example"), true);
+  });
 
-  void it('returns invalid_index for unavailable chunks', () => {
-    const { document } = parseHTML('<main><p>Only one chunk</p></main>')
+  void it("returns invalid_index for unavailable chunks", () => {
+    const { document } = parseHTML("<main><p>Only one chunk</p></main>");
 
     const response = handleContentRequest(
       {
-        type: 'extract_page_content',
+        type: "extract_page_content",
         index: 2,
         maxContentBytes: 120000,
-        maxPayloadBytes: 131072
+        maxPayloadBytes: 131072,
       },
       {
         document,
-        locationHref: 'https://example.com/',
-        title: 'Example',
-        selectedText: '',
-        now: () => '2026-05-25T10:02:00.000Z'
-      }
-    )
+        locationHref: "https://example.com/",
+        title: "Example",
+        selectedText: "",
+        now: () => "2026-05-25T10:02:00.000Z",
+      },
+    );
 
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'invalid_index',
-        message: 'Page content chunk index must be available and 1-based.'
-      }
-    })
-  })
+        code: "invalid_index",
+        message: "Page content chunk index must be available and 1-based.",
+      },
+    });
+  });
 
-  void it('clicks a visible link target by page-context id', () => {
+  void it("clicks a visible link target by page-context id", () => {
     const { document } = parseHTML(
-      '<main><a href="/first">First</a><a href="/second">Second</a></main>'
-    )
-    let clickedHref = ''
+      '<main><a href="/first">First</a><a href="/second">Second</a></main>',
+    );
+    let clickedHref = "";
 
-    document.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', (event) => {
-        event.preventDefault()
-        clickedHref = link.getAttribute('href') ?? ''
-      })
-    })
+    document.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        clickedHref = link.getAttribute("href") ?? "";
+      });
+    });
 
     const response = handleContentRequest(
       {
-        type: 'perform_click',
+        type: "perform_click",
         target: {
-          kind: 'link',
-          id: 'bb-2'
-        }
+          kind: "link",
+          id: "bb-2",
+        },
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: true,
       data: {
-        action: 'click',
+        action: "click",
         target: {
-          kind: 'link',
-          id: 'bb-2'
-        }
-      }
-    })
-    assert.equal(clickedHref, '/second')
-  })
+          kind: "link",
+          id: "bb-2",
+        },
+      },
+    });
+    assert.equal(clickedHref, "/second");
+  });
 
-  void it('clicks an enabled button-like action target by page-context id', () => {
+  void it("clicks an enabled button-like action target by page-context id", () => {
     const { document } = parseHTML(
-      '<main><button>Save</button><button>Publish</button></main>'
-    )
-    let clickedText = ''
+      "<main><button>Save</button><button>Publish</button></main>",
+    );
+    let clickedText = "";
 
-    document.querySelectorAll('button').forEach((button) => {
-      button.addEventListener('click', () => {
-        clickedText = button.textContent ?? ''
-      })
-    })
+    document.querySelectorAll("button").forEach((button) => {
+      button.addEventListener("click", () => {
+        clickedText = button.textContent ?? "";
+      });
+    });
 
     const response = handleContentRequest(
       {
-        type: 'perform_click',
+        type: "perform_click",
         target: {
-          kind: 'action',
-          id: 'bb-2'
-        }
+          kind: "action",
+          id: "bb-2",
+        },
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: true,
       data: {
-        action: 'click',
+        action: "click",
         target: {
-          kind: 'action',
-          id: 'bb-2'
-        }
-      }
-    })
-    assert.equal(clickedText, 'Publish')
-  })
+          kind: "action",
+          id: "bb-2",
+        },
+      },
+    });
+    assert.equal(clickedText, "Publish");
+  });
 
-  void it('writes text to a visible text input target by form-control id', () => {
+  void it("writes text to a visible text input target by form-control id", () => {
     const { document } = parseHTML(`
       <main>
         <form>
@@ -165,69 +168,69 @@ void describe('content handler request handler', () => {
           <label>Search <input type="search" value="" /></label>
         </form>
       </main>
-    `)
+    `);
     const input = document.querySelector(
-      'input[type="search"]'
-    ) as HTMLInputElement
+      'input[type="search"]',
+    ) as HTMLInputElement;
 
     const response = handleContentRequest(
       {
-        type: 'perform_write_text',
+        type: "perform_write_text",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-2'
+          formId: "bb-1",
+          controlId: "bb-2",
         },
-        text: 'Ada Lovelace'
+        text: "Ada Lovelace",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: true,
       data: {
-        action: 'write_text',
+        action: "write_text",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-2'
+          formId: "bb-1",
+          controlId: "bb-2",
         },
-        textLength: 12
-      }
-    })
-    assert.equal(input.value, 'Ada Lovelace')
-  })
+        textLength: 12,
+      },
+    });
+    assert.equal(input.value, "Ada Lovelace");
+  });
 
-  void it('writes text to a visible textarea target and dispatches input events', () => {
+  void it("writes text to a visible textarea target and dispatches input events", () => {
     const { document } = parseHTML(`
       <main>
         <form>
           <textarea>Draft</textarea>
         </form>
       </main>
-    `)
-    const textarea = document.querySelector('textarea') as HTMLTextAreaElement
-    const dispatchedEvents: string[] = []
+    `);
+    const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+    const dispatchedEvents: string[] = [];
 
-    textarea.addEventListener('input', () => dispatchedEvents.push('input'))
-    textarea.addEventListener('change', () => dispatchedEvents.push('change'))
+    textarea.addEventListener("input", () => dispatchedEvents.push("input"));
+    textarea.addEventListener("change", () => dispatchedEvents.push("change"));
 
     const response = handleContentRequest(
       {
-        type: 'perform_write_text',
+        type: "perform_write_text",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
-        text: 'Ready'
+        text: "Ready",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
-    assert.equal(response.ok, true)
-    assert.equal(textarea.value, 'Ready')
-    assert.deepEqual(dispatchedEvents, ['input', 'change'])
-  })
+    assert.equal(response.ok, true);
+    assert.equal(textarea.value, "Ready");
+    assert.deepEqual(dispatchedEvents, ["input", "change"]);
+  });
 
-  void it('writes text to additional value-entry input types', () => {
+  void it("writes text to additional value-entry input types", () => {
     const { document } = parseHTML(`
       <main>
         <form>
@@ -236,182 +239,182 @@ void describe('content handler request handler', () => {
           <input type="number" />
         </form>
       </main>
-    `)
+    `);
     const input = document.querySelector(
-      'input[type="number"]'
-    ) as HTMLInputElement
+      'input[type="number"]',
+    ) as HTMLInputElement;
 
     const response = handleContentRequest(
       {
-        type: 'perform_write_text',
+        type: "perform_write_text",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-3'
+          formId: "bb-1",
+          controlId: "bb-3",
         },
-        text: '42'
+        text: "42",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
-    assert.equal(response.ok, true)
-    assert.equal(input.value, '42')
-  })
+    assert.equal(response.ok, true);
+    assert.equal(input.value, "42");
+  });
 
-  void it('writes text to a visible contenteditable target', () => {
+  void it("writes text to a visible contenteditable target", () => {
     const { document } = parseHTML(`
       <main>
         <div contenteditable="true" role="textbox" aria-label="Notes">Draft</div>
       </main>
-    `)
-    const editable = document.querySelector('[contenteditable]') as HTMLElement
-    const dispatchedEvents: string[] = []
+    `);
+    const editable = document.querySelector("[contenteditable]") as HTMLElement;
+    const dispatchedEvents: string[] = [];
 
-    editable.addEventListener('input', () => dispatchedEvents.push('input'))
+    editable.addEventListener("input", () => dispatchedEvents.push("input"));
 
     const response = handleContentRequest(
       {
-        type: 'perform_write_text',
+        type: "perform_write_text",
         target: {
-          kind: 'editable',
-          id: 'bb-1'
+          kind: "editable",
+          id: "bb-1",
         },
-        text: 'Ready'
+        text: "Ready",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: true,
       data: {
-        action: 'write_text',
+        action: "write_text",
         target: {
-          kind: 'editable',
-          id: 'bb-1'
+          kind: "editable",
+          id: "bb-1",
         },
-        textLength: 5
-      }
-    })
-    assert.equal(editable.textContent, 'Ready')
-    assert.deepEqual(dispatchedEvents, ['input'])
-  })
+        textLength: 5,
+      },
+    });
+    assert.equal(editable.textContent, "Ready");
+    assert.deepEqual(dispatchedEvents, ["input"]);
+  });
 
-  void it('returns target_disabled for disabled text targets', () => {
+  void it("returns target_disabled for disabled text targets", () => {
     const { document } = parseHTML(
-      '<main><form><input type="text" disabled /></form></main>'
-    )
+      '<main><form><input type="text" disabled /></form></main>',
+    );
 
     const response = handleContentRequest(
       {
-        type: 'perform_write_text',
+        type: "perform_write_text",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
-        text: 'Ada Lovelace'
+        text: "Ada Lovelace",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'target_disabled',
-        message: 'The requested text target is disabled.'
-      }
-    })
-  })
+        code: "target_disabled",
+        message: "The requested text target is disabled.",
+      },
+    });
+  });
 
-  void it('returns target_readonly for readonly text targets', () => {
+  void it("returns target_readonly for readonly text targets", () => {
     const { document } = parseHTML(
-      '<main><form><input type="text" readonly /></form></main>'
-    )
+      '<main><form><input type="text" readonly /></form></main>',
+    );
 
     const response = handleContentRequest(
       {
-        type: 'perform_write_text',
+        type: "perform_write_text",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
-        text: 'Ada Lovelace'
+        text: "Ada Lovelace",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'target_readonly',
-        message: 'The requested text target is read-only.'
-      }
-    })
-  })
+        code: "target_readonly",
+        message: "The requested text target is read-only.",
+      },
+    });
+  });
 
-  void it('returns unsupported_control for unsupported form controls', () => {
+  void it("returns unsupported_control for unsupported form controls", () => {
     const { document } = parseHTML(
-      '<main><form><input type="password" /></form></main>'
-    )
+      '<main><form><input type="password" /></form></main>',
+    );
 
     const response = handleContentRequest(
       {
-        type: 'perform_write_text',
+        type: "perform_write_text",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
-        text: 'Ada Lovelace'
+        text: "Ada Lovelace",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'unsupported_control',
-        message: 'The requested form control does not support text writing.'
-      }
-    })
-  })
+        code: "unsupported_control",
+        message: "The requested form control does not support text writing.",
+      },
+    });
+  });
 
-  void it('sets checkbox checked state by form-control id', () => {
+  void it("sets checkbox checked state by form-control id", () => {
     const { document } = parseHTML(
-      '<main><form><input type="checkbox" /></form></main>'
-    )
-    const checkbox = document.querySelector('input') as HTMLInputElement
-    const dispatchedEvents: string[] = []
+      '<main><form><input type="checkbox" /></form></main>',
+    );
+    const checkbox = document.querySelector("input") as HTMLInputElement;
+    const dispatchedEvents: string[] = [];
 
-    checkbox.addEventListener('input', () => dispatchedEvents.push('input'))
-    checkbox.addEventListener('change', () => dispatchedEvents.push('change'))
+    checkbox.addEventListener("input", () => dispatchedEvents.push("input"));
+    checkbox.addEventListener("change", () => dispatchedEvents.push("change"));
 
     const response = handleContentRequest(
       {
-        type: 'perform_set_checked',
+        type: "perform_set_checked",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
-        },
-        checked: true
-      },
-      createEnvironment(document)
-    )
-
-    assert.deepEqual(response, {
-      ok: true,
-      data: {
-        action: 'set_checked',
-        target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
         checked: true,
-        changed: true
-      }
-    })
-    assert.equal(checkbox.checked, true)
-    assert.deepEqual(dispatchedEvents, ['input', 'change'])
-  })
+      },
+      createEnvironment(document),
+    );
 
-  void it('selects a radio option by form-control id', () => {
+    assert.deepEqual(response, {
+      ok: true,
+      data: {
+        action: "set_checked",
+        target: {
+          formId: "bb-1",
+          controlId: "bb-1",
+        },
+        checked: true,
+        changed: true,
+      },
+    });
+    assert.equal(checkbox.checked, true);
+    assert.deepEqual(dispatchedEvents, ["input", "change"]);
+  });
+
+  void it("selects a radio option by form-control id", () => {
     const { document } = parseHTML(`
       <main>
         <form>
@@ -419,27 +422,27 @@ void describe('content handler request handler', () => {
           <input name="choice" type="radio" value="two" />
         </form>
       </main>
-    `)
-    const radios = document.querySelectorAll('input')
+    `);
+    const radios = document.querySelectorAll("input");
 
     const response = handleContentRequest(
       {
-        type: 'perform_set_checked',
+        type: "perform_set_checked",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-2'
+          formId: "bb-1",
+          controlId: "bb-2",
         },
-        checked: true
+        checked: true,
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
-    assert.equal(response.ok, true)
-    assert.equal((radios[0]).checked, false)
-    assert.equal((radios[1]).checked, true)
-  })
+    assert.equal(response.ok, true);
+    assert.equal(radios[0].checked, false);
+    assert.equal(radios[1].checked, true);
+  });
 
-  void it('selects options by form-control id', () => {
+  void it("selects options by form-control id", () => {
     const { document } = parseHTML(`
       <main>
         <form>
@@ -450,177 +453,437 @@ void describe('content handler request handler', () => {
           </select>
         </form>
       </main>
-    `)
-    const options = document.querySelectorAll('option')
+    `);
+    const options = document.querySelectorAll("option");
 
     const response = handleContentRequest(
       {
-        type: 'perform_select_options',
+        type: "perform_select_options",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
-        values: ['alpha', 'gamma']
+        values: ["alpha", "gamma"],
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: true,
       data: {
-        action: 'select_options',
+        action: "select_options",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
-        values: ['alpha', 'gamma']
-      }
-    })
-    assert.equal((options[0]).selected, true)
-    assert.equal((options[1]).selected, false)
-    assert.equal((options[2]).selected, true)
-  })
+        values: ["alpha", "gamma"],
+      },
+    });
+    assert.equal(options[0].selected, true);
+    assert.equal(options[1].selected, false);
+    assert.equal(options[2].selected, true);
+  });
 
-  void it('returns option_not_found for unavailable option values', () => {
+  void it("returns option_not_found for unavailable option values", () => {
     const { document } = parseHTML(
-      '<main><form><select><option value="alpha">Alpha</option></select></form></main>'
-    )
+      '<main><form><select><option value="alpha">Alpha</option></select></form></main>',
+    );
 
     const response = handleContentRequest(
       {
-        type: 'perform_select_options',
+        type: "perform_select_options",
         target: {
-          formId: 'bb-1',
-          controlId: 'bb-1'
+          formId: "bb-1",
+          controlId: "bb-1",
         },
-        values: ['missing']
+        values: ["missing"],
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'option_not_found',
-        message: 'The requested option value was not found.'
-      }
-    })
-  })
+        code: "option_not_found",
+        message: "The requested option value was not found.",
+      },
+    });
+  });
 
-  void it('submits a visible form by form id', () => {
-    const { document } = parseHTML('<main><form></form></main>')
-    const form = document.querySelector('form') as HTMLFormElement & {
-      requestSubmit: () => void
-    }
-    let submitted = false
+  void it("submits a visible form by form id", () => {
+    const { document } = parseHTML("<main><form></form></main>");
+    const form = document.querySelector("form") as HTMLFormElement & {
+      requestSubmit: () => void;
+    };
+    let submitted = false;
 
     form.requestSubmit = () => {
-      submitted = true
-    }
+      submitted = true;
+    };
 
     const response = handleContentRequest(
       {
-        type: 'perform_submit_form',
+        type: "perform_submit_form",
         target: {
-          formId: 'bb-1'
-        }
+          formId: "bb-1",
+        },
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: true,
       data: {
-        action: 'submit_form',
+        action: "submit_form",
         target: {
-          formId: 'bb-1'
-        }
-      }
-    })
-    assert.equal(submitted, true)
-  })
-
-  void it('returns target_not_found when no matching text target exists', () => {
-    const { document } = parseHTML(
-      '<main><form><input type="text" /></form></main>'
-    )
-
-    const response = handleContentRequest(
-      {
-        type: 'perform_write_text',
-        target: {
-          formId: 'bb-2',
-          controlId: 'bb-1'
+          formId: "bb-1",
         },
-        text: 'Ada Lovelace'
       },
-      createEnvironment(document)
-    )
+    });
+    assert.equal(submitted, true);
+  });
 
-    assert.deepEqual(response, {
-      ok: false,
-      error: {
-        code: 'target_not_found',
-        message: 'No matching text target was found.'
-      }
-    })
-  })
-
-  void it('returns target_disabled for disabled button-like action targets', () => {
+  void it("returns target_not_found when no matching text target exists", () => {
     const { document } = parseHTML(
-      '<main><button disabled>Save</button></main>'
-    )
+      '<main><form><input type="text" /></form></main>',
+    );
 
     const response = handleContentRequest(
       {
-        type: 'perform_click',
+        type: "perform_write_text",
         target: {
-          kind: 'action',
-          id: 'bb-1'
-        }
+          formId: "bb-2",
+          controlId: "bb-1",
+        },
+        text: "Ada Lovelace",
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'target_disabled',
-        message: 'The requested click target is disabled.'
-      }
-    })
-  })
+        code: "target_not_found",
+        message: "No matching text target was found.",
+      },
+    });
+  });
 
-  void it('returns target_not_found when no matching click target exists', () => {
-    const { document } = parseHTML('<main><button>Save</button></main>')
+  void it("returns target_disabled for disabled button-like action targets", () => {
+    const { document } = parseHTML(
+      "<main><button disabled>Save</button></main>",
+    );
 
     const response = handleContentRequest(
       {
-        type: 'perform_click',
+        type: "perform_click",
         target: {
-          kind: 'link',
-          id: 'bb-1'
-        }
+          kind: "action",
+          id: "bb-1",
+        },
       },
-      createEnvironment(document)
-    )
+      createEnvironment(document),
+    );
 
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'target_not_found',
-        message: 'No matching click target was found.'
-      }
-    })
-  })
-})
+        code: "target_disabled",
+        message: "The requested click target is disabled.",
+      },
+    });
+  });
 
-function createEnvironment (document: Document): ContentEnvironment {
+  void it("returns target_not_found when no matching click target exists", () => {
+    const { document } = parseHTML("<main><button>Save</button></main>");
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: {
+          kind: "link",
+          id: "bb-1",
+        },
+      },
+      createEnvironment(document),
+    );
+
+    assert.deepEqual(response, {
+      ok: false,
+      error: {
+        code: "target_not_found",
+        message: "No matching click target was found.",
+      },
+    });
+  });
+
+  // ── Stale-context validation tests ─────────────────────────────────
+
+  void it("clicks a link when expectedText matches (case-insensitive)", () => {
+    const { document } = parseHTML(
+      '<main><a href="/first">First Page</a><a href="/second">Second Page</a></main>',
+    );
+    let clickedHref = "";
+    document.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        clickedHref = link.getAttribute("href") ?? "";
+      });
+    });
+
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "link", id: "bb-1", expectedText: "first" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, true);
+    assert.equal(clickedHref, "/first");
+  });
+
+  void it("returns stale_context when expectedText does not match", () => {
+    const { document } = parseHTML(
+      '<main><a href="/first">First Page</a><a href="/second">Second Page</a></main>',
+    );
+
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "link", id: "bb-1", expectedText: "Second" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, false);
+    if (response.ok) {
+      assert.fail("Expected stale_context error");
+      return;
+    }
+    assert.equal(response.error.code, "stale_context");
+    assert.equal(
+      response.error.message.includes('Expected text containing "Second"'),
+      true,
+    );
+    assert.equal(
+      response.error.message.includes("Call read_current_page"),
+      true,
+    );
+    if (!response.error.detail) {
+      assert.fail("Expected detail on stale_context error");
+      return;
+    }
+    assert.equal(response.error.detail.id, "bb-1");
+    assert.equal(response.error.detail.kind, "link");
+    assert.equal(response.error.detail.expectedText, "Second");
+    assert.equal(response.error.detail.foundText, "First Page");
+  });
+
+  void it("returns stale_context when expectedHref does not match (link)", () => {
+    const { document } = parseHTML(
+      '<main><a href="/payments">Payments</a><a href="/jobs">My Jobs</a></main>',
+    );
+
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "link", id: "bb-2", expectedHref: "/payments" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, false);
+    if (response.ok) {
+      assert.fail("Expected stale_context error");
+      return;
+    }
+    assert.equal(response.error.code, "stale_context");
+    assert.equal(response.error.detail?.expectedHref, "/payments");
+    assert.equal(response.error.detail?.foundHref, "/jobs");
+  });
+
+  void it("clicks a link when expectedHref matches (pathname)", () => {
+    const { document } = parseHTML(
+      '<main><a href="/jobs?page=2">My Jobs</a></main>',
+    );
+    let clickedHref = "";
+    document.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        clickedHref = link.getAttribute("href") ?? "";
+      });
+    });
+
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "link", id: "bb-1", expectedHref: "/jobs" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, true);
+    assert.equal(clickedHref, "/jobs?page=2");
+  });
+
+  void it("returns stale_context when expectedRole does not match (action)", () => {
+    const { document } = parseHTML(
+      '<main><button>Save</button><button role="switch">Toggle</button></main>',
+    );
+
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "action", id: "bb-2", expectedRole: "button" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, false);
+    if (response.ok) {
+      assert.fail("Expected stale_context error");
+      return;
+    }
+    assert.equal(response.error.code, "stale_context");
+    assert.equal(response.error.detail?.expectedRole, "button");
+    assert.equal(response.error.detail?.foundRole, "switch");
+  });
+
+  void it("clicks an action when expectedRole matches implicit role", () => {
+    const { document } = parseHTML("<main><button>Save</button></main>");
+    let clicked = false;
+    document.querySelector("button")!.addEventListener("click", () => {
+      clicked = true;
+    });
+
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "action", id: "bb-1", expectedRole: "button" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, true);
+    assert.equal(clicked, true);
+  });
+
+  void it("ignores expectedHref for kind=action targets", () => {
+    const { document } = parseHTML("<main><button>Save</button></main>");
+    let clicked = false;
+    document.querySelector("button")!.addEventListener("click", () => {
+      clicked = true;
+    });
+
+    // expectedHref should be ignored for actions — only expectedText and expectedRole apply
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: {
+          kind: "action",
+          id: "bb-1",
+          expectedText: "Save",
+          expectedHref: "/irrelevant",
+        },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, true);
+    assert.equal(clicked, true);
+  });
+
+  void it("ignores empty expectedText (treated as not provided)", () => {
+    const { document } = parseHTML('<main><a href="/page">A Page</a></main>');
+    let clicked = false;
+    document.querySelector("a")!.addEventListener("click", (event) => {
+      event.preventDefault();
+      clicked = true;
+    });
+
+    // Empty string expectedText is treated as not provided, so no validation
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "link", id: "bb-1", expectedText: "" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, true);
+    assert.equal(clicked, true);
+  });
+
+  void it("returns stale_context with multiple mismatching validations", () => {
+    const { document } = parseHTML(
+      '<main><a href="/payments">Payments History</a></main>',
+    );
+
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: {
+          kind: "link",
+          id: "bb-1",
+          expectedText: "My Jobs",
+          expectedHref: "/jobs",
+        },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, false);
+    if (response.ok) {
+      assert.fail("Expected stale_context error");
+      return;
+    }
+    assert.equal(response.error.code, "stale_context");
+    // Both text and href should mismatch
+    assert.equal(
+      response.error.message.includes('Expected text containing "My Jobs"'),
+      true,
+    );
+    assert.equal(
+      response.error.message.includes('Expected href path "/jobs"'),
+      true,
+    );
+    assert.equal(response.error.detail?.expectedText, "My Jobs");
+    assert.equal(response.error.detail?.foundText, "Payments History");
+    assert.equal(response.error.detail?.expectedHref, "/jobs");
+  });
+
+  void it("clicks without validation when no expected fields are provided", () => {
+    const { document } = parseHTML(
+      '<main><a href="/first">First</a><a href="/second">Second</a></main>',
+    );
+    let clickedHref = "";
+    document.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        clickedHref = link.getAttribute("href") ?? "";
+      });
+    });
+
+    // No validation — backward compatible, existing behavior
+    const response = handleContentRequest(
+      {
+        type: "perform_click",
+        target: { kind: "link", id: "bb-2" },
+      },
+      createEnvironment(document),
+    );
+
+    assert.equal(response.ok, true);
+    assert.equal(clickedHref, "/second");
+  });
+});
+
+function createEnvironment(document: Document): ContentEnvironment {
   return {
     document,
-    locationHref: 'https://example.com/',
-    title: 'Example',
-    selectedText: '',
-    now: () => '2026-05-25T10:03:00.000Z'
-  }
+    locationHref: "https://example.com/",
+    title: "Example",
+    selectedText: "",
+    now: () => "2026-05-25T10:03:00.000Z",
+  };
 }
