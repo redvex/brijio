@@ -24,13 +24,18 @@ Placing tokens in `EnvironmentVariables` inside a LaunchAgent plist works functi
 
 ## Decision
 
-### 1. Add `install`, `uninstall`, `status` subcommands
+### 1. Add daemon lifecycle subcommands
 
 ```
 npx @redvex/browserbridge          # Run interactively (current behaviour, unchanged)
 npx @redvex/browserbridge install   # Install as daemon (LaunchAgent / systemd)
 npx @redvex/browserbridge uninstall # Remove the daemon
+npx @redvex/browserbridge start     # Start the installed daemon
+npx @redvex/browserbridge stop      # Stop the installed daemon
+npx @redvex/browserbridge restart   # Restart the installed daemon
 npx @redvex/browserbridge status    # Check daemon status
+npx @redvex/browserbridge logs      # Show recent daemon logs
+npx @redvex/browserbridge logs --live # Follow daemon logs until interrupted
 ```
 
 Optional flags for `install`:
@@ -42,7 +47,7 @@ Optional flags for `install`:
 
 These write custom ports into `~/.browserbridge/.env` so the daemon starts on the specified ports. Without flags, defaults apply. Re-running `install` with different port values updates the `.env` and restarts the daemon on the new ports.
 
-These are **subcommands**, not flags (`--install`). Server flags (`--port`, `--token`) remain flags when running interactively. Meta-operations on the daemon are actions — the subcommand form is cleaner, avoids collision with server args, and leaves room for future commands (e.g. `logs`, `restart`).
+These are **subcommands**, not flags (`--install`). Server flags (`--port`, `--token`) remain flags when running interactively. Meta-operations on the daemon are actions — the subcommand form is cleaner, avoids collision with server args, and leaves room for future commands (e.g. token rotation).
 
 ### 2. Configuration directory: `~/.browserbridge/`
 
@@ -178,6 +183,19 @@ npx @redvex/browserbridge status
 4. Pings both health endpoints (`localhost:8787/health`, `localhost:8788/health`)
 5. Prints a unified status table
 
+### 9. Lifecycle and logs commands
+
+```
+npx @redvex/browserbridge stop
+npx @redvex/browserbridge start
+npx @redvex/browserbridge restart
+npx @redvex/browserbridge logs [--lines 100] [--live]
+```
+
+- **macOS**: `start` / `stop` / `restart` wrap `launchctl load` and `launchctl unload` for the LaunchAgent link. `logs` tails `~/.browserbridge/browserbridge.log`; `logs --live` runs `tail -f` with the requested initial line count.
+- **Linux**: `start` / `stop` / `restart` wrap `systemctl --user start|stop|restart browserbridge.service`. `logs` reads `journalctl --user -u browserbridge.service`; `logs --live` uses `journalctl --follow`.
+- These commands do not modify `~/.browserbridge/.env` and do not remove the service definition.
+
 ## Consequences
 
 ### Positive
@@ -203,8 +221,6 @@ npx @redvex/browserbridge status
 
 ## Future work (out of scope)
 
-- **`npx @redvex/browserbridge logs`** — tail the daemon log file
-- **`npx @redvex/browserbridge restart`** — unload + load the daemon
 - **Windows support** — scheduled task via `schtasks`
 - **Token rotation** — `install --rotate-tokens` to regenerate and update `.env`
 - **Health monitoring** — watchdog that pings `/health` and restarts on failure
