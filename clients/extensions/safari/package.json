@@ -2,7 +2,7 @@
   "name": "@browserbridge/safari-extension",
   "version": "0.0.0",
   "private": true,
-  "description": "BrowserBridge Safari extension.",
+  "description": "Brijio Safari extension.",
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {

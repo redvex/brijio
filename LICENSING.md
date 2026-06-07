@@ -1,6 +1,6 @@
-# BrowserBridge Licensing
+# Brijio Licensing
 
-BrowserBridge follows an open-core friendly model built on AGPLv3.
+Brijio follows an open-core friendly model built on AGPLv3.
 
 ## Repository License
 

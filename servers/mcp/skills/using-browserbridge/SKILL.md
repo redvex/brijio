@@ -1,11 +1,11 @@
 ---
 name: using-browserbridge
-description: Use when starting any BrowserBridge session — establishes how to discover and use skills, which tools are available, and when to invoke each skill before any browser interaction.
+description: Use when starting any Brijio session — establishes how to discover and use skills, which tools are available, and when to invoke each skill before any browser interaction.
 ---
 
-# Using BrowserBridge
+# Using Brijio
 
-BrowserBridge connects your AI agent to the user's real browser. The browser
+Brijio connects your AI agent to the user's real browser. The browser
 extension is only active while the user explicitly starts it, so always check
 for connected browsers first.
 
@@ -55,7 +55,7 @@ skill://browserbridge/{skill_name}
 | ------------------- | ----------------------------------------------------------------- |
 | `list_browsers`     | Check which browsers are connected. **Always call this first.**   |
 | `read_current_page` | Get the current page context (URL, title, forms, links, actions). |
-| `read_resource`     | Read BrowserBridge content chunks for large pages (paginated).    |
+| `read_resource`     | Read Brijio content chunks for large pages (paginated).           |
 
 ### Interaction
 
@@ -78,7 +78,7 @@ elements if the page may have changed.**
 
 ## Step 1: Check Connection
 
-Every BrowserBridge session starts with a connection check:
+Every Brijio session starts with a connection check:
 
 ```
 → list_browsers
@@ -128,7 +128,7 @@ These thoughts mean STOP — you're about to make a mistake:
 
 ## User Instructions Always Win
 
-BrowserBridge skills override default system behavior, but **user instructions
+Brijio skills override default system behavior, but **user instructions
 always take precedence**. If the user explicitly says "skip the skill" or
 "just click the button," follow the user's request.
 

@@ -11,6 +11,7 @@ import {
   isPlaceholderToken,
   classifyEnv,
   generateConfig,
+  withCompatibilityAliases,
   healthCheck,
   printBanner,
   parseArgs,
@@ -32,10 +33,10 @@ function removeTempDir (dir) {
 const SAMPLE_ENV_EXAMPLE = [
   'WEBSOCKET_HOST=127.0.0.1',
   'WEBSOCKET_PORT=8787',
-  'BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787',
-  'BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000',
-  'BROWSERBRIDGE_PAIRING_TOKEN=replace-with-generated-token',
-  'BROWSERBRIDGE_BROWSER_INSTANCE_ID=',
+  'BRIJIO_WS_URL=ws://127.0.0.1:8787',
+  'BRIJIO_REQUEST_TIMEOUT_MS=5000',
+  'BRIJIO_PAIRING_TOKEN=replace-with-generated-token',
+  'BRIJIO_BROWSER_INSTANCE_ID=',
   'MCP_HTTP_HOST=127.0.0.1',
   'MCP_HTTP_PORT=8788',
   'MCP_HTTP_PATH=/mcp',
@@ -204,9 +205,9 @@ void describe('generateConfig', () => {
 
     assert.equal(config.WEBSOCKET_HOST, '0.0.0.0')
     assert.equal(config.MCP_HTTP_HOST, '0.0.0.0')
-    assert.match(config.BROWSERBRIDGE_PAIRING_TOKEN, /^[A-Za-z0-9_-]{43}$/)
+    assert.match(config.BRIJIO_PAIRING_TOKEN, /^[A-Za-z0-9_-]{43}$/)
     assert.match(config.MCP_HTTP_AUTH_TOKEN, /^[A-Za-z0-9_-]{43}$/)
-    assert.equal(config.BROWSERBRIDGE_WEBSOCKET_URL, 'ws://127.0.0.1:8787')
+    assert.equal(config.BRIJIO_WS_URL, 'ws://127.0.0.1:8787')
   })
 
   void it('preserves ports and other values from defaults', () => {
@@ -215,6 +216,33 @@ void describe('generateConfig', () => {
     assert.equal(config.WEBSOCKET_PORT, '8787')
     assert.equal(config.MCP_HTTP_PORT, '8788')
     assert.equal(config.MCP_HTTP_PATH, '/mcp')
+  })
+  void it('adds BrowserBridge aliases for generated Brijio config', () => {
+    const config = withCompatibilityAliases({
+      BRIJIO_PAIRING_TOKEN: 'pair-abc123',
+      BRIJIO_WS_URL: 'ws://127.0.0.1:8787',
+      BRIJIO_REQUEST_TIMEOUT_MS: '5000',
+      BRIJIO_BROWSER_INSTANCE_ID: 'chrome-main'
+    })
+
+    assert.equal(config.BROWSERBRIDGE_PAIRING_TOKEN, 'pair-abc123')
+    assert.equal(config.BROWSERBRIDGE_WEBSOCKET_URL, 'ws://127.0.0.1:8787')
+    assert.equal(config.BROWSERBRIDGE_REQUEST_TIMEOUT_MS, '5000')
+    assert.equal(config.BROWSERBRIDGE_BROWSER_INSTANCE_ID, 'chrome-main')
+  })
+
+  void it('adds Brijio aliases for legacy BrowserBridge config', () => {
+    const config = withCompatibilityAliases({
+      BROWSERBRIDGE_PAIRING_TOKEN: 'legacy-pair',
+      BROWSERBRIDGE_WEBSOCKET_URL: 'ws://legacy.example:8787',
+      BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '8000',
+      BROWSERBRIDGE_BROWSER_INSTANCE_ID: 'legacy-browser'
+    })
+
+    assert.equal(config.BRIJIO_PAIRING_TOKEN, 'legacy-pair')
+    assert.equal(config.BRIJIO_WS_URL, 'ws://legacy.example:8787')
+    assert.equal(config.BRIJIO_REQUEST_TIMEOUT_MS, '8000')
+    assert.equal(config.BRIJIO_BROWSER_INSTANCE_ID, 'legacy-browser')
   })
 })
 
@@ -285,12 +313,12 @@ void describe('printBanner', () => {
       WEBSOCKET_PORT: '8787',
       MCP_HTTP_PORT: '8788',
       MCP_HTTP_PATH: '/mcp',
-      BROWSERBRIDGE_PAIRING_TOKEN: 'pair-abc123',
+      BRIJIO_PAIRING_TOKEN: 'pair-abc123',
       MCP_HTTP_AUTH_TOKEN: 'auth-xyz789'
     }, mockStdout, mockStderr)
 
     const output = lines.join('')
-    assert.match(output, /🚀 BrowserBridge/)
+    assert.match(output, /🚀 Brijio/)
     assert.match(output, /pair-abc123/)
     assert.match(output, /auth-xyz789/)
     assert.match(output, /Ctrl\+C/)
@@ -307,7 +335,7 @@ void describe('printBanner', () => {
       WEBSOCKET_PORT: '8787',
       MCP_HTTP_PORT: '8788',
       MCP_HTTP_PATH: '/mcp',
-      BROWSERBRIDGE_PAIRING_TOKEN: 'pair-abc123',
+      BRIJIO_PAIRING_TOKEN: 'pair-abc123',
       MCP_HTTP_AUTH_TOKEN: 'auth-xyz789'
     }, mockStdout, mockStderr)
 
@@ -328,7 +356,7 @@ void describe('printBanner', () => {
       WEBSOCKET_PORT: '8787',
       MCP_HTTP_PORT: '8788',
       MCP_HTTP_PATH: '/mcp',
-      BROWSERBRIDGE_PAIRING_TOKEN: 'pair-abc123',
+      BRIJIO_PAIRING_TOKEN: 'pair-abc123',
       MCP_HTTP_AUTH_TOKEN: 'auth-xyz789'
     }, mockStdout, mockStderr, true)
 
@@ -419,7 +447,7 @@ void describe('promptUser', () => {
 void describe('classifyEnv', () => {
   void it('returns "placeholders" when tokens are placeholder values', () => {
     const env = {
-      BROWSERBRIDGE_PAIRING_TOKEN: 'replace-with-generated-token',
+      BRIJIO_PAIRING_TOKEN: 'replace-with-generated-token',
       MCP_HTTP_AUTH_TOKEN: 'replace-with-generated-mcp-token'
     }
     assert.equal(classifyEnv(env), 'placeholders')
@@ -427,7 +455,7 @@ void describe('classifyEnv', () => {
 
   void it('returns "configured" when tokens are real values', () => {
     const env = {
-      BROWSERBRIDGE_PAIRING_TOKEN: 'real-pairing-token-value',
+      BRIJIO_PAIRING_TOKEN: 'real-pairing-token-value',
       MCP_HTTP_AUTH_TOKEN: 'real-mcp-auth-token-value'
     }
     assert.equal(classifyEnv(env), 'configured')
@@ -435,7 +463,7 @@ void describe('classifyEnv', () => {
 
   void it('returns "incomplete" when tokens are empty or missing', () => {
     assert.equal(classifyEnv({}), 'incomplete')
-    assert.equal(classifyEnv({ BROWSERBRIDGE_PAIRING_TOKEN: '', MCP_HTTP_AUTH_TOKEN: '' }), 'incomplete')
-    assert.equal(classifyEnv({ BROWSERBRIDGE_PAIRING_TOKEN: 'real-token' }), 'incomplete')
+    assert.equal(classifyEnv({ BRIJIO_PAIRING_TOKEN: '', MCP_HTTP_AUTH_TOKEN: '' }), 'incomplete')
+    assert.equal(classifyEnv({ BRIJIO_PAIRING_TOKEN: 'real-token' }), 'incomplete')
   })
 })

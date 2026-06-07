@@ -129,7 +129,7 @@ asserting element state.
 
 ### Rate Limiting and Anti-Bot
 
-Rapid clicks and form submissions through BrowserBridge may trigger
+Rapid clicks and form submissions through Brijio may trigger
 rate-limiting or anti-bot protections on the target site. Add brief pauses
 between rapid interactions.
 

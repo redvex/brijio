@@ -103,8 +103,8 @@ void describe('Chrome popup entry integration', () => {
 
 function popupHtml (): string {
   return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8" /><title>BrowserBridge</title></head><body>
-<h1>BrowserBridge</h1>
+<html lang="en"><head><meta charset="utf-8" /><title>Brijio</title></head><body>
+<h1>Brijio</h1>
 <form id="settings-form" novalidate>
   <input id="websocket-url" name="websocketUrl" type="text" required />
   <input id="pairing-token" name="pairingToken" type="password" required />

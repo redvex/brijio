@@ -1,6 +1,6 @@
-# BrowserBridge Chrome Extension
+# Brijio Chrome Extension
 
-The Chrome extension is the first BrowserBridge browser client.
+The Chrome extension is the first Brijio browser client.
 
 It must remain user-controlled:
 
@@ -50,7 +50,7 @@ Current page action behavior:
 The extension uses a popup overlay for configuration and connection control:
 
 1. Load the extension in Chrome.
-2. Click the BrowserBridge toolbar action to open the configuration popup.
+2. Click the Brijio toolbar action to open the configuration popup.
 3. Enter the local WebSocket URL, for example `ws://127.0.0.1:8787`.
 4. Enter the pairing token generated with `pnpm token`.
 5. Confirm the auto-generated browser identity or edit the profile/label fields.
@@ -105,7 +105,7 @@ The manifest also declares required host permissions for regular pages:
 - `https://*/*`
 
 These host permissions are granted at extension-install time. They let
-BrowserBridge read regular HTTP and HTTPS pages without a runtime permission
+Brijio read regular HTTP and HTTPS pages without a runtime permission
 prompt. The extension still rejects Chrome internal pages, extension pages,
 local files, and other unsupported schemes.
 
@@ -265,7 +265,7 @@ returns:
     "ok": false,
     "error": {
       "code": "unsupported_page",
-      "message": "BrowserBridge can read page content only from HTTP and HTTPS tabs."
+      "message": "Brijio can read page content only from HTTP and HTTPS tabs."
     }
   }
 }

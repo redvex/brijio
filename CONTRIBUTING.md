@@ -1,6 +1,6 @@
 # Contributing
 
-BrowserBridge accepts contributions under the AGPLv3 license.
+Brijio accepts contributions under the AGPLv3 license.
 
 ## License Grant
 

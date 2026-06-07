@@ -1,8 +1,8 @@
-# BrowserBridge Roadmap (2026–2027)
+# Brijio Roadmap (2026–2027)
 
 ## Vision
 
-BrowserBridge is a secure bridge between AI agents and the browser session users already control.
+Brijio is a secure bridge between AI agents and the browser session users already control.
 
 ### Core Principles
 

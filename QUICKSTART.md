@@ -1,6 +1,6 @@
-# BrowserBridge Quick Start
+# Brijio Quick Start
 
-Get BrowserBridge running and make your first tool call in under 5 minutes.
+Get Brijio running and make your first tool call in under 5 minutes.
 
 ## Prerequisites
 
@@ -11,8 +11,8 @@ Get BrowserBridge running and make your first tool call in under 5 minutes.
 ## Step 1: Clone and Install
 
 ```sh
-git clone https://github.com/redvex/browser-bridge.git
-cd browser-bridge
+git clone https://github.com/redvex/brijio.git
+cd brijio
 pnpm install
 ```
 
@@ -49,7 +49,7 @@ Allow Tailscale connections? (true/false) [false]:
 Starting servers...
 Waiting for servers to be ready...
 
-🚀 BrowserBridge dev servers ready!
+🚀 Brijio dev servers ready!
 
   WebSocket:    ws://localhost:8787
   MCP:         http://localhost:8788/mcp
@@ -67,7 +67,7 @@ Waiting for servers to be ready...
 
 ## Step 3: Build and Load the Browser Extension
 
-BrowserBridge supports Chrome and Safari. Choose your browser and follow the
+Brijio supports Chrome and Safari. Choose your browser and follow the
 relevant steps below, then continue to Step 4.
 
 ### Chrome
@@ -101,7 +101,7 @@ Build complete. Output in dist/.
 3. Click **Load unpacked**.
 4. Select the `clients/extensions/chrome/dist` directory.
 
-The BrowserBridge icon appears in your toolbar.
+The Brijio icon appears in your toolbar.
 
 ### Safari
 
@@ -119,7 +119,7 @@ make safari
 This runs two steps automatically:
 
 1. `pnpm --filter @browserbridge/safari-extension build` — compiles and bundles the extension into `clients/extensions/safari/dist/`.
-2. `xcrun safari-web-extension-converter --force --project-location clients/extensions/safari/BrowserBridge clients/extensions/safari/dist` — converts the built extension into an Xcode project at `clients/extensions/safari/BrowserBridge/`.
+2. `xcrun safari-web-extension-converter --force --project-location clients/extensions/safari/Brijio clients/extensions/safari/dist` — converts the built extension into an Xcode project at `clients/extensions/safari/Brijio/`.
 
 Expected output (last few lines):
 
@@ -129,29 +129,29 @@ Expected output (last few lines):
 
 #### Install in Safari
 
-1. Open `clients/extensions/safari/BrowserBridge/BrowserBridge.xcodeproj` in Xcode.
-2. Select the **BrowserBridge** target → **Signing & Capabilities** → set **Team** to your Apple Developer account (or your personal team for local development).
-3. Build and run the project (⌘R). This installs the BrowserBridge app and extension.
+1. Open `clients/extensions/safari/Brijio/Brijio.xcodeproj` in Xcode.
+2. Select the **Brijio** target → **Signing & Capabilities** → set **Team** to your Apple Developer account (or your personal team for local development).
+3. Build and run the project (⌘R). This installs the Brijio app and extension.
 4. Open Safari → **Settings** → **Extensions**.
-5. Enable the BrowserBridge extension and grant the requested permissions.
+5. Enable the Brijio extension and grant the requested permissions.
 
-The BrowserBridge button appears in your Safari toolbar.
+The Brijio button appears in your Safari toolbar.
 
 ## Step 4: Pair the Extension
 
 ### Chrome
 
-1. Click the BrowserBridge toolbar icon. The setup page opens.
+1. Click the Brijio toolbar icon. The setup page opens.
 2. Enter the **WebSocket URL**: `ws://127.0.0.1:8787`
 3. Enter the **Pairing Token** from the `pnpm dev` banner (e.g. `bb_xxxxxxxxxxxxxxxx`).
 4. Accept or edit the auto-generated browser identity (the defaults are fine).
 5. Optionally enable **regular page access** for HTTP/HTTPS pages (needed if you want to interact with regular websites during testing).
 6. Click **Save**.
-7. Click the BrowserBridge toolbar icon again to **start the bridge**.
+7. Click the Brijio toolbar icon again to **start the bridge**.
 
 ### Safari
 
-1. Click the BrowserBridge toolbar button. The popup overlay opens.
+1. Click the Brijio toolbar button. The popup overlay opens.
 2. Enter the **WebSocket URL**: `ws://127.0.0.1:8787`
 3. Enter the **Pairing Token** from the `pnpm dev` banner (e.g. `bb_xxxxxxxxxxxxxxxx`).
 4. Accept or edit the profile name and browser label (the defaults are fine).
@@ -166,7 +166,7 @@ the WebSocket server.
 
 ## Step 5: Make Your First Tool Call
 
-With the servers running and the extension connected, you can call BrowserBridge tools through the MCP HTTP endpoint. Open a new terminal and use `curl`:
+With the servers running and the extension connected, you can call Brijio tools through the MCP HTTP endpoint. Open a new terminal and use `curl`:
 
 ### Discover Online Browsers
 
@@ -224,11 +224,11 @@ Expected output (truncated):
 }
 ```
 
-You just read a real browser page through an AI-facing API. That's the core BrowserBridge value proposition.
+You just read a real browser page through an AI-facing API. That's the core Brijio value proposition.
 
 ## Step 6: Connect an MCP Client
 
-BrowserBridge is compatible with any app that supports the
+Brijio is compatible with any app that supports the
 [MCP streamable HTTP transport](https://modelcontextprotocol.io/specification/2025-03-26/streamable-http).
 Once configured, you can ask any supported model to read pages, click links,
 fill forms, and perform other browser actions on your behalf — all through your
@@ -336,13 +336,13 @@ Use the CLI command:
 ```sh
 codex mcp add browserbridge \
   --url http://127.0.0.1:8788/mcp \
-  --bearer-token-env-var BROWSERBRIDGE_TOKEN
+  --bearer-token-env-var BRIJIO_PAIRING_TOKEN
 ```
 
 Then set the environment variable before running Codex:
 
 ```sh
-export BROWSERBRIDGE_TOKEN="YOUR_MCP_AUTH_TOKEN"
+export BRIJIO_PAIRING_TOKEN="YOUR_MCP_AUTH_TOKEN"
 ```
 
 Or add manually to `~/.codex/config.toml`:
@@ -351,7 +351,7 @@ Or add manually to `~/.codex/config.toml`:
 [mcp_servers.browserbridge]
 transport = "streamable_http"
 url = "http://127.0.0.1:8788/mcp"
-bearer_token_env_var = "BROWSERBRIDGE_TOKEN"
+bearer_token_env_var = "BRIJIO_PAIRING_TOKEN"
 ```
 
 ### OpenClaw
@@ -386,9 +386,9 @@ openclaw mcp set browserbridge '{
 
 Restart the OpenClaw gateway to pick up the new config.
 
-### Using BrowserBridge with Your Agent
+### Using Brijio with Your Agent
 
-Once connected, your agent can use BrowserBridge's 9 tools and 2 resources to
+Once connected, your agent can use Brijio's 9 tools and 2 resources to
 interact with your browser. For example, you could ask:
 
 - _"Read the current page and summarize it"_
@@ -400,11 +400,11 @@ The agent reads and acts on the page you have open in your browser, using your
 authenticated session. No screenshots or screen sharing — the agent works
 directly with the page structure through MCP tool calls.
 
-## Accessing BrowserBridge over Tailscale
+## Accessing Brijio over Tailscale
 
 If your development machine is on a
 [Tailscale](https://tailscale.com/) tailnet, you can let other machines on
-your network reach the BrowserBridge MCP server — useful when your AI agent
+your network reach the Brijio MCP server — useful when your AI agent
 runs on a different device.
 
 ### Quick Setup
@@ -471,8 +471,8 @@ Then restart the servers (`Ctrl+C` and `pnpm dev` again).
 ## Stopping
 
 - Press **Ctrl+C** in the terminal running `pnpm dev` to stop both servers.
-- **Chrome**: Click the BrowserBridge toolbar icon to stop the bridge, or close Chrome.
-- **Safari**: Click the BrowserBridge toolbar button and click **Disconnect**, or close Safari.
+- **Chrome**: Click the Brijio toolbar icon to stop the bridge, or close Chrome.
+- **Safari**: Click the Brijio toolbar button and click **Disconnect**, or close Safari.
 
 ## Troubleshooting
 
@@ -485,8 +485,8 @@ Then restart the servers (`Ctrl+C` and `pnpm dev` again).
 | Tool call returns `auth_required`      | The MCP Auth Token in the `Authorization: Bearer` header must match `MCP_HTTP_AUTH_TOKEN` in `.env`.                                                                             |
 | Tool call returns `timeout`            | The extension is not connected or the target page is a Chrome internal page (`chrome://`, `about:`) which the extension cannot read.                                             |
 | Safari: `make safari` fails            | Ensure Xcode is installed. Run `xcode-select --install` if `xcrun` is not found.                                                                                                 |
-| Safari: Xcode build fails (signing)    | Open the project in Xcode → select BrowserBridge target → Signing & Capabilities → set Team to your developer account.                                                           |
-| Safari: extension not in Settings      | Build and run the BrowserBridge Xcode project first (⌘R). The extension appears in Safari Settings → Extensions after install.                                                   |
+| Safari: Xcode build fails (signing)    | Open the project in Xcode → select Brijio target → Signing & Capabilities → set Team to your developer account.                                                                  |
+| Safari: extension not in Settings      | Build and run the Brijio Xcode project first (⌘R). The extension appears in Safari Settings → Extensions after install.                                                          |
 | Safari: badge shows `ERR` after wake   | Safari may suspend background scripts under memory pressure. Click Disconnect then Connect to re-establish the WebSocket.                                                        |
 | Tailscale: MCP client can't connect    | Ensure `MCP_HTTP_HOST=0.0.0.0` (not `127.0.0.1`) and `MCP_HTTP_ALLOW_TAILSCALE_HOSTS=true` in `.env`. Verify with `tailscale status` that both machines are on the same tailnet. |
 | Tailscale: extension won't pair        | Use the Tailscale hostname (`ws://machine.tailnet.ts.net:8787`) not `127.0.0.1` for the WebSocket URL in the extension setup.                                                    |

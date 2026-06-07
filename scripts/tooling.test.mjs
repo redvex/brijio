@@ -100,6 +100,42 @@ describe('repository tooling', () => {
     }
   })
 
+  it('publishes the MCP runtime under the Brijio package and keeps the old CLI alias', async () => {
+    const packageJson = await readJson('servers/mcp/package.json')
+
+    assert.equal(packageJson.name, '@brijio/mcp')
+    assert.equal(
+      packageJson.description,
+      'Brijio MCP server for AI agent browser resources and tools.'
+    )
+    assert.deepEqual(packageJson.bin, {
+      brijio: 'dist/bin/browserbridge.js',
+      browserbridge: 'dist/bin/browserbridge.js'
+    })
+    assert.equal(
+      packageJson.repository.url,
+      'git+https://github.com/redvex/brijio.git'
+    )
+    assert.equal(packageJson.homepage, 'https://github.com/redvex/brijio#readme')
+    assert.equal(packageJson.bugs.url, 'https://github.com/redvex/brijio/issues')
+  })
+
+  it('uses Brijio descriptions for current package metadata', async () => {
+    const expectedDescriptions = new Map([
+      ['package.json', 'Brijio gives AI agents controlled, user-approved browser access.'],
+      ['packages/shared/package.json', 'Shared Brijio protocol types, message schemas, and browser-agnostic logic.'],
+      ['servers/websocket/package.json', 'Brijio WebSocket session router.'],
+      ['clients/extensions/chrome/package.json', 'Brijio Chrome extension.'],
+      ['clients/extensions/safari/package.json', 'Brijio Safari extension.']
+    ])
+
+    for (const [path, description] of expectedDescriptions) {
+      const packageJson = await readJson(path)
+
+      assert.equal(packageJson.description, description)
+    }
+  })
+
   it('documents the AGPLv3 repository license policy', async () => {
     const readme = await readFile('README.md', 'utf8')
     const license = await readFile('LICENSE', 'utf8')

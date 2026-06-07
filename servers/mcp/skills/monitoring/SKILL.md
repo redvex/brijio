@@ -1,6 +1,6 @@
 ---
 name: monitoring
-description: "Periodic page monitoring via BrowserBridge: read authenticated pages on a schedule, extract specific data, compare to previous state, and notify on changes — designed for Hermes cron jobs."
+description: "Periodic page monitoring via Brijio: read authenticated pages on a schedule, extract specific data, compare to previous state, and notify on changes — designed for Hermes cron jobs."
 ---
 
 # Periodic Page Monitoring
@@ -29,7 +29,7 @@ cronjob action=create \
 ```
 
 Load the `using-browserbridge` and `monitoring` skills in the cron job so the
-agent knows how to use BrowserBridge tools:
+agent knows how to use Brijio tools:
 
 ```
 skills: ["using-browserbridge", "monitoring"]
@@ -188,7 +188,7 @@ Scan page content for specific keywords. Best for:
 
 ### Authenticated Pages
 
-BrowserBridge monitors pages through the user's real browser session. The
+Brijio monitors pages through the user's real browser session. The
 browser must be connected when the cron job runs. If the connection fails:
 
 - Report the failure clearly

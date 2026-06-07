@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-BrowserBridge is under active development.
+Brijio is under active development.
 
 Security fixes are applied to the latest supported release.
 
@@ -32,7 +32,7 @@ The maintainers will:
 
 ## Security Philosophy
 
-BrowserBridge is designed around:
+Brijio is designed around:
 
 - User-controlled infrastructure
 - End-to-end encryption where possible

@@ -1,8 +1,8 @@
 {
-  "name": "browserbridge",
+  "name": "brijio",
   "version": "0.1.0",
   "private": true,
-  "description": "User-controlled bridge between browser extensions and AI agents.",
+  "description": "Brijio gives AI agents controlled, user-approved browser access.",
   "license": "AGPL-3.0-only",
   "packageManager": "pnpm@10.32.1",
   "scripts": {

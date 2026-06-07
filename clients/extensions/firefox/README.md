@@ -1,4 +1,4 @@
-# BrowserBridge Firefox Extension
+# Brijio Firefox Extension
 
 Firefox support is planned but not implemented.
 

@@ -1,16 +1,16 @@
-# BrowserBridge Security Guarantees
+# Brijio Security Guarantees
 
 ## Purpose
 
-This document defines the guarantees BrowserBridge is designed to provide.
+This document defines the guarantees Brijio is designed to provide.
 
 These guarantees are part of the project's identity and should only change with extreme care.
 
 ---
 
-## BrowserBridge Does Not Export Cookies
+## Brijio Does Not Export Cookies
 
-BrowserBridge does not export:
+Brijio does not export:
 
 - authentication cookies
 - session cookies
@@ -20,17 +20,17 @@ The browser session remains local.
 
 ---
 
-## BrowserBridge Does Not Clone Browser Sessions
+## Brijio Does Not Clone Browser Sessions
 
-BrowserBridge operates on the browser session already controlled by the user.
+Brijio operates on the browser session already controlled by the user.
 
 It does not create duplicate authenticated environments.
 
 ---
 
-## BrowserBridge Is Not Remote Desktop Software
+## Brijio Is Not Remote Desktop Software
 
-BrowserBridge does not:
+Brijio does not:
 
 - mirror browser windows
 - stream desktops
@@ -38,17 +38,17 @@ BrowserBridge does not:
 
 ---
 
-## BrowserBridge Does Not Continuously Monitor Browsers
+## Brijio Does Not Continuously Monitor Browsers
 
-BrowserBridge is reactive.
+Brijio is reactive.
 
 Information is exchanged only when explicitly requested.
 
 ---
 
-## BrowserBridge Does Not Collect Credentials
+## Brijio Does Not Collect Credentials
 
-BrowserBridge does not collect:
+Brijio does not collect:
 
 - passwords
 - passkeys
@@ -56,7 +56,7 @@ BrowserBridge does not collect:
 
 ---
 
-## BrowserBridge Cloud Is Intended To Be A Relay
+## Brijio Cloud Is Intended To Be A Relay
 
 The hosted relay transports messages.
 
@@ -68,6 +68,6 @@ Future versions will strengthen this guarantee through end-to-end encryption.
 
 ## User Control Comes First
 
-Users can disconnect BrowserBridge at any time.
+Users can disconnect Brijio at any time.
 
 The browser remains under user control.
