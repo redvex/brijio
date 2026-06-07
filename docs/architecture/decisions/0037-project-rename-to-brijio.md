@@ -15,7 +15,7 @@ The project now needs a brand that can support:
 - future commercial/enterprise positioning;
 - a concise name that can survive beyond the initial “browser bridge” implementation detail.
 
-After exploring literal `*Port`, `*Dock`, `*Relay`, and `*IO` options, Gianni selected **Brijio**.
+After exploring literal `*Port`, `*Dock`, `*Relay`, and `*IO` options, the project lead selected **Brijio**.
 
 The name keeps useful associations without being literal:
 
@@ -148,7 +148,7 @@ Expected public npm target:
 
 ```json
 {
-  "name": "@brijio/browser",
+  "name": "@brijio/mcp",
   "bin": {
     "brijio": "./bin/browserbridge.mjs",
     "browserbridge": "./bin/browserbridge.mjs"
