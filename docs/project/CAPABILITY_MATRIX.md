@@ -1,18 +1,18 @@
-# BrowserBridge Capability Matrix
+# Brijio Capability Matrix
 
 ## Purpose
 
-This document describes what BrowserBridge can and cannot do.
+This document describes what Brijio can and cannot do.
 
 It serves as a product contract, security reference, and implementation guide.
 
-The goal is to make BrowserBridge capabilities explicit rather than implicit.
+The goal is to make Brijio capabilities explicit rather than implicit.
 
 ---
 
 # Design Philosophy
 
-BrowserBridge is designed around:
+Brijio is designed around:
 
 - Existing authenticated browser sessions
 - Explicit user control
@@ -52,7 +52,7 @@ Capabilities are intentionally constrained to align with these principles.
 
 # Explicit Non-Capabilities
 
-The following are intentionally outside the BrowserBridge design.
+The following are intentionally outside the Brijio design.
 
 - Cookie export ❌ — Violates authenticated-session model
 - Session cloning ❌ — Browser remains source of truth
@@ -129,7 +129,7 @@ Future:
 
 # Privacy Guarantees
 
-BrowserBridge does not:
+Brijio does not:
 
 - export cookies
 - replicate sessions
@@ -137,13 +137,13 @@ BrowserBridge does not:
 - continuously stream screenshots
 - continuously stream DOM changes
 
-BrowserBridge only exchanges information through explicit protocol requests.
+Brijio only exchanges information through explicit protocol requests.
 
 ---
 
 # Security Boundaries
 
-BrowserBridge assumes:
+Brijio assumes:
 
 - the browser session belongs to the user
 - the relay should not require trust
@@ -159,4 +159,4 @@ When evaluating new features, ask:
 
 "Does this help a remote AI agent collaborate with an existing authenticated browser session?"
 
-If the answer is no, the feature likely does not belong in BrowserBridge.
+If the answer is no, the feature likely does not belong in Brijio.

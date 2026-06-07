@@ -3,6 +3,7 @@ import { describe, it } from 'node:test'
 import {
   getCurrentPageContent,
   getCurrentPageContext,
+  getPageContextConfigFromEnv,
   parsePageContentResourceIndex
 } from './page-context.js'
 import { type PageContext } from './protocol.js'
@@ -97,6 +98,52 @@ void describe('MCP page context resource helpers', () => {
       parsePageContentResourceIndex('browser://page/current/content/12'),
       12
     )
+  })
+
+  void it('prefers Brijio environment variables while preserving BrowserBridge fallbacks', () => {
+    const warnings: string[] = []
+    const config = getPageContextConfigFromEnv(
+      {
+        BRIJIO_WS_URL: 'ws://brijio.example:8787',
+        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://browserbridge.example:8787',
+        BRIJIO_PAIRING_TOKEN: 'new-token',
+        BROWSERBRIDGE_PAIRING_TOKEN: 'old-token',
+        BRIJIO_BROWSER_INSTANCE_ID: 'brijio-browser',
+        BROWSERBRIDGE_BROWSER_INSTANCE_ID: 'browserbridge-browser',
+        BRIJIO_REQUEST_TIMEOUT_MS: '9000',
+        BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '1000'
+      },
+      (message) => warnings.push(message)
+    )
+
+    assert.deepEqual(config, {
+      websocketUrl: 'ws://brijio.example:8787',
+      pairingToken: 'new-token',
+      defaultBrowserInstanceId: 'brijio-browser',
+      timeoutMs: 9000
+    })
+    assert.deepEqual(warnings, [
+      'Both BRIJIO_WS_URL and BROWSERBRIDGE_WEBSOCKET_URL are set; preferring BRIJIO_WS_URL.',
+      'Both BRIJIO_PAIRING_TOKEN and BROWSERBRIDGE_PAIRING_TOKEN are set; preferring BRIJIO_PAIRING_TOKEN.',
+      'Both BRIJIO_BROWSER_INSTANCE_ID and BROWSERBRIDGE_BROWSER_INSTANCE_ID are set; preferring BRIJIO_BROWSER_INSTANCE_ID.',
+      'Both BRIJIO_REQUEST_TIMEOUT_MS and BROWSERBRIDGE_REQUEST_TIMEOUT_MS are set; preferring BRIJIO_REQUEST_TIMEOUT_MS.'
+    ])
+  })
+
+  void it('uses BrowserBridge environment variables as backwards-compatible aliases', () => {
+    const config = getPageContextConfigFromEnv({
+      BROWSERBRIDGE_WEBSOCKET_URL: 'ws://old.example:8787',
+      BROWSERBRIDGE_PAIRING_TOKEN: 'old-token',
+      BROWSERBRIDGE_BROWSER_INSTANCE_ID: 'old-browser',
+      BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '7000'
+    })
+
+    assert.deepEqual(config, {
+      websocketUrl: 'ws://old.example:8787',
+      pairingToken: 'old-token',
+      defaultBrowserInstanceId: 'old-browser',
+      timeoutMs: 7000
+    })
   })
 
   void it('rejects invalid page content resource indexes', () => {

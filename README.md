@@ -1,22 +1,22 @@
-# BrowserBridge
+# Brijio
 
 > **Remote agents. Local browser. No shared credentials.**
 
 <p align="center">
-  <img src=".github/images/hero.png" alt="BrowserBridge — Remote agents. Local browser. No shared credentials." width="800" />
+  <img src=".github/images/hero.png" alt="Brijio — Remote agents. Local browser. No shared credentials." width="800" />
 </p>
 
-BrowserBridge connects remote AI agents to the browser session you already control.
+Brijio connects remote AI agents to the browser session you already control.
 
-Instead of launching a separate browser, cloning sessions, exporting cookies, or streaming screenshots, BrowserBridge allows agents to collaborate with the browser you're already using.
+Instead of launching a separate browser, cloning sessions, exporting cookies, or streaming screenshots, Brijio allows agents to collaborate with the browser you're already using.
 
 The result is faster, safer, and more privacy-friendly access to the authenticated web.
 
-BrowserBridge is open source under AGPLv3. See [LICENSE](LICENSE) and [COMMERCIAL-LICENSING.md](COMMERCIAL-LICENSING.md).
+Brijio is open source under AGPLv3. See [LICENSE](LICENSE) and [COMMERCIAL-LICENSING.md](COMMERCIAL-LICENSING.md).
 
 ---
 
-## Why BrowserBridge?
+## Why Brijio?
 
 Most AI browser tools start with the assumption that the agent needs its own browser.
 
@@ -32,7 +32,7 @@ The challenge isn't giving a browser to the agent.
 
 The challenge is allowing the agent to collaborate with the browser session you already control.
 
-That's what BrowserBridge solves.
+That's what Brijio solves.
 
 ---
 
@@ -61,7 +61,7 @@ Your browser remains local.
 
 ### Privacy By Design
 
-BrowserBridge is intentionally reactive.
+Brijio is intentionally reactive.
 
 The browser does not continuously stream:
 
@@ -82,7 +82,7 @@ Instead of sending:
 - massive DOM trees
 - full browser state
 
-BrowserBridge provides structured context first, then content when requested.
+Brijio provides structured context first, then content when requested.
 
 ### Human In Control
 
@@ -99,7 +99,7 @@ Agent
   ↓
 MCP Server
   ↓
-BrowserBridge Relay
+Brijio Relay
   ↓
 Browser Extension
  ↓
@@ -230,34 +230,34 @@ type ToolResult<T> =
 
 ---
 
-## Running BrowserBridge
+## Running Brijio
 
 ### Option 1: npx (recommended for local use)
 
 ```sh
-npx @redvex/browserbridge
+npx @brijio/mcp
 ```
 
 This starts both the WebSocket server and the MCP server with zero config. On startup, auto-generated tokens are printed to the console:
 
 ```text
-[BrowserBridge] WebSocket server listening on ws://0.0.0.0:8787
-[BrowserBridge] MCP server listening on http://0.0.0.0:8788/mcp
-[BrowserBridge] Pairing token [auto-generated]: dG9rZW4x
-[BrowserBridge] MCP auth token [auto-generated]: dG9rZW4y
+[Brijio] WebSocket server listening on ws://0.0.0.0:8787
+[Brijio] MCP server listening on http://0.0.0.0:8788/mcp
+[Brijio] Pairing token [auto-generated]: dG9rZW4x
+[Brijio] MCP auth token [auto-generated]: dG9rZW4y
 ```
 
 Copy these tokens — they change on every restart unless you persist them. To persist tokens, create a `.env` file in the working directory:
 
 ```sh
-BROWSERBRIDGE_PAIRING_TOKEN=your-secure-token-here
+BRIJIO_PAIRING_TOKEN=your-secure-token-here
 MCP_HTTP_AUTH_TOKEN=your-mcp-token-here
 ```
 
 Or set environment variables directly:
 
 ```sh
-BROWSERBRIDGE_PAIRING_TOKEN=my-secret npx @redvex/browserbridge
+BRIJIO_PAIRING_TOKEN=my-secret npx @brijio/mcp
 ```
 
 The MCP endpoint is then available at `http://localhost:8788/mcp`.
@@ -266,9 +266,9 @@ The MCP endpoint is then available at `http://localhost:8788/mcp`.
 
 ```sh
 docker run -p 8787:8787 -p 8788:8788 \
-  -e BROWSERBRIDGE_PAIRING_TOKEN=my-pairing-token \
+  -e BRIJIO_PAIRING_TOKEN=my-pairing-token \
   -e MCP_HTTP_AUTH_TOKEN=my-mcp-token \
-  redvex/browserbridge
+  redvex/brijio
 ```
 
 Or with Docker Compose — copy `.env.example` to `.env`, fill in your tokens, then:
@@ -281,8 +281,8 @@ Both ports must be exposed: **8787** (WebSocket relay) and **8788** (MCP HTTP se
 
 ### Connecting Your Browser
 
-1. Install the [BrowserBridge Chrome extension](https://github.com/redvex/browser-bridge)
-2. Click the BrowserBridge icon in your toolbar
+1. Install the [Brijio Chrome extension](https://github.com/redvex/brijio)
+2. Click the Brijio icon in your toolbar
 3. Enter the WebSocket URL (default: `ws://localhost:8787`) and the pairing token
 4. Click **Connect**
 
@@ -293,7 +293,7 @@ Configure your MCP client (Claude Desktop, Hermes, etc.) to connect to the MCP s
 ```json
 {
   "mcpServers": {
-    "browserbridge": {
+    "brijio": {
       "type": "streamableHttp",
       "url": "http://localhost:8788/mcp",
       "headers": {
@@ -306,19 +306,19 @@ Configure your MCP client (Claude Desktop, Hermes, etc.) to connect to the MCP s
 
 ### Environment Variables
 
-| Variable                           | Default               | Description                       |
-| ---------------------------------- | --------------------- | --------------------------------- |
-| `WEBSOCKET_HOST`                   | `0.0.0.0`             | WebSocket server bind address     |
-| `WEBSOCKET_PORT`                   | `8787`                | WebSocket server port             |
-| `BROWSERBRIDGE_PAIRING_TOKEN`      | _auto-generated_      | Token for extension ↔ server auth |
-| `MCP_HTTP_HOST`                    | `0.0.0.0`             | MCP server bind address           |
-| `MCP_HTTP_PORT`                    | `8788`                | MCP server port                   |
-| `MCP_HTTP_PATH`                    | `/mcp`                | MCP server path                   |
-| `MCP_HTTP_AUTH_TOKEN`              | _auto-generated_      | Bearer token for MCP clients      |
-| `BROWSERBRIDGE_WEBSOCKET_URL`      | `ws://127.0.0.1:8787` | WS URL for MCP → relay connection |
-| `BROWSERBRIDGE_REQUEST_TIMEOUT_MS` | `5000`                | Timeout for forwarded requests    |
+| Variable                    | Default               | Description                       |
+| --------------------------- | --------------------- | --------------------------------- |
+| `WEBSOCKET_HOST`            | `0.0.0.0`             | WebSocket server bind address     |
+| `WEBSOCKET_PORT`            | `8787`                | WebSocket server port             |
+| `BRIJIO_PAIRING_TOKEN`      | _auto-generated_      | Token for extension ↔ server auth |
+| `MCP_HTTP_HOST`             | `0.0.0.0`             | MCP server bind address           |
+| `MCP_HTTP_PORT`             | `8788`                | MCP server port                   |
+| `MCP_HTTP_PATH`             | `/mcp`                | MCP server path                   |
+| `MCP_HTTP_AUTH_TOKEN`       | _auto-generated_      | Bearer token for MCP clients      |
+| `BRIJIO_WS_URL`             | `ws://127.0.0.1:8787` | WS URL for MCP → relay connection |
+| `BRIJIO_REQUEST_TIMEOUT_MS` | `5000`                | Timeout for forwarded requests    |
 
-Auto-generated tokens are ephemeral — they change on restart. For production or persistent setups, always set `BROWSERBRIDGE_PAIRING_TOKEN` and `MCP_HTTP_AUTH_TOKEN` explicitly.
+Auto-generated tokens are ephemeral — they change on restart. For production or persistent setups, always set `BRIJIO_PAIRING_TOKEN` and `MCP_HTTP_AUTH_TOKEN` explicitly.
 
 For Tailscale:
 
@@ -356,7 +356,7 @@ Generate a local pairing token before starting the runtime:
 pnpm run token
 ```
 
-Set the generated value as `BROWSERBRIDGE_PAIRING_TOKEN` for the WebSocket and
+Set the generated value as `BRIJIO_PAIRING_TOKEN` for the WebSocket and
 MCP servers. Configure the same token in the Chrome extension setup page along
 with the local WebSocket URL.
 
@@ -401,7 +401,7 @@ Then send a valid MCP-scoped request:
 { "type": "message", "id": "cli-1", "payload": { "type": "list_browsers" } }
 ```
 
-> **Note:** `BROWSERBRIDGE_TOKEN` is accepted as a backward-compatible alias for `BROWSERBRIDGE_PAIRING_TOKEN`. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` is optional; when set, MCP tools target that browser by default.
+> **Compatibility:** `BROWSERBRIDGE_PAIRING_TOKEN`, `BROWSERBRIDGE_TOKEN`, `BROWSERBRIDGE_WEBSOCKET_URL`, `BROWSERBRIDGE_WS_URL`, `BROWSERBRIDGE_REQUEST_TIMEOUT_MS`, and `BROWSERBRIDGE_BROWSER_INSTANCE_ID` remain accepted as backward-compatible aliases during the transition window. `BRIJIO_BROWSER_INSTANCE_ID` is optional; when set, MCP tools target that browser by default.
 
 ---
 
@@ -451,7 +451,7 @@ Then send a valid MCP-scoped request:
 
 ## License
 
-BrowserBridge source code is licensed under the GNU Affero General Public
+Brijio source code is licensed under the GNU Affero General Public
 License v3.0 (AGPLv3). See [LICENSE](LICENSE).
 
 Commercial licensing is available for organizations that require alternative

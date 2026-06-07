@@ -1,8 +1,8 @@
-# BrowserBridge Trust Boundaries
+# Brijio Trust Boundaries
 
 ## Purpose
 
-This document defines the trust boundaries in the BrowserBridge architecture — where trust is required, where it is minimized, and where it is explicitly not assumed.
+This document defines the trust boundaries in the Brijio architecture — where trust is required, where it is minimized, and where it is explicitly not assumed.
 
 ---
 
@@ -14,7 +14,7 @@ The agent trusts the MCP server to relay requests accurately and return response
 
 The MCP server does not trust the agent to limit itself to appropriate requests. All requests are validated against the protocol specification.
 
-### MCP Server ↔ BrowserBridge Relay
+### MCP Server ↔ Brijio Relay
 
 The MCP server and relay authenticate with separate tokens. The relay trusts the MCP server to be an authorized consumer. The MCP server trusts the relay to route messages to the intended browser.
 
@@ -51,7 +51,7 @@ The extension does not trust web page content. Page data is read as structured c
 | Agent → Browser     | Explicit request protocol, no continuous streaming              |
 | Relay → Payload     | Relay routes without content inspection; E2E encryption planned |
 | Website → Extension | Read-only structured extraction, no code execution              |
-| Agent → Credentials | BrowserBridge never exports cookies, passwords, or MFA codes    |
+| Agent → Credentials | Brijio never exports cookies, passwords, or MFA codes           |
 
 ## Where Trust Is Not Assumed
 

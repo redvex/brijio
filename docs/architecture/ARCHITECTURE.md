@@ -1,15 +1,15 @@
-# BrowserBridge Architecture
+# Brijio Architecture
 
 ## Overview
 
-BrowserBridge connects remote AI agents to the browser session users already control.
+Brijio connects remote AI agents to the browser session users already control.
 
 ```text
 Agent
   ↓
 MCP Server
   ↓
-BrowserBridge Relay
+Brijio Relay
   ↓
 Browser Extension
   ↓
@@ -36,9 +36,9 @@ Examples:
 
 ### MCP Server
 
-Exposes BrowserBridge capabilities to agents.
+Exposes Brijio capabilities to agents.
 
-### BrowserBridge Relay
+### Brijio Relay
 
 Routes messages between agents and browsers.
 

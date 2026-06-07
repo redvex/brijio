@@ -5,7 +5,7 @@ description: "Automate e-commerce checkout flows on authenticated pages: add to 
 
 # E-Commerce Checkout Automation
 
-Guide users through e-commerce checkout flows using BrowserBridge. Handles the
+Guide users through e-commerce checkout flows using Brijio. Handles the
 full pipeline: product selection, cart management, address forms, promo codes,
 and payment — always stopping before the final "Place Order" step.
 
@@ -130,13 +130,13 @@ Present the complete order summary to the user:
 ### Payment Iframes
 
 Many e-commerce sites embed payment forms in iframes (Stripe, PayPal, etc.).
-BrowserBridge may not be able to interact with iframe-embedded fields. If
+Brijio may not be able to interact with iframe-embedded fields. If
 `read_current_page` doesn't show card number fields inside the form, they're
 likely in an iframe. Ask the user to fill payment details manually.
 
 ### Password-Type Fields
 
-Card number, CVV, and some expiry fields use `type="password"`. BrowserBridge
+Card number, CVV, and some expiry fields use `type="password"`. Brijio
 returns `browser_error` for these fields. This is correct security behavior —
 let the user fill sensitive payment data manually.
 

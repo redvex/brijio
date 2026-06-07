@@ -2,7 +2,7 @@
   "name": "@browserbridge/chrome-extension",
   "version": "0.1.0",
   "private": true,
-  "description": "BrowserBridge Chrome extension.",
+  "description": "Brijio Chrome extension.",
   "license": "AGPL-3.0-only",
   "type": "module",
   "scripts": {

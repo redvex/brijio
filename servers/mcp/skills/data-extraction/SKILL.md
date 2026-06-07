@@ -26,7 +26,7 @@ Call `list_browsers`. If no browsers are connected, ask the user to connect.
 
 ### 2. Navigate (If Needed)
 
-BrowserBridge does **not** navigate. The user must have the target page
+Brijio does **not** navigate. The user must have the target page
 open in their browser before extraction begins. If the user is on the wrong
 page, ask them to navigate to the correct URL and confirm when ready.
 
@@ -86,7 +86,7 @@ For multi-page data sets:
 
 1. Read the current page and extract all data.
 2. Look for "Next" or pagination links in the `links` array.
-3. Ask the user to click "Next" (BrowserBridge can click pagination links,
+3. Ask the user to click "Next" (Brijio can click pagination links,
    but the user should confirm for authenticated pages).
 4. After the page updates, call `read_current_page` again.
 5. Accumulate data from all pages.
@@ -135,7 +135,7 @@ user that their account has the visibility needed for the extraction.
 
 ### Rate Limiting
 
-BrowserBridge requests go through the user's real browser. Rapid repeated
+Brijio requests go through the user's real browser. Rapid repeated
 calls may trigger rate limiting or anti-bot protections on the target site.
 Add small delays between reads if extracting from multiple pages.
 

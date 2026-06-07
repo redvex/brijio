@@ -22,7 +22,7 @@ pages where direct URL access may fail.
 ### 1. Check Connection
 
 Call `list_browsers` to confirm a browser is connected. If no browsers are
-available, ask the user to connect the BrowserBridge extension.
+available, ask the user to connect the Brijio extension.
 
 ### 2. Read the Current Page
 

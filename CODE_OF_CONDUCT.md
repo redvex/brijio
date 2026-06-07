@@ -2,7 +2,7 @@
 
 ## Our Pledge
 
-We are committed to making participation in BrowserBridge a respectful and welcoming experience for everyone.
+We are committed to making participation in Brijio a respectful and welcoming experience for everyone.
 
 ## Expected Behavior
 

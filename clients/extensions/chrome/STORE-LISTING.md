@@ -2,7 +2,7 @@
 
 ## Name
 
-BrowserBridge
+Brijio
 
 ## Short Description (132 chars max)
 
@@ -10,24 +10,24 @@ Connect AI agents to the browser session you already control — privacy-first, 
 
 ## Detailed Description
 
-BrowserBridge connects AI agents to the browser session you already control.
+Brijio connects AI agents to the browser session you already control.
 
-Instead of launching a separate browser, cloning sessions, or exporting cookies — BrowserBridge lets agents collaborate with the browser you're already using. The result is faster, safer, and more privacy-friendly access to the authenticated web.
+Instead of launching a separate browser, cloning sessions, or exporting cookies — Brijio lets agents collaborate with the browser you're already using. The result is faster, safer, and more privacy-friendly access to the authenticated web.
 
 ### How it works
 
-1. **Start the server** — No cloning or building needed. Run BrowserBridge with a single command:
+1. **Start the server** — No cloning or building needed. Run Brijio with a single command:
 
    Using npx (recommended for local use):
 
    ```
-   npx @redvex/browserbridge
+   npx @brijio/mcp
    ```
 
    Using Docker:
 
    ```
-   docker run -p 8787:8787 -p 8788:8788 giannimazza/browserbridge
+   docker run -p 8787:8787 -p 8788:8788 brijio/brijio
    ```
 
    Both commands start the WebSocket relay (port 8787) and MCP server (port 8788). Auto-generated auth tokens are printed on startup — copy them for the next steps.
@@ -42,7 +42,7 @@ Instead of launching a separate browser, cloning sessions, or exporting cookies 
 - **Privacy by design** — The browser does not continuously stream data. Agents must explicitly request information.
 - **Progressive disclosure** — Agents receive structured context first, then content when requested. No massive DOM dumps.
 - **Human in control** — The extension only connects when you explicitly start it. Disconnect anytime.
-- **Auto-reconnect** — If the connection drops, BrowserBridge automatically reconnects with exponential backoff.
+- **Auto-reconnect** — If the connection drops, Brijio automatically reconnects with exponential backoff.
 
 ### What it doesn't do
 
@@ -53,8 +53,8 @@ Instead of launching a separate browser, cloning sessions, or exporting cookies 
 
 ### Requirements
 
-- A running BrowserBridge server (Docker or npm). See https://github.com/redvex/browser-bridge for setup instructions.
-- An MCP-compatible AI agent configured to connect to the BrowserBridge MCP server.
+- A running Brijio server (Docker or npm). See https://github.com/redvex/browser-bridge for setup instructions.
+- An MCP-compatible AI agent configured to connect to the Brijio MCP server.
 
 ### Permissions explained
 
@@ -66,7 +66,7 @@ Instead of launching a separate browser, cloning sessions, or exporting cookies 
 
 ### Open Source
 
-BrowserBridge is open source under AGPLv3. View the source code at https://github.com/redvex/browser-bridge
+Brijio is open source under AGPLv3. View the source code at https://github.com/redvex/browser-bridge
 
 ## Category
 

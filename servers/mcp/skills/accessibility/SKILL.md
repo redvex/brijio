@@ -5,7 +5,7 @@ description: "Audit web pages for accessibility issues: missing alt text, unlabe
 
 # Accessibility Audit
 
-Audit web pages for common accessibility issues using BrowserBridge's page
+Audit web pages for common accessibility issues using Brijio's page
 context data. Unlike automated scanners (Lighthouse, axe) that run on public
 pages, this skill audits pages behind authentication — admin panels, dashboards,
 internal tools, and staging environments.
@@ -17,9 +17,9 @@ internal tools, and staging environments.
 - Verifying WCAG 2.1 compliance on pages requiring login
 - Quick spot-checks after UI changes
 
-## What BrowserBridge Can Detect
+## What Brijio Can Detect
 
-BrowserBridge provides page context (`links`, `forms`, `actions`, `editables`),
+Brijio provides page context (`links`, `forms`, `actions`, `editables`),
 which enables these checks:
 
 | Check             | Data Source              | What to Look For                                           |
@@ -32,9 +32,9 @@ which enables these checks:
 | Required fields   | `forms.controls`         | Required fields without visual indication                  |
 | Select options    | `forms.controls.options` | Selects with no options, placeholder-only options          |
 
-## What BrowserBridge Cannot Detect
+## What Brijio Cannot Detect
 
-These require CSS/rendered analysis that BrowserBridge doesn't provide:
+These require CSS/rendered analysis that Brijio doesn't provide:
 
 - **Color contrast ratios** — needs computed styles and colors
 - **Keyboard focus order** — needs interactive testing
@@ -162,7 +162,7 @@ different user roles.
 ### False Positives
 
 - Not every icon button is a11y failure — some use `aria-label` which
-  BrowserBridge doesn't surface directly. Flag these as "possible" issues.
+  Brijio doesn't surface directly. Flag these as "possible" issues.
 - "Choose..." placeholder options are a common pattern — flag as minor, not
   critical.
 - Multiple h1s may be intentional in section-based designs — flag as minor.

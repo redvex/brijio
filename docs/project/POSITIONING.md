@@ -1,12 +1,12 @@
-# BrowserBridge Positioning
+# Brijio Positioning
 
-## BrowserBridge Is Not Another Browser Automation Framework
+## Brijio Is Not Another Browser Automation Framework
 
 Most browser automation tools ask:
 
 > How do we give a browser to an agent?
 
-BrowserBridge asks:
+Brijio asks:
 
 > How do we give an agent access to the browser the user already controls?
 
@@ -30,7 +30,7 @@ Most AI agents cannot access those environments without:
 
 ---
 
-## The BrowserBridge Approach
+## The Brijio Approach
 
 Remote agents.
 
@@ -38,7 +38,7 @@ Local browser.
 
 No shared credentials.
 
-BrowserBridge allows agents to collaborate with existing authenticated browser sessions.
+Brijio allows agents to collaborate with existing authenticated browser sessions.
 
 ---
 
@@ -72,6 +72,6 @@ The user remains in charge.
 
 ## Strategic North Star
 
-BrowserBridge should become known as:
+Brijio should become known as:
 
 > The safest way for remote AI agents to access the browser session you already control.
