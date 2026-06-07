@@ -88,10 +88,10 @@ export function generateConfig () {
   return {
     WEBSOCKET_HOST: '0.0.0.0',
     WEBSOCKET_PORT: '8787',
-    BROWSERBRIDGE_WEBSOCKET_URL: 'ws://127.0.0.1:8787',
-    BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '5000',
-    BROWSERBRIDGE_PAIRING_TOKEN: generatePairingToken(),
-    BROWSERBRIDGE_BROWSER_INSTANCE_ID: '',
+    BRIJIO_WS_URL: 'ws://127.0.0.1:8787',
+    BRIJIO_REQUEST_TIMEOUT_MS: '5000',
+    BRIJIO_PAIRING_TOKEN: generatePairingToken(),
+    BRIJIO_BROWSER_INSTANCE_ID: '',
     MCP_HTTP_HOST: '0.0.0.0',
     MCP_HTTP_PORT: '8788',
     MCP_HTTP_PATH: '/mcp',
@@ -99,6 +99,21 @@ export function generateConfig () {
     MCP_HTTP_ALLOWED_ORIGINS: '',
     TEST_PAGE_PORT: '8080'
   }
+}
+
+export function withCompatibilityAliases (config) {
+  const result = { ...config }
+
+  result.BRIJIO_PAIRING_TOKEN ||= result.BROWSERBRIDGE_PAIRING_TOKEN || generatePairingToken()
+  result.BROWSERBRIDGE_PAIRING_TOKEN ||= result.BRIJIO_PAIRING_TOKEN
+  result.BRIJIO_WS_URL ||= result.BROWSERBRIDGE_WEBSOCKET_URL || result.BROWSERBRIDGE_WS_URL || result.WEBSOCKET_URL || 'ws://127.0.0.1:8787'
+  result.BROWSERBRIDGE_WEBSOCKET_URL ||= result.BRIJIO_WS_URL
+  result.BRIJIO_REQUEST_TIMEOUT_MS ||= result.BROWSERBRIDGE_REQUEST_TIMEOUT_MS || '5000'
+  result.BROWSERBRIDGE_REQUEST_TIMEOUT_MS ||= result.BRIJIO_REQUEST_TIMEOUT_MS
+  result.BRIJIO_BROWSER_INSTANCE_ID ||= result.BROWSERBRIDGE_BROWSER_INSTANCE_ID || ''
+  result.BROWSERBRIDGE_BROWSER_INSTANCE_ID ||= result.BRIJIO_BROWSER_INSTANCE_ID
+
+  return result
 }
 
 // ─── Health check ──────────────────────────────────────────────────────────────
@@ -149,7 +164,7 @@ export function printBanner (config, stdout = process.stdout, stderr = process.s
   const wsPort = config.WEBSOCKET_PORT || '8787'
   const mcpPort = config.MCP_HTTP_PORT || '8788'
   const mcpPath = config.MCP_HTTP_PATH || '/mcp'
-  const pairingToken = config.BROWSERBRIDGE_PAIRING_TOKEN || ''
+  const pairingToken = config.BRIJIO_PAIRING_TOKEN || config.BROWSERBRIDGE_PAIRING_TOKEN || ''
   const authToken = config.MCP_HTTP_AUTH_TOKEN || ''
 
   // Display localhost instead of 0.0.0.0 for readability
@@ -161,7 +176,7 @@ export function printBanner (config, stdout = process.stdout, stderr = process.s
 
   const lines = [
     '',
-    '🚀 BrowserBridge dev servers ready!',
+    '🚀 Brijio dev servers ready!',
     '',
     `  WebSocket:    ws://${displayWsHost}:${wsPort}`,
     `  MCP:         http://${displayMcpHost}:${mcpPort}${mcpPath}`,
@@ -214,7 +229,7 @@ export async function promptUser (questions, createInterface = null) {
 // ─── Classify existing .env ────────────────────────────────────────────────────
 
 export function classifyEnv (env) {
-  const pairing = env.BROWSERBRIDGE_PAIRING_TOKEN || ''
+  const pairing = env.BRIJIO_PAIRING_TOKEN || env.BROWSERBRIDGE_PAIRING_TOKEN || ''
   const mcpAuth = env.MCP_HTTP_AUTH_TOKEN || ''
 
   if (isPlaceholderToken(pairing) || isPlaceholderToken(mcpAuth)) {
@@ -248,12 +263,12 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
     const displayMcpHost = (env.MCP_HTTP_HOST || '0.0.0.0') === '0.0.0.0' ? 'localhost' : (env.MCP_HTTP_HOST || '0.0.0.0')
     console.log(`  WebSocket:    ws://${displayWsHost}:${env.WEBSOCKET_PORT || '8787'}`)
     console.log(`  MCP:         http://${displayMcpHost}:${env.MCP_HTTP_PORT || '8788'}${env.MCP_HTTP_PATH || '/mcp'}`)
-    console.log(`  Pairing Token:    ${maskToken(env.BROWSERBRIDGE_PAIRING_TOKEN || '')}`)
+    console.log(`  Pairing Token:    ${maskToken(env.BRIJIO_PAIRING_TOKEN || env.BROWSERBRIDGE_PAIRING_TOKEN || '')}`)
     console.log(`  MCP Auth Token:   ${maskToken(env.MCP_HTTP_AUTH_TOKEN || '')}`)
 
     if (nonInteractive) {
       console.log('Non-interactive mode: keeping existing tokens.')
-      return env
+      return withCompatibilityAliases(env)
     }
 
     const answer = await promptUser([
@@ -263,7 +278,7 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
 
     if (!regenerateTokens) {
       console.log('Keeping existing configuration.')
-      return env
+      return withCompatibilityAliases(env)
     }
   } else if (state === 'placeholders') {
     console.log('Found .env with placeholder tokens.')
@@ -275,11 +290,14 @@ async function setupEnv (envPath, templatePath, nonInteractive) {
   const config = generateConfig()
 
   // Merge with existing env preserving values we don't override
-  const merged = { ...env, ...config }
+  const merged = withCompatibilityAliases({ ...env, ...config })
 
   // Ensure placeholders are replaced by generated tokens
+  if (isPlaceholderToken(merged.BRIJIO_PAIRING_TOKEN)) {
+    merged.BRIJIO_PAIRING_TOKEN = config.BRIJIO_PAIRING_TOKEN
+  }
   if (isPlaceholderToken(merged.BROWSERBRIDGE_PAIRING_TOKEN)) {
-    merged.BROWSERBRIDGE_PAIRING_TOKEN = config.BROWSERBRIDGE_PAIRING_TOKEN
+    merged.BROWSERBRIDGE_PAIRING_TOKEN = merged.BRIJIO_PAIRING_TOKEN
   }
   if (isPlaceholderToken(merged.MCP_HTTP_AUTH_TOKEN)) {
     merged.MCP_HTTP_AUTH_TOKEN = config.MCP_HTTP_AUTH_TOKEN

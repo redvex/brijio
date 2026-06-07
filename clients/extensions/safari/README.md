@@ -1,6 +1,6 @@
-# BrowserBridge Safari Extension
+# Brijio Safari Extension
 
-The Safari Web Extension brings full BrowserBridge functionality to Safari,
+The Safari Web Extension brings full Brijio functionality to Safari,
 using `@browserbridge/shared` for browser-agnostic logic and Safari-specific
 adapters for API differences.
 
@@ -23,7 +23,7 @@ contributes only browser-specific wiring:
 clients/extensions/safari/src/
   background.ts         Safari adapter classes (SafariActionBadge, SafariStorageAdapter,
                         SafariSetupAdapter, SafariPageReaderAdapter, SafariWebSocketConnection)
-  background-entry.ts   Wires BrowserBridgeBackgroundController to browser.* APIs
+  background-entry.ts   Wires BrijioBackgroundController to browser.* APIs
   content-script-entry.ts  Registers browser.runtime.onMessage listener, delegates to shared handler
   popup.ts              Pure popup message construction and parsing logic
   popup-entry.ts        DOM wiring for popup.html
@@ -107,13 +107,13 @@ This runs two steps:
 1. `pnpm --filter @browserbridge/safari-extension build` — compiles and
    bundles the extension.
 2. `xcrun safari-web-extension-converter --force --project-location
-clients/extensions/safari/BrowserBridge clients/extensions/safari/dist` —
+clients/extensions/safari/Brijio clients/extensions/safari/dist` —
    converts the built extension into an Xcode project at
-   `clients/extensions/safari/BrowserBridge/`.
+   `clients/extensions/safari/Brijio/`.
 
 After running `make safari`:
 
-1. Open `clients/extensions/safari/BrowserBridge/BrowserBridge.xcodeproj` in
+1. Open `clients/extensions/safari/Brijio/Brijio.xcodeproj` in
    Xcode.
 2. Build and run to install the extension into Safari.
 3. Enable the extension in Safari Preferences → Extensions.
@@ -145,7 +145,7 @@ for details.
 
 1. Load the extension in Safari (via Xcode build or enabled in Safari
    Preferences → Extensions).
-2. Click the BrowserBridge toolbar button to open the popup.
+2. Click the Brijio toolbar button to open the popup.
 3. Enter the local WebSocket URL (for example `ws://127.0.0.1:8787`).
 4. Enter the pairing token used by the local WebSocket and MCP servers.
 5. Confirm or edit the profile name and browser label used for browser

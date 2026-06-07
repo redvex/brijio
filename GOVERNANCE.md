@@ -2,9 +2,9 @@
 
 ## Project Status
 
-BrowserBridge is currently a founder-led open source project.
+Brijio is currently a founder-led open source project.
 
-The project is maintained by the BrowserBridge maintainers and contributors.
+The project is maintained by the Brijio maintainers and contributors.
 
 ## Principles
 
@@ -24,7 +24,7 @@ Community feedback is encouraged through issues, discussions, and pull requests.
 
 ## Maintainers
 
-Initially, the project maintainer is the BrowserBridge founder.
+Initially, the project maintainer is the Brijio founder.
 
 Additional maintainers may be appointed based on sustained contribution and community trust.
 

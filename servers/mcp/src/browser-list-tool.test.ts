@@ -16,7 +16,7 @@ void describe('MCP browser list tool', () => {
         ok: false,
         error: {
           code: 'auth_required',
-          message: 'BROWSERBRIDGE_PAIRING_TOKEN must be configured.'
+          message: 'BRIJIO_PAIRING_TOKEN or BROWSERBRIDGE_PAIRING_TOKEN must be configured.'
         }
       }
     )

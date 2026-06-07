@@ -1,11 +1,20 @@
 # Changelog
 
-All notable changes to BrowserBridge are documented in this file.
+All notable changes to Brijio are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Server packages and browser extensions use **independent versioning** — extension releases are tagged separately (`ext-chrome-v*`, `ext-safari-v*`) from server releases (`v*`).
+
+## [Unreleased]
+
+### Changed
+
+- Renamed the project from Brijio to Brijio for current public branding.
+- Renamed the publishable MCP runtime package from `@brijio/mcp` to `@brijio/mcp`.
+- Added the preferred `brijio` CLI binary while keeping `browserbridge` as a backwards-compatible alias for the transition window.
+- Added `BRIJIO_*` environment variables while preserving `BROWSERBRIDGE_*` aliases.
 
 ## [ext-chrome-v0.1.0] - 2026-06-03
 
@@ -26,7 +35,7 @@ Initial Chrome Web Store submission.
 
 ## [0.1.0] - 2026-06-02
 
-First official release of BrowserBridge — a user-controlled bridge between
+First official release of Brijio — a user-controlled bridge between
 browser extensions and AI agents via the Model Context Protocol.
 
 ### Added
@@ -42,7 +51,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - Structured JSON logging via `@browserbridge/shared` logger
 - Per-request observability: request routing, browser targeting, error events
 
-**MCP Server** (`@browserbridge/mcp`)
+**MCP Server** (`@brijio/mcp`)
 
 - MCP page context resource and reading tool (ADRs 0007, 0009, 0010)
 - Rich paginated page content extraction (ADRs 0008, 0009)

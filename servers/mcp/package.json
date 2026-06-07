@@ -1,11 +1,12 @@
 {
-  "name": "@redvex/browserbridge",
+  "name": "@brijio/mcp",
   "version": "0.1.1",
   "private": false,
-  "description": "BrowserBridge MCP server for AI agent browser resources and tools.",
+  "description": "Brijio MCP server for AI agent browser resources and tools.",
   "license": "AGPL-3.0-only",
   "type": "module",
   "bin": {
+    "brijio": "dist/bin/browserbridge.js",
     "browserbridge": "dist/bin/browserbridge.js"
   },
   "exports": {
@@ -39,11 +40,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/redvex/browser-bridge.git",
+    "url": "git+https://github.com/redvex/brijio.git",
     "directory": "servers/mcp"
   },
-  "homepage": "https://github.com/redvex/browser-bridge#readme",
+  "homepage": "https://github.com/redvex/brijio#readme",
   "bugs": {
-    "url": "https://github.com/redvex/browser-bridge/issues"
+    "url": "https://github.com/redvex/brijio/issues"
   }
 }

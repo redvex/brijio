@@ -1,12 +1,12 @@
-# BrowserBridge MCP Server
+# Brijio MCP Server
 
-The MCP server exposes BrowserBridge resources and tools to AI agents and
+The MCP server exposes Brijio resources and tools to AI agents and
 routes explicit page-reading, click, and form-fill requests to an active
 browser extension session through the WebSocket server.
 
 ## Current Scope
 
-The current implementation authenticates to the BrowserBridge WebSocket server
+The current implementation authenticates to the Brijio WebSocket server
 with a local pairing token and exposes the read-only MCP resources from ADR
 0007 and ADR 0009:
 
@@ -14,7 +14,7 @@ with a local pairing token and exposes the read-only MCP resources from ADR
 - `browser://page/current/content/{index}`, named `current-page-content`
 
 The page context resource handler opens a WebSocket connection to the
-configured BrowserBridge WebSocket server, sends a `get_page_context` request
+configured Brijio WebSocket server, sends a `get_page_context` request
 with a generated request ID, waits for the matching `page_context_response`, and
 returns a structured JSON result.
 
@@ -66,7 +66,7 @@ message and waits for the matching `action_result`.
 
 The HTTP MCP runtime uses the official TypeScript MCP SDK Streamable HTTP
 transport for server lifecycle, protocol framing, initialization, resource
-discovery, resource reads, tool discovery, and tool calls. BrowserBridge code
+discovery, resource reads, tool discovery, and tool calls. Brijio code
 owns HTTP boundary checks, page reading behavior, and WebSocket request routing.
 
 The Chrome extension must already be connected by the user. The MCP server does
@@ -76,7 +76,7 @@ background automation.
 
 Browser tools accept optional `browserInstanceId`. If omitted, the WebSocket
 server routes automatically only when exactly one browser is online for the
-pairing token. `BROWSERBRIDGE_BROWSER_INSTANCE_ID` can set a default target for
+pairing token. `BRIJIO_BROWSER_INSTANCE_ID` can set a default target for
 all tool and resource requests from this MCP server.
 
 Out of scope for this package version:
@@ -226,7 +226,7 @@ errors use:
 
 `kind` must be `link` for targets from `structure.links[]` or `action` for
 targets from `structure.actions[]`. `id` must be a non-empty short-lived
-BrowserBridge target ID from the latest page context. Call
+Brijio target ID from the latest page context. Call
 `read_current_page` first, choose a target, then pass its kind and ID to
 `click_element`.
 
@@ -428,10 +428,10 @@ behavior. Successful submit calls return:
 Expected local variables:
 
 ```sh
-BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
-BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
-BROWSERBRIDGE_PAIRING_TOKEN=replace-with-generated-token
-BROWSERBRIDGE_BROWSER_INSTANCE_ID=
+BRIJIO_WS_URL=ws://127.0.0.1:8787
+BRIJIO_REQUEST_TIMEOUT_MS=5000
+BRIJIO_PAIRING_TOKEN=replace-with-generated-token
+BRIJIO_BROWSER_INSTANCE_ID=
 MCP_HTTP_HOST=127.0.0.1
 MCP_HTTP_PORT=8788
 MCP_HTTP_PATH=/mcp
@@ -442,12 +442,10 @@ MCP_HTTP_ALLOW_TAILSCALE_HOSTS=false
 MCP_HTTP_ALLOW_LOCAL_HOSTS=false
 ```
 
-`WEBSOCKET_URL` is also accepted as a backward-compatible alias for
-`BROWSERBRIDGE_WEBSOCKET_URL`. `BROWSERBRIDGE_TOKEN` is accepted as a
-backward-compatible alias for `BROWSERBRIDGE_PAIRING_TOKEN`.
+`WEBSOCKET_URL`, `BROWSERBRIDGE_WEBSOCKET_URL`, and `BROWSERBRIDGE_WS_URL` are accepted as backward-compatible aliases for `BRIJIO_WS_URL`. `BROWSERBRIDGE_TOKEN` and `BROWSERBRIDGE_PAIRING_TOKEN` are accepted as aliases for `BRIJIO_PAIRING_TOKEN`; `BROWSERBRIDGE_REQUEST_TIMEOUT_MS` and `BROWSERBRIDGE_BROWSER_INSTANCE_ID` are also accepted during the transition window.
 
 `MCP_HTTP_AUTH_TOKEN` is required. It authenticates MCP clients to this HTTP
-server and must not be reused as the BrowserBridge pairing token.
+server and must not be reused as the Brijio pairing token.
 `MCP_HTTP_ALLOWED_HOSTS` accepts comma-separated host names or host values.
 `MCP_HTTP_ALLOWED_ORIGINS` accepts comma-separated origins for browser-based
 MCP clients that send an `Origin` header.
@@ -463,10 +461,10 @@ required.
 ## Development
 
 ```sh
-pnpm --filter @browserbridge/mcp build
-pnpm --filter @browserbridge/mcp check
-pnpm --filter @browserbridge/mcp dev
-pnpm --filter @browserbridge/mcp test
+pnpm --filter @brijio/mcp build
+pnpm --filter @brijio/mcp check
+pnpm --filter @brijio/mcp dev
+pnpm --filter @brijio/mcp test
 ```
 
 The tests start local WebSocket servers on `127.0.0.1` with ephemeral ports and
@@ -490,7 +488,7 @@ the extension action.
 Run the MCP server over HTTP:
 
 ```sh
-BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787 BROWSERBRIDGE_PAIRING_TOKEN=your-local-token MCP_HTTP_AUTH_TOKEN=your-mcp-http-token pnpm --filter @browserbridge/mcp dev
+BRIJIO_WS_URL=ws://127.0.0.1:8787 BRIJIO_PAIRING_TOKEN=your-local-token MCP_HTTP_AUTH_TOKEN=your-mcp-http-token pnpm --filter @brijio/mcp dev
 ```
 
 The default MCP endpoint is `http://127.0.0.1:8788/mcp`. MCP clients must send

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "BrowserBridge",
+  "name": "Brijio",
   "version": "0.1.0",
   "minimum_chrome_version": "116",
   "description": "Connect AI agents to the browser session you already control. Privacy-first, user-controlled, no shared credentials.",
@@ -16,7 +16,7 @@
       "48": "icons/icon-48.png",
       "128": "icons/icon-128.png"
     },
-    "default_title": "BrowserBridge"
+    "default_title": "Brijio"
   },
   "icons": {
     "16": "icons/icon-16.png",

@@ -6,7 +6,7 @@ description: "Complete forms on authenticated pages: detect field types, handle 
 # Smart Form Filling
 
 Complete forms on authenticated pages using the user's real browser session
-through BrowserBridge. Handles multi-step forms, field type detection, and
+through Brijio. Handles multi-step forms, field type detection, and
 common pitfalls.
 
 ## When to Use
@@ -22,7 +22,7 @@ common pitfalls.
 
 Call `list_browsers` to confirm a browser is connected. If the response is
 empty or `data.browsers` is an empty array, ask the user to open their
-browser and connect the BrowserBridge extension before continuing.
+browser and connect the Brijio extension before continuing.
 
 When multiple browsers are connected, note the `browserInstanceId` values
 and use the correct one for all subsequent calls.
@@ -130,7 +130,7 @@ referencing new element IDs.
 
 ### React and SPA Forms
 
-BrowserBridge injects values via the DOM, which triggers React's synthetic
+Brijio injects values via the DOM, which triggers React's synthetic
 event system. This works for most modern inputs. If a React textarea or
 input doesn't update after filling, it may be a hidden internal editor — look
 for a named textarea with content content instead.

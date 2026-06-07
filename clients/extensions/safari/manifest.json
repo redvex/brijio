@@ -1,6 +1,6 @@
 {
   "manifest_version": 2,
-  "name": "BrowserBridge",
+  "name": "Brijio",
   "version": "0.0.0",
   "description": "User-controlled bridge between Safari and AI agents.",
   "background": {
@@ -8,7 +8,7 @@
   },
   "browser_action": {
     "default_popup": "popup.html",
-    "default_title": "BrowserBridge",
+    "default_title": "Brijio",
     "default_icon": {
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png",

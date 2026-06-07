@@ -1,6 +1,6 @@
-# BrowserBridge WebSocket Server
+# Brijio WebSocket Server
 
-The WebSocket server is the local message transport for BrowserBridge.
+The WebSocket server is the local message transport for Brijio.
 
 ## Current Scope
 
@@ -8,7 +8,7 @@ The current implementation authenticates MCP and extension WebSocket clients
 with a local pairing token, tracks live browser extension presence in memory,
 and routes MCP requests only to browser instances in the same token scope.
 
-- The WebSocket server requires `BROWSERBRIDGE_PAIRING_TOKEN`.
+- The WebSocket server requires `BRIJIO_PAIRING_TOKEN`.
 - MCP and extension clients must send an `auth` message before any other
   message.
 - Extension connections announce browser presence after authentication and in
@@ -100,7 +100,7 @@ Expected local variables:
 ```sh
 WEBSOCKET_HOST=127.0.0.1
 WEBSOCKET_PORT=8787
-BROWSERBRIDGE_PAIRING_TOKEN=replace-with-generated-token
+BRIJIO_PAIRING_TOKEN=replace-with-generated-token
 ```
 
 ## Development

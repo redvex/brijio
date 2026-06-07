@@ -24,15 +24,41 @@ export interface BrowserBridgePageContextConfig {
 }
 
 export function getPageContextConfigFromEnv (
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
+  warn: (message: string) => void = console.warn
 ): Omit<BrowserBridgePageContextConfig, 'requestPageContext'> {
+  const websocketUrl = resolveRenamedEnv({
+    env,
+    newName: 'BRIJIO_WS_URL',
+    oldNames: ['BROWSERBRIDGE_WEBSOCKET_URL', 'BROWSERBRIDGE_WS_URL', 'WEBSOCKET_URL'],
+    defaultValue: 'ws://127.0.0.1:8787',
+    warn
+  })
+  const pairingToken = resolveRenamedEnv({
+    env,
+    newName: 'BRIJIO_PAIRING_TOKEN',
+    oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BROWSERBRIDGE_TOKEN'],
+    defaultValue: '',
+    warn
+  })
+  const defaultBrowserInstanceId = resolveRenamedEnv({
+    env,
+    newName: 'BRIJIO_BROWSER_INSTANCE_ID',
+    oldNames: ['BROWSERBRIDGE_BROWSER_INSTANCE_ID'],
+    warn
+  })
+  const timeoutMs = parseTimeoutMs(resolveRenamedEnv({
+    env,
+    newName: 'BRIJIO_REQUEST_TIMEOUT_MS',
+    oldNames: ['BROWSERBRIDGE_REQUEST_TIMEOUT_MS'],
+    warn
+  }))
+
   return {
-    websocketUrl:
-      env.BROWSERBRIDGE_WEBSOCKET_URL ?? env.WEBSOCKET_URL ?? 'ws://127.0.0.1:8787',
-    pairingToken:
-      env.BROWSERBRIDGE_PAIRING_TOKEN ?? env.BROWSERBRIDGE_TOKEN ?? '',
-    defaultBrowserInstanceId: env.BROWSERBRIDGE_BROWSER_INSTANCE_ID,
-    timeoutMs: parseTimeoutMs(env.BROWSERBRIDGE_REQUEST_TIMEOUT_MS)
+    websocketUrl,
+    pairingToken,
+    defaultBrowserInstanceId,
+    timeoutMs
   }
 }
 
@@ -98,4 +124,46 @@ function parseTimeoutMs (value: string | undefined): number {
   }
 
   return parsed
+}
+
+function resolveRenamedEnv (options: {
+  env: NodeJS.ProcessEnv
+  newName: string
+  oldNames: string[]
+  defaultValue?: string
+  warn: (message: string) => void
+}): string | undefined {
+  const newValue = normalizedEnvValue(options.env[options.newName])
+
+  for (const oldName of options.oldNames) {
+    const oldValue = normalizedEnvValue(options.env[oldName])
+
+    if (newValue !== undefined && oldValue !== undefined && newValue !== oldValue) {
+      options.warn(
+        `Both ${options.newName} and ${oldName} are set; preferring ${options.newName}.`
+      )
+    }
+  }
+
+  if (newValue !== undefined) {
+    return newValue
+  }
+
+  for (const oldName of options.oldNames) {
+    const oldValue = normalizedEnvValue(options.env[oldName])
+
+    if (oldValue !== undefined) {
+      return oldValue
+    }
+  }
+
+  return options.defaultValue
+}
+
+function normalizedEnvValue (value: string | undefined): string | undefined {
+  if (value === undefined || value.trim() === '') {
+    return undefined
+  }
+
+  return value
 }

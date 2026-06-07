@@ -6,7 +6,7 @@ description: "Compare two pages or browser views side by side: staging vs produc
 # Visual/Page Comparison
 
 Compare two web pages to find differences in content, structure, forms, and
-links. Uses BrowserBridge's multi-browser support to compare pages across
+links. Uses Brijio's multi-browser support to compare pages across
 different browsers, tabs, or environments.
 
 ## When to Use

@@ -1,8 +1,8 @@
-# BrowserBridge Threat Model
+# Brijio Threat Model
 
 ## Overview
 
-BrowserBridge assumes that AI agents, networks, cloud infrastructure, and third-party services may be imperfect or untrusted.
+Brijio assumes that AI agents, networks, cloud infrastructure, and third-party services may be imperfect or untrusted.
 
 ## Security Goals
 

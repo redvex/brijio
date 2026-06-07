@@ -135,13 +135,13 @@ Step 5: Notification preferences
 ### Password Fields
 
 Registration forms always include password fields (often two: password +
-confirm password). BrowserBridge returns `browser_error` for these. **Skip
+confirm password). Brijio returns `browser_error` for these. **Skip
 them** and let the user fill them manually. This is a security feature, not a
 bug.
 
 ### CAPTCHA
 
-Some signup flows include CAPTCHA challenges. BrowserBridge cannot solve these.
+Some signup flows include CAPTCHA challenges. Brijio cannot solve these.
 Ask the user to complete the CAPTCHA manually, then continue with the rest of
 the form.
 

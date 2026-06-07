@@ -24,7 +24,7 @@ safari-xcode-project: safari-extension-build
 	xcrun safari-web-extension-converter \
 		--force \
 		--bundle-identifier uk.co.redvex.BrowserBridge \
-		--project-location clients/extensions/safari/BrowserBridge \
+		--project-location clients/extensions/safari/Brijio \
 		clients/extensions/safari/dist
 
 chrome:
@@ -32,6 +32,7 @@ chrome:
 
 clean:
 	pnpm -r clean
+	rm -rf clients/extensions/safari/Brijio
 	rm -rf clients/extensions/safari/BrowserBridge
 	rm -rf clients/extensions/safari/dist
 	rm -rf clients/extensions/chrome/dist

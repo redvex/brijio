@@ -1,6 +1,6 @@
-# BrowserBridge Agent Instructions
+# Brijio Agent Instructions
 
-BrowserBridge is a user-controlled bridge between browser extensions and AI
+Brijio is a user-controlled bridge between browser extensions and AI
 agents. The browser extension connects to a WebSocket server only when the user
 explicitly starts it. The MCP server can then request browser state and perform
 approved browser actions through that WebSocket channel.
@@ -258,7 +258,7 @@ the `websocket` and `mcp` workspaces, and runs `pnpm test`.
 
 ## Security Model
 
-BrowserBridge is not an ambient monitoring system. Agents may only access browser
+Brijio is not an ambient monitoring system. Agents may only access browser
 state through explicit requests while the user-controlled extension connection is
 active.
 

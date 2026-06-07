@@ -1,14 +1,14 @@
-# BrowserBridge Privacy Policy
+# Brijio Privacy Policy
 
 **Last updated:** June 2026
 
 ## Overview
 
-BrowserBridge is a user-controlled bridge between your browser and AI agents. We take privacy seriously — the extension is designed from the ground up to prevent silent data collection.
+Brijio is a user-controlled bridge between your browser and AI agents. We take privacy seriously — the extension is designed from the ground up to prevent silent data collection.
 
 ## Data Collection
 
-**BrowserBridge does not collect, store, or transmit any personal data to external services.**
+**Brijio does not collect, store, or transmit any personal data to external services.**
 
 Specifically:
 
@@ -19,11 +19,11 @@ Specifically:
 
 ## Data Flow
 
-When you connect the BrowserBridge extension to your local server:
+When you connect the Brijio extension to your local server:
 
 1. **You explicitly start the connection** — The extension only connects when you click "Connect" and enter server details.
 2. **Page data is request-driven** — AI agents must explicitly request page context or content. The extension does not continuously stream any data.
-3. **All communication is local** — Data flows between your browser and your BrowserBridge server (which you run on your own machine or network).
+3. **All communication is local** — Data flows between your browser and your Brijio server (which you run on your own machine or network).
 4. **You can disconnect anytime** — Clicking "Disconnect" immediately closes the connection. No background activity continues.
 
 ## Permissions Explained
@@ -38,7 +38,7 @@ When you connect the BrowserBridge extension to your local server:
 
 ## Third-Party Services
 
-BrowserBridge does not integrate with any third-party services, advertising networks, or analytics platforms.
+Brijio does not integrate with any third-party services, advertising networks, or analytics platforms.
 
 ## Data Retention
 
