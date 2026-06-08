@@ -10,9 +10,12 @@ import {
   createPageContextResponse,
   createActionResultErrorResponse,
   createActionResultResponse,
+  createNavigateToUrlResponse,
+  createNavigateToUrlErrorResponse,
   isPerformActionEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
+  isNavigateToUrlEnvelope,
   parseBrijioEnvelope
 } from './protocol.js'
 import type { PageContext } from './protocol.js'
@@ -541,6 +544,141 @@ void describe('Chrome extension protocol helpers', () => {
         }
       }
     )
+  })
+})
+
+void describe('navigate_to_url protocol helpers', () => {
+  void it('recognizes navigate_to_url message envelopes', () => {
+    assert.equal(
+      isNavigateToUrlEnvelope({
+        type: 'message',
+        id: 'request-1',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/'
+        }
+      }),
+      true
+    )
+  })
+
+  void it('recognizes navigate_to_url envelopes without id', () => {
+    assert.equal(
+      isNavigateToUrlEnvelope({
+        type: 'message',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/'
+        }
+      }),
+      true
+    )
+  })
+
+  void it('rejects navigate_to_url envelopes with invalid url', () => {
+    assert.equal(
+      isNavigateToUrlEnvelope({
+        type: 'message',
+        id: 'request-2',
+        payload: {
+          type: 'navigate_to_url',
+          url: 42
+        }
+      }),
+      false
+    )
+  })
+
+  void it('rejects envelopes with wrong payload type', () => {
+    assert.equal(
+      isNavigateToUrlEnvelope({
+        type: 'message',
+        id: 'request-3',
+        payload: {
+          type: 'get_page_context'
+        }
+      }),
+      false
+    )
+  })
+
+  void it('builds navigate_to_url success responses', () => {
+    assert.deepEqual(
+      createNavigateToUrlResponse('nav-1', {
+        url: 'https://example.com/',
+        title: 'Example Domain',
+        timestamp: '2026-06-08T10:00:00.000Z',
+        redirected: false,
+        navigationMs: 250
+      }),
+      {
+        type: 'message',
+        id: 'nav-1',
+        payload: {
+          type: 'navigate_to_url_response',
+          ok: true,
+          data: {
+            url: 'https://example.com/',
+            title: 'Example Domain',
+            timestamp: '2026-06-08T10:00:00.000Z',
+            redirected: false,
+            navigationMs: 250
+          }
+        }
+      }
+    )
+  })
+
+  void it('builds navigate_to_url error responses', () => {
+    assert.deepEqual(
+      createNavigateToUrlErrorResponse(
+        'nav-2',
+        'unsupported_scheme',
+        'URL scheme \'ftp\' is not supported. Only http and https are allowed.'
+      ),
+      {
+        type: 'message',
+        id: 'nav-2',
+        payload: {
+          type: 'navigate_to_url_response',
+          ok: false,
+          error: {
+            code: 'unsupported_scheme',
+            message: 'URL scheme \'ftp\' is not supported. Only http and https are allowed.'
+          }
+        }
+      }
+    )
+  })
+
+  void it('recognizes navigate as a valid BrowserCapability', () => {
+    assert.equal(
+      isNavigateToUrlEnvelope({
+        type: 'message',
+        id: 'nav-3',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/'
+        }
+      }),
+      true
+    )
+  })
+
+  void it('round-trips navigate_to_url through parseBrijioEnvelope', () => {
+    const envelope = {
+      type: 'message' as const,
+      id: 'nav-4',
+      payload: {
+        type: 'navigate_to_url',
+        url: 'https://example.com/'
+      }
+    }
+
+    assert.deepEqual(parseBrijioEnvelope(JSON.stringify(envelope)), {
+      ok: true,
+      message: envelope
+    })
   })
 })
 
