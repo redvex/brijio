@@ -4,6 +4,7 @@ import {
   type BrijioSocket,
   type PageContent,
   type PageContext,
+  type PageNavigationResult,
   type PageReadResult,
   normalizeBridgeSettings,
   readActiveTabPage as sharedReadActiveTabPage,
@@ -73,6 +74,9 @@ export interface BrowserApi {
     }>
     >
     sendMessage: (tabId: number, message: unknown) => Promise<unknown>
+    update: (tabId: number, updateProperties: { url: string }) => Promise<
+    { id?: number, title?: string, url?: string }
+    >
   }
 }
 
@@ -184,6 +188,57 @@ export class SafariPageReaderAdapter {
       },
       this.deps
     )
+  }
+}
+
+export class SafariPageNavigationAdapter {
+  constructor (
+    private readonly tabs: BrowserApi['tabs']
+  ) {}
+
+  async navigateToUrl (url: string): Promise<PageNavigationResult> {
+    const tabs = await this.tabs.query({ active: true, currentWindow: true })
+
+    if (tabs.length === 0 || tabs[0].id === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'no_active_tab',
+          message: 'No active tab is available.'
+        }
+      }
+    }
+
+    const tabId = tabs[0].id
+    const startTime = Date.now()
+
+    try {
+      const updatedTab = await this.tabs.update(tabId, { url })
+
+      const navigatedUrl = typeof updatedTab.url === 'string' && updatedTab.url !== ''
+        ? updatedTab.url
+        : url
+      const navigatedTitle = typeof updatedTab.title === 'string' ? updatedTab.title : ''
+
+      return {
+        ok: true,
+        data: {
+          url: navigatedUrl,
+          title: navigatedTitle,
+          timestamp: new Date(startTime).toISOString(),
+          redirected: navigatedUrl !== url,
+          navigationMs: Date.now() - startTime
+        }
+      }
+    } catch {
+      return {
+        ok: false,
+        error: {
+          code: 'navigation_failed',
+          message: `Failed to navigate tab to ${url}.`
+        }
+      }
+    }
   }
 }
 

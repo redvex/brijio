@@ -13,6 +13,7 @@ import {
   SafariStorageAdapter,
   SafariSetupAdapter,
   SafariPageReaderAdapter,
+  SafariPageNavigationAdapter,
   SafariWebSocketConnection
 } from './background.js'
 
@@ -49,9 +50,11 @@ interface MockTabs {
   queryResult: Array<{ id?: number, title?: string, url?: string }>
   sendMessageResult: unknown
   createResult: unknown
+  updateResult: { id?: number, title?: string, url?: string }
   query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
   sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   create: (properties: { url: string }) => Promise<unknown>
+  update: (tabId: number, updateProperties: { url: string }) => Promise<{ id?: number, title?: string, url?: string }>
 }
 
 interface MockScripting {
@@ -133,6 +136,10 @@ function createMockBrowser (): MockBrowser {
     createResult: {} as unknown,
     async create (_properties: { url: string }) {
       return tabs.createResult
+    },
+    updateResult: {} as { id?: number, title?: string, url?: string },
+    async update (_tabId: number, updateProperties: { url: string }) {
+      return tabs.updateResult
     }
   }
 
@@ -407,6 +414,88 @@ void describe('SafariWebSocketConnection', () => {
   })
 })
 
+// --- SafariPageNavigationAdapter tests ---
+
+void describe('SafariPageNavigationAdapter', () => {
+  let browser: MockBrowser
+
+  beforeEach(() => {
+    browser = createMockBrowser()
+  })
+
+  void it('returns ok with navigation result when active tab exists', async () => {
+    browser.tabs.queryResult = [{ id: 5, url: 'https://example.com/page', title: 'Example' }]
+    browser.tabs.updateResult = { id: 5, url: 'https://example.com/page', title: 'Example' }
+
+    const adapter = new SafariPageNavigationAdapter(browser.tabs)
+    const result = await adapter.navigateToUrl('https://example.com/page')
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.url, 'https://example.com/page')
+      assert.equal(result.data.title, 'Example')
+      assert.equal(result.data.redirected, false)
+      assert.ok(typeof result.data.navigationMs === 'number')
+      assert.ok(typeof result.data.timestamp === 'string')
+    }
+  })
+
+  void it('detects redirect when final url differs from requested url', async () => {
+    browser.tabs.queryResult = [{ id: 5, url: 'https://example.com/old', title: 'Old' }]
+    browser.tabs.updateResult = { id: 5, url: 'https://example.com/new', title: 'New Page' }
+
+    const adapter = new SafariPageNavigationAdapter(browser.tabs)
+    const result = await adapter.navigateToUrl('https://example.com/old')
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.url, 'https://example.com/new')
+      assert.equal(result.data.title, 'New Page')
+      assert.equal(result.data.redirected, true)
+    }
+  })
+
+  void it('returns no_active_tab error when no tabs found', async () => {
+    browser.tabs.queryResult = []
+
+    const adapter = new SafariPageNavigationAdapter(browser.tabs)
+    const result = await adapter.navigateToUrl('https://example.com/page')
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'no_active_tab')
+    }
+  })
+
+  void it('returns no_active_tab error when tab has no id', async () => {
+    browser.tabs.queryResult = [{ url: 'https://example.com/page', title: 'Tab' }]
+
+    const adapter = new SafariPageNavigationAdapter(browser.tabs)
+    const result = await adapter.navigateToUrl('https://example.com/page')
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'no_active_tab')
+    }
+  })
+
+  void it('returns navigation_failed error when tabs.update throws', async () => {
+    browser.tabs.queryResult = [{ id: 1, url: 'about:blank', title: '' }]
+    browser.tabs.update = async function () {
+      throw new Error('Cannot access chrome:// URLs')
+    }
+
+    const adapter = new SafariPageNavigationAdapter(browser.tabs)
+    const result = await adapter.navigateToUrl('https://example.com/page')
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'navigation_failed')
+      assert.ok(result.error.message.includes('https://example.com/page'))
+    }
+  })
+})
+
 // --- BrijioBackgroundController with Safari adapters ---
 
 void describe('BrijioBackgroundController with Safari adapters', () => {
@@ -417,6 +506,7 @@ void describe('BrijioBackgroundController with Safari adapters', () => {
     const storage = new SafariStorageAdapter(browser.storage)
     const setup = new SafariSetupAdapter()
     const pageReader = new SafariPageReaderAdapter(browser.tabs, browser.scripting)
+    const pageNavigation = new SafariPageNavigationAdapter(browser.tabs)
 
     const createWebSocket = (_url: string): BrijioSocket => {
       // Return a stub socket for instantiation test
@@ -450,6 +540,7 @@ void describe('BrijioBackgroundController with Safari adapters', () => {
         async selectOptions () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } },
         async submitForm () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } }
       },
+      pageNavigation,
       timers
     })
 
