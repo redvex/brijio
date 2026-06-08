@@ -16,6 +16,7 @@ import {
   type WriteTextEditableTarget,
   type FormSubmitTarget,
   type PageActionResult,
+  type PageNavigationResult,
   stringValue,
   requireString,
   createBrowserInstanceId,
@@ -28,6 +29,7 @@ import {
   SafariSetupAdapter,
   SafariPageReaderAdapter,
   SafariWebSocketConnection,
+  SafariPageNavigationAdapter,
   type BrowserApi
 } from './background.js'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
@@ -91,6 +93,8 @@ const pageActions = {
   }
 }
 
+const pageNavigation = new SafariPageNavigationAdapter(browser.tabs)
+
 const controller = new BrijioBackgroundController({
   action,
   createWebSocket (url: string): BrijioSocket {
@@ -102,6 +106,7 @@ const controller = new BrijioBackgroundController({
   storage,
   pageReader,
   pageActions,
+  pageNavigation,
   timers: createGlobalTimers()
 })
 
