@@ -416,6 +416,42 @@ export interface ActionResultErrorResponse {
   }
 }
 
+export interface NavigateToUrlRequest {
+  type: 'navigate_to_url'
+  url: string
+}
+
+export interface NavigateToUrlResult {
+  url: string
+  title: string
+  timestamp: string
+  redirected: boolean
+  navigationMs: number
+}
+
+export interface NavigateToUrlResponse {
+  type: 'navigate_to_url_response'
+  ok: true
+  data: NavigateToUrlResult
+}
+
+export interface NavigateToUrlErrorResponse {
+  type: 'navigate_to_url_response'
+  ok: false
+  error: {
+    code: NavigateToUrlErrorCode
+    message: string
+  }
+}
+
+export type NavigateToUrlErrorCode =
+  | 'no_active_tab'
+  | 'unsupported_scheme'
+  | 'unsupported_page'
+  | 'navigation_failed'
+  | 'timeout'
+  | 'content_script_unavailable'
+
 export type ExtensionResponse =
   | PageContextResponse
   | PageContextErrorResponse
@@ -423,6 +459,8 @@ export type ExtensionResponse =
   | PageContentErrorResponse
   | ActionResultResponse
   | ActionResultErrorResponse
+  | NavigateToUrlResponse
+  | NavigateToUrlErrorResponse
 
 export function createAuthEnvelope (input: {
   requestId?: string
@@ -694,6 +732,58 @@ export function isPerformActionEnvelope (
   }
 
   return false
+}
+
+export function isNavigateToUrlEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: NavigateToUrlRequest } {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type !== 'message') {
+    return false
+  }
+
+  if (Object.hasOwn(value, 'id') && typeof value.id !== 'string') {
+    return false
+  }
+
+  if (!isRecord(value.payload)) {
+    return false
+  }
+
+  if (value.payload.type !== 'navigate_to_url') {
+    return false
+  }
+
+  return typeof value.payload.url === 'string'
+}
+
+export function createNavigateToUrlResponse (
+  id: string | undefined,
+  result: NavigateToUrlResult
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'navigate_to_url_response',
+    ok: true,
+    data: result
+  })
+}
+
+export function createNavigateToUrlErrorResponse (
+  id: string | undefined,
+  code: NavigateToUrlErrorCode,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'navigate_to_url_response',
+    ok: false,
+    error: {
+      code,
+      message
+    }
+  })
 }
 
 export function createPageContextResponse (
