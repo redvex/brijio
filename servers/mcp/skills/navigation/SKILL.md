@@ -1,6 +1,6 @@
 ---
 name: navigation
-description: "Navigate multi-step flows on authenticated pages: follow menu paths, click through breadcrumbs, handle SPA routing, wait for page loads, and backtrack safely."
+description: "Navigate multi-step flows on authenticated pages: follow menu paths, click through breadcrumbs, handle SPA routing, wait for page loads, and backtrack safely. Also covers direct URL navigation with the navigate_to_url tool."
 ---
 
 # Guided Multi-Step Navigation
@@ -9,7 +9,7 @@ Navigate through web pages by clicking links and actions rather than constructin
 URLs. This approach survives URL changes, handles SPAs, and works on authenticated
 pages where direct URL access may fail.
 
-## When to Use
+## When to Use Click Navigation
 
 - "Go to Settings → Privacy → Manage Data"
 - "Navigate to the admin dashboard"
@@ -76,6 +76,88 @@ If you need to go back to a previous level:
 
 Do **not** assume URLs are stable — always navigate by clicking, not by
 constructing URLs.
+
+---
+
+# Direct URL Navigation
+
+Use the `navigate_to_url` tool to navigate the browser directly to an HTTP or
+HTTPS URL without clicking through the page.
+
+## When to Use Direct URL Navigation
+
+- You know the exact URL and need to go there directly
+- The user provides a specific URL (e.g., "Go to https://example.com/dashboard")
+- You need to jump to a known page quickly and re-read it
+- Click-based navigation would take too many steps for a known URL
+
+**Do not use `navigate_to_url` for:**
+
+- Auth-gated pages where the URL alone won't work (use click navigation instead)
+- URLs with schemes other than `http:` or `https:` (ftp, data, javascript — these
+  return `unsupported_scheme`)
+- Pages that require POST data or specific headers
+
+## Workflow
+
+### 1. Check Connection
+
+Call `list_browsers` to confirm a browser is connected. If multiple browsers
+are available and you need a specific one, note the `browserInstanceId`.
+
+### 2. Navigate
+
+Call `navigate_to_url` with:
+
+| Parameter           | Required | Description                                           |
+| ------------------- | -------- | ----------------------------------------------------- |
+| `url`               | Yes      | The HTTP or HTTPS URL to navigate to                  |
+| `browserInstanceId` | No       | Target a specific browser when multiple are connected |
+
+Example:
+
+```
+navigate_to_url(url: "https://example.com/dashboard")
+```
+
+### 3. Check the Result
+
+The response includes:
+
+| Field          | Type    | Description                                               |
+| -------------- | ------- | --------------------------------------------------------- |
+| `url`          | string  | The final URL after navigation (may differ if redirected) |
+| `title`        | string  | The page title after navigation                           |
+| `redirected`   | boolean | `true` if the final URL differs from the requested URL    |
+| `navigationMs` | number  | Time taken for the navigation in milliseconds             |
+| `timestamp`    | string  | ISO 8601 timestamp of when navigation completed           |
+
+### 4. Handle Errors
+
+| Error Code            | Cause                                                   |
+| --------------------- | ------------------------------------------------------- |
+| `unsupported_scheme`  | URL is not http: or https:                              |
+| `no_active_tab`       | No active browser tab found                             |
+| `navigation_failed`   | Browser reported an error (restricted URL, crashed tab) |
+| `timeout`             | Navigation took longer than 10 seconds                  |
+| `browser_unavailable` | No browser extension connected                          |
+| `connection_failed`   | Could not reach the Brijio WebSocket server             |
+| `invalid_response`    | Extension returned an unrecognisable response           |
+
+### 5. Re-Read After Navigation
+
+After `navigate_to_url` succeeds, always call `read_current_page` to get fresh
+element IDs. The navigation result only tells you the URL and title — you still
+need page context to interact with elements.
+
+## Choosing Between Click Navigation and Direct URL
+
+- **Prefer `navigate_to_url`** when you have a precise URL and the page isn't
+  behind a login wall or requires cookie-based auth that click-through preserves.
+- **Prefer click navigation** when you need to follow menu paths, breadcrumbs,
+  or when direct URL access would fail (e.g., SPA hash routes, auth-gated pages).
+
+---
 
 ## SPA and Dynamic Pages
 
