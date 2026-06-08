@@ -287,15 +287,15 @@ npx @brijio/mcp uninstall  # remove the daemon service
 
 Daemon commands:
 
-| Command | Description |
-| ------- | ----------- |
+| Command                                | Description                                    |
+| -------------------------------------- | ---------------------------------------------- |
 | `install [--ws-port N] [--mcp-port N]` | Install daemon, generate tokens, start service |
-| `uninstall` | Remove service (preserves config and logs) |
-| `start` | Start the daemon |
-| `stop` | Stop the daemon |
-| `restart` | Restart the daemon |
-| `status` | Show daemon state and health check results |
-| `logs [--lines N] [--live]` | View or stream daemon logs |
+| `uninstall`                            | Remove service (preserves config and logs)     |
+| `start`                                | Start the daemon                               |
+| `stop`                                 | Stop the daemon                                |
+| `restart`                              | Restart the daemon                             |
+| `status`                               | Show daemon state and health check results     |
+| `logs [--lines N] [--live]`            | View or stream daemon logs                     |
 
 Config is stored in `~/.brijio/.env`. To fully remove all Brijio daemon data: `rm -rf ~/.brijio`.
 

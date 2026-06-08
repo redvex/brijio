@@ -4,3 +4,4 @@ node_modules
 dist
 servers/mcp/src/.test-skills*
 docs/superpowers
+.DS_Store
