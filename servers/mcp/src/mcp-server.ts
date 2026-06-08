@@ -13,6 +13,7 @@ import {
 import { listBrowsers } from './browser-list-tool.js'
 import { clickElement } from './click-element-tool.js'
 import { fillInput } from './fill-input-tool.js'
+import { navigateToUrl } from './navigate-to-url-tool.js'
 import {
   fillEditable,
   selectOptions,
@@ -402,6 +403,34 @@ export async function createBrijioMcpServer (
     async (input) => {
       logToolCall('submit_form', input as Record<string, unknown>)
       const result = await submitForm(pageContextConfig, input)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
+    'navigate_to_url',
+    {
+      title: 'Navigate to URL',
+      description:
+        'Navigate the browser to an HTTP or HTTPS URL and wait for the page to load.',
+      inputSchema: {
+        url: z
+          .string()
+          .describe('The HTTP or HTTPS URL to navigate to.'),
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input) => {
+      logToolCall('navigate_to_url', input as Record<string, unknown>)
+      const result = await navigateToUrl(pageContextConfig, input)
 
       return {
         content: [

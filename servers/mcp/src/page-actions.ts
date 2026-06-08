@@ -1,6 +1,7 @@
 import {
   type BrijioClickElementResult,
   type BrijioFillInputResult,
+  type BrijioNavigateToUrlResult,
   type BrijioSelectOptionsResult,
   type BrijioSetCheckedResult,
   type BrijioSubmitFormResult,
@@ -14,6 +15,8 @@ import {
   type ClickElementRequestOptions,
   requestFillInput as defaultRequestFillInput,
   type FillInputRequestOptions,
+  requestNavigateToUrl as defaultRequestNavigateToUrl,
+  type NavigateToUrlRequestOptions,
   requestSelectOptions as defaultRequestSelectOptions,
   type SelectOptionsRequestOptions,
   requestSetChecked as defaultRequestSetChecked,
@@ -47,6 +50,9 @@ export interface BrijioPageActionsConfig {
   requestSubmitForm?: (
     options: SubmitFormRequestOptions
   ) => Promise<BrijioSubmitFormResult>
+  requestNavigateToUrl?: (
+    options: NavigateToUrlRequestOptions
+  ) => Promise<BrijioNavigateToUrlResult>
 }
 
 export async function clickCurrentPageElement (
@@ -167,5 +173,22 @@ export async function submitCurrentPageForm (
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     pageContextId
+  })
+}
+
+export async function navigateToCurrentPageUrl (
+  config: BrijioPageActionsConfig,
+  url: string,
+  browserInstanceId?: string
+): Promise<BrijioNavigateToUrlResult> {
+  const requestNavigateToUrl =
+    config.requestNavigateToUrl ?? defaultRequestNavigateToUrl
+
+  return await requestNavigateToUrl({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    url
   })
 }
