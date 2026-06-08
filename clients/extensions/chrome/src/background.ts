@@ -250,23 +250,47 @@ async function performActiveTabSubmitForm (target: {
 }
 
 export async function navigateActiveTabToUrl (url: string): Promise<PageNavigationResult> {
-  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
-
-  if (tabs.length === 0 || tabs[0].id === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: 'no_active_tab',
-        message: 'No active tab is available.'
-      }
-    }
-  }
-
-  const tabId = tabs[0].id
-  const startTime = Date.now()
+  const NAVIGATION_TIMEOUT_MS = 10000
 
   try {
-    const updatedTab = await chrome.tabs.update(tabId, { url })
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+
+    if (tabs.length === 0 || tabs[0].id === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'no_active_tab',
+          message: 'No active tab is available.'
+        }
+      }
+    }
+
+    const tabId = tabs[0].id
+    const startTime = Date.now()
+
+    // Chrome's chrome.tabs.update() usually resolves quickly with the tab
+    // object, but in edge-cases (restricted pages, permission prompts) it may
+    // hang. Wrap in a timeout so the MCP client always gets a response.
+    const updatedTab = await withTabTimeout(
+      chrome.tabs.update(tabId, { url }),
+      NAVIGATION_TIMEOUT_MS,
+      `Navigation to ${url} timed out.`
+    )
+
+    if (updatedTab === undefined || updatedTab === null) {
+      // tabs.update resolved but returned no tab object — still report
+      // success because Chrome has accepted the navigation request.
+      return {
+        ok: true,
+        data: {
+          url,
+          title: '',
+          timestamp: new Date(startTime).toISOString(),
+          redirected: false,
+          navigationMs: Date.now() - startTime
+        }
+      }
+    }
 
     const navigatedUrl = typeof updatedTab.url === 'string' && updatedTab.url !== ''
       ? updatedTab.url
@@ -283,15 +307,49 @@ export async function navigateActiveTabToUrl (url: string): Promise<PageNavigati
         navigationMs: Date.now() - startTime
       }
     }
-  } catch {
+  } catch (error: unknown) {
+    const message =
+      error instanceof TabTimeoutError
+        ? error.message
+        : `Failed to navigate tab to ${url}.`
     return {
       ok: false,
       error: {
-        code: 'navigation_failed',
-        message: `Failed to navigate tab to ${url}.`
+        code: error instanceof TabTimeoutError ? 'timeout' : 'navigation_failed',
+        message
       }
     }
   }
+}
+
+class TabTimeoutError extends Error {
+  constructor (message: string) {
+    super(message)
+    this.name = 'TabTimeoutError'
+  }
+}
+
+async function withTabTimeout<T> (
+  promise: Promise<T>,
+  timeoutMs: number,
+  message: string
+): Promise<T> {
+  return await new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new TabTimeoutError(message))
+    }, timeoutMs)
+
+    promise.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (reason) => {
+        clearTimeout(timer)
+        reject(reason)
+      }
+    )
+  })
 }
 
 class DomWebSocketAdapter implements BrijioSocket {

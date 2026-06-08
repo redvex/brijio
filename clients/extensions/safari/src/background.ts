@@ -192,28 +192,52 @@ export class SafariPageReaderAdapter {
 }
 
 export class SafariPageNavigationAdapter {
+  private static readonly NAVIGATION_TIMEOUT_MS = 10000
+
   constructor (
     private readonly tabs: BrowserApi['tabs']
   ) {}
 
   async navigateToUrl (url: string): Promise<PageNavigationResult> {
-    const tabs = await this.tabs.query({ active: true, currentWindow: true })
+    try {
+      const tabs = await this.tabs.query({ active: true, currentWindow: true })
 
-    if (tabs.length === 0 || tabs[0].id === undefined) {
-      return {
-        ok: false,
-        error: {
-          code: 'no_active_tab',
-          message: 'No active tab is available.'
+      if (tabs.length === 0 || tabs[0].id === undefined) {
+        return {
+          ok: false,
+          error: {
+            code: 'no_active_tab',
+            message: 'No active tab is available.'
+          }
         }
       }
-    }
 
-    const tabId = tabs[0].id
-    const startTime = Date.now()
+      const tabId = tabs[0].id
+      const startTime = Date.now()
 
-    try {
-      const updatedTab = await this.tabs.update(tabId, { url })
+      // Safari's browser.tabs.update() may hang or return undefined in some
+      // edge-cases (e.g. restricted pages, permission prompts). Wrap the call
+      // in a timeout so the MCP client always gets a response.
+      const updatedTab = await withTimeout(
+        this.tabs.update(tabId, { url }),
+        SafariPageNavigationAdapter.NAVIGATION_TIMEOUT_MS,
+        `Navigation to ${url} timed out.`
+      )
+
+      if (updatedTab === undefined || updatedTab === null) {
+        // tabs.update resolved but returned no tab object — still report
+        // success because Safari has accepted the navigation request.
+        return {
+          ok: true,
+          data: {
+            url,
+            title: '',
+            timestamp: new Date(startTime).toISOString(),
+            redirected: false,
+            navigationMs: Date.now() - startTime
+          }
+        }
+      }
 
       const navigatedUrl = typeof updatedTab.url === 'string' && updatedTab.url !== ''
         ? updatedTab.url
@@ -230,16 +254,50 @@ export class SafariPageNavigationAdapter {
           navigationMs: Date.now() - startTime
         }
       }
-    } catch {
+    } catch (error: unknown) {
+      const message =
+        error instanceof TimeoutError
+          ? error.message
+          : `Failed to navigate tab to ${url}.`
       return {
         ok: false,
         error: {
-          code: 'navigation_failed',
-          message: `Failed to navigate tab to ${url}.`
+          code: error instanceof TimeoutError ? 'timeout' : 'navigation_failed',
+          message
         }
       }
     }
   }
+}
+
+class TimeoutError extends Error {
+  constructor (message: string) {
+    super(message)
+    this.name = 'TimeoutError'
+  }
+}
+
+async function withTimeout<T> (
+  promise: Promise<T>,
+  timeoutMs: number,
+  message: string
+): Promise<T> {
+  return await new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new TimeoutError(message))
+    }, timeoutMs)
+
+    promise.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (reason) => {
+        clearTimeout(timer)
+        reject(reason)
+      }
+    )
+  })
 }
 
 export class SafariWebSocketConnection implements BrijioSocket {

@@ -15,7 +15,6 @@ import {
   type WriteTextActionTarget,
   type WriteTextEditableTarget,
   type PageActionResult,
-  type PageNavigationResult,
   stringValue,
   requireString,
   createBrowserInstanceId,
