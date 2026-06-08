@@ -7,6 +7,8 @@ import {
   type PageActionAdapter,
   type PageActionResult,
   type BrijioSocket,
+  type PageNavigationAdapter,
+  type PageNavigationResult,
   type PageReadResult,
   type PageReaderAdapter,
   type SetupAdapter,
@@ -15,6 +17,8 @@ import {
 import type {
   ActionResultErrorCode,
   ClickActionTarget,
+  NavigateToUrlErrorCode,
+  NavigateToUrlResult,
   PageContent,
   PageContentErrorCode,
   PageContext,
@@ -737,6 +741,157 @@ void describe('Brijio background controller', () => {
     })
   })
 
+  // --- navigate_to_url ---
+
+  void it('responds to navigate_to_url with a navigation result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787'
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'nav-1',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/page'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'nav-1',
+      payload: {
+        type: 'navigate_to_url_response',
+        ok: true,
+        data: {
+          url: 'https://example.com/page',
+          title: 'Navigated Page',
+          timestamp: '2026-06-08T12:00:00.000Z',
+          redirected: false,
+          navigationMs: 150
+        }
+      }
+    })
+  })
+
+  void it('responds to navigate_to_url with a custom result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      navigateResult: {
+        url: 'https://example.com/redirected',
+        title: 'Redirected Page',
+        timestamp: '2026-06-08T12:01:00.000Z',
+        redirected: true,
+        navigationMs: 320
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'nav-2',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/page'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'nav-2',
+      payload: {
+        type: 'navigate_to_url_response',
+        ok: true,
+        data: {
+          url: 'https://example.com/redirected',
+          title: 'Redirected Page',
+          timestamp: '2026-06-08T12:01:00.000Z',
+          redirected: true,
+          navigationMs: 320
+        }
+      }
+    })
+  })
+
+  void it('returns navigate_to_url error when navigation fails', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      navigateError: {
+        code: 'no_active_tab',
+        message: 'No active tab is available.'
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'nav-3',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/page'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'nav-3',
+      payload: {
+        type: 'navigate_to_url_response',
+        ok: false,
+        error: {
+          code: 'no_active_tab',
+          message: 'No active tab is available.'
+        }
+      }
+    })
+  })
+
+  void it('returns unsupported_scheme error from navigate_to_url', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      navigateError: {
+        code: 'unsupported_scheme',
+        message: 'Only http: and https: URLs are supported.'
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'nav-4',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'ftp://example.com/file'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'nav-4',
+      payload: {
+        type: 'navigate_to_url_response',
+        ok: false,
+        error: {
+          code: 'unsupported_scheme',
+          message: 'Only http: and https: URLs are supported.'
+        }
+      }
+    })
+  })
+
   void it('transitions to reconnecting when a socket error is followed by close', async () => {
     const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
 
@@ -1182,6 +1337,11 @@ interface HarnessOptions {
     code: ActionResultErrorCode
     message: string
   }
+  navigateResult?: NavigateToUrlResult
+  navigateError?: {
+    code: NavigateToUrlErrorCode
+    message: string
+  }
 }
 
 interface Harness {
@@ -1203,6 +1363,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const action = new FakeActionAdapter()
   const pageReader = new FakePageReaderAdapter(options)
   const pageActions = new FakePageActionAdapter(options)
+  const pageNavigation = new FakePageNavigationAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
   const controller = new BrijioBackgroundController({
@@ -1212,6 +1373,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
     storage,
     pageReader,
     pageActions,
+    pageNavigation,
     timers
   })
 
@@ -1454,6 +1616,37 @@ class FakePageReaderAdapter implements PageReaderAdapter {
     return {
       ok: true,
       data: this.options.pageContent
+    }
+  }
+}
+
+class FakePageNavigationAdapter implements PageNavigationAdapter {
+  constructor (private readonly options: HarnessOptions) {}
+
+  async navigateToUrl (url: string): Promise<PageNavigationResult> {
+    if (this.options.navigateError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.navigateError
+      }
+    }
+
+    if (this.options.navigateResult === undefined) {
+      return {
+        ok: true,
+        data: {
+          url,
+          title: 'Navigated Page',
+          timestamp: '2026-06-08T12:00:00.000Z',
+          redirected: false,
+          navigationMs: 150
+        }
+      }
+    }
+
+    return {
+      ok: true,
+      data: this.options.navigateResult
     }
   }
 }

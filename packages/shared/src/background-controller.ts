@@ -3,6 +3,8 @@ import {
   createActionResultResponse,
   createAuthEnvelope,
   createBrowserPresenceAnnounceEnvelope,
+  createNavigateToUrlErrorResponse,
+  createNavigateToUrlResponse,
   createPageContentErrorResponse,
   createPageContentResponse,
   createPageContextErrorResponse,
@@ -11,10 +13,13 @@ import {
   isBrowserPresenceRequestEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
+  isNavigateToUrlEnvelope,
   isPerformActionEnvelope,
   type ActionResultData,
   type ActionResultErrorCode,
   type ClickActionTarget,
+  type NavigateToUrlErrorCode,
+  type NavigateToUrlResult,
   type SelectOptionsActionResultData,
   type SetCheckedActionResultData,
   type SubmitFormActionResultData,
@@ -119,6 +124,20 @@ export interface PageActionAdapter {
   submitForm: (target: { formId: string, expectedLabel?: string }, pageContextId?: number) => Promise<PageActionResult>
 }
 
+export type PageNavigationResult =
+  | { ok: true, data: NavigateToUrlResult }
+  | {
+    ok: false
+    error: {
+      code: NavigateToUrlErrorCode
+      message: string
+    }
+  }
+
+export interface PageNavigationAdapter {
+  navigateToUrl: (url: string) => Promise<PageNavigationResult>
+}
+
 export interface BrijioSocket {
   onopen: (() => void) | undefined
   onmessage: ((event: { data: string }) => void | Promise<void>) | undefined
@@ -132,6 +151,7 @@ export interface BrijioBackgroundControllerOptions {
   action: ActionAdapter
   createWebSocket: (url: string) => BrijioSocket
   pageActions: PageActionAdapter
+  pageNavigation: PageNavigationAdapter
   pageReader: PageReaderAdapter
   setup: SetupAdapter
   storage: StorageAdapter
@@ -394,6 +414,16 @@ export class BrijioBackgroundController {
       return
     }
 
+    if (isNavigateToUrlEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handleNavigateToUrlRequest(message.id, message.payload.url)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
+    }
+
     if (isPerformActionRequestEnvelope(message)) {
       this.pendingRequestCount++
       try {
@@ -502,6 +532,30 @@ export class BrijioBackgroundController {
 
     this.socket?.send(
       JSON.stringify(createActionResultResponse(requestId, result.data))
+    )
+  }
+
+  private async handleNavigateToUrlRequest (
+    requestId: string | undefined,
+    url: string
+  ): Promise<void> {
+    const result = await this.options.pageNavigation.navigateToUrl(url)
+
+    if (!result.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createNavigateToUrlErrorResponse(
+            requestId,
+            result.error.code,
+            result.error.message
+          )
+        )
+      )
+      return
+    }
+
+    this.socket?.send(
+      JSON.stringify(createNavigateToUrlResponse(requestId, result.data))
     )
   }
 
