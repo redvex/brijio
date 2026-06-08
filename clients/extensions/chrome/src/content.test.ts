@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { parseHTML } from 'linkedom'
-import { handleContentRequest, type ContentEnvironment } from '@browserbridge/shared'
+import { handleContentRequest, type ContentEnvironment } from '@brijio/shared'
 
 void describe('Chrome content script entry', () => {
   void it('delegates to shared handleContentRequest', () => {

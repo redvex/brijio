@@ -1,11 +1,11 @@
 // Safari popup DOM entry point.
 //
-// Per ADR 0031, Safari uses shared initPopup from @browserbridge/shared
+// Per ADR 0031, Safari uses shared initPopup from @brijio/shared
 // for all popup logic. This file only provides Safari-specific BrowserApi
 // interface, the promisifying sendMessage wrapper, and the production boot.
 
-import { initPopup } from '@browserbridge/shared'
-import type { SendMessageFn } from '@browserbridge/shared'
+import { initPopup } from '@brijio/shared'
+import type { SendMessageFn } from '@brijio/shared'
 
 export interface BrowserRuntime {
   sendMessage: (message: unknown, options?: unknown, callback?: (response: unknown) => void) => void

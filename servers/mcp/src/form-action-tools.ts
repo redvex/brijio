@@ -3,7 +3,7 @@ import {
   selectCurrentPageOptions,
   setCurrentPageChecked,
   submitCurrentPageForm,
-  type BrowserBridgePageActionsConfig
+  type BrijioPageActionsConfig
 } from './page-actions.js'
 import {
   type EditableTarget,
@@ -13,7 +13,7 @@ import {
   type SetCheckedActionResultData,
   type SubmitFormActionResultData
 } from './protocol.js'
-import { type BrowserBridgeToolResult } from './page-reading-tool.js'
+import { type BrijioToolResult } from './page-reading-tool.js'
 
 export interface SetCheckedInput {
   formId?: unknown
@@ -41,19 +41,19 @@ export interface FillEditableInput {
 }
 
 export type SetCheckedResult =
-  BrowserBridgeToolResult<SetCheckedActionResultData>
+  BrijioToolResult<SetCheckedActionResultData>
 
 export type SelectOptionsResult =
-  BrowserBridgeToolResult<SelectOptionsActionResultData>
+  BrijioToolResult<SelectOptionsActionResultData>
 
 export type SubmitFormResult =
-  BrowserBridgeToolResult<SubmitFormActionResultData>
+  BrijioToolResult<SubmitFormActionResultData>
 
 export type FillEditableResult =
-  BrowserBridgeToolResult<FillInputActionResultData>
+  BrijioToolResult<FillInputActionResultData>
 
 export async function setChecked (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   input: SetCheckedInput
 ): Promise<SetCheckedResult> {
   const targetResult = normalizeFormControlTarget(input)
@@ -75,7 +75,7 @@ export async function setChecked (
 }
 
 export async function selectOptions (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   input: SelectOptionsInput
 ): Promise<SelectOptionsResult> {
   const targetResult = normalizeFormControlTarget(input)
@@ -100,7 +100,7 @@ export async function selectOptions (
 }
 
 export async function submitForm (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   input: SubmitFormInput
 ): Promise<SubmitFormResult> {
   if (typeof input.formId !== 'string' || input.formId.length === 0) {
@@ -123,7 +123,7 @@ export async function submitForm (
 }
 
 export async function fillEditable (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   input: FillEditableInput
 ): Promise<FillEditableResult> {
   const targetResult = normalizeEditableTarget(input)
@@ -146,7 +146,7 @@ export async function fillEditable (
 
 function normalizeFormControlTarget (
   input: SetCheckedInput | SelectOptionsInput
-): BrowserBridgeToolResult<{
+): BrijioToolResult<{
     target: FillInputTarget
     browserInstanceId?: string
   }> {
@@ -185,7 +185,7 @@ function normalizeFormControlTarget (
 
 function normalizeEditableTarget (
   input: FillEditableInput
-): BrowserBridgeToolResult<{
+): BrijioToolResult<{
     target: EditableTarget
     browserInstanceId?: string
   }> {
@@ -217,7 +217,7 @@ function normalizeEditableTarget (
 
 function normalizeBrowserInstanceId (
   value: unknown
-): BrowserBridgeToolResult<string | undefined> {
+): BrijioToolResult<string | undefined> {
   if (value === undefined) {
     return {
       ok: true,
@@ -239,7 +239,7 @@ function normalizeBrowserInstanceId (
 
 function invalidToolInputResponse (
   message: string
-): BrowserBridgeToolResult<never> {
+): BrijioToolResult<never> {
   return {
     ok: false,
     error: {

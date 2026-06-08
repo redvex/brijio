@@ -206,14 +206,14 @@ void describe('skills', () => {
     void it('builds a skill URI from a name', () => {
       assert.equal(
         skillResourceUri('form-filling'),
-        'skill://browserbridge/form-filling'
+        'skill://brijio/form-filling'
       )
     })
 
     void it('handles names with hyphens', () => {
       assert.equal(
         skillResourceUri('web-qa'),
-        'skill://browserbridge/web-qa'
+        'skill://brijio/web-qa'
       )
     })
   })
@@ -330,7 +330,7 @@ void describe('skills', () => {
 
     void it('includes skill URI format', () => {
       const message = buildContextMessage([])
-      assert.ok(message.includes('skill://browserbridge/'))
+      assert.ok(message.includes('skill://brijio/'))
     })
 
     void it('handles empty skill list', () => {

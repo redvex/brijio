@@ -1,7 +1,7 @@
 // Chrome popup message helpers.
 //
 // Per ADR 0031, message creators and response parsers are shared via
-// @browserbridge/shared. This file only contains Chrome-specific helpers:
+// @brijio/shared. This file only contains Chrome-specific helpers:
 // the ChromeRuntime interface and the Promise-based sendMessage wrapper.
 
 import {
@@ -13,7 +13,7 @@ import {
   parseSettingsResponse,
   parseStatusResponse,
   parseErrorResponse
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 
 export {
   createGetSettingsMessage,

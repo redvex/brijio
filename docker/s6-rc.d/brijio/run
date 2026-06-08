@@ -1,6 +1,6 @@
 #!/command/with-contenv sh
-# s6 service: BrowserBridge (combined WebSocket + MCP server)
+# s6 service: Brijio (combined WebSocket + MCP server)
 # The Node.js entry point handles token auto-generation and startup banner.
 
 cd /app
-exec node dist/bin/browserbridge.js
+exec node dist/bin/brijio.js

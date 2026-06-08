@@ -6,10 +6,10 @@ import {
   type ContentRequest,
   type ContentResponse,
   type ContentEnvironment
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 
 void describe('Safari content-script-entry module', () => {
-  void it('exports handleContentRequest from @browserbridge/shared', () => {
+  void it('exports handleContentRequest from @brijio/shared', () => {
     assert.equal(typeof handleContentRequest, 'function')
   })
 

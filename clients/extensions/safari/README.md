@@ -1,18 +1,18 @@
 # Brijio Safari Extension
 
 The Safari Web Extension brings full Brijio functionality to Safari,
-using `@browserbridge/shared` for browser-agnostic logic and Safari-specific
+using `@brijio/shared` for browser-agnostic logic and Safari-specific
 adapters for API differences.
 
 ## Architecture
 
 The Safari extension follows the same adapter pattern as the Chrome extension.
 Shared logic — protocol types, background controller, page extraction, content
-handling, and timers — lives in `@browserbridge/shared`. The Safari package
+handling, and timers — lives in `@brijio/shared`. The Safari package
 contributes only browser-specific wiring:
 
 ```text
-@browserbridge/shared
+@brijio/shared
   protocol.ts           WebSocket envelope types, request/response types, guards
   background-controller.ts  Background controller (adapter-driven, no browser API)
   page-context.ts       Pure DOM page-context extraction
@@ -71,7 +71,7 @@ clients/extensions/safari/src/
 ## Build
 
 ```sh
-pnpm --filter @browserbridge/safari-extension build
+pnpm --filter @brijio/safari-extension build
 ```
 
 This compiles TypeScript and bundles the extension into
@@ -86,12 +86,12 @@ This compiles TypeScript and bundles the extension into
 ## Test
 
 ```sh
-pnpm --filter @browserbridge/safari-extension test
+pnpm --filter @brijio/safari-extension test
 ```
 
 Tests cover the Safari adapter classes, permission logic, and popup message
 handling. The shared controller, content handler, and extraction logic are
-tested in `@browserbridge/shared`.
+tested in `@brijio/shared`.
 
 ## Build and convert to Xcode project
 
@@ -104,7 +104,7 @@ make safari
 
 This runs two steps:
 
-1. `pnpm --filter @browserbridge/safari-extension build` — compiles and
+1. `pnpm --filter @brijio/safari-extension build` — compiles and
    bundles the extension.
 2. `xcrun safari-web-extension-converter --force --project-location
 clients/extensions/safari/Brijio clients/extensions/safari/dist` —

@@ -19,6 +19,6 @@ const backgroundScript = await readFile(new URL('../dist/background.js', import.
 
 assert.doesNotMatch(
   backgroundScript,
-  /@browserbridge\/shared/,
+  /@brijio\/shared/,
   'dist/background.js must not contain unresolved workspace imports.'
 )

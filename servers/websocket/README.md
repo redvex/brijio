@@ -106,10 +106,10 @@ BRIJIO_PAIRING_TOKEN=replace-with-generated-token
 ## Development
 
 ```sh
-pnpm --filter @browserbridge/websocket dev
-pnpm --filter @browserbridge/websocket test
-pnpm --filter @browserbridge/websocket build
-pnpm --filter @browserbridge/websocket check
+pnpm --filter @brijio/websocket dev
+pnpm --filter @brijio/websocket test
+pnpm --filter @brijio/websocket build
+pnpm --filter @brijio/websocket check
 ```
 
 The tests start a real local WebSocket server on `127.0.0.1` with an ephemeral
@@ -120,7 +120,7 @@ port and connect test clients through `ws`.
 Start the server:
 
 ```sh
-pnpm --filter @browserbridge/websocket dev
+pnpm --filter @brijio/websocket dev
 ```
 
 In another terminal, connect with `wscat`:

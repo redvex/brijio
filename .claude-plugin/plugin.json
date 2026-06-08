@@ -1,13 +1,13 @@
 {
-  "name": "browserbridge",
-  "description": "BrowserBridge: control real browsers through authenticated sessions — form filling, data extraction, QA testing, and web navigation via MCP. Includes 10 workflow skills for guided browser interactions.",
+  "name": "brijio",
+  "description": "Brijio: control real browsers through authenticated sessions — form filling, data extraction, QA testing, and web navigation via MCP. Includes 10 workflow skills for guided browser interactions.",
   "version": "0.0.0",
   "author": {
     "name": "Redvex",
     "url": "https://github.com/redvex"
   },
-  "homepage": "https://github.com/redvex/browser-bridge",
-  "repository": "https://github.com/redvex/browser-bridge",
+  "homepage": "https://github.com/brijio/mcp",
+  "repository": "https://github.com/brijio/mcp",
   "license": "PolyForm-Noncommercial-1.0.0",
   "keywords": [
     "browser",

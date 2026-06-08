@@ -2,10 +2,10 @@ import { readFile, readdir, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
 /**
- * Represents a BrowserBridge skill exposed via MCP resources, prompts,
+ * Represents a Brijio skill exposed via MCP resources, prompts,
  * and plugin manifests.
  */
-export interface BrowserBridgeSkill {
+export interface BrijioSkill {
   /** Skill identifier (derived from directory name, e.g. "form-filling") */
   name: string
   /** Human-readable title extracted from the first H1 in the markdown */
@@ -53,7 +53,7 @@ interface SkillFrontmatter {
  */
 export async function loadSkills (
   skillsDir: string
-): Promise<BrowserBridgeSkill[]> {
+): Promise<BrijioSkill[]> {
   let entries: string[]
   try {
     entries = await readdir(skillsDir)
@@ -85,26 +85,26 @@ export async function loadSkills (
       const title = extractTitle(body)
       const description = frontmatter.description ?? extractDescription(body)
 
-      return { name, title, description, content: body } satisfies BrowserBridgeSkill
+      return { name, title, description, content: body } satisfies BrijioSkill
     })
   )
 
   return skills
-    .filter((s): s is BrowserBridgeSkill => s !== null)
+    .filter((s): s is BrijioSkill => s !== null)
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
 /**
  * Build the MCP skill resource URI for a given skill name.
  *
- * Format: `skill://browserbridge/{name}`
+ * Format: `skill://brijio/{name}`
  */
 export function skillResourceUri (name: string): string {
-  return `skill://browserbridge/${name}`
+  return `skill://brijio/${name}`
 }
 
 /**
- * Build the combined context message for the `browserbridge-context`
+ * Build the combined context message for the `brijio-context`
  * prompt. This includes connected browsers, pitfalls, and skill descriptions.
  *
  * @param skillSummaries - Array of skill name/title/description summaries.
@@ -118,7 +118,7 @@ export function buildContextMessage (
     .join('\n')
 
   return [
-    'You have access to BrowserBridge, a bridge to the user\'s real browser.',
+    'You have access to Brijio, a bridge to the user\'s real browser.',
     '',
     '## Connected Browsers',
     '',
@@ -129,7 +129,7 @@ export function buildContextMessage (
     '',
     'Skills are detailed workflow guides available as MCP resources.',
     'Read a skill\'s full instructions with `read_resource` using the URI format:',
-    '`skill://browserbridge/{skill_name}`',
+    '`skill://brijio/{skill_name}`',
     '',
     skillList,
     '',

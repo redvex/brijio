@@ -13,8 +13,8 @@ Server packages and browser extensions use **independent versioning** — extens
 
 - Renamed the project from Brijio to Brijio for current public branding.
 - Renamed the publishable MCP runtime package from `@brijio/mcp` to `@brijio/mcp`.
-- Added the preferred `brijio` CLI binary while keeping `browserbridge` as a backwards-compatible alias for the transition window.
-- Added `BRIJIO_*` environment variables while preserving `BROWSERBRIDGE_*` aliases.
+- Added the preferred `brijio` CLI binary while keeping `brijio` as a backwards-compatible alias for the transition window.
+- Added `BRIJIO_*` environment variables while preserving `BRIJIO_*` aliases.
 
 ## [ext-chrome-v0.1.0] - 2026-06-03
 
@@ -22,7 +22,7 @@ Initial Chrome Web Store submission.
 
 ### Added
 
-**Chrome Extension** (`@browserbridge/chrome-extension`)
+**Chrome Extension** (`@brijio/chrome-extension`)
 
 - Extension icons (16, 32, 48, 128, 256, 512) for Chrome Web Store
 - Manifest production-ready with description, icons, and version
@@ -31,7 +31,7 @@ Initial Chrome Web Store submission.
 - Store listing description and assets
 - Independent versioning from server packages (ADR 0036)
 
-[ext-chrome-v0.1.0]: https://github.com/redvex/browser-bridge/releases/tag/ext-chrome-v0.1.0
+[ext-chrome-v0.1.0]: https://github.com/brijio/mcp/releases/tag/ext-chrome-v0.1.0
 
 ## [0.1.0] - 2026-06-02
 
@@ -40,7 +40,7 @@ browser extensions and AI agents via the Model Context Protocol.
 
 ### Added
 
-**WebSocket Relay Server** (`@browserbridge/websocket`)
+**WebSocket Relay Server** (`@brijio/websocket`)
 
 - Single-channel echo and pub/sub WebSocket server (ADR 0002)
 - Peer forwarding — routes MCP requests to connected browser extensions
@@ -48,7 +48,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - Token-based pairing and authentication with scoped routing (ADR 0021)
 - Extension keepalive handling at debug level
 - `GET /health` endpoint with version, uptime, and connected extension details
-- Structured JSON logging via `@browserbridge/shared` logger
+- Structured JSON logging via `@brijio/shared` logger
 - Per-request observability: request routing, browser targeting, error events
 
 **MCP Server** (`@brijio/mcp`)
@@ -72,7 +72,7 @@ browser extensions and AI agents via the Model Context Protocol.
 - Request-level observability: tool calls, resource reads, prompt invocations
 - Per-request WebSocket connections to the relay server
 
-**Shared Package** (`@browserbridge/shared`)
+**Shared Package** (`@brijio/shared`)
 
 - Shared protocol types, message schemas, and envelope factories
 - Structured JSON logger (`createLogger`) writing to stderr
@@ -114,4 +114,4 @@ browser extensions and AI agents via the Model Context Protocol.
 - Monorepo structure: `packages/shared`, `servers/websocket`, `servers/mcp`,
   `clients/extensions/{chrome,safari}`
 
-[0.1.0]: https://github.com/redvex/browser-bridge/releases/tag/v0.1.0
+[0.1.0]: https://github.com/brijio/mcp/releases/tag/v0.1.0

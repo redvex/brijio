@@ -6,7 +6,7 @@ import {
   setChecked,
   submitForm
 } from './form-action-tools.js'
-import { type BrowserBridgePageActionsConfig } from './page-actions.js'
+import { type BrijioPageActionsConfig } from './page-actions.js'
 
 void describe('MCP form action tools', () => {
   void it('returns invalid tool input for non-boolean checked values', async () => {
@@ -288,7 +288,7 @@ void describe('MCP form action tools', () => {
   })
 })
 
-function createConfig (): BrowserBridgePageActionsConfig {
+function createConfig (): BrijioPageActionsConfig {
   return {
     websocketUrl: 'ws://127.0.0.1:8787',
     timeoutMs: 5000,

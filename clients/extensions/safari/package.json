@@ -1,5 +1,5 @@
 {
-  "name": "@browserbridge/safari-extension",
+  "name": "@brijio/safari-extension",
   "version": "0.0.0",
   "private": true,
   "description": "Brijio Safari extension.",
@@ -12,7 +12,7 @@
     "test": "node --import tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
-    "@browserbridge/shared": "workspace:*"
+    "@brijio/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",

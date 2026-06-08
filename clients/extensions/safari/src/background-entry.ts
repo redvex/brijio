@@ -7,10 +7,10 @@
 // registers the browser.browserAction.onClicked and browser.runtime.onMessage listeners.
 
 import {
-  BrowserBridgeBackgroundController,
+  BrijioBackgroundController,
   createGlobalTimers,
   type BridgeSettings,
-  type BrowserBridgeSocket,
+  type BrijioSocket,
   type ClickActionTarget,
   type WriteTextActionTarget,
   type WriteTextEditableTarget,
@@ -20,7 +20,7 @@ import {
   createBrowserInstanceId,
   performActiveTabAction as sharedPerformActiveTabAction,
   type ActiveTabDeps
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 import {
   SafariActionBadge,
   SafariStorageAdapter,
@@ -87,9 +87,9 @@ const pageActions = {
   }
 }
 
-const controller = new BrowserBridgeBackgroundController({
+const controller = new BrijioBackgroundController({
   action,
-  createWebSocket (url: string): BrowserBridgeSocket {
+  createWebSocket (url: string): BrijioSocket {
     const ws = new SafariWebSocketConnection(url)
     ws.connect()
     return ws

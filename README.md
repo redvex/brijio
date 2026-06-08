@@ -187,7 +187,7 @@ sequenceDiagram
 This project has the local WebSocket transport, Chrome extension page context
 and action handling, MCP resources and tools, and local pairing/presence routing
 in place. Safari Web Extension support with full Chrome feature parity is also
-implemented (ADR 0019), using shared logic from `@browserbridge/shared`. The
+implemented (ADR 0019), using shared logic from `@brijio/shared`. The
 current working milestone is:
 
 1. A local Chrome extension manually connects to the WebSocket server.
@@ -232,7 +232,7 @@ type ToolResult<T> =
 
 ## Running Brijio
 
-### Option 1: npx (recommended for local use)
+### Option 1: npx (recommended for quick use)
 
 ```sh
 npx @brijio/mcp
@@ -241,10 +241,13 @@ npx @brijio/mcp
 This starts both the WebSocket server and the MCP server with zero config. On startup, auto-generated tokens are printed to the console:
 
 ```text
-[Brijio] WebSocket server listening on ws://0.0.0.0:8787
-[Brijio] MCP server listening on http://0.0.0.0:8788/mcp
-[Brijio] Pairing token [auto-generated]: dG9rZW4x
-[Brijio] MCP auth token [auto-generated]: dG9rZW4y
+🚀 Brijio ready!
+
+  WebSocket:    ws://localhost:8787
+  MCP:         http://localhost:8788/mcp
+
+  Pairing Token:    dG9rZW4x  [auto-generated]
+  MCP Auth Token:   dG9rZW4y  [auto-generated]
 ```
 
 Copy these tokens — they change on every restart unless you persist them. To persist tokens, create a `.env` file in the working directory:
@@ -262,13 +265,47 @@ BRIJIO_PAIRING_TOKEN=my-secret npx @brijio/mcp
 
 The MCP endpoint is then available at `http://localhost:8788/mcp`.
 
-### Option 2: Docker
+### Option 2: Daemon (recommended for persistent use)
+
+Install Brijio as a background service that starts on login:
+
+```sh
+npx @brijio/mcp install
+```
+
+This creates a LaunchAgent (macOS) or systemd user unit (Linux) that keeps Brijio running. Tokens are generated and stored in `~/.brijio/.env`.
+
+```sh
+npx @brijio/mcp start     # start the daemon
+npx @brijio/mcp stop      # stop the daemon
+npx @brijio/mcp restart   # restart the daemon
+npx @brijio/mcp status    # check daemon and health status
+npx @brijio/mcp logs      # view recent logs
+npx @brijio/mcp logs --live  # stream logs in real-time
+npx @brijio/mcp uninstall  # remove the daemon service
+```
+
+Daemon commands:
+
+| Command | Description |
+| ------- | ----------- |
+| `install [--ws-port N] [--mcp-port N]` | Install daemon, generate tokens, start service |
+| `uninstall` | Remove service (preserves config and logs) |
+| `start` | Start the daemon |
+| `stop` | Stop the daemon |
+| `restart` | Restart the daemon |
+| `status` | Show daemon state and health check results |
+| `logs [--lines N] [--live]` | View or stream daemon logs |
+
+Config is stored in `~/.brijio/.env`. To fully remove all Brijio daemon data: `rm -rf ~/.brijio`.
+
+### Option 3: Docker
 
 ```sh
 docker run -p 8787:8787 -p 8788:8788 \
   -e BRIJIO_PAIRING_TOKEN=my-pairing-token \
   -e MCP_HTTP_AUTH_TOKEN=my-mcp-token \
-  redvex/brijio
+  brijio/mcp
 ```
 
 Or with Docker Compose — copy `.env.example` to `.env`, fill in your tokens, then:
@@ -281,7 +318,7 @@ Both ports must be exposed: **8787** (WebSocket relay) and **8788** (MCP HTTP se
 
 ### Connecting Your Browser
 
-1. Install the [Brijio Chrome extension](https://github.com/redvex/brijio)
+1. Install the [Brijio Chrome extension](https://github.com/brijio/mcp)
 2. Click the Brijio icon in your toolbar
 3. Enter the WebSocket URL (default: `ws://localhost:8787`) and the pairing token
 4. Click **Connect**
@@ -332,10 +369,64 @@ No additional host allowlists are needed — auth tokens are the security bounda
 
 ## Local Development
 
+### Prerequisites
+
+- **Node.js** ≥ 20
+- **pnpm** ≥ 10 (`corepack enable` or `npm i -g pnpm`)
+
+### Build
+
+Build all workspace packages (shared package, WebSocket server, MCP server, and both browser extensions):
+
 ```sh
 pnpm install
+pnpm build
+```
+
+To build only the server packages:
+
+```sh
+pnpm --filter @brijio/websocket build
+pnpm --filter @brijio/mcp build
+```
+
+### Install & Start
+
+Copy the environment template and generate tokens:
+
+```sh
 cp .env.example .env
+pnpm run token     # generates BRIJIO_PAIRING_TOKEN
+```
+
+Edit `.env` to set `BRIJIO_PAIRING_TOKEN` and `MCP_HTTP_AUTH_TOKEN` with your own values.
+
+Start both servers with hot-reload:
+
+```sh
 pnpm dev
+```
+
+Or start individual servers:
+
+```sh
+pnpm --filter @brijio/websocket dev   # WebSocket relay on ws://0.0.0.0:8787
+pnpm --filter @brijio/mcp dev         # MCP server on http://0.0.0.0:8788/mcp
+```
+
+For a production-style build + run:
+
+```sh
+pnpm build
+node servers/mcp/dist/bin/brijio.js
+```
+
+Or use the daemon lifecycle commands from source:
+
+```sh
+pnpm brijio install   # install as a background service
+pnpm brijio start      # start the daemon
+pnpm brijio status     # check daemon health
 ```
 
 Docker-based local development:
@@ -350,14 +441,7 @@ The runtime profile serves a local form test page over HTTP:
 http://127.0.0.1:${TEST_PAGE_PORT:-8080}/test.html
 ```
 
-Generate a local pairing token before starting the runtime:
-
-```sh
-pnpm run token
-```
-
-Set the generated value as `BRIJIO_PAIRING_TOKEN` for the WebSocket and
-MCP servers. Configure the same token in the Chrome extension setup page along
+Configure the same pairing token in the Chrome extension setup page along
 with the local WebSocket URL.
 
 Generate a separate MCP HTTP bearer token and set it as
@@ -372,7 +456,7 @@ http://127.0.0.1:${MCP_HTTP_PORT:-8788}${MCP_HTTP_PATH:-/mcp}
 Start the WebSocket server:
 
 ```sh
-pnpm --filter @browserbridge/websocket dev
+pnpm --filter @brijio/websocket dev
 ```
 
 In another terminal, connect with `wscat`:
@@ -401,7 +485,7 @@ Then send a valid MCP-scoped request:
 { "type": "message", "id": "cli-1", "payload": { "type": "list_browsers" } }
 ```
 
-> **Compatibility:** `BROWSERBRIDGE_PAIRING_TOKEN`, `BROWSERBRIDGE_TOKEN`, `BROWSERBRIDGE_WEBSOCKET_URL`, `BROWSERBRIDGE_WS_URL`, `BROWSERBRIDGE_REQUEST_TIMEOUT_MS`, and `BROWSERBRIDGE_BROWSER_INSTANCE_ID` remain accepted as backward-compatible aliases during the transition window. `BRIJIO_BROWSER_INSTANCE_ID` is optional; when set, MCP tools target that browser by default.
+> **Compatibility:** `BRIJIO_PAIRING_TOKEN`, `BRIJIO_TOKEN`, `BRIJIO_WEBSOCKET_URL`, `BRIJIO_WS_URL`, `BRIJIO_REQUEST_TIMEOUT_MS`, and `BRIJIO_BROWSER_INSTANCE_ID` remain accepted as backward-compatible aliases during the transition window. `BRIJIO_BROWSER_INSTANCE_ID` is optional; when set, MCP tools target that browser by default.
 
 ---
 

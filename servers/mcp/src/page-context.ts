@@ -1,6 +1,6 @@
 import {
-  type BrowserBridgePageContentResult,
-  type BrowserBridgePageContextResult,
+  type BrijioPageContentResult,
+  type BrijioPageContextResult,
   invalidResourceUriResponse
 } from './protocol.js'
 import {
@@ -10,34 +10,34 @@ import {
   type PageContextRequestOptions
 } from './websocket-client.js'
 
-export interface BrowserBridgePageContextConfig {
+export interface BrijioPageContextConfig {
   websocketUrl: string
   pairingToken?: string
   timeoutMs: number
   defaultBrowserInstanceId?: string
   requestPageContext?: (
     options: PageContextRequestOptions
-  ) => Promise<BrowserBridgePageContextResult>
+  ) => Promise<BrijioPageContextResult>
   requestPageContent?: (
     options: PageContentRequestOptions
-  ) => Promise<BrowserBridgePageContentResult>
+  ) => Promise<BrijioPageContentResult>
 }
 
 export function getPageContextConfigFromEnv (
   env: NodeJS.ProcessEnv = process.env,
   warn: (message: string) => void = console.warn
-): Omit<BrowserBridgePageContextConfig, 'requestPageContext'> {
+): Omit<BrijioPageContextConfig, 'requestPageContext'> {
   const websocketUrl = resolveRenamedEnv({
     env,
     newName: 'BRIJIO_WS_URL',
-    oldNames: ['BROWSERBRIDGE_WEBSOCKET_URL', 'BROWSERBRIDGE_WS_URL', 'WEBSOCKET_URL'],
+    oldNames: ['BROWSERBRIDGE_WEBSOCKET_URL', 'BRIJIO_WEBSOCKET_URL', 'WEBSOCKET_URL'],
     defaultValue: 'ws://127.0.0.1:8787',
     warn
   })
   const pairingToken = resolveRenamedEnv({
     env,
     newName: 'BRIJIO_PAIRING_TOKEN',
-    oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BROWSERBRIDGE_TOKEN'],
+    oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BRIJIO_TOKEN'],
     defaultValue: '',
     warn
   })
@@ -63,9 +63,9 @@ export function getPageContextConfigFromEnv (
 }
 
 export async function getCurrentPageContext (
-  config: BrowserBridgePageContextConfig,
+  config: BrijioPageContextConfig,
   browserInstanceId?: string
-): Promise<BrowserBridgePageContextResult> {
+): Promise<BrijioPageContextResult> {
   const requestPageContext =
     config.requestPageContext ?? defaultRequestPageContext
 
@@ -78,10 +78,10 @@ export async function getCurrentPageContext (
 }
 
 export async function getCurrentPageContent (
-  config: BrowserBridgePageContextConfig,
+  config: BrijioPageContextConfig,
   index: number,
   browserInstanceId?: string
-): Promise<BrowserBridgePageContentResult> {
+): Promise<BrijioPageContentResult> {
   const requestPageContent =
     config.requestPageContent ?? defaultRequestPageContent
 
@@ -96,7 +96,7 @@ export async function getCurrentPageContent (
 
 export function parsePageContentResourceIndex (
   resourceUri: string
-): number | BrowserBridgePageContentResult {
+): number | BrijioPageContentResult {
   const match = /^browser:\/\/page\/current\/content\/([^/]+)$/.exec(resourceUri)
 
   if (match === null) {

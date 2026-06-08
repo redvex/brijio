@@ -6,12 +6,12 @@ export {
   createErrorEnvelope,
   isAuthPayload,
   isBrowserPresenceAnnouncePayload,
-  parseBrowserBridgeEnvelope,
-  type BrowserBridgeEnvelope,
+  parseBrijioEnvelope,
+  type BrijioEnvelope,
   type BrowserPresence,
   type BrowserPresenceAnnouncePayload,
-  type BrowserBridgeRole
-} from '@browserbridge/shared'
+  type BrijioRole
+} from '@brijio/shared'
 
 export function createScopeKey (token: string): string {
   return createHash('sha256').update(token).digest('hex')
