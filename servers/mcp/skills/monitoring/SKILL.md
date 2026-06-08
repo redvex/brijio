@@ -28,11 +28,11 @@ cronjob action=create \
   prompt="Check the price of Product X on the authenticated page at https://shop.example.com/product-x. Use list_browsers to confirm connection, read_current_page to get the price, compare to the last known price stored in memory, and report if the price has changed."
 ```
 
-Load the `using-browserbridge` and `monitoring` skills in the cron job so the
+Load the `using-brijio` and `monitoring` skills in the cron job so the
 agent knows how to use Brijio tools:
 
 ```
-skills: ["using-browserbridge", "monitoring"]
+skills: ["using-brijio", "monitoring"]
 ```
 
 ## Workflow
@@ -53,7 +53,7 @@ read_current_page(includeContent: true) → Full page context
 ```
 
 If the page requires navigation from the current URL, use the
-[navigation](skill://browserbridge/navigation) skill to reach the target page
+[navigation](skill://brijio/navigation) skill to reach the target page
 first.
 
 ### 3. Extract Target Data
@@ -199,7 +199,7 @@ browser must be connected when the cron job runs. If the connection fails:
 
 Pages with live data (countdown timers, live feeds) will always show changes.
 Focus on specific data points rather than full-page comparison. Use the
-[data-extraction](skill://browserbridge/data-extraction) skill for targeted
+[data-extraction](skill://brijio/data-extraction) skill for targeted
 extraction instead of comparing entire page snapshots.
 
 ### Rate Limiting

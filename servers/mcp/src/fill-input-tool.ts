@@ -1,12 +1,12 @@
 import {
   fillCurrentPageInput,
-  type BrowserBridgePageActionsConfig
+  type BrijioPageActionsConfig
 } from './page-actions.js'
 import {
   type FillInputActionResultData,
   type FillInputTarget
 } from './protocol.js'
-import { type BrowserBridgeToolResult } from './page-reading-tool.js'
+import { type BrijioToolResult } from './page-reading-tool.js'
 
 export interface FillInputInput {
   formId?: unknown
@@ -16,10 +16,10 @@ export interface FillInputInput {
 }
 
 export type FillInputResult =
-  BrowserBridgeToolResult<FillInputActionResultData>
+  BrijioToolResult<FillInputActionResultData>
 
 export async function fillInput (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   input: FillInputInput
 ): Promise<FillInputResult> {
   const normalizedInput = normalizeInput(input)
@@ -38,7 +38,7 @@ export async function fillInput (
 
 function normalizeInput (
   input: FillInputInput
-): BrowserBridgeToolResult<{
+): BrijioToolResult<{
     target: FillInputTarget
     text: string
     browserInstanceId?: string
@@ -83,7 +83,7 @@ function normalizeInput (
 
 function normalizeBrowserInstanceId (
   value: unknown
-): BrowserBridgeToolResult<string | undefined> {
+): BrijioToolResult<string | undefined> {
   if (value === undefined) {
     return {
       ok: true,
@@ -105,7 +105,7 @@ function normalizeBrowserInstanceId (
 
 function invalidToolInputResponse (
   message: string
-): BrowserBridgeToolResult<never> {
+): BrijioToolResult<never> {
   return {
     ok: false,
     error: {

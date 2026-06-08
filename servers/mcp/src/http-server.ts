@@ -7,27 +7,27 @@ import {
 import { readFileSync } from 'node:fs'
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import {
-  type BrowserBridgePageContextConfig,
+  type BrijioPageContextConfig,
   getPageContextConfigFromEnv
 } from './page-context.js'
-import { createBrowserBridgeMcpServer } from './mcp-server.js'
-import { createLogger } from '@browserbridge/shared'
+import { createBrijioMcpServer } from './mcp-server.js'
+import { createLogger } from '@brijio/shared'
 
 const version: string = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8')
 ).version
 const logger = createLogger('mcp')
 
-export interface BrowserBridgeMcpHttpServerOptions {
+export interface BrijioMcpHttpServerOptions {
   host: string
   port: number
   path: string
   authToken: string
   allowedOrigins: string[]
-  pageContextConfig?: BrowserBridgePageContextConfig
+  pageContextConfig?: BrijioPageContextConfig
 }
 
-export interface BrowserBridgeMcpHttpRuntime {
+export interface BrijioMcpHttpRuntime {
   server: Server
   url: string
   close: () => Promise<void>
@@ -53,7 +53,7 @@ interface HttpErrorBody {
 
 export function getMcpHttpServerOptionsFromEnv (
   env: NodeJS.ProcessEnv = process.env
-): BrowserBridgeMcpHttpServerOptions {
+): BrijioMcpHttpServerOptions {
   const host = env.MCP_HTTP_HOST ?? '0.0.0.0'
   const port = parsePort(env.MCP_HTTP_PORT)
   const authToken = env.MCP_HTTP_AUTH_TOKEN ?? ''
@@ -72,9 +72,9 @@ export function getMcpHttpServerOptionsFromEnv (
   }
 }
 
-export async function startBrowserBridgeMcpHttpServer (
-  options: BrowserBridgeMcpHttpServerOptions
-): Promise<BrowserBridgeMcpHttpRuntime> {
+export async function startBrijioMcpHttpServer (
+  options: BrijioMcpHttpServerOptions
+): Promise<BrijioMcpHttpRuntime> {
   const startTime = Date.now()
   const wsUrl = options.pageContextConfig?.websocketUrl ?? ''
 
@@ -91,7 +91,7 @@ export async function startBrowserBridgeMcpHttpServer (
   const address = server.address()
 
   if (address === null || typeof address === 'string') {
-    throw new Error('BrowserBridge MCP HTTP server is not listening on TCP.')
+    throw new Error('Brijio MCP HTTP server is not listening on TCP.')
   }
 
   return {
@@ -106,11 +106,11 @@ export async function startBrowserBridgeMcpHttpServer (
 async function handleMcpHttpRequest (
   request: IncomingMessage,
   response: ServerResponse,
-  options: BrowserBridgeMcpHttpServerOptions,
+  options: BrijioMcpHttpServerOptions,
   startTime: number,
   wsUrl: string
 ): Promise<void> {
-  const url = new URL(request.url ?? '/', 'http://browserbridge.local')
+  const url = new URL(request.url ?? '/', 'http://brijio.local')
 
   if (url.pathname === '/health' && request.method === 'GET') {
     const health: McpHealthStatus = {
@@ -133,7 +133,7 @@ async function handleMcpHttpRequest (
       ok: false,
       error: {
         code: 'not_found',
-        message: 'BrowserBridge MCP HTTP endpoint was not found.'
+        message: 'Brijio MCP HTTP endpoint was not found.'
       }
     })
     return
@@ -168,13 +168,13 @@ async function handleMcpHttpRequest (
       ok: false,
       error: {
         code: 'method_not_allowed',
-        message: 'BrowserBridge MCP HTTP only supports GET, POST, and DELETE.'
+        message: 'Brijio MCP HTTP only supports GET, POST, and DELETE.'
       }
     })
     return
   }
 
-  const mcpServer = await createBrowserBridgeMcpServer(options.pageContextConfig)
+  const mcpServer = await createBrijioMcpServer(options.pageContextConfig)
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true
@@ -242,7 +242,7 @@ function parseList (value: string | undefined, fallback: string[]): string[] {
 }
 
 function matchesPath (request: IncomingMessage, expectedPath: string): boolean {
-  const url = new URL(request.url ?? '/', 'http://browserbridge.local')
+  const url = new URL(request.url ?? '/', 'http://brijio.local')
 
   return url.pathname === expectedPath
 }
@@ -265,7 +265,7 @@ function validateOrigin (
     ok: false,
     error: {
       code: 'forbidden_origin',
-      message: 'Origin is not allowed for BrowserBridge MCP HTTP.'
+      message: 'Origin is not allowed for Brijio MCP HTTP.'
     }
   }
 }

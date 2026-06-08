@@ -2,8 +2,8 @@ import assert from 'node:assert/strict'
 import { describe, it, mock } from 'node:test'
 import {
   type BridgeSettings,
-  type BrowserBridgeBackgroundController
-} from '@browserbridge/shared'
+  type BrijioBackgroundController
+} from '@brijio/shared'
 import {
   createMessageHandler
 } from './background.js'
@@ -11,7 +11,7 @@ import {
 // --- Test helpers ---
 
 function createMockController (): {
-  controller: BrowserBridgeBackgroundController
+  controller: BrijioBackgroundController
   getBridgeSettings: ReturnType<typeof mock.fn>
   saveBridgeSettings: ReturnType<typeof mock.fn>
   requestConnect: ReturnType<typeof mock.fn>
@@ -32,7 +32,7 @@ function createMockController (): {
     requestConnect,
     requestDisconnect,
     getConnectionStatus
-  } as unknown as BrowserBridgeBackgroundController
+  } as unknown as BrijioBackgroundController
 
   return {
     controller,

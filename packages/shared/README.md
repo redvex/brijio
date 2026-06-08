@@ -1,4 +1,4 @@
-# @browserbridge/shared
+# @brijio/shared
 
 Shared TypeScript types, protocol message schemas, and browser-agnostic logic
 for Brijio.
@@ -20,12 +20,12 @@ browser-specific behavior is injected through adapter interfaces.
 
 ## How browser extensions use it
 
-Both the Chrome and Safari extensions import from `@browserbridge/shared` and
+Both the Chrome and Safari extensions import from `@brijio/shared` and
 provide only browser-specific adapters and entry-point wiring:
 
 ```text
 Browser extension package
-  ├── Imports from @browserbridge/shared:
+  ├── Imports from @brijio/shared:
   │     BrijioBackgroundController
   │     handleContentRequest
   │     createGlobalTimers
@@ -42,17 +42,17 @@ Browser extension package
 ## Build
 
 ```sh
-pnpm --filter @browserbridge/shared build
+pnpm --filter @brijio/shared build
 ```
 
 ## Test
 
 ```sh
-pnpm --filter @browserbridge/shared test
+pnpm --filter @brijio/shared test
 ```
 
 ## Type checks
 
 ```sh
-pnpm --filter @browserbridge/shared check
+pnpm --filter @brijio/shared check
 ```

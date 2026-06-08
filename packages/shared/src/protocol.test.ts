@@ -13,11 +13,11 @@ import {
   isPerformActionEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
-  parseBrowserBridgeEnvelope
+  parseBrijioEnvelope
 } from './protocol.js'
 import type { PageContext } from './protocol.js'
 
-void describe('shared BrowserBridge protocol', () => {
+void describe('shared Brijio protocol', () => {
   void it('parses auth envelopes', () => {
     const envelope = createAuthEnvelope({
       requestId: 'auth-1',
@@ -25,7 +25,7 @@ void describe('shared BrowserBridge protocol', () => {
       role: 'extension'
     })
 
-    assert.deepEqual(parseBrowserBridgeEnvelope(JSON.stringify(envelope)), {
+    assert.deepEqual(parseBrijioEnvelope(JSON.stringify(envelope)), {
       ok: true,
       message: envelope
     })
@@ -34,7 +34,7 @@ void describe('shared BrowserBridge protocol', () => {
   void it('parses browser presence request envelopes', () => {
     const envelope = createBrowserPresenceRequestEnvelope('presence-1')
 
-    assert.deepEqual(parseBrowserBridgeEnvelope(JSON.stringify(envelope)), {
+    assert.deepEqual(parseBrijioEnvelope(JSON.stringify(envelope)), {
       ok: true,
       message: envelope
     })
@@ -50,14 +50,14 @@ void describe('shared BrowserBridge protocol', () => {
       capabilities: ['page_context', 'click']
     })
 
-    assert.deepEqual(parseBrowserBridgeEnvelope(JSON.stringify(envelope)), {
+    assert.deepEqual(parseBrijioEnvelope(JSON.stringify(envelope)), {
       ok: true,
       message: envelope
     })
   })
 
   void it('rejects invalid JSON', () => {
-    assert.deepEqual(parseBrowserBridgeEnvelope('{not json'), {
+    assert.deepEqual(parseBrijioEnvelope('{not json'), {
       ok: false,
       error: {
         type: 'error',

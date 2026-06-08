@@ -1,5 +1,5 @@
 import { createWebSocketServer } from './server.js'
-import { createLogger } from '@browserbridge/shared'
+import { createLogger } from '@brijio/shared'
 
 const logger = createLogger('websocket')
 

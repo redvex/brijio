@@ -5,14 +5,14 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 import { WebSocketServer, type RawData, type WebSocket } from 'ws'
 import {
-  startBrowserBridgeMcpHttpServer,
-  type BrowserBridgeMcpHttpRuntime
+  startBrijioMcpHttpServer,
+  type BrijioMcpHttpRuntime
 } from './http-server.js'
 
 const currentPageResourceUri = 'browser://page/current'
 const currentPageContentTemplateUri = 'browser://page/current/content/{index}'
 const servers: WebSocketServer[] = []
-const mcpRuntimes: BrowserBridgeMcpHttpRuntime[] = []
+const mcpRuntimes: BrijioMcpHttpRuntime[] = []
 
 afterEach(async () => {
   await Promise.all(
@@ -23,7 +23,7 @@ afterEach(async () => {
   await Promise.all(servers.splice(0).map(closeServer))
 })
 
-void describe('BrowserBridge MCP HTTP server', () => {
+void describe('Brijio MCP HTTP server', () => {
   void it('returns enriched health data from the health endpoint', async () => {
     const runtime = await startTestMcpRuntime()
     const healthUrl = runtime.url.replace('/mcp', '/health')
@@ -105,7 +105,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
         ok: false,
         error: {
           code: 'forbidden_origin',
-          message: 'Origin is not allowed for BrowserBridge MCP HTTP.'
+          message: 'Origin is not allowed for Brijio MCP HTTP.'
         }
       })
     } finally {
@@ -122,7 +122,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
       await client.connect(transport, { timeout: 1000 })
 
       assert.deepEqual(client.getServerVersion(), {
-        name: 'browserbridge-mcp',
+        name: 'brijio-mcp',
         version: '0.0.0'
       })
 
@@ -142,52 +142,52 @@ void describe('BrowserBridge MCP HTTP server', () => {
             mimeType: 'application/json'
           },
           {
-            uri: 'skill://browserbridge/accessibility',
+            uri: 'skill://brijio/accessibility',
             name: 'accessibility',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/comparison',
+            uri: 'skill://brijio/comparison',
             name: 'comparison',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/data-extraction',
+            uri: 'skill://brijio/data-extraction',
             name: 'data-extraction',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/ecommerce',
+            uri: 'skill://brijio/ecommerce',
             name: 'ecommerce',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/form-filling',
+            uri: 'skill://brijio/form-filling',
             name: 'form-filling',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/monitoring',
+            uri: 'skill://brijio/monitoring',
             name: 'monitoring',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/navigation',
+            uri: 'skill://brijio/navigation',
             name: 'navigation',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/onboarding',
+            uri: 'skill://brijio/onboarding',
             name: 'onboarding',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/using-browserbridge',
-            name: 'using-browserbridge',
+            uri: 'skill://brijio/using-brijio',
+            name: 'using-brijio',
             mimeType: 'text/markdown'
           },
           {
-            uri: 'skill://browserbridge/web-qa',
+            uri: 'skill://brijio/web-qa',
             name: 'web-qa',
             mimeType: 'text/markdown'
           }
@@ -224,7 +224,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
             name: 'list_browsers',
             title: 'List Browsers',
             description:
-              'List BrowserBridge browser instances currently online for the configured pairing token.'
+              'List Brijio browser instances currently online for the configured pairing token.'
           },
           {
             name: 'read_current_page',
@@ -280,7 +280,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
           browserInstanceId: {
             type: 'string',
             description:
-              'Optional BrowserBridge browser instance ID to target.'
+              'Optional Brijio browser instance ID to target.'
           },
           includeContent: {
             type: 'boolean',
@@ -302,7 +302,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
           browserInstanceId: {
             type: 'string',
             description:
-              'Optional BrowserBridge browser instance ID to target.'
+              'Optional Brijio browser instance ID to target.'
           },
           expectedHref: {
             type: 'string',
@@ -322,7 +322,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
           id: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge target ID from the latest page context.'
+              'Short-lived Brijio target ID from the latest page context.'
           },
           kind: {
             type: 'string',
@@ -340,17 +340,17 @@ void describe('BrowserBridge MCP HTTP server', () => {
           browserInstanceId: {
             type: 'string',
             description:
-              'Optional BrowserBridge browser instance ID to target.'
+              'Optional Brijio browser instance ID to target.'
           },
           controlId: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge form control ID from the latest page context.'
+              'Short-lived Brijio form control ID from the latest page context.'
           },
           formId: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge form ID from the latest page context.'
+              'Short-lived Brijio form ID from the latest page context.'
           },
           text: {
             type: 'string',
@@ -367,12 +367,12 @@ void describe('BrowserBridge MCP HTTP server', () => {
           browserInstanceId: {
             type: 'string',
             description:
-              'Optional BrowserBridge browser instance ID to target.'
+              'Optional Brijio browser instance ID to target.'
           },
           id: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge editable target ID from the latest page context.'
+              'Short-lived Brijio editable target ID from the latest page context.'
           },
           text: {
             type: 'string',
@@ -390,7 +390,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
           browserInstanceId: {
             type: 'string',
             description:
-              'Optional BrowserBridge browser instance ID to target.'
+              'Optional Brijio browser instance ID to target.'
           },
           checked: {
             type: 'boolean',
@@ -399,12 +399,12 @@ void describe('BrowserBridge MCP HTTP server', () => {
           controlId: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge form control ID from the latest page context.'
+              'Short-lived Brijio form control ID from the latest page context.'
           },
           formId: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge form ID from the latest page context.'
+              'Short-lived Brijio form ID from the latest page context.'
           }
         },
         required: ['formId', 'controlId', 'checked'],
@@ -417,17 +417,17 @@ void describe('BrowserBridge MCP HTTP server', () => {
           browserInstanceId: {
             type: 'string',
             description:
-              'Optional BrowserBridge browser instance ID to target.'
+              'Optional Brijio browser instance ID to target.'
           },
           controlId: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge form control ID from the latest page context.'
+              'Short-lived Brijio form control ID from the latest page context.'
           },
           formId: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge form ID from the latest page context.'
+              'Short-lived Brijio form ID from the latest page context.'
           },
           values: {
             type: 'array',
@@ -448,12 +448,12 @@ void describe('BrowserBridge MCP HTTP server', () => {
           browserInstanceId: {
             type: 'string',
             description:
-              'Optional BrowserBridge browser instance ID to target.'
+              'Optional Brijio browser instance ID to target.'
           },
           formId: {
             type: 'string',
             description:
-              'Short-lived BrowserBridge form ID from the latest page context.'
+              'Short-lived Brijio form ID from the latest page context.'
           }
         },
         required: ['formId'],
@@ -476,7 +476,7 @@ void describe('BrowserBridge MCP HTTP server', () => {
         error: {
           code: 'connection_failed',
           message:
-            'Unable to connect to BrowserBridge WebSocket at ws://127.0.0.1:1.'
+            'Unable to connect to Brijio WebSocket at ws://127.0.0.1:1.'
         }
       })
 
@@ -1038,8 +1038,8 @@ async function startTestMcpRuntime (
     websocketUrl?: string
     allowedOrigins?: string[]
   } = {}
-): Promise<BrowserBridgeMcpHttpRuntime> {
-  const runtime = await startBrowserBridgeMcpHttpServer({
+): Promise<BrijioMcpHttpRuntime> {
+  const runtime = await startBrijioMcpHttpServer({
     host: '127.0.0.1',
     port: 0,
     path: '/mcp',
@@ -1059,7 +1059,7 @@ async function startTestMcpRuntime (
 
 function createHttpClient (): Client {
   return new Client({
-    name: 'browserbridge-mcp-test',
+    name: 'brijio-mcp-test',
     version: '0.0.0'
   })
 }

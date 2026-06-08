@@ -225,13 +225,14 @@ void describe('generateConfig', () => {
       BRIJIO_BROWSER_INSTANCE_ID: 'chrome-main'
     })
 
-    assert.equal(config.BROWSERBRIDGE_PAIRING_TOKEN, 'pair-abc123')
+    assert.equal(config.BRIJIO_PAIRING_TOKEN, 'pair-abc123')
     assert.equal(config.BROWSERBRIDGE_WEBSOCKET_URL, 'ws://127.0.0.1:8787')
+    assert.equal(config.BROWSERBRIDGE_PAIRING_TOKEN, 'pair-abc123')
     assert.equal(config.BROWSERBRIDGE_REQUEST_TIMEOUT_MS, '5000')
     assert.equal(config.BROWSERBRIDGE_BROWSER_INSTANCE_ID, 'chrome-main')
   })
 
-  void it('adds Brijio aliases for legacy BrowserBridge config', () => {
+  void it('adds BrowserBridge aliases for legacy Brijio config', () => {
     const config = withCompatibilityAliases({
       BROWSERBRIDGE_PAIRING_TOKEN: 'legacy-pair',
       BROWSERBRIDGE_WEBSOCKET_URL: 'ws://legacy.example:8787',

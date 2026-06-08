@@ -1,13 +1,13 @@
 {
-  "name": "browserbridge-dev",
-  "description": "Development marketplace for BrowserBridge skills plugin",
+  "name": "brijio-dev",
+  "description": "Development marketplace for Brijio skills plugin",
   "owner": {
     "name": "Redvex",
     "url": "https://github.com/redvex"
   },
   "plugins": [
     {
-      "name": "browserbridge",
+      "name": "brijio",
       "description": "Control real browsers through authenticated sessions — form filling, data extraction, QA testing, and web navigation via MCP. Includes 10 workflow skills for guided browser interactions.",
       "version": "0.0.0",
       "source": "./",

@@ -117,14 +117,14 @@ is connected. The extension does not continuously stream or store page content.
 Build the extension package:
 
 ```sh
-pnpm --filter @browserbridge/chrome-extension build
+pnpm --filter @brijio/chrome-extension build
 ```
 
 Run tests and type checks:
 
 ```sh
-pnpm --filter @browserbridge/chrome-extension test
-pnpm --filter @browserbridge/chrome-extension check
+pnpm --filter @brijio/chrome-extension test
+pnpm --filter @brijio/chrome-extension check
 ```
 
 Load `clients/extensions/chrome/dist` through Chrome's "Load unpacked" flow.

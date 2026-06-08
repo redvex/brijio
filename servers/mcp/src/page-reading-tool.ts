@@ -1,10 +1,10 @@
 import {
   getCurrentPageContent,
   getCurrentPageContext,
-  type BrowserBridgePageContextConfig
+  type BrijioPageContextConfig
 } from './page-context.js'
 import {
-  type BrowserBridgeErrorCode,
+  type BrijioErrorCode,
   type PageContent,
   type PageContext,
   type StaleContextDetail
@@ -13,11 +13,11 @@ import {
 const defaultMaxContentChunks = 1
 const maxAllowedContentChunks = 5
 
-export type BrowserBridgeToolErrorCode =
-  | BrowserBridgeErrorCode
+export type BrijioToolErrorCode =
+  | BrijioErrorCode
   | 'invalid_tool_input'
 
-export type BrowserBridgeToolResult<T> =
+export type BrijioToolResult<T> =
   | {
     ok: true
     data: T
@@ -25,7 +25,7 @@ export type BrowserBridgeToolResult<T> =
   | {
     ok: false
     error: {
-      code: BrowserBridgeToolErrorCode
+      code: BrijioToolErrorCode
       message: string
       detail?: StaleContextDetail
     }
@@ -45,7 +45,7 @@ export interface ReadCurrentPageData {
 }
 
 export type ReadCurrentPageResult =
-  BrowserBridgeToolResult<ReadCurrentPageData>
+  BrijioToolResult<ReadCurrentPageData>
 
 interface NormalizedReadCurrentPageInput {
   includeContent: boolean
@@ -54,7 +54,7 @@ interface NormalizedReadCurrentPageInput {
 }
 
 export async function readCurrentPage (
-  config: BrowserBridgePageContextConfig,
+  config: BrijioPageContextConfig,
   input: ReadCurrentPageInput
 ): Promise<ReadCurrentPageResult> {
   const normalizedInput = normalizeInput(input)
@@ -98,7 +98,7 @@ export async function readCurrentPage (
 
 function normalizeInput (
   input: ReadCurrentPageInput
-): BrowserBridgeToolResult<NormalizedReadCurrentPageInput> {
+): BrijioToolResult<NormalizedReadCurrentPageInput> {
   const includeContent = input.includeContent ?? true
   const maxContentChunks = input.maxContentChunks ?? defaultMaxContentChunks
   const browserInstanceId = normalizeBrowserInstanceId(input.browserInstanceId)
@@ -134,7 +134,7 @@ function normalizeInput (
 }
 
 async function readContentChunks (
-  config: BrowserBridgePageContextConfig,
+  config: BrijioPageContextConfig,
   context: PageContext,
   maxContentChunks: number,
   browserInstanceId?: string
@@ -186,7 +186,7 @@ async function readContentChunks (
 
 function normalizeBrowserInstanceId (
   value: unknown
-): BrowserBridgeToolResult<string | undefined> {
+): BrijioToolResult<string | undefined> {
   if (value === undefined) {
     return {
       ok: true,
@@ -208,7 +208,7 @@ function normalizeBrowserInstanceId (
 
 function invalidToolInputResponse (
   message: string
-): BrowserBridgeToolResult<never> {
+): BrijioToolResult<never> {
   return {
     ok: false,
     error: {

@@ -1,14 +1,14 @@
 import {
   defaultPageContentMaxPayloadBytes,
   type BridgeSettings,
-  type BrowserBridgeSocket,
+  type BrijioSocket,
   type PageContent,
   type PageContext,
   type PageReadResult,
   normalizeBridgeSettings,
   readActiveTabPage as sharedReadActiveTabPage,
   type ActiveTabDeps
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
 // --- Browser API types for Safari (browser.* namespace) ---
@@ -187,7 +187,7 @@ export class SafariPageReaderAdapter {
   }
 }
 
-export class SafariWebSocketConnection implements BrowserBridgeSocket {
+export class SafariWebSocketConnection implements BrijioSocket {
   private openListener: (() => void) | undefined
   private messageListener: MessageListener | undefined
   private closeListener: (() => void) | undefined

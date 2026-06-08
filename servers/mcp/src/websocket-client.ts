@@ -1,14 +1,14 @@
 import WebSocket, { type RawData } from 'ws'
 import {
-  type BrowserBridgeClickElementResult,
-  type BrowserBridgeBrowserListResult,
-  type BrowserBridgeFillInputResult,
-  type BrowserBridgePageContentResult,
-  type BrowserBridgePageContextResult,
-  type BrowserBridgeResourceResult,
-  type BrowserBridgeSelectOptionsResult,
-  type BrowserBridgeSetCheckedResult,
-  type BrowserBridgeSubmitFormResult,
+  type BrijioClickElementResult,
+  type BrijioBrowserListResult,
+  type BrijioFillInputResult,
+  type BrijioPageContentResult,
+  type BrijioPageContextResult,
+  type BrijioResourceResult,
+  type BrijioSelectOptionsResult,
+  type BrijioSetCheckedResult,
+  type BrijioSubmitFormResult,
   type ClickElementTarget,
   createAuthEnvelope,
   createClickElementEnvelope,
@@ -32,7 +32,7 @@ import {
   type SubmitFormTarget,
   timeoutResponse
 } from './protocol.js'
-import { createLogger } from '@browserbridge/shared'
+import { createLogger } from '@brijio/shared'
 
 const wsLogger = createLogger('mcp-ws')
 
@@ -78,10 +78,10 @@ export interface SubmitFormRequestOptions extends PageContextRequestOptions {
 
 export async function requestPageContext (
   options: PageContextRequestOptions
-): Promise<BrowserBridgePageContextResult> {
+): Promise<BrijioPageContextResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -94,10 +94,10 @@ export async function requestPageContext (
 
 export async function requestPageContent (
   options: PageContentRequestOptions
-): Promise<BrowserBridgePageContentResult> {
+): Promise<BrijioPageContentResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -110,10 +110,10 @@ export async function requestPageContent (
 
 export async function requestClickElement (
   options: ClickElementRequestOptions
-): Promise<BrowserBridgeClickElementResult> {
+): Promise<BrijioClickElementResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -126,10 +126,10 @@ export async function requestClickElement (
 
 export async function requestFillInput (
   options: FillInputRequestOptions
-): Promise<BrowserBridgeFillInputResult> {
+): Promise<BrijioFillInputResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -146,10 +146,10 @@ export async function requestFillInput (
 
 export async function requestWriteEditable (
   options: WriteEditableRequestOptions
-): Promise<BrowserBridgeFillInputResult> {
+): Promise<BrijioFillInputResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -166,10 +166,10 @@ export async function requestWriteEditable (
 
 export async function requestSetChecked (
   options: SetCheckedRequestOptions
-): Promise<BrowserBridgeSetCheckedResult> {
+): Promise<BrijioSetCheckedResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -186,10 +186,10 @@ export async function requestSetChecked (
 
 export async function requestSelectOptions (
   options: SelectOptionsRequestOptions
-): Promise<BrowserBridgeSelectOptionsResult> {
+): Promise<BrijioSelectOptionsResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -206,10 +206,10 @@ export async function requestSelectOptions (
 
 export async function requestSubmitForm (
   options: SubmitFormRequestOptions
-): Promise<BrowserBridgeSubmitFormResult> {
+): Promise<BrijioSubmitFormResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -225,10 +225,10 @@ export async function requestBrowserList (options: {
   pairingToken: string
   timeoutMs: number
   createRequestId?: () => string
-}): Promise<BrowserBridgeBrowserListResult> {
+}): Promise<BrijioBrowserListResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
 
-  return await requestBrowserBridge({
+  return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
@@ -247,7 +247,7 @@ export async function requestBrowserList (options: {
 function parseClickActionResultEnvelope (
   value: unknown,
   requestId: string
-): BrowserBridgeClickElementResult | { ok: false, ignored: true } {
+): BrijioClickElementResult | { ok: false, ignored: true } {
   const result = parseActionResultEnvelope(value, requestId)
 
   if ('ignored' in result || !result.ok) {
@@ -267,14 +267,14 @@ function parseClickActionResultEnvelope (
 function parseFillActionResultEnvelope (
   value: unknown,
   requestId: string
-): BrowserBridgeFillInputResult | { ok: false, ignored: true } {
+): BrijioFillInputResult | { ok: false, ignored: true } {
   return parseWriteTextActionResultEnvelope(value, requestId)
 }
 
 function parseWriteTextActionResultEnvelope (
   value: unknown,
   requestId: string
-): BrowserBridgeFillInputResult | { ok: false, ignored: true } {
+): BrijioFillInputResult | { ok: false, ignored: true } {
   const result = parseActionResultEnvelope(value, requestId)
 
   if ('ignored' in result || !result.ok) {
@@ -294,7 +294,7 @@ function parseWriteTextActionResultEnvelope (
 function parseSetCheckedActionResultEnvelope (
   value: unknown,
   requestId: string
-): BrowserBridgeSetCheckedResult | { ok: false, ignored: true } {
+): BrijioSetCheckedResult | { ok: false, ignored: true } {
   const result = parseActionResultEnvelope(value, requestId)
 
   if ('ignored' in result || !result.ok) {
@@ -314,7 +314,7 @@ function parseSetCheckedActionResultEnvelope (
 function parseSelectOptionsActionResultEnvelope (
   value: unknown,
   requestId: string
-): BrowserBridgeSelectOptionsResult | { ok: false, ignored: true } {
+): BrijioSelectOptionsResult | { ok: false, ignored: true } {
   const result = parseActionResultEnvelope(value, requestId)
 
   if ('ignored' in result || !result.ok) {
@@ -334,7 +334,7 @@ function parseSelectOptionsActionResultEnvelope (
 function parseSubmitFormActionResultEnvelope (
   value: unknown,
   requestId: string
-): BrowserBridgeSubmitFormResult | { ok: false, ignored: true } {
+): BrijioSubmitFormResult | { ok: false, ignored: true } {
   const result = parseActionResultEnvelope(value, requestId)
 
   if ('ignored' in result || !result.ok) {
@@ -351,7 +351,7 @@ function parseSubmitFormActionResultEnvelope (
   return invalidResponse()
 }
 
-async function requestBrowserBridge<T> (options: {
+async function requestBrijio<T> (options: {
   websocketUrl: string
   pairingToken: string
   timeoutMs: number
@@ -365,8 +365,8 @@ async function requestBrowserBridge<T> (options: {
   timeoutMessage: string
   parseEnvelope: (
     value: unknown
-  ) => BrowserBridgeResourceResult<T> | { ok: false, ignored: true }
-}): Promise<BrowserBridgeResourceResult<T>> {
+  ) => BrijioResourceResult<T> | { ok: false, ignored: true }
+}): Promise<BrijioResourceResult<T>> {
   if (options.pairingToken.trim() === '') {
     return authRequiredResponse()
   }
@@ -437,7 +437,7 @@ async function requestBrowserBridge<T> (options: {
       settle(connectionFailedResponse(options.websocketUrl))
     })
 
-    function settle (result: BrowserBridgeResourceResult<T>): void {
+    function settle (result: BrijioResourceResult<T>): void {
       if (settled) {
         return
       }

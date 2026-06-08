@@ -89,7 +89,7 @@ export function queryPopupElements (document: Document): PopupElements {
     statusSpinner === null ||
     statusText === null
   ) {
-    throw new Error('BrowserBridge popup is missing required elements.')
+    throw new Error('Brijio popup is missing required elements.')
   }
 
   return {

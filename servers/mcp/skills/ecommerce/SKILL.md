@@ -27,7 +27,7 @@ and payment — always stopping before the final "Place Order" step.
 ```
 
 Verify the user is on a product page or cart page. If they need to add items
-first, help them navigate using the [navigation](skill://browserbridge/navigation)
+first, help them navigate using the [navigation](skill://brijio/navigation)
 skill.
 
 ### 2. Add to Cart (if needed)

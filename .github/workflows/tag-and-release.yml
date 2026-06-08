@@ -54,7 +54,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
-          name: BrowserBridge v${{ steps.version.outputs.VERSION }}
+          name: Brijio v${{ steps.version.outputs.VERSION }}
           body: ${{ steps.changelog.outputs.BODY }}
           draft: false
           prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
@@ -153,7 +153,7 @@ jobs:
           fi
 
           VERSION="${GITHUB_REF_NAME#v}"
-          IMAGE="${DOCKER_HUB_USER}/browserbridge"
+          IMAGE="${DOCKER_HUB_USER}/mcp"
 
           {
             echo "tags<<EOF"

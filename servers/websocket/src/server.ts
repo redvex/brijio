@@ -8,13 +8,13 @@ import {
   createScopeKey,
   isAuthPayload,
   isBrowserPresenceAnnouncePayload,
-  parseBrowserBridgeEnvelope,
-  type BrowserBridgeEnvelope,
-  type BrowserBridgeRole,
+  parseBrijioEnvelope,
+  type BrijioEnvelope,
+  type BrijioRole,
   type BrowserPresence,
   type BrowserPresenceAnnouncePayload
 } from './protocol.js'
-import { createLogger } from '@browserbridge/shared'
+import { createLogger } from '@brijio/shared'
 
 const version: string = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8')
@@ -39,14 +39,14 @@ export interface WebSocketHealthStatus {
   }
 }
 
-export interface BrowserBridgeWebSocketServer {
+export interface BrijioWebSocketServer {
   url: string
   getStatus: () => WebSocketHealthStatus
   close: () => Promise<void>
 }
 
 interface ConnectionState {
-  role: BrowserBridgeRole | undefined
+  role: BrijioRole | undefined
   scopeKey: string | undefined
   browserInstanceId: string | undefined
 }
@@ -58,7 +58,7 @@ interface PresenceRecord extends Required<BrowserPresence> {
 
 export async function createWebSocketServer (
   options: WebSocketServerOptions = {}
-): Promise<BrowserBridgeWebSocketServer> {
+): Promise<BrijioWebSocketServer> {
   const host = options.host ?? '0.0.0.0'
   const port = options.port ?? 8787
   const pairingTokens = getPairingTokens(options)
@@ -99,7 +99,7 @@ export async function createWebSocketServer (
     }
 
     socket.on('message', (data) => {
-      const result = parseBrowserBridgeEnvelope(rawDataToString(data))
+      const result = parseBrijioEnvelope(rawDataToString(data))
 
       if (!result.ok) {
         sendJson(socket, result.error)
@@ -151,11 +151,11 @@ export async function createWebSocketServer (
 function getPairingTokens (options: WebSocketServerOptions): Set<string> {
   const token =
     options.pairingToken ??
-    process.env.BROWSERBRIDGE_PAIRING_TOKEN ??
-    process.env.BROWSERBRIDGE_TOKEN
+    process.env.BRIJIO_PAIRING_TOKEN ??
+    process.env.BRIJIO_TOKEN
 
   if (token === undefined || token.length === 0) {
-    throw new Error('BROWSERBRIDGE_PAIRING_TOKEN must be configured.')
+    throw new Error('BRIJIO_PAIRING_TOKEN must be configured.')
   }
 
   return new Set([token, ...(options.additionalPairingTokens ?? [])])
@@ -164,7 +164,7 @@ function getPairingTokens (options: WebSocketServerOptions): Set<string> {
 function handleUnauthenticatedMessage (
   socket: WebSocket,
   state: ConnectionState,
-  message: BrowserBridgeEnvelope,
+  message: BrijioEnvelope,
   pairingTokens: Set<string>
 ): void {
   if (!isAuthPayload(message.payload)) {
@@ -172,7 +172,7 @@ function handleUnauthenticatedMessage (
       socket,
       createErrorEnvelope(
         'auth_required',
-        'Authenticate before sending BrowserBridge messages.'
+        'Authenticate before sending Brijio messages.'
       )
     )
     return
@@ -184,7 +184,7 @@ function handleUnauthenticatedMessage (
       socket,
       createErrorEnvelope(
         'auth_failed',
-        'BrowserBridge pairing token was not accepted.'
+        'Brijio pairing token was not accepted.'
       )
     )
     return
@@ -203,7 +203,7 @@ function handleUnauthenticatedMessage (
 function handleAuthenticatedMessage (
   socket: WebSocket,
   state: ConnectionState,
-  message: BrowserBridgeEnvelope,
+  message: BrijioEnvelope,
   presence: Map<string, PresenceRecord>,
   pendingRequests: Map<string, WebSocket>,
   now: () => Date
@@ -230,7 +230,7 @@ function handleAuthenticatedMessage (
 function handleExtensionMessage (
   socket: WebSocket,
   state: ConnectionState,
-  message: BrowserBridgeEnvelope,
+  message: BrijioEnvelope,
   presence: Map<string, PresenceRecord>,
   pendingRequests: Map<string, WebSocket>,
   now: () => Date
@@ -276,7 +276,7 @@ function handleExtensionMessage (
 
 function routeExtensionResponse (
   scopeKey: string,
-  message: BrowserBridgeEnvelope,
+  message: BrijioEnvelope,
   pendingRequests: Map<string, WebSocket>
 ): boolean {
   if (message.id === undefined) {
@@ -323,7 +323,7 @@ function upsertPresence (
 function handleMcpMessage (
   socket: WebSocket,
   scopeKey: string,
-  message: BrowserBridgeEnvelope,
+  message: BrijioEnvelope,
   presence: Map<string, PresenceRecord>,
   pendingRequests: Map<string, WebSocket>
 ): void {
@@ -385,7 +385,7 @@ function selectBrowser (
         ok: false,
         error: createErrorEnvelope(
           'browser_unavailable',
-          'No matching BrowserBridge browser is online.'
+          'No matching Brijio browser is online.'
         )
       }
     }
@@ -398,7 +398,7 @@ function selectBrowser (
       ok: false,
       error: createErrorEnvelope(
         'browser_unavailable',
-        'No BrowserBridge browser is online.'
+        'No Brijio browser is online.'
       )
     }
   }
@@ -408,7 +408,7 @@ function selectBrowser (
       ok: false,
       error: createErrorEnvelope(
         'ambiguous_browser_target',
-        'Multiple BrowserBridge browsers are online. Specify browserInstanceId.',
+        'Multiple Brijio browsers are online. Specify browserInstanceId.',
         records.map(presenceForResponse)
       )
     }

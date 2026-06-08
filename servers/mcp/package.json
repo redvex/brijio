@@ -6,8 +6,8 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "bin": {
-    "brijio": "dist/bin/browserbridge.js",
-    "browserbridge": "dist/bin/browserbridge.js"
+    "brijio": "dist/bin/brijio.js",
+    "browserbridge": "dist/bin/brijio.js"
   },
   "exports": {
     ".": {
@@ -30,8 +30,8 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@browserbridge/shared": "workspace:*",
-    "@browserbridge/websocket": "workspace:*",
+    "@brijio/shared": "workspace:*",
+    "@brijio/websocket": "workspace:*",
     "@types/node": "^22.15.21",
     "@types/ws": "^8.5.13",
     "tsup": "^8.5.1",

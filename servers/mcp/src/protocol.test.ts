@@ -617,7 +617,7 @@ void describe('MCP page context protocol helpers', () => {
       ok: false,
       error: {
         code: 'invalid_response',
-        message: 'Received an invalid BrowserBridge response.'
+        message: 'Received an invalid Brijio response.'
       }
     })
   })
@@ -646,7 +646,7 @@ void describe('MCP page context protocol helpers', () => {
       ok: false,
       error: {
         code: 'invalid_response',
-        message: 'Received an invalid BrowserBridge response.'
+        message: 'Received an invalid Brijio response.'
       }
     })
   })

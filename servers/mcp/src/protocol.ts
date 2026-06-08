@@ -152,7 +152,7 @@ export interface SubmitFormActionResultData {
   target: SubmitFormTarget
 }
 
-export type BrowserBridgeErrorCode =
+export type BrijioErrorCode =
   | 'auth_required'
   | 'auth_failed'
   | 'invalid_auth_message'
@@ -177,7 +177,7 @@ export interface StaleContextDetail {
   foundRole?: string
 }
 
-export type BrowserBridgeResourceResult<T> =
+export type BrijioResourceResult<T> =
   | {
     ok: true
     data: T
@@ -185,56 +185,56 @@ export type BrowserBridgeResourceResult<T> =
   | {
     ok: false
     error: {
-      code: BrowserBridgeErrorCode
+      code: BrijioErrorCode
       message: string
       detail?: StaleContextDetail
       browsers?: BrowserPresence[]
     }
   }
 
-export type BrowserBridgePageContextResult =
-  BrowserBridgeResourceResult<PageContext>
+export type BrijioPageContextResult =
+  BrijioResourceResult<PageContext>
 
-export type BrowserBridgePageContentResult =
-  BrowserBridgeResourceResult<PageContent>
+export type BrijioPageContentResult =
+  BrijioResourceResult<PageContent>
 
-export type BrowserBridgeClickElementResult =
-  BrowserBridgeResourceResult<ClickElementActionResultData>
+export type BrijioClickElementResult =
+  BrijioResourceResult<ClickElementActionResultData>
 
-export type BrowserBridgeFillInputResult =
-  BrowserBridgeResourceResult<FillInputActionResultData>
+export type BrijioFillInputResult =
+  BrijioResourceResult<FillInputActionResultData>
 
-export type BrowserBridgeSetCheckedResult =
-  BrowserBridgeResourceResult<SetCheckedActionResultData>
+export type BrijioSetCheckedResult =
+  BrijioResourceResult<SetCheckedActionResultData>
 
-export type BrowserBridgeSelectOptionsResult =
-  BrowserBridgeResourceResult<SelectOptionsActionResultData>
+export type BrijioSelectOptionsResult =
+  BrijioResourceResult<SelectOptionsActionResultData>
 
-export type BrowserBridgeSubmitFormResult =
-  BrowserBridgeResourceResult<SubmitFormActionResultData>
+export type BrijioSubmitFormResult =
+  BrijioResourceResult<SubmitFormActionResultData>
 
-export type BrowserBridgeBrowserListResult = BrowserBridgeResourceResult<{
+export type BrijioBrowserListResult = BrijioResourceResult<{
   browsers: BrowserPresence[]
 }>
 
 export type PageContextParseResult =
-  | BrowserBridgePageContextResult
+  | BrijioPageContextResult
   | { ok: false, ignored: true }
 
 export type PageContentParseResult =
-  | BrowserBridgePageContentResult
+  | BrijioPageContentResult
   | { ok: false, ignored: true }
 
 export type ActionResultParseResult =
-  | BrowserBridgeClickElementResult
-  | BrowserBridgeFillInputResult
-  | BrowserBridgeSetCheckedResult
-  | BrowserBridgeSelectOptionsResult
-  | BrowserBridgeSubmitFormResult
+  | BrijioClickElementResult
+  | BrijioFillInputResult
+  | BrijioSetCheckedResult
+  | BrijioSelectOptionsResult
+  | BrijioSubmitFormResult
   | { ok: false, ignored: true }
 
 export type BrowserListParseResult =
-  | BrowserBridgeBrowserListResult
+  | BrijioBrowserListResult
   | { ok: false, ignored: true }
 
 export function createGetPageContextEnvelope (
@@ -500,7 +500,7 @@ export function parseBrowserListEnvelope (
 
 export function parseRouterErrorEnvelope (
   value: unknown
-): BrowserBridgeResourceResult<never> | { ok: false, ignored: true } {
+): BrijioResourceResult<never> | { ok: false, ignored: true } {
   if (!isRecord(value) || value.type !== 'error') {
     return { ok: false, ignored: true }
   }
@@ -509,7 +509,7 @@ export function parseRouterErrorEnvelope (
     return invalidResponse()
   }
 
-  if (!isBrowserBridgeErrorCode(value.error.code)) {
+  if (!isBrijioErrorCode(value.error.code)) {
     return invalidResponse()
   }
 
@@ -527,7 +527,7 @@ export function parseRouterErrorEnvelope (
 
 function parsePageContextSuccessPayload (
   payload: Record<PropertyKey, unknown>
-): BrowserBridgePageContextResult {
+): BrijioPageContextResult {
   if (!isPageContext(payload.data)) {
     return invalidPageContextResponse()
   }
@@ -540,7 +540,7 @@ function parsePageContextSuccessPayload (
 
 function parsePageContentSuccessPayload (
   payload: Record<PropertyKey, unknown>
-): BrowserBridgePageContentResult {
+): BrijioPageContentResult {
   if (!isPageContent(payload.data)) {
     return invalidResponse()
   }
@@ -554,11 +554,11 @@ function parsePageContentSuccessPayload (
 function parseActionResultSuccessPayload (
   payload: Record<PropertyKey, unknown>
 ):
-  | BrowserBridgeClickElementResult
-  | BrowserBridgeFillInputResult
-  | BrowserBridgeSetCheckedResult
-  | BrowserBridgeSelectOptionsResult
-  | BrowserBridgeSubmitFormResult {
+  | BrijioClickElementResult
+  | BrijioFillInputResult
+  | BrijioSetCheckedResult
+  | BrijioSelectOptionsResult
+  | BrijioSubmitFormResult {
   const data = payload.data
 
   if (isClickElementActionResultData(data)) {
@@ -601,8 +601,8 @@ function parseActionResultSuccessPayload (
 
 function parseErrorPayload<T> (
   payload: Record<PropertyKey, unknown>,
-  fallback: BrowserBridgeResourceResult<T>
-): BrowserBridgeResourceResult<T> {
+  fallback: BrijioResourceResult<T>
+): BrijioResourceResult<T> {
   if (!isRecord(payload.error) || typeof payload.error.message !== 'string') {
     return fallback
   }
@@ -632,17 +632,17 @@ function parseErrorPayload<T> (
   }
 }
 
-export function invalidResponse (): BrowserBridgeResourceResult<never> {
+export function invalidResponse (): BrijioResourceResult<never> {
   return {
     ok: false,
     error: {
       code: 'invalid_response',
-      message: 'Received an invalid BrowserBridge response.'
+      message: 'Received an invalid Brijio response.'
     }
   }
 }
 
-export function invalidPageContextResponse (): BrowserBridgePageContextResult {
+export function invalidPageContextResponse (): BrijioPageContextResult {
   return {
     ok: false,
     error: {
@@ -652,7 +652,7 @@ export function invalidPageContextResponse (): BrowserBridgePageContextResult {
   }
 }
 
-export function invalidResourceUriResponse (): BrowserBridgeResourceResult<never> {
+export function invalidResourceUriResponse (): BrijioResourceResult<never> {
   return {
     ok: false,
     error: {
@@ -665,7 +665,7 @@ export function invalidResourceUriResponse (): BrowserBridgeResourceResult<never
 
 export function timeoutResponse (
   message = 'Timed out waiting for a browser page context response.'
-): BrowserBridgeResourceResult<never> {
+): BrijioResourceResult<never> {
   return {
     ok: false,
     error: {
@@ -677,17 +677,17 @@ export function timeoutResponse (
 
 export function connectionFailedResponse (
   websocketUrl: string
-): BrowserBridgeResourceResult<never> {
+): BrijioResourceResult<never> {
   return {
     ok: false,
     error: {
       code: 'connection_failed',
-      message: `Unable to connect to BrowserBridge WebSocket at ${websocketUrl}.`
+      message: `Unable to connect to Brijio WebSocket at ${websocketUrl}.`
     }
   }
 }
 
-export function authRequiredResponse (): BrowserBridgeResourceResult<never> {
+export function authRequiredResponse (): BrijioResourceResult<never> {
   return {
     ok: false,
     error: {
@@ -850,9 +850,9 @@ function isBrowserPresence (value: unknown): value is BrowserPresence {
   )
 }
 
-function isBrowserBridgeErrorCode (
+function isBrijioErrorCode (
   value: unknown
-): value is BrowserBridgeErrorCode {
+): value is BrijioErrorCode {
   return (
     value === 'auth_required' ||
     value === 'auth_failed' ||

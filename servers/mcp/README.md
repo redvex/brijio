@@ -442,7 +442,7 @@ MCP_HTTP_ALLOW_TAILSCALE_HOSTS=false
 MCP_HTTP_ALLOW_LOCAL_HOSTS=false
 ```
 
-`WEBSOCKET_URL`, `BROWSERBRIDGE_WEBSOCKET_URL`, and `BROWSERBRIDGE_WS_URL` are accepted as backward-compatible aliases for `BRIJIO_WS_URL`. `BROWSERBRIDGE_TOKEN` and `BROWSERBRIDGE_PAIRING_TOKEN` are accepted as aliases for `BRIJIO_PAIRING_TOKEN`; `BROWSERBRIDGE_REQUEST_TIMEOUT_MS` and `BROWSERBRIDGE_BROWSER_INSTANCE_ID` are also accepted during the transition window.
+`WEBSOCKET_URL`, `BRIJIO_WEBSOCKET_URL`, and `BRIJIO_WS_URL` are accepted as backward-compatible aliases for `BRIJIO_WS_URL`. `BRIJIO_TOKEN` and `BRIJIO_PAIRING_TOKEN` are accepted as aliases for `BRIJIO_PAIRING_TOKEN`; `BRIJIO_REQUEST_TIMEOUT_MS` and `BRIJIO_BROWSER_INSTANCE_ID` are also accepted during the transition window.
 
 `MCP_HTTP_AUTH_TOKEN` is required. It authenticates MCP clients to this HTTP
 server and must not be reused as the Brijio pairing token.
@@ -478,7 +478,7 @@ lifecycle behavior.
 Start the WebSocket server:
 
 ```sh
-pnpm --filter @browserbridge/websocket dev
+pnpm --filter @brijio/websocket dev
 ```
 
 Build and load the Chrome extension, configure it with

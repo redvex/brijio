@@ -1,14 +1,14 @@
 import {
   getMcpHttpServerOptionsFromEnv,
-  startBrowserBridgeMcpHttpServer
+  startBrijioMcpHttpServer
 } from './http-server.js'
-import { createLogger } from '@browserbridge/shared'
+import { createLogger } from '@brijio/shared'
 
 const logger = createLogger('mcp')
 
 async function main (): Promise<void> {
   const options = getMcpHttpServerOptionsFromEnv()
-  const runtime = await startBrowserBridgeMcpHttpServer(options)
+  const runtime = await startBrijioMcpHttpServer(options)
 
   logger.info('server_started', { url: runtime.url })
 }

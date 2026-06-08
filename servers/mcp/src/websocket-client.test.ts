@@ -20,7 +20,7 @@ afterEach(async () => {
   await Promise.all(servers.splice(0).map(closeServer))
 })
 
-void describe('BrowserBridge WebSocket client', () => {
+void describe('Brijio WebSocket client', () => {
   void it('authenticates before sending a page context request', async () => {
     const receivedPayloadTypes: string[] = []
     const server = await startServer((socket) => {
@@ -743,7 +743,7 @@ void describe('BrowserBridge WebSocket client', () => {
             error: {
               code: 'ambiguous_browser_target',
               message:
-                'Multiple BrowserBridge browsers are online. Specify browserInstanceId.',
+                'Multiple Brijio browsers are online. Specify browserInstanceId.',
               browsers: [
                 {
                   browserInstanceId: 'chrome-default-test',
@@ -773,7 +773,7 @@ void describe('BrowserBridge WebSocket client', () => {
         error: {
           code: 'ambiguous_browser_target',
           message:
-            'Multiple BrowserBridge browsers are online. Specify browserInstanceId.',
+            'Multiple Brijio browsers are online. Specify browserInstanceId.',
           browsers: [
             {
               browserInstanceId: 'chrome-default-test',
@@ -805,7 +805,7 @@ void describe('BrowserBridge WebSocket client', () => {
         ok: false,
         error: {
           code: 'connection_failed',
-          message: `Unable to connect to BrowserBridge WebSocket at ${closedServer.url}.`
+          message: `Unable to connect to Brijio WebSocket at ${closedServer.url}.`
         }
       }
     )

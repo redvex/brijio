@@ -1,13 +1,13 @@
 import assert from 'node:assert/strict'
 import { describe, it, beforeEach } from 'node:test'
 import {
-  BrowserBridgeBackgroundController,
+  BrijioBackgroundController,
   createGlobalTimers,
-  type BrowserBridgeSocket,
+  type BrijioSocket,
   type PageReadResult,
   type PageContext,
   type PageContent
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 import {
   SafariActionBadge,
   SafariStorageAdapter,
@@ -184,8 +184,8 @@ void describe('SafariActionBadge', () => {
 
   void it('setTitle delegates to browser.browserAction.setTitle', async () => {
     const badge = new SafariActionBadge(browser.browserAction)
-    await badge.setTitle('BrowserBridge connected')
-    assert.equal(browser.browserAction.lastTitle, 'BrowserBridge connected')
+    await badge.setTitle('Brijio connected')
+    assert.equal(browser.browserAction.lastTitle, 'Brijio connected')
   })
 })
 
@@ -377,7 +377,7 @@ void describe('SafariWebSocketConnection', () => {
     assert.equal(typeof ws.send, 'function')
   })
 
-  void it('close method exists and is callable (implements BrowserBridgeSocket)', () => {
+  void it('close method exists and is callable (implements BrijioSocket)', () => {
     const ws = new SafariWebSocketConnection('wss://example.com')
     assert.equal(typeof ws.close, 'function')
   })
@@ -407,9 +407,9 @@ void describe('SafariWebSocketConnection', () => {
   })
 })
 
-// --- BrowserBridgeBackgroundController with Safari adapters ---
+// --- BrijioBackgroundController with Safari adapters ---
 
-void describe('BrowserBridgeBackgroundController with Safari adapters', () => {
+void describe('BrijioBackgroundController with Safari adapters', () => {
   void it('can be instantiated with all Safari adapter implementations', () => {
     const browser = createMockBrowser()
 
@@ -418,7 +418,7 @@ void describe('BrowserBridgeBackgroundController with Safari adapters', () => {
     const setup = new SafariSetupAdapter()
     const pageReader = new SafariPageReaderAdapter(browser.tabs, browser.scripting)
 
-    const createWebSocket = (_url: string): BrowserBridgeSocket => {
+    const createWebSocket = (_url: string): BrijioSocket => {
       // Return a stub socket for instantiation test
       const listeners: Record<string, (() => void) | undefined> = {}
       return {
@@ -437,7 +437,7 @@ void describe('BrowserBridgeBackgroundController with Safari adapters', () => {
 
     const timers = createGlobalTimers()
 
-    const controller = new BrowserBridgeBackgroundController({
+    const controller = new BrijioBackgroundController({
       action,
       createWebSocket,
       setup,
@@ -453,6 +453,6 @@ void describe('BrowserBridgeBackgroundController with Safari adapters', () => {
       timers
     })
 
-    assert.ok(controller instanceof BrowserBridgeBackgroundController)
+    assert.ok(controller instanceof BrijioBackgroundController)
   })
 })

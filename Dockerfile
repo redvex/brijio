@@ -1,21 +1,21 @@
-# ─── BrowserBridge Combined Image ────────────────────────────────────────────
+# ─── Brijio Combined Image ────────────────────────────────────────────
 # Single image running both the WebSocket companion and MCP server under s6-overlay.
 # Uses the bundled dist/ output from tsup (same as the published npm package).
 #
 # Usage:
-#   docker build -t redvex/browserbridge:0.1.1 .
-#   docker run -p 8787:8787 -p 8788:8788 redvex/browserbridge:0.1.1
+#   docker build -t brijio/mcp:0.1.1 .
+#   docker run -p 8787:8787 -p 8788:8788 brijio/mcp:0.1.1
 #
 # Environment variables with defaults:
 #   WEBSOCKET_HOST            — default 0.0.0.0
 #   WEBSOCKET_PORT            — default 8787
-#   BROWSERBRIDGE_PAIRING_TOKEN — auto-generated if empty
+#   BRIJIO_PAIRING_TOKEN — auto-generated if empty
 #   MCP_HTTP_HOST             — default 0.0.0.0
 #   MCP_HTTP_PORT             — default 8788
 #   MCP_HTTP_PATH             — default /mcp
 #   MCP_HTTP_AUTH_TOKEN       — auto-generated if empty
-#   BROWSERBRIDGE_WEBSOCKET_URL — default ws://127.0.0.1:8787
-#   BROWSERBRIDGE_REQUEST_TIMEOUT_MS — default 5000
+#   BRIJIO_WEBSOCKET_URL — default ws://127.0.0.1:8787
+#   BRIJIO_REQUEST_TIMEOUT_MS — default 5000
 #
 # Auto-generated tokens are printed to stdout on first startup.
 # Persist them by setting the env vars explicitly.
@@ -32,14 +32,14 @@ COPY packages/shared/package.json packages/shared/package.json
 COPY servers/mcp/package.json servers/mcp/package.json
 COPY servers/websocket/package.json servers/websocket/package.json
 
-RUN pnpm install --filter @redvex/browserbridge... --frozen-lockfile
+RUN pnpm install --filter @brijio/mcp... --frozen-lockfile
 
 COPY packages/shared packages/shared
 COPY servers/mcp servers/mcp
 COPY servers/websocket servers/websocket
 
 # Build the bundled dist/ output
-RUN pnpm --filter @redvex/browserbridge build
+RUN pnpm --filter @brijio/mcp build
 
 # ─── Stage 2: Runtime with s6-overlay ────────────────────────────────────────
 FROM node:22-alpine AS runtime
@@ -75,7 +75,7 @@ RUN node -e "const pkg=require('./package.json');const s=d=>{if(!d)return;for(co
 
 # Copy s6 service definitions
 COPY docker/s6-rc.d /etc/s6-overlay/s6-rc.d/
-RUN chmod +x /etc/s6-overlay/s6-rc.d/browserbridge/run
+RUN chmod +x /etc/s6-overlay/s6-rc.d/brijio/run
 
 # Default environment — tokens auto-generate if empty
 ENV WEBSOCKET_HOST=0.0.0.0 \
@@ -83,8 +83,8 @@ ENV WEBSOCKET_HOST=0.0.0.0 \
     MCP_HTTP_HOST=0.0.0.0 \
     MCP_HTTP_PORT=8788 \
     MCP_HTTP_PATH=/mcp \
-    BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787 \
-    BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
+    BRIJIO_WEBSOCKET_URL=ws://127.0.0.1:8787 \
+    BRIJIO_REQUEST_TIMEOUT_MS=5000
 
 EXPOSE 8787 8788
 

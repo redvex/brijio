@@ -32,10 +32,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build shared package
-        run: pnpm --filter @browserbridge/shared build
+        run: pnpm --filter @brijio/shared build
 
       - name: Build Chrome extension
-        run: pnpm --filter @browserbridge/chrome-extension build
+        run: pnpm --filter @brijio/chrome-extension build
 
       - name: Validate manifest
         run: |
@@ -71,8 +71,8 @@ jobs:
       - name: Create submission ZIP
         run: |
           cd clients/extensions/chrome/dist
-          zip -r "${GITHUB_WORKSPACE}/browserbridge-chrome-extension.zip" .
-          ls -lh "${GITHUB_WORKSPACE}/browserbridge-chrome-extension.zip"
+          zip -r "${GITHUB_WORKSPACE}/brijio-chrome-extension.zip" .
+          ls -lh "${GITHUB_WORKSPACE}/brijio-chrome-extension.zip"
 
       - name: Extract version from tag
         id: version
@@ -93,7 +93,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Chrome Extension v${{ steps.version.outputs.VERSION }}
           body: ${{ steps.changelog.outputs.BODY }}
-          files: browserbridge-chrome-extension.zip
+          files: brijio-chrome-extension.zip
           draft: false
           prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
 
@@ -119,10 +119,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build shared package
-        run: pnpm --filter @browserbridge/shared build
+        run: pnpm --filter @brijio/shared build
 
       - name: Build Safari extension
-        run: pnpm --filter @browserbridge/safari-extension build
+        run: pnpm --filter @brijio/safari-extension build
 
       - name: Extract version from tag
         id: version

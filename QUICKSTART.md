@@ -11,7 +11,7 @@ Get Brijio running and make your first tool call in under 5 minutes.
 ## Step 1: Clone and Install
 
 ```sh
-git clone https://github.com/redvex/brijio.git
+git clone https://github.com/brijio/mcp.git
 cd brijio
 pnpm install
 ```
@@ -77,7 +77,7 @@ relevant steps below, then continue to Step 4.
 In a new terminal (while `pnpm dev` keeps running):
 
 ```sh
-pnpm --filter @browserbridge/chrome-extension build
+pnpm --filter @brijio/chrome-extension build
 ```
 
 Or use the Makefile shortcut:
@@ -89,7 +89,7 @@ make chrome
 Expected output:
 
 ```text
-> @browserbridge/chrome-extension@0.0.0 build /.../clients/extensions/chrome
+> @brijio/chrome-extension@0.0.0 build /.../clients/extensions/chrome
 > ...
 Build complete. Output in dist/.
 ```
@@ -118,7 +118,7 @@ make safari
 
 This runs two steps automatically:
 
-1. `pnpm --filter @browserbridge/safari-extension build` — compiles and bundles the extension into `clients/extensions/safari/dist/`.
+1. `pnpm --filter @brijio/safari-extension build` — compiles and bundles the extension into `clients/extensions/safari/dist/`.
 2. `xcrun safari-web-extension-converter --force --project-location clients/extensions/safari/Brijio clients/extensions/safari/dist` — converts the built extension into an Xcode project at `clients/extensions/safari/Brijio/`.
 
 Expected output (last few lines):
@@ -237,7 +237,7 @@ authenticated browser session.
 ### Hermes
 
 ```sh
-hermes mcp add browserbridge \
+hermes mcp add brijio \
   --url http://127.0.0.1:8788/mcp \
   --header "Authorization=Bearer YOUR_MCP_AUTH_TOKEN"
 ```
@@ -259,7 +259,7 @@ Or open it from Claude Desktop: **Settings → Developer → Edit Config**.
 ```json
 {
   "mcpServers": {
-    "browserbridge": {
+    "brijio": {
       "type": "streamable-http",
       "url": "http://127.0.0.1:8788/mcp",
       "headers": {
@@ -281,7 +281,7 @@ project-level `.cursor/mcp.json` in your workspace:
 ```json
 {
   "mcpServers": {
-    "browserbridge": {
+    "brijio": {
       "type": "streamable-http",
       "url": "http://127.0.0.1:8788/mcp",
       "headers": {
@@ -302,7 +302,7 @@ Add to your VS Code `settings.json`:
 ```json
 {
   "github.copilot.chat.mcp.servers": {
-    "browserbridge": {
+    "brijio": {
       "type": "streamable-http",
       "url": "http://127.0.0.1:8788/mcp",
       "headers": {
@@ -318,7 +318,7 @@ Or create `.vscode/mcp.json` at the project level:
 ```json
 {
   "servers": {
-    "browserbridge": {
+    "brijio": {
       "type": "streamable-http",
       "url": "http://127.0.0.1:8788/mcp",
       "headers": {
@@ -334,7 +334,7 @@ Or create `.vscode/mcp.json` at the project level:
 Use the CLI command:
 
 ```sh
-codex mcp add browserbridge \
+codex mcp add brijio \
   --url http://127.0.0.1:8788/mcp \
   --bearer-token-env-var BRIJIO_PAIRING_TOKEN
 ```
@@ -348,7 +348,7 @@ export BRIJIO_PAIRING_TOKEN="YOUR_MCP_AUTH_TOKEN"
 Or add manually to `~/.codex/config.toml`:
 
 ```toml
-[mcp_servers.browserbridge]
+[mcp_servers.brijio]
 transport = "streamable_http"
 url = "http://127.0.0.1:8788/mcp"
 bearer_token_env_var = "BRIJIO_PAIRING_TOKEN"
@@ -362,7 +362,7 @@ Edit `~/.openclaw/openclaw.json` (or `openclaw.jsonc`):
 {
   "mcp": {
     "servers": {
-      "browserbridge": {
+      "brijio": {
         "url": "http://127.0.0.1:8788/mcp",
         "transport": "streamable-http",
         "headers": {
@@ -377,7 +377,7 @@ Edit `~/.openclaw/openclaw.json` (or `openclaw.jsonc`):
 Or use the CLI:
 
 ```sh
-openclaw mcp set browserbridge '{
+openclaw mcp set brijio '{
   "url": "http://127.0.0.1:8788/mcp",
   "transport": "streamable-http",
   "headers": {"Authorization": "Bearer YOUR_MCP_AUTH_TOKEN"}

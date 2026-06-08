@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
-  BrowserBridgeBackgroundController,
+  BrijioBackgroundController,
   type ActionAdapter,
   type BridgeSettings,
   type PageActionAdapter,
   type PageActionResult,
-  type BrowserBridgeSocket,
+  type BrijioSocket,
   type PageReadResult,
   type PageReaderAdapter,
   type SetupAdapter,
@@ -25,7 +25,7 @@ import type {
   WriteTextActionTarget
 } from './protocol.js'
 
-void describe('BrowserBridge background controller', () => {
+void describe('Brijio background controller', () => {
   void it('opens setup when action is clicked without a stored WebSocket URL', async () => {
     const harness = createHarness()
 
@@ -57,7 +57,7 @@ void describe('BrowserBridge background controller', () => {
     assert.equal(harness.sockets.created.length, 1)
     assert.equal(harness.sockets.created[0].url, 'ws://127.0.0.1:8787')
     assert.equal(harness.action.badgeText, '...')
-    assert.equal(harness.action.title, 'BrowserBridge connecting')
+    assert.equal(harness.action.title, 'Brijio connecting')
   })
 
   void it('authenticates when the socket opens', async () => {
@@ -135,7 +135,7 @@ void describe('BrowserBridge background controller', () => {
 
     assert.deepEqual(await harness.controller.getBridgeSettings(), settings)
     assert.equal(harness.action.badgeText, 'OFF')
-    assert.equal(harness.action.title, 'BrowserBridge stopped')
+    assert.equal(harness.action.title, 'Brijio stopped')
   })
 
   void it('sets connected state when the socket opens', async () => {
@@ -146,7 +146,7 @@ void describe('BrowserBridge background controller', () => {
     await new Promise((resolve) => setImmediate(resolve))
 
     assert.equal(harness.action.badgeText, 'ON')
-    assert.equal(harness.action.title, 'BrowserBridge connected')
+    assert.equal(harness.action.title, 'Brijio connected')
   })
 
   void it('disconnects when action is clicked while connected', async () => {
@@ -157,7 +157,7 @@ void describe('BrowserBridge background controller', () => {
 
     assert.equal(harness.sockets.created[0].closed, true)
     assert.equal(harness.action.badgeText, 'OFF')
-    assert.equal(harness.action.title, 'BrowserBridge stopped')
+    assert.equal(harness.action.title, 'Brijio stopped')
   })
 
   void it('responds to get_page_context with rich active tab context', async () => {
@@ -312,7 +312,7 @@ void describe('BrowserBridge background controller', () => {
       pageReaderError: {
         code: 'regular_page_permission_required',
         message:
-          'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+          'Regular page access is not enabled. Open Brijio setup and enable regular page access.'
       }
     })
 
@@ -338,7 +338,7 @@ void describe('BrowserBridge background controller', () => {
         error: {
           code: 'regular_page_permission_required',
           message:
-            'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+            'Regular page access is not enabled. Open Brijio setup and enable regular page access.'
         }
       }
     })
@@ -747,7 +747,7 @@ void describe('BrowserBridge background controller', () => {
     await new Promise((resolve) => setImmediate(resolve))
 
     assert.equal(harness.action.badgeText, 'RCY')
-    assert.match(harness.action.title, /BrowserBridge reconnecting/)
+    assert.match(harness.action.title, /Brijio reconnecting/)
   })
 
   void it('sends extension keepalives while connected', async () => {
@@ -796,7 +796,7 @@ void describe('BrowserBridge background controller', () => {
 
     assert.equal(harness.sockets.created.length, 1)
     assert.equal(harness.action.badgeText, '...')
-    assert.equal(harness.action.title, 'BrowserBridge connecting')
+    assert.equal(harness.action.title, 'Brijio connecting')
   })
 
   void it('requestConnect opens setup when no URL is stored', async () => {
@@ -926,7 +926,7 @@ void describe('BrowserBridge background controller', () => {
     assert.equal(status.state, 'reconnecting')
     assert.equal(status.reconnectAttempt, 1)
     assert.equal(harness.action.badgeText, 'RCY')
-    assert.match(harness.action.title, /BrowserBridge reconnecting \(attempt 1\)/)
+    assert.match(harness.action.title, /Brijio reconnecting \(attempt 1\)/)
   })
 
   void it('increases reconnect attempt number on each close', async () => {
@@ -1078,7 +1078,7 @@ void describe('BrowserBridge background controller', () => {
     await new Promise((resolve) => setImmediate(resolve))
 
     assert.equal(harness.action.badgeText, 'RCY')
-    assert.equal(harness.action.title, 'BrowserBridge reconnecting (attempt 1)')
+    assert.equal(harness.action.title, 'Brijio reconnecting (attempt 1)')
   })
 
   void it('transitions to reconnecting with enriched message when socket errors after connection', async () => {
@@ -1186,7 +1186,7 @@ interface HarnessOptions {
 
 interface Harness {
   action: FakeActionAdapter
-  controller: BrowserBridgeBackgroundController
+  controller: BrijioBackgroundController
   setup: FakeSetupAdapter
   sockets: FakeSocketFactory
   timers: FakeTimersAdapter
@@ -1205,7 +1205,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const pageActions = new FakePageActionAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
-  const controller = new BrowserBridgeBackgroundController({
+  const controller = new BrijioBackgroundController({
     action,
     createWebSocket: sockets.create,
     setup,
@@ -1489,14 +1489,14 @@ function createPageContext (): PageContext {
 class FakeSocketFactory {
   readonly created: FakeSocket[] = []
 
-  readonly create = (url: string): BrowserBridgeSocket => {
+  readonly create = (url: string): BrijioSocket => {
     const socket = new FakeSocket(url)
     this.created.push(socket)
     return socket
   }
 }
 
-class FakeSocket implements BrowserBridgeSocket {
+class FakeSocket implements BrijioSocket {
   onopen: (() => void) | undefined
   onmessage: ((event: { data: string }) => void | Promise<void>) | undefined
   onclose: ((event: { code: number, reason: string }) => void) | undefined

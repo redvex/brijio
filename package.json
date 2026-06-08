@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-only",
   "packageManager": "pnpm@10.32.1",
   "scripts": {
-    "browserbridge": "node scripts/browserbridge-token.mjs",
+    "brijio": "node scripts/brijio-token.mjs",
     "build": "pnpm -r build",
     "check": "pnpm -r check",
     "dev": "node scripts/dev.mjs",
@@ -18,7 +18,7 @@
     "lint:ts": "XDG_CACHE_HOME=.cache ts-standard \"**/*.ts\"",
     "precommit": "scripts/pre-commit",
     "test": "pnpm -r test && node --test scripts/*.test.mjs",
-    "token": "node scripts/browserbridge-token.mjs"
+    "token": "node scripts/brijio-token.mjs"
   },
   "devDependencies": {
     "prettier": "^3.5.3",

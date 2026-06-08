@@ -1,4 +1,4 @@
-import { handleContentRequest, type ContentRequest, type ContentResponse } from '@browserbridge/shared'
+import { handleContentRequest, type ContentRequest, type ContentResponse } from '@brijio/shared'
 
 type SendResponse = (response: ContentResponse) => void
 

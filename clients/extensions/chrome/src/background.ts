@@ -1,11 +1,11 @@
 import {
-  BrowserBridgeBackgroundController,
+  BrijioBackgroundController,
   type BridgeSettings,
   type ClickActionTarget,
   createGlobalTimers,
   defaultPageContentMaxPayloadBytes,
   type PageActionResult,
-  type BrowserBridgeSocket,
+  type BrijioSocket,
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
   stringValue,
@@ -15,7 +15,7 @@ import {
   readActiveTabPage as sharedReadActiveTabPage,
   performActiveTabAction as sharedPerformActiveTabAction,
   type ActiveTabDeps
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 import { isRegularPageUrl } from './permissions.js'
 
 interface RuntimeMessage {
@@ -98,7 +98,7 @@ const bridgeSettingsKeys = [
 const previewMaxBytes = 4096
 const maxContentBytes = 120000
 
-const controller = new BrowserBridgeBackgroundController({
+const controller = new BrijioBackgroundController({
   action: {
     async setBadgeText (text) {
       await chrome.action.setBadgeText({ text })
@@ -240,7 +240,7 @@ async function performActiveTabSubmitForm (target: {
   )
 }
 
-class DomWebSocketAdapter implements BrowserBridgeSocket {
+class DomWebSocketAdapter implements BrijioSocket {
   private openListener: (() => void) | undefined
 
   private messageListener: MessageListener | undefined
@@ -321,7 +321,7 @@ class DomWebSocketAdapter implements BrowserBridgeSocket {
 // --- Message handler (exported for testing) ---
 
 export function createMessageHandler (
-  ctrl: BrowserBridgeBackgroundController
+  ctrl: BrijioBackgroundController
 ): (
     message: RuntimeMessage,
     sender: unknown,
@@ -435,7 +435,7 @@ if (
 }
 
 async function saveRuntimeSettings (
-  ctrl: BrowserBridgeBackgroundController,
+  ctrl: BrijioBackgroundController,
   message: RuntimeMessage
 ): Promise<void> {
   const existing = await ctrl.getBridgeSettings()

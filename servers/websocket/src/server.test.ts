@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { afterEach, describe, it } from 'node:test'
 import http from 'node:http'
 import WebSocket from 'ws'
-import { createWebSocketServer, type BrowserBridgeWebSocketServer } from './server.js'
+import { createWebSocketServer, type BrijioWebSocketServer } from './server.js'
 
 type JsonObject = Record<string, unknown>
 
@@ -81,7 +81,7 @@ void describe('WebSocket authenticated browser routing', () => {
       type: 'error',
       error: {
         code: 'auth_required',
-        message: 'Authenticate before sending BrowserBridge messages.'
+        message: 'Authenticate before sending Brijio messages.'
       }
     })
     client.close()
@@ -98,7 +98,7 @@ void describe('WebSocket authenticated browser routing', () => {
       type: 'error',
       error: {
         code: 'auth_failed',
-        message: 'BrowserBridge pairing token was not accepted.'
+        message: 'Brijio pairing token was not accepted.'
       }
     })
     client.close()
@@ -231,7 +231,7 @@ void describe('WebSocket authenticated browser routing', () => {
       error: {
         code: 'ambiguous_browser_target',
         message:
-          'Multiple BrowserBridge browsers are online. Specify browserInstanceId.',
+          'Multiple Brijio browsers are online. Specify browserInstanceId.',
         browsers: [
           {
             browserInstanceId: 'chrome-default',
@@ -305,7 +305,7 @@ void describe('WebSocket authenticated browser routing', () => {
       type: 'error',
       error: {
         code: 'browser_unavailable',
-        message: 'No matching BrowserBridge browser is online.'
+        message: 'No matching Brijio browser is online.'
       }
     })
     extension.close()
@@ -359,7 +359,7 @@ void describe('WebSocket authenticated browser routing', () => {
   })
 })
 
-async function startTestServer (): Promise<BrowserBridgeWebSocketServer> {
+async function startTestServer (): Promise<BrijioWebSocketServer> {
   const server = await createWebSocketServer({
     host: '127.0.0.1',
     port: 0,

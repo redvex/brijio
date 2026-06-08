@@ -9,9 +9,9 @@ export interface WebSocketEnvelope {
 
 export const defaultPageContentMaxPayloadBytes = 131072
 
-export type BrowserBridgeEnvelope = WebSocketEnvelope
+export type BrijioEnvelope = WebSocketEnvelope
 
-export type BrowserBridgeRole = 'extension' | 'mcp'
+export type BrijioRole = 'extension' | 'mcp'
 
 export type BrowserCapability =
   | 'page_context'
@@ -35,7 +35,7 @@ export interface BrowserPresence {
 
 export interface AuthPayload {
   type: 'auth'
-  role: BrowserBridgeRole
+  role: BrijioRole
   token: string
 }
 
@@ -51,7 +51,7 @@ export interface BrowserPresenceAnnouncePayload extends BrowserPresence {
   type: 'browser_presence_announce'
 }
 
-export type BrowserBridgeErrorCode =
+export type BrijioErrorCode =
   | 'invalid_json'
   | 'invalid_message'
   | 'auth_required'
@@ -63,18 +63,18 @@ export type BrowserBridgeErrorCode =
   | 'timeout'
   | 'unsupported_action'
 
-export interface BrowserBridgeErrorEnvelope {
+export interface BrijioErrorEnvelope {
   type: 'error'
   error: {
-    code: BrowserBridgeErrorCode
+    code: BrijioErrorCode
     message: string
     browsers?: BrowserPresence[]
   }
 }
 
-export type ParseBrowserBridgeEnvelopeResult =
-  | { ok: true, message: BrowserBridgeEnvelope }
-  | { ok: false, error: BrowserBridgeErrorEnvelope }
+export type ParseBrijioEnvelopeResult =
+  | { ok: true, message: BrijioEnvelope }
+  | { ok: false, error: BrijioErrorEnvelope }
 
 export interface GetPageContextRequest {
   type: 'get_page_context'
@@ -384,18 +384,18 @@ export type ExtensionResponse =
 export function createAuthEnvelope (input: {
   requestId?: string
   token: string
-  role: BrowserBridgeRole
-}): BrowserBridgeEnvelope
-export function createAuthEnvelope (token: string): BrowserBridgeEnvelope
+  role: BrijioRole
+}): BrijioEnvelope
+export function createAuthEnvelope (token: string): BrijioEnvelope
 export function createAuthEnvelope (
   input:
   | string
   | {
     requestId?: string
     token: string
-    role: BrowserBridgeRole
+    role: BrijioRole
   }
-): BrowserBridgeEnvelope {
+): BrijioEnvelope {
   if (typeof input === 'string') {
     return {
       type: 'message',
@@ -420,7 +420,7 @@ export function createAuthEnvelope (
 
 export function createAuthSuccessEnvelope (
   requestId: string | undefined
-): BrowserBridgeEnvelope {
+): BrijioEnvelope {
   return {
     type: 'message',
     id: requestId,
@@ -432,7 +432,7 @@ export function createAuthSuccessEnvelope (
 
 export function createBrowserPresenceRequestEnvelope (
   requestId?: string
-): BrowserBridgeEnvelope {
+): BrijioEnvelope {
   return {
     type: 'message',
     id: requestId,
@@ -444,7 +444,7 @@ export function createBrowserPresenceRequestEnvelope (
 
 export function createBrowserPresenceAnnounceEnvelope (
   input: BrowserPresence & { requestId?: string }
-): BrowserBridgeEnvelope {
+): BrijioEnvelope {
   return {
     type: 'message',
     id: input.requestId,
@@ -460,10 +460,10 @@ export function createBrowserPresenceAnnounceEnvelope (
 }
 
 export function createErrorEnvelope (
-  code: BrowserBridgeErrorCode,
+  code: BrijioErrorCode,
   message: string,
   browsers?: BrowserPresence[]
-): BrowserBridgeErrorEnvelope {
+): BrijioErrorEnvelope {
   return {
     type: 'error',
     error: {
@@ -474,9 +474,9 @@ export function createErrorEnvelope (
   }
 }
 
-export function parseBrowserBridgeEnvelope (
+export function parseBrijioEnvelope (
   rawMessage: string
-): ParseBrowserBridgeEnvelopeResult {
+): ParseBrijioEnvelopeResult {
   let parsed: unknown
 
   try {
@@ -825,7 +825,7 @@ function isFormControlTarget (value: unknown): value is WriteTextActionTarget {
   )
 }
 
-function isEnvelope (value: unknown): value is BrowserBridgeEnvelope {
+function isEnvelope (value: unknown): value is BrijioEnvelope {
   return (
     isRecord(value) &&
     value.type === 'message' &&

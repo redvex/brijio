@@ -17,7 +17,7 @@ importers:
 
   clients/extensions/chrome:
     dependencies:
-      '@browserbridge/shared':
+      '@brijio/shared':
         specifier: workspace:*
         version: link:../../../packages/shared
     devDependencies:
@@ -39,7 +39,7 @@ importers:
 
   clients/extensions/safari:
     dependencies:
-      '@browserbridge/shared':
+      '@brijio/shared':
         specifier: workspace:*
         version: link:../../../packages/shared
     devDependencies:
@@ -89,10 +89,10 @@ importers:
         specifier: ^3.25.76
         version: 3.25.76
     devDependencies:
-      '@browserbridge/shared':
+      '@brijio/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@browserbridge/websocket':
+      '@brijio/websocket':
         specifier: workspace:*
         version: link:../websocket
       '@types/node':
@@ -113,7 +113,7 @@ importers:
 
   servers/websocket:
     dependencies:
-      '@browserbridge/shared':
+      '@brijio/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       ws:

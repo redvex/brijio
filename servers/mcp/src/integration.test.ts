@@ -5,18 +5,18 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import WebSocket, { type RawData } from 'ws'
 import {
   createWebSocketServer,
-  type BrowserBridgeWebSocketServer
-} from '@browserbridge/websocket/server'
+  type BrijioWebSocketServer
+} from '@brijio/websocket/server'
 import {
-  startBrowserBridgeMcpHttpServer,
-  type BrowserBridgeMcpHttpRuntime
+  startBrijioMcpHttpServer,
+  type BrijioMcpHttpRuntime
 } from './http-server.js'
 
 const testPairingToken = 'integration-test-token'
 const testMcpAuthToken = 'test-mcp-token'
 
-const servers: BrowserBridgeWebSocketServer[] = []
-const mcpRuntimes: BrowserBridgeMcpHttpRuntime[] = []
+const servers: BrijioWebSocketServer[] = []
+const mcpRuntimes: BrijioMcpHttpRuntime[] = []
 
 afterEach(async () => {
   await Promise.all(mcpRuntimes.splice(0).map(async (runtime) => {
@@ -27,7 +27,7 @@ afterEach(async () => {
   }))
 })
 
-void describe('BrowserBridge integration: WS + MCP full-stack', () => {
+void describe('Brijio integration: WS + MCP full-stack', () => {
   void it('rejects unauthenticated MCP requests', async () => {
     const { runtime } = await startIntegration({ skipExtension: true })
     try {
@@ -365,8 +365,8 @@ void describe('BrowserBridge integration: WS + MCP full-stack', () => {
 // --- Integration test infrastructure ---
 
 interface IntegrationRuntime {
-  wsServer: BrowserBridgeWebSocketServer
-  runtime: BrowserBridgeMcpHttpRuntime
+  wsServer: BrijioWebSocketServer
+  runtime: BrijioMcpHttpRuntime
   extension: WebSocket
 }
 
@@ -383,7 +383,7 @@ async function startIntegration (options: IntegrationOptions = {}): Promise<Inte
   })
   servers.push(wsServer)
 
-  const runtime = await startBrowserBridgeMcpHttpServer({
+  const runtime = await startBrijioMcpHttpServer({
     host: '127.0.0.1',
     port: 0,
     path: '/mcp',
@@ -621,7 +621,7 @@ function createPageContext (): Record<string, unknown> {
 
 function createHttpClient (): Client {
   return new Client({
-    name: 'browserbridge-integration-test',
+    name: 'brijio-integration-test',
     version: '0.0.0'
   })
 }
