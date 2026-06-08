@@ -530,7 +530,23 @@ export class BrijioBackgroundController {
     requestId: string | undefined,
     url: string
   ): Promise<void> {
-    const result = await this.options.pageNavigation.navigateToUrl(url)
+    let result: PageNavigationResult
+    try {
+      result = await this.options.pageNavigation.navigateToUrl(url)
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'Unexpected navigation error.'
+      this.socket?.send(
+        JSON.stringify(
+          createNavigateToUrlErrorResponse(
+            requestId,
+            'navigation_failed',
+            message
+          )
+        )
+      )
+      return
+    }
 
     if (!result.ok) {
       this.socket?.send(

@@ -892,6 +892,39 @@ void describe('Brijio background controller', () => {
     })
   })
 
+  void it('returns navigation_failed error when navigateToUrl throws unexpectedly', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      navigateThrowsError: true
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'nav-throw-1',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/page'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'nav-throw-1',
+      payload: {
+        type: 'navigate_to_url_response',
+        ok: false,
+        error: {
+          code: 'navigation_failed',
+          message: 'Unexpected internal error in page navigation'
+        }
+      }
+    })
+  })
+
   void it('transitions to reconnecting when a socket error is followed by close', async () => {
     const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
 
@@ -1342,6 +1375,7 @@ interface HarnessOptions {
     code: NavigateToUrlErrorCode
     message: string
   }
+  navigateThrowsError?: boolean
 }
 
 interface Harness {
@@ -1624,6 +1658,10 @@ class FakePageNavigationAdapter implements PageNavigationAdapter {
   constructor (private readonly options: HarnessOptions) {}
 
   async navigateToUrl (url: string): Promise<PageNavigationResult> {
+    if (this.options.navigateThrowsError === true) {
+      throw new Error('Unexpected internal error in page navigation')
+    }
+
     if (this.options.navigateError !== undefined) {
       return {
         ok: false,
