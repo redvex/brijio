@@ -6,6 +6,7 @@ import {
   defaultPageContentMaxPayloadBytes,
   type PageActionResult,
   type BrijioSocket,
+  type PageNavigationResult,
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
   stringValue,
@@ -72,6 +73,9 @@ export interface ChromeApi {
     }>
     >
     sendMessage: (tabId: number, message: unknown) => Promise<unknown>
+    update: (tabId: number, updateProperties: { url: string }) => Promise<
+    { id?: number, title?: string, url?: string }
+    >
   }
 }
 
@@ -171,6 +175,11 @@ const controller = new BrijioBackgroundController({
       return await performActiveTabSubmitForm(target)
     }
   },
+  pageNavigation: {
+    async navigateToUrl (url) {
+      return await navigateActiveTabToUrl(url)
+    }
+  },
   timers: createGlobalTimers()
 })
 
@@ -238,6 +247,51 @@ async function performActiveTabSubmitForm (target: {
     },
     chromeDeps
   )
+}
+
+export async function navigateActiveTabToUrl (url: string): Promise<PageNavigationResult> {
+  const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+
+  if (tabs.length === 0 || tabs[0].id === undefined) {
+    return {
+      ok: false,
+      error: {
+        code: 'no_active_tab',
+        message: 'No active tab is available.'
+      }
+    }
+  }
+
+  const tabId = tabs[0].id
+  const startTime = Date.now()
+
+  try {
+    const updatedTab = await chrome.tabs.update(tabId, { url })
+
+    const navigatedUrl = typeof updatedTab.url === 'string' && updatedTab.url !== ''
+      ? updatedTab.url
+      : url
+    const navigatedTitle = typeof updatedTab.title === 'string' ? updatedTab.title : ''
+
+    return {
+      ok: true,
+      data: {
+        url: navigatedUrl,
+        title: navigatedTitle,
+        timestamp: new Date(startTime).toISOString(),
+        redirected: navigatedUrl !== url,
+        navigationMs: Date.now() - startTime
+      }
+    }
+  } catch {
+    return {
+      ok: false,
+      error: {
+        code: 'navigation_failed',
+        message: `Failed to navigate tab to ${url}.`
+      }
+    }
+  }
 }
 
 class DomWebSocketAdapter implements BrijioSocket {

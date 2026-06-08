@@ -1,12 +1,36 @@
 import assert from 'node:assert/strict'
-import { describe, it, mock } from 'node:test'
+import { describe, it, mock, beforeEach, afterEach } from 'node:test'
 import {
   type BridgeSettings,
-  type BrijioBackgroundController
+  type BrijioBackgroundController,
+  type PageNavigationResult
 } from '@brijio/shared'
 import {
-  createMessageHandler
+  createMessageHandler,
+  navigateActiveTabToUrl
 } from './background.js'
+
+// --- Chrome API mock for navigateActiveTabToUrl tests ---
+
+interface MockTabs {
+  queryResult: Array<{ id?: number, title?: string, url?: string }>
+  updateResult: { id?: number, title?: string, url?: string }
+  query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
+  update: (tabId: number, updateProperties: { url: string }) => Promise<{ id?: number, title?: string, url?: string }>
+}
+
+function createMockTabs (): MockTabs {
+  return {
+    queryResult: [],
+    updateResult: { id: 1 },
+    async query (_queryInfo: { active: boolean, currentWindow: boolean }) {
+      return this.queryResult
+    },
+    async update (_tabId: number, _updateProperties: { url: string }) {
+      return this.updateResult
+    }
+  }
+}
 
 // --- Test helpers ---
 
@@ -268,5 +292,112 @@ void describe('createMessageHandler', () => {
         message: 'Unsupported extension message.'
       }
     })
+  })
+})
+
+// --- navigateActiveTabToUrl tests ---
+
+// The background.ts module declares `declare const chrome: ChromeApi` which
+// references a global. In the test environment there is no chrome global, so
+// we inject a mock on globalThis and clean up after each test.
+
+void describe('navigateActiveTabToUrl', () => {
+  let mockTabs: MockTabs
+
+  beforeEach(() => {
+    mockTabs = createMockTabs()
+    ;(globalThis as unknown as Record<string, unknown>).chrome = {
+      tabs: mockTabs,
+      action: {
+        setBadgeText: async () => {},
+        setBadgeBackgroundColor: async () => {},
+        setBadgeTextColor: async () => {},
+        setTitle: async () => {}
+      },
+      runtime: {
+        getURL: (path: string) => `chrome-extension://abc/${path}`,
+        onMessage: { addListener: () => {} }
+      },
+      storage: {
+        local: {
+          get: async () => ({}),
+          set: async () => {}
+        }
+      },
+      scripting: {
+        executeScript: async () => {}
+      }
+    }
+  })
+
+  afterEach(() => {
+    delete (globalThis as unknown as Record<string, unknown>).chrome
+  })
+
+  void it('returns ok with navigation result when active tab exists', async () => {
+    mockTabs.queryResult = [{ id: 42, url: 'https://example.com/page', title: 'Example Page' }]
+    mockTabs.updateResult = { id: 42, url: 'https://example.com/page', title: 'Example Page' }
+
+    const result = await navigateActiveTabToUrl('https://example.com/page')
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.url, 'https://example.com/page')
+      assert.equal(result.data.title, 'Example Page')
+      assert.equal(result.data.redirected, false)
+      assert.ok(typeof result.data.navigationMs === 'number')
+      assert.ok(typeof result.data.timestamp === 'string')
+    }
+  })
+
+  void it('detects redirect when final url differs from requested url', async () => {
+    mockTabs.queryResult = [{ id: 10, url: 'https://example.com/old', title: 'Old' }]
+    mockTabs.updateResult = { id: 10, url: 'https://example.com/new', title: 'New Page' }
+
+    const result = await navigateActiveTabToUrl('https://example.com/old')
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.url, 'https://example.com/new')
+      assert.equal(result.data.title, 'New Page')
+      assert.equal(result.data.redirected, true)
+    }
+  })
+
+  void it('returns no_active_tab error when no tabs found', async () => {
+    mockTabs.queryResult = []
+
+    const result = await navigateActiveTabToUrl('https://example.com/page')
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'no_active_tab')
+    }
+  })
+
+  void it('returns no_active_tab error when tab has no id', async () => {
+    mockTabs.queryResult = [{ url: 'https://example.com/page', title: 'Tab' }]
+
+    const result = await navigateActiveTabToUrl('https://example.com/page')
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'no_active_tab')
+    }
+  })
+
+  void it('returns navigation_failed error when tabs.update throws', async () => {
+    mockTabs.queryResult = [{ id: 1, url: 'about:blank', title: '' }]
+    mockTabs.update = async function () {
+      throw new Error('Cannot access chrome:// URLs')
+    }
+
+    const result = await navigateActiveTabToUrl('https://example.com/page')
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'navigation_failed')
+      assert.ok(result.error.message.includes('https://example.com/page'))
+    }
   })
 })
