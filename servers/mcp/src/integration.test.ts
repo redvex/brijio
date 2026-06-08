@@ -360,6 +360,91 @@ void describe('Brijio integration: WS + MCP full-stack', () => {
       await client.close()
     }
   })
+
+  void it('navigates to a URL through full stack', async () => {
+    const { runtime, extension } = await startIntegration()
+
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
+
+    try {
+      await client.connect(transport, { timeout: 2000 })
+
+      const toolResult = await client.callTool(
+        {
+          name: 'navigate_to_url',
+          arguments: { url: 'https://example.com/' }
+        },
+        undefined,
+        { timeout: 2000 }
+      )
+
+      const parsed = JSON.parse(getOnlyToolText(toolResult))
+      assert.equal(parsed.ok, true)
+      assert.equal(parsed.data.url, 'https://example.com/')
+      assert.equal(parsed.data.title, 'Navigated Page')
+      assert.equal(parsed.data.redirected, false)
+      assert.equal(typeof parsed.data.navigationMs, 'number')
+    } finally {
+      await client.close()
+      extension.close()
+      await waitForClose(extension)
+    }
+  })
+
+  void it('returns unsupported_scheme for ftp URL without hitting extension', async () => {
+    const { runtime, extension } = await startIntegration()
+
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
+
+    try {
+      await client.connect(transport, { timeout: 2000 })
+
+      const toolResult = await client.callTool(
+        {
+          name: 'navigate_to_url',
+          arguments: { url: 'ftp://example.com/' }
+        },
+        undefined,
+        { timeout: 2000 }
+      )
+
+      const parsed = JSON.parse(getOnlyToolText(toolResult))
+      assert.equal(parsed.ok, false)
+      assert.equal(parsed.error.code, 'unsupported_scheme')
+    } finally {
+      await client.close()
+      extension.close()
+      await waitForClose(extension)
+    }
+  })
+
+  void it('returns browser_unavailable when no extension is connected for navigate', async () => {
+    const { runtime } = await startIntegration({ skipExtension: true })
+
+    const client = createHttpClient()
+    const transport = createHttpTransport(runtime.url)
+
+    try {
+      await client.connect(transport, { timeout: 2000 })
+
+      const toolResult = await client.callTool(
+        {
+          name: 'navigate_to_url',
+          arguments: { url: 'https://example.com/' }
+        },
+        undefined,
+        { timeout: 2000 }
+      )
+
+      const parsed = JSON.parse(getOnlyToolText(toolResult))
+      assert.equal(parsed.ok, false)
+      assert.equal(parsed.error.code, 'browser_unavailable')
+    } finally {
+      await client.close()
+    }
+  })
 })
 
 // --- Integration test infrastructure ---
@@ -492,6 +577,25 @@ function handleExtensionRequest (socket: WebSocket, data: RawData): void {
           content: 'Page content',
           truncated: false,
           maxPayloadBytes: 131072
+        }
+      }
+    }))
+    return
+  }
+
+  if (payloadType === 'navigate_to_url') {
+    socket.send(JSON.stringify({
+      type: 'message',
+      id: message.id,
+      payload: {
+        type: 'navigate_to_url_response',
+        ok: true,
+        data: {
+          url: (message.payload as Record<string, unknown>).url as string,
+          title: 'Navigated Page',
+          timestamp: '2026-06-08T12:00:00.000Z',
+          redirected: false,
+          navigationMs: 150
         }
       }
     }))

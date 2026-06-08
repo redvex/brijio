@@ -266,6 +266,12 @@ void describe('Brijio MCP HTTP server', () => {
             name: 'submit_form',
             title: 'Submit Form',
             description: 'Submit a visible form from the current browser page.'
+          },
+          {
+            name: 'navigate_to_url',
+            title: 'Navigate to URL',
+            description:
+              'Navigate the browser to an HTTP or HTTPS URL and wait for the page to load.'
           }
         ]
       )
@@ -517,6 +523,24 @@ void describe('Brijio MCP HTTP server', () => {
           }
         },
         required: ['formId'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[8].inputSchema, {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description:
+              'The HTTP or HTTPS URL to navigate to.'
+          },
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional Brijio browser instance ID to target.'
+          }
+        },
+        required: ['url'],
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
