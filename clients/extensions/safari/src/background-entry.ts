@@ -16,7 +16,6 @@ import {
   type WriteTextEditableTarget,
   type FormSubmitTarget,
   type PageActionResult,
-  type PageNavigationResult,
   stringValue,
   requireString,
   createBrowserInstanceId,
