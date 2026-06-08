@@ -6,6 +6,7 @@ import {
   requestClickElement,
   requestBrowserList,
   requestFillInput,
+  requestNavigateToUrl,
   requestPageContent,
   requestPageContext,
   requestSelectOptions,
@@ -928,3 +929,112 @@ function rawDataToString (data: RawData): string {
 
   return Buffer.from(data).toString('utf8')
 }
+
+void describe('requestNavigateToUrl', () => {
+  void it('requests navigation and returns the matching response', async () => {
+    let receivedPayload: unknown
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id: string
+          payload: unknown
+        }
+        receivedPayload = request.payload
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'navigate_to_url_response',
+              ok: true,
+              data: {
+                url: 'https://example.com/',
+                title: 'Example Domain',
+                timestamp: '2026-06-08T10:00:00.000Z',
+                redirected: false,
+                navigationMs: 250
+              }
+            }
+          })
+        )
+      })
+    })
+
+    assert.deepEqual(
+      await requestNavigateToUrl({
+        websocketUrl: server.url,
+        pairingToken: 'local-token',
+        timeoutMs: 100,
+        url: 'https://example.com/',
+        createRequestId: () => 'request-nav-1'
+      }),
+      {
+        ok: true,
+        data: {
+          url: 'https://example.com/',
+          title: 'Example Domain',
+          timestamp: '2026-06-08T10:00:00.000Z',
+          redirected: false,
+          navigationMs: 250
+        }
+      }
+    )
+    assert.deepEqual(receivedPayload, {
+      type: 'navigate_to_url',
+      url: 'https://example.com/'
+    })
+  })
+
+  void it('returns browser_error for unsupported_scheme from extension', async () => {
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, (data) => {
+        const request = JSON.parse(rawDataToString(data)) as { id: string }
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'navigate_to_url_response',
+              ok: false,
+              error: {
+                code: 'unsupported_scheme',
+                message: 'URL scheme \'ftp\' is not supported.'
+              }
+            }
+          })
+        )
+      })
+    })
+
+    const result = await requestNavigateToUrl({
+      websocketUrl: server.url,
+      pairingToken: 'local-token',
+      timeoutMs: 100,
+      url: 'ftp://example.com/',
+      createRequestId: () => 'request-nav-2'
+    })
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'browser_error')
+      assert.equal(result.error.message, 'URL scheme \'ftp\' is not supported.')
+    }
+  })
+
+  void it('returns auth_required when pairing token is empty', async () => {
+    const result = await requestNavigateToUrl({
+      websocketUrl: 'ws://127.0.0.1:1',
+      pairingToken: '',
+      timeoutMs: 100,
+      url: 'https://example.com/',
+      createRequestId: () => 'request-nav-3'
+    })
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'auth_required')
+    }
+  })
+})

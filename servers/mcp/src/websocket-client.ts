@@ -4,6 +4,7 @@ import {
   type BrijioClickElementResult,
   type BrijioBrowserListResult,
   type BrijioFillInputResult,
+  type BrijioNavigateToUrlResult,
   type BrijioPageContentResult,
   type BrijioPageContextResult,
   type BrijioResourceResult,
@@ -14,6 +15,7 @@ import {
   createAuthEnvelope,
   createClickElementEnvelope,
   createFillInputEnvelope,
+  createNavigateToUrlEnvelope,
   createSelectOptionsEnvelope,
   createSetCheckedEnvelope,
   createSubmitFormEnvelope,
@@ -27,6 +29,7 @@ import {
   invalidResponse,
   parseActionResultEnvelope,
   parseBrowserListEnvelope,
+  parseNavigateToUrlEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
   parseRouterErrorEnvelope,
@@ -81,6 +84,10 @@ export interface SelectOptionsRequestOptions extends PageContextRequestOptions {
 export interface SubmitFormRequestOptions extends PageContextRequestOptions {
   target: SubmitFormTarget
   pageContextId?: number
+}
+
+export interface NavigateToUrlRequestOptions extends PageContextRequestOptions {
+  url: string
 }
 
 export async function requestPageContext (
@@ -228,6 +235,22 @@ export async function requestSubmitForm (
     requestEnvelope: createSubmitFormEnvelope(requestId, options.target, options.pageContextId),
     parseEnvelope: (value) => parseSubmitFormActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
+export async function requestNavigateToUrl (
+  options: NavigateToUrlRequestOptions
+): Promise<BrijioNavigateToUrlResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createNavigateToUrlEnvelope(requestId, options.url),
+    parseEnvelope: (value) => parseNavigateToUrlEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser navigation response.'
   })
 }
 
