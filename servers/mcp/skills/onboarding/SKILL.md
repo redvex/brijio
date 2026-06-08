@@ -28,7 +28,7 @@ list_browsers → Confirm browser connected
 
 ### 2. Navigate to Signup
 
-If not already on the signup page, use the [navigation](skill://browserbridge/navigation) skill to get there. Look for links like:
+If not already on the signup page, use the [navigation](skill://brijio/navigation) skill to get there. Look for links like:
 
 - "Sign up", "Create account", "Register", "Get started"
 - Avoid "Sign in" / "Log in" — these are for existing accounts

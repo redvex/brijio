@@ -2,7 +2,7 @@
 
 ## Summary
 
-`servers/mcp` now provides the first BrowserBridge agent-facing runtime path.
+`servers/mcp` now provides the first Brijio agent-facing runtime path.
 It exposes the `browser://page/current` MCP resource and routes explicit
 resource reads through the local WebSocket server to the user-started Chrome
 extension.
@@ -20,7 +20,7 @@ does not perform browser actions, stream state, or store page context.
 sequenceDiagram
   participant Agent as AI Agent
   participant SDK as MCP SDK Stdio Transport
-  participant MCP as BrowserBridge Resource Handler
+  participant MCP as Brijio Resource Handler
   participant WS as WebSocket Server
   participant Ext as Chrome Extension
   participant Tab as Active Browser Tab
@@ -53,8 +53,8 @@ sequenceDiagram
 ## Environment
 
 ```sh
-BROWSERBRIDGE_WEBSOCKET_URL=ws://127.0.0.1:8787
-BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
+BRIJIO_WEBSOCKET_URL=ws://127.0.0.1:8787
+BRIJIO_REQUEST_TIMEOUT_MS=5000
 ```
 
 `WEBSOCKET_URL` remains accepted as an alias for older local configuration.
@@ -62,10 +62,10 @@ BROWSERBRIDGE_REQUEST_TIMEOUT_MS=5000
 ## Local Commands
 
 ```sh
-pnpm --filter @browserbridge/mcp test
-pnpm --filter @browserbridge/mcp build
-pnpm --filter @browserbridge/mcp check
-pnpm --filter @browserbridge/mcp exec tsx src/index.ts
+pnpm --filter @brijio/mcp test
+pnpm --filter @brijio/mcp build
+pnpm --filter @brijio/mcp check
+pnpm --filter @brijio/mcp exec tsx src/index.ts
 ```
 
 The MCP tests use local loopback WebSocket servers with ephemeral ports, so they

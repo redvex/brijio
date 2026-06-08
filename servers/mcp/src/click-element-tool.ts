@@ -1,9 +1,9 @@
 import {
   clickCurrentPageElement,
-  type BrowserBridgePageActionsConfig
+  type BrijioPageActionsConfig
 } from './page-actions.js'
 import { type ClickElementTarget } from './protocol.js'
-import { type BrowserBridgeToolResult } from './page-reading-tool.js'
+import { type BrijioToolResult } from './page-reading-tool.js'
 
 export interface ClickElementInput {
   kind?: unknown
@@ -14,13 +14,13 @@ export interface ClickElementInput {
   expectedRole?: unknown
 }
 
-export type ClickElementResult = BrowserBridgeToolResult<{
+export type ClickElementResult = BrijioToolResult<{
   action: 'click'
   target: ClickElementTarget
 }>
 
 export async function clickElement (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   input: ClickElementInput
 ): Promise<ClickElementResult> {
   const normalizedInput = normalizeInput(input)
@@ -36,7 +36,7 @@ export async function clickElement (
   )
 }
 
-function normalizeInput (input: ClickElementInput): BrowserBridgeToolResult<{
+function normalizeInput (input: ClickElementInput): BrijioToolResult<{
   target: ClickElementTarget
   browserInstanceId?: string
 }> {
@@ -109,7 +109,7 @@ function normalizeInput (input: ClickElementInput): BrowserBridgeToolResult<{
 
 function normalizeBrowserInstanceId (
   value: unknown
-): BrowserBridgeToolResult<string | undefined> {
+): BrijioToolResult<string | undefined> {
   if (value === undefined) {
     return {
       ok: true,
@@ -131,7 +131,7 @@ function normalizeBrowserInstanceId (
 
 function invalidToolInputResponse (
   message: string
-): BrowserBridgeToolResult<never> {
+): BrijioToolResult<never> {
   return {
     ok: false,
     error: {

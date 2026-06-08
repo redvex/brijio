@@ -4,7 +4,7 @@ import {
 } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import {
-  type BrowserBridgePageContextConfig,
+  type BrijioPageContextConfig,
   getCurrentPageContent,
   getCurrentPageContext,
   getPageContextConfigFromEnv,
@@ -26,7 +26,7 @@ import {
   resolveSkillsDir,
   skillResourceUri
 } from './skills.js'
-import { createLogger } from '@browserbridge/shared'
+import { createLogger } from '@brijio/shared'
 
 const logger = createLogger('mcp')
 
@@ -38,18 +38,18 @@ const currentPageResourceUri = 'browser://page/current'
 const currentPageContentResourceTemplateUri =
   'browser://page/current/content/{index}'
 
-export async function createBrowserBridgeMcpServer (
-  pageContextConfig: BrowserBridgePageContextConfig = getPageContextConfigFromEnv()
+export async function createBrijioMcpServer (
+  pageContextConfig: BrijioPageContextConfig = getPageContextConfigFromEnv()
 ): Promise<McpServer> {
   const server = new McpServer({
-    name: 'browserbridge-mcp',
+    name: 'brijio-mcp',
     version: '0.0.0'
   })
 
   const browserInstanceIdInput = z
     .string()
     .optional()
-    .describe('Optional BrowserBridge browser instance ID to target.')
+    .describe('Optional Brijio browser instance ID to target.')
 
   server.server.registerCapabilities({
     tools: {
@@ -62,7 +62,7 @@ export async function createBrowserBridgeMcpServer (
     {
       title: 'List Browsers',
       description:
-        'List BrowserBridge browser instances currently online for the configured pairing token.',
+        'List Brijio browser instances currently online for the configured pairing token.',
       inputSchema: {}
     },
     async () => {
@@ -130,7 +130,7 @@ export async function createBrowserBridgeMcpServer (
         id: z
           .string()
           .describe(
-            'Short-lived BrowserBridge target ID from the latest page context.'
+            'Short-lived Brijio target ID from the latest page context.'
           ),
         expectedText: z
           .string()
@@ -178,12 +178,12 @@ export async function createBrowserBridgeMcpServer (
         formId: z
           .string()
           .describe(
-            'Short-lived BrowserBridge form ID from the latest page context.'
+            'Short-lived Brijio form ID from the latest page context.'
           ),
         controlId: z
           .string()
           .describe(
-            'Short-lived BrowserBridge form control ID from the latest page context.'
+            'Short-lived Brijio form control ID from the latest page context.'
           ),
         text: z
           .string()
@@ -216,7 +216,7 @@ export async function createBrowserBridgeMcpServer (
         id: z
           .string()
           .describe(
-            'Short-lived BrowserBridge editable target ID from the latest page context.'
+            'Short-lived Brijio editable target ID from the latest page context.'
           ),
         text: z
           .string()
@@ -249,12 +249,12 @@ export async function createBrowserBridgeMcpServer (
         formId: z
           .string()
           .describe(
-            'Short-lived BrowserBridge form ID from the latest page context.'
+            'Short-lived Brijio form ID from the latest page context.'
           ),
         controlId: z
           .string()
           .describe(
-            'Short-lived BrowserBridge form control ID from the latest page context.'
+            'Short-lived Brijio form control ID from the latest page context.'
           ),
         checked: z.boolean().describe('Desired checked state.'),
         browserInstanceId: browserInstanceIdInput
@@ -285,12 +285,12 @@ export async function createBrowserBridgeMcpServer (
         formId: z
           .string()
           .describe(
-            'Short-lived BrowserBridge form ID from the latest page context.'
+            'Short-lived Brijio form ID from the latest page context.'
           ),
         controlId: z
           .string()
           .describe(
-            'Short-lived BrowserBridge form control ID from the latest page context.'
+            'Short-lived Brijio form control ID from the latest page context.'
           ),
         values: z
           .array(z.string())
@@ -322,7 +322,7 @@ export async function createBrowserBridgeMcpServer (
         formId: z
           .string()
           .describe(
-            'Short-lived BrowserBridge form ID from the latest page context.'
+            'Short-lived Brijio form ID from the latest page context.'
           ),
         browserInstanceId: browserInstanceIdInput
       }
@@ -348,7 +348,7 @@ export async function createBrowserBridgeMcpServer (
     {
       title: 'Current Page Context',
       description:
-        'Read the current browser page context through BrowserBridge.',
+        'Read the current browser page context through Brijio.',
       mimeType: 'application/json'
     },
     async () => {
@@ -375,7 +375,7 @@ export async function createBrowserBridgeMcpServer (
     {
       title: 'Current Page Content',
       description:
-        'Read a chunk of normalized current browser page content through BrowserBridge.',
+        'Read a chunk of normalized current browser page content through Brijio.',
       mimeType: 'application/json'
     },
     async (uri) => {
@@ -436,20 +436,20 @@ export async function createBrowserBridgeMcpServer (
 
   // ── Session-Start Prompt ───────────────────────────────────────────────
   //
-  // The `browserbridge-context` prompt injects a summary of connected
+  // The `brijio-context` prompt injects a summary of connected
   // browsers, available skills, and key pitfalls into the agent's context.
   // MCP clients can call this prompt at the start of a session to get
   // oriented.
 
   server.registerPrompt(
-    'browserbridge-context',
+    'brijio-context',
     {
-      title: 'BrowserBridge Context',
+      title: 'Brijio Context',
       description:
-        'Inject BrowserBridge context: connected browsers, available skills, pitfalls.'
+        'Inject Brijio context: connected browsers, available skills, pitfalls.'
     },
     async () => {
-      logger.info('prompt_called', { prompt: 'browserbridge-context' })
+      logger.info('prompt_called', { prompt: 'brijio-context' })
       const skillSummaries = skills.map((s) => ({
         name: s.name,
         title: s.title,

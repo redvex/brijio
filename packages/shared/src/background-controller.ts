@@ -116,7 +116,7 @@ export interface PageActionAdapter {
   submitForm: (target: { formId: string }) => Promise<PageActionResult>
 }
 
-export interface BrowserBridgeSocket {
+export interface BrijioSocket {
   onopen: (() => void) | undefined
   onmessage: ((event: { data: string }) => void | Promise<void>) | undefined
   onclose: ((event: { code: number, reason: string }) => void) | undefined
@@ -125,9 +125,9 @@ export interface BrowserBridgeSocket {
   close: () => void
 }
 
-export interface BrowserBridgeBackgroundControllerOptions {
+export interface BrijioBackgroundControllerOptions {
   action: ActionAdapter
-  createWebSocket: (url: string) => BrowserBridgeSocket
+  createWebSocket: (url: string) => BrijioSocket
   pageActions: PageActionAdapter
   pageReader: PageReaderAdapter
   setup: SetupAdapter
@@ -160,11 +160,11 @@ function describeCloseEvent (code: number, reason: string): string {
   }
 }
 
-export class BrowserBridgeBackgroundController {
+export class BrijioBackgroundController {
   private keepaliveTimerId: number | undefined
   private reconnectTimerId: number | undefined
   private reconnectAttempt: number = 0
-  private socket: BrowserBridgeSocket | undefined
+  private socket: BrijioSocket | undefined
   private settings: BridgeSettings | undefined
   private connectionState: ConnectionState = 'disconnected'
   private lastErrorMessage: string | undefined
@@ -172,7 +172,7 @@ export class BrowserBridgeBackgroundController {
   private pendingRequestCount: number = 0
 
   constructor (
-    private readonly options: BrowserBridgeBackgroundControllerOptions
+    private readonly options: BrijioBackgroundControllerOptions
   ) {}
 
   async handleActionClicked (): Promise<void> {
@@ -602,7 +602,7 @@ export class BrowserBridgeBackgroundController {
     await this.options.action.setBadgeText('ON')
     await this.options.action.setBadgeColor('#1f8f4d')
     await this.options.action.setBadgeTextColor('#ffffff')
-    await this.options.action.setTitle('BrowserBridge connected')
+    await this.options.action.setTitle('Brijio connected')
   }
 
   private async setConnectingState (): Promise<void> {
@@ -611,7 +611,7 @@ export class BrowserBridgeBackgroundController {
     await this.options.action.setBadgeText('...')
     await this.options.action.setBadgeColor('#f59e0b')
     await this.options.action.setBadgeTextColor('#ffffff')
-    await this.options.action.setTitle('BrowserBridge connecting')
+    await this.options.action.setTitle('Brijio connecting')
   }
 
   private async setReconnectingState (): Promise<void> {
@@ -619,7 +619,7 @@ export class BrowserBridgeBackgroundController {
     await this.options.action.setBadgeText('RCY')
     await this.options.action.setBadgeColor('#f59e0b')
     await this.options.action.setBadgeTextColor('#ffffff')
-    await this.options.action.setTitle(`BrowserBridge reconnecting (attempt ${this.reconnectAttempt})`)
+    await this.options.action.setTitle(`Brijio reconnecting (attempt ${this.reconnectAttempt})`)
   }
 
   private async setStoppedState (): Promise<void> {
@@ -629,19 +629,19 @@ export class BrowserBridgeBackgroundController {
     await this.options.action.setBadgeText('OFF')
     await this.options.action.setBadgeColor('#666666')
     await this.options.action.setBadgeTextColor('#ffffff')
-    await this.options.action.setTitle('BrowserBridge stopped')
+    await this.options.action.setTitle('Brijio stopped')
   }
 
-  private async setErrorState (message: string = 'BrowserBridge connection error'): Promise<void> {
+  private async setErrorState (message: string = 'Brijio connection error'): Promise<void> {
     this.connectionState = 'error'
     this.lastErrorMessage = message
     await this.options.action.setBadgeText('ERR')
     await this.options.action.setBadgeColor('#b42318')
     await this.options.action.setBadgeTextColor('#ffffff')
-    await this.options.action.setTitle(`BrowserBridge error: ${message}`)
+    await this.options.action.setTitle(`Brijio error: ${message}`)
   }
 
-  private startKeepalive (socket: BrowserBridgeSocket): void {
+  private startKeepalive (socket: BrijioSocket): void {
     this.stopKeepalive()
     this.keepaliveTimerId = this.options.timers.setInterval(() => {
       socket.send(

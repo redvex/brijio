@@ -1,7 +1,7 @@
 // Safari popup message helpers.
 //
 // Per ADR 0031, message creators and response parsers are shared via
-// @browserbridge/shared. This file only contains Safari-specific helpers:
+// @brijio/shared. This file only contains Safari-specific helpers:
 // the BrowserApi interface and the callback-based sendMessage wrapper.
 
 import type { BrowserApi } from './popup-entry.js'
@@ -15,7 +15,7 @@ import {
   parseSettingsResponse,
   parseStatusResponse,
   parseErrorResponse
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 
 export {
   createGetSettingsMessage,

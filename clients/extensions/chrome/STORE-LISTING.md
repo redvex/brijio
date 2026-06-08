@@ -53,7 +53,7 @@ Instead of launching a separate browser, cloning sessions, or exporting cookies 
 
 ### Requirements
 
-- A running Brijio server (Docker or npm). See https://github.com/redvex/browser-bridge for setup instructions.
+- A running Brijio server (Docker or npm). See https://github.com/brijio/mcp for setup instructions.
 - An MCP-compatible AI agent configured to connect to the Brijio MCP server.
 
 ### Permissions explained
@@ -66,7 +66,7 @@ Instead of launching a separate browser, cloning sessions, or exporting cookies 
 
 ### Open Source
 
-Brijio is open source under AGPLv3. View the source code at https://github.com/redvex/browser-bridge
+Brijio is open source under AGPLv3. View the source code at https://github.com/brijio/mcp
 
 ## Category
 
@@ -78,8 +78,8 @@ English
 
 ## Privacy Policy URL
 
-https://browserbridge.redvex.io/privacy
+https://brijio.redvex.io/privacy
 
 ## Homepage URL
 
-https://github.com/redvex/browser-bridge
+https://github.com/brijio/mcp

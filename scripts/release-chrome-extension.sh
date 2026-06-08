@@ -60,10 +60,10 @@ node -e "const f='${PKG_JSON}'; const m=JSON.parse(require('fs').readFileSync(f,
 # --- Build ---
 echo ""
 echo "Building shared package..."
-pnpm --filter @browserbridge/shared build
+pnpm --filter @brijio/shared build
 
 echo "Building Chrome extension..."
-pnpm --filter @browserbridge/chrome-extension build
+pnpm --filter @brijio/chrome-extension build
 
 # --- Verify ---
 echo ""
@@ -93,7 +93,7 @@ echo "✓ Build verified — version ${MANIFEST_VERSION}"
 echo ""
 echo "Creating submission ZIP..."
 cd "${DIST}"
-ZIP_NAME="browserbridge-chrome-extension-v${VERSION}.zip"
+ZIP_NAME="brijio-chrome-extension-v${VERSION}.zip"
 rm -f "../${ZIP_NAME}"
 zip -r "../${ZIP_NAME}" .
 cd -

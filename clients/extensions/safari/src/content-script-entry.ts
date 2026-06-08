@@ -2,7 +2,7 @@
 //
 // Per ADR 0019, this is a thin file that registers a
 // browser.runtime.onMessage listener and delegates to the shared
-// handleContentRequest function from @browserbridge/shared.
+// handleContentRequest function from @brijio/shared.
 // It is analogous to Chrome's content-script-entry.ts but uses the
 // browser.* namespace (WebExtension API) instead of chrome.*.
 
@@ -10,7 +10,7 @@ import {
   handleContentRequest,
   type ContentRequest,
   type ContentResponse
-} from '@browserbridge/shared'
+} from '@brijio/shared'
 
 type SendResponse = (response: ContentResponse) => void
 

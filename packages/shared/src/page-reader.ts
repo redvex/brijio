@@ -52,7 +52,7 @@ export function regularPagePermissionRequired<T> (): PageReadResult<T> {
     error: {
       code: 'regular_page_permission_required' as PageContentErrorCode,
       message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+        'Regular page access is not enabled. Open Brijio setup and enable regular page access.'
     }
   }
 }
@@ -63,7 +63,7 @@ export function actionRegularPagePermissionRequired (): PageActionResult {
     error: {
       code: 'regular_page_permission_required' as ActionResultErrorCode,
       message:
-        'Regular page access is not enabled. Open BrowserBridge setup and enable regular page access.'
+        'Regular page access is not enabled. Open Brijio setup and enable regular page access.'
     }
   }
 }
@@ -95,7 +95,7 @@ export async function readActiveTabPage<T> (
       error: {
         code: 'unsupported_page',
         message:
-          'BrowserBridge can read page content only from HTTP and HTTPS tabs.'
+          'Brijio can read page content only from HTTP and HTTPS tabs.'
       }
     }
   }
@@ -165,7 +165,7 @@ export async function performActiveTabAction (
       error: {
         code: 'unsupported_page',
         message:
-          'BrowserBridge can perform actions only on HTTP and HTTPS tabs.'
+          'Brijio can perform actions only on HTTP and HTTPS tabs.'
       }
     }
   }

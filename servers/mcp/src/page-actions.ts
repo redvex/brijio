@@ -1,9 +1,9 @@
 import {
-  type BrowserBridgeClickElementResult,
-  type BrowserBridgeFillInputResult,
-  type BrowserBridgeSelectOptionsResult,
-  type BrowserBridgeSetCheckedResult,
-  type BrowserBridgeSubmitFormResult,
+  type BrijioClickElementResult,
+  type BrijioFillInputResult,
+  type BrijioSelectOptionsResult,
+  type BrijioSetCheckedResult,
+  type BrijioSubmitFormResult,
   type ClickElementTarget,
   type EditableTarget,
   type FillInputTarget
@@ -23,36 +23,36 @@ import {
   type WriteEditableRequestOptions
 } from './websocket-client.js'
 
-export interface BrowserBridgePageActionsConfig {
+export interface BrijioPageActionsConfig {
   websocketUrl: string
   pairingToken?: string
   timeoutMs: number
   defaultBrowserInstanceId?: string
   requestClickElement?: (
     options: ClickElementRequestOptions
-  ) => Promise<BrowserBridgeClickElementResult>
+  ) => Promise<BrijioClickElementResult>
   requestFillInput?: (
     options: FillInputRequestOptions
-  ) => Promise<BrowserBridgeFillInputResult>
+  ) => Promise<BrijioFillInputResult>
   requestWriteEditable?: (
     options: WriteEditableRequestOptions
-  ) => Promise<BrowserBridgeFillInputResult>
+  ) => Promise<BrijioFillInputResult>
   requestSetChecked?: (
     options: SetCheckedRequestOptions
-  ) => Promise<BrowserBridgeSetCheckedResult>
+  ) => Promise<BrijioSetCheckedResult>
   requestSelectOptions?: (
     options: SelectOptionsRequestOptions
-  ) => Promise<BrowserBridgeSelectOptionsResult>
+  ) => Promise<BrijioSelectOptionsResult>
   requestSubmitForm?: (
     options: SubmitFormRequestOptions
-  ) => Promise<BrowserBridgeSubmitFormResult>
+  ) => Promise<BrijioSubmitFormResult>
 }
 
 export async function clickCurrentPageElement (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   target: ClickElementTarget,
   browserInstanceId?: string
-): Promise<BrowserBridgeClickElementResult> {
+): Promise<BrijioClickElementResult> {
   const requestClickElement =
     config.requestClickElement ?? defaultRequestClickElement
 
@@ -66,11 +66,11 @@ export async function clickCurrentPageElement (
 }
 
 export async function fillCurrentPageInput (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   target: FillInputTarget,
   text: string,
   browserInstanceId?: string
-): Promise<BrowserBridgeFillInputResult> {
+): Promise<BrijioFillInputResult> {
   const requestFillInput = config.requestFillInput ?? defaultRequestFillInput
 
   return await requestFillInput({
@@ -84,11 +84,11 @@ export async function fillCurrentPageInput (
 }
 
 export async function fillCurrentPageEditable (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   target: EditableTarget,
   text: string,
   browserInstanceId?: string
-): Promise<BrowserBridgeFillInputResult> {
+): Promise<BrijioFillInputResult> {
   const requestWriteEditable =
     config.requestWriteEditable ?? defaultRequestWriteEditable
 
@@ -103,11 +103,11 @@ export async function fillCurrentPageEditable (
 }
 
 export async function setCurrentPageChecked (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   target: FillInputTarget,
   checked: boolean,
   browserInstanceId?: string
-): Promise<BrowserBridgeSetCheckedResult> {
+): Promise<BrijioSetCheckedResult> {
   const requestSetChecked =
     config.requestSetChecked ?? defaultRequestSetChecked
 
@@ -122,11 +122,11 @@ export async function setCurrentPageChecked (
 }
 
 export async function selectCurrentPageOptions (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   target: FillInputTarget,
   values: string[],
   browserInstanceId?: string
-): Promise<BrowserBridgeSelectOptionsResult> {
+): Promise<BrijioSelectOptionsResult> {
   const requestSelectOptions =
     config.requestSelectOptions ?? defaultRequestSelectOptions
 
@@ -141,10 +141,10 @@ export async function selectCurrentPageOptions (
 }
 
 export async function submitCurrentPageForm (
-  config: BrowserBridgePageActionsConfig,
+  config: BrijioPageActionsConfig,
   formId: string,
   browserInstanceId?: string
-): Promise<BrowserBridgeSubmitFormResult> {
+): Promise<BrijioSubmitFormResult> {
   const requestSubmitForm =
     config.requestSubmitForm ?? defaultRequestSubmitForm
 

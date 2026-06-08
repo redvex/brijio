@@ -4,20 +4,25 @@
 // Per ADR-0037: `npx @brijio/mcp` exposes the preferred `brijio` binary and
 // keeps `browserbridge` as a backwards-compatible alias for the transition window.
 //
-// Auto-generates BRIJIO_PAIRING_TOKEN and MCP_HTTP_AUTH_TOKEN when unset,
-// mirrors the pairing token to legacy BrowserBridge env vars for compatibility,
-// prints them to stdout at startup, and manages graceful shutdown on SIGINT/SIGTERM.
+// Supports daemon lifecycle commands (install, uninstall, start, stop, restart,
+// status, logs) and auto-generates BRIJIO_PAIRING_TOKEN / MCP_HTTP_AUTH_TOKEN
+// when unset, mirrors the pairing token to legacy BrowserBridge env vars for
+// compatibility, prints them to stdout at startup, and manages graceful
+// shutdown on SIGINT/SIGTERM.
 
 import { randomBytes } from 'node:crypto'
 import { basename } from 'node:path'
+// Static imports so tsup can bundle them. Server modules read process.env at
+// evaluation time, so we must configure env BEFORE these run — hence the
+// indirection through the main() function below.
+import { createWebSocketServer } from '@brijio/websocket/server'
+import {
+  getMcpHttpServerOptionsFromEnv,
+  startBrijioMcpHttpServer
+} from '../src/http-server.ts'
 
 const invokedAs = basename(process.argv[1] ?? 'brijio')
 const usingLegacyBinary = invokedAs === 'browserbridge'
-
-if (process.argv.includes('--help') || process.argv.includes('-h')) {
-  printHelp()
-  process.exit(0)
-}
 
 if (process.argv.includes('--version') || process.argv.includes('-v')) {
   const { readFileSync } = await import('node:fs')
@@ -35,31 +40,124 @@ if (usingLegacyBinary) {
   )
 }
 
-// ─── Register tsx for .ts imports (dev mode only) ───────────────────────────
-// In the published npm package, tsx is not a dependency and this registration
-// is skipped. When running from the monorepo, tsx allows importing .ts files.
+// ─── Load TypeScript daemon module ───────────────────────────────────────────
+// Daemon commands exit early, so dynamic import is fine — tsup externalises tsx.
+
+async function importDaemonModule () {
+  try {
+    const { tsImport } = await import('tsx/esm/api')
+    return await tsImport('../src/daemon.ts', import.meta.url)
+  } catch {
+    return await import('../src/daemon.ts')
+  }
+}
+
+const {
+  applyBrijioEnv,
+  formatStatus,
+  getDaemonLogs,
+  getDaemonStatus,
+  installDaemon,
+  loadBrijioEnv,
+  parseDaemonCommand,
+  restartDaemon,
+  startDaemon,
+  stopDaemon,
+  streamDaemonLogs,
+  uninstallDaemon,
+  usage
+} = await importDaemonModule()
+
+// ─── Dispatch daemon commands ─────────────────────────────────────────────────
 
 try {
-  const { register } = await import('node:module')
-  const { pathToFileURL } = await import('node:url')
-  register('tsx/esm', pathToFileURL(import.meta.url))
-} catch {
-  // tsx not available or registration failed — bundled JS doesn't need it
+  const command = parseDaemonCommand(process.argv.slice(2))
+
+  if (command.name === 'help') {
+    console.log(usage())
+    process.exit(0)
+  }
+
+  if (command.name === 'install') {
+    const plan = await installDaemon(command, { binaryUrl: import.meta.url })
+    console.log([
+      'Brijio daemon installed.',
+      '',
+      `Config: ${plan.envFilePath}`,
+      `Service: ${plan.linkPath}`,
+      '',
+      `Pairing Token:  ${plan.env.BRIJIO_PAIRING_TOKEN}`,
+      `MCP Auth Token: ${plan.env.MCP_HTTP_AUTH_TOKEN}`,
+      '',
+      'Save these tokens for your browser extension and MCP client configuration.'
+    ].join('\n'))
+    process.exit(0)
+  }
+
+  if (command.name === 'uninstall') {
+    const result = await uninstallDaemon()
+    console.log([
+      'Brijio daemon uninstalled.',
+      `Removed service link: ${result.linkPath}`,
+      `Preserved config and logs: ${result.configDir}`,
+      `To fully remove Brijio daemon data, run: rm -rf ${result.configDir}`
+    ].join('\n'))
+    process.exit(0)
+  }
+
+  if (command.name === 'start') {
+    const result = await startDaemon()
+    console.log(`Brijio daemon started: ${result.linkPath}`)
+    process.exit(0)
+  }
+
+  if (command.name === 'stop') {
+    const result = await stopDaemon()
+    console.log(`Brijio daemon stopped: ${result.linkPath}`)
+    process.exit(0)
+  }
+
+  if (command.name === 'restart') {
+    const result = await restartDaemon()
+    console.log(`Brijio daemon restarted: ${result.linkPath}`)
+    process.exit(0)
+  }
+
+  if (command.name === 'status') {
+    console.log(formatStatus(await getDaemonStatus()))
+    process.exit(0)
+  }
+
+  if (command.name === 'logs') {
+    if (command.live) {
+      process.exit(await streamDaemonLogs({ lines: command.lines }))
+    }
+
+    console.log(await getDaemonLogs({ lines: command.lines }))
+    process.exit(0)
+  }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error))
+  process.exit(1)
 }
+
+// ─── Interactive mode: apply env and start servers ────────────────────────────
+
+applyBrijioEnv(loadBrijioEnv())
 
 // ─── Auto-generate tokens if not set ─────────────────────────────────────────
 
 const pairingTokenProvided = !!(
   envValue('BRIJIO_PAIRING_TOKEN') ??
   envValue('BROWSERBRIDGE_PAIRING_TOKEN') ??
-  envValue('BROWSERBRIDGE_TOKEN')
+  envValue('BRIJIO_TOKEN')
 )
 
 const authTokenProvided = !!envValue('MCP_HTTP_AUTH_TOKEN')
 
 const configuredPairingToken = resolveRenamedEnv({
   newName: 'BRIJIO_PAIRING_TOKEN',
-  oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BROWSERBRIDGE_TOKEN'],
+  oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BRIJIO_TOKEN'],
   defaultValue: randomBytes(32).toString('base64url')
 })
 
@@ -71,14 +169,16 @@ if (!authTokenProvided) {
 }
 
 // ─── Set sensible defaults for local-single-machine use ──────────────────────
-// These MUST be set before importing server modules, because both the WebSocket
-// and MCP servers read from process.env at module-evaluation time.
+// These MUST be set before the server modules' side effects run. Because we use
+// static imports at the top, the modules are loaded but their top-level code
+// that reads process.env runs at import evaluation time — which happens in the
+// main() call below, after this env setup.
 
 process.env.WEBSOCKET_HOST ??= '0.0.0.0'
 process.env.WEBSOCKET_PORT ??= '8787'
 const configuredWsUrl = resolveRenamedEnv({
   newName: 'BRIJIO_WS_URL',
-  oldNames: ['BROWSERBRIDGE_WEBSOCKET_URL', 'BROWSERBRIDGE_WS_URL', 'WEBSOCKET_URL'],
+  oldNames: ['BROWSERBRIDGE_WEBSOCKET_URL', 'BRIJIO_WEBSOCKET_URL', 'WEBSOCKET_URL'],
   defaultValue: 'ws://127.0.0.1:8787'
 })
 process.env.BRIJIO_WS_URL = configuredWsUrl
@@ -94,18 +194,13 @@ const configuredTimeoutMs = resolveRenamedEnv({
 process.env.BRIJIO_REQUEST_TIMEOUT_MS = configuredTimeoutMs
 process.env.BROWSERBRIDGE_REQUEST_TIMEOUT_MS = configuredTimeoutMs
 
-// ─── Import and start servers ────────────────────────────────────────────────
-// Imports use the pnpm workspace package names. tsx handles .ts resolution.
-
-const { createWebSocketServer } = await import('@browserbridge/websocket/server')
-const {
-  getMcpHttpServerOptionsFromEnv,
-  startBrowserBridgeMcpHttpServer
-} = await import('../src/http-server.ts')
+// ─── Start servers ────────────────────────────────────────────────────────────
+// Server modules were imported statically at the top. Now that process.env is
+// fully configured, call their factory functions to actually start listening.
 
 const wsHost = process.env.WEBSOCKET_HOST
 const wsPort = Number(process.env.WEBSOCKET_PORT)
-const pairingToken = process.env.BROWSERBRIDGE_PAIRING_TOKEN
+const pairingToken = process.env.BRIJIO_PAIRING_TOKEN
 
 const wsServer = await createWebSocketServer({
   host: wsHost,
@@ -114,7 +209,7 @@ const wsServer = await createWebSocketServer({
 })
 
 const mcpOptions = getMcpHttpServerOptionsFromEnv()
-const mcpRuntime = await startBrowserBridgeMcpHttpServer(mcpOptions)
+const mcpRuntime = await startBrijioMcpHttpServer(mcpOptions)
 
 // ─── Startup banner ──────────────────────────────────────────────────────────
 
@@ -177,27 +272,7 @@ async function gracefulShutdown () {
 process.on('SIGINT', gracefulShutdown)
 process.on('SIGTERM', gracefulShutdown)
 
-function printHelp () {
-  console.log(`Brijio MCP runtime
-
-Usage:
-  brijio [--help] [--version]
-  browserbridge [--help] [--version]  # deprecated alias
-
-Starts the local Brijio WebSocket and MCP HTTP servers.
-
-Environment:
-  BRIJIO_PAIRING_TOKEN          Pairing token for browser extensions
-  BRIJIO_WS_URL                 WebSocket URL used by the MCP server
-  BRIJIO_REQUEST_TIMEOUT_MS     Browser request timeout in milliseconds
-  MCP_HTTP_AUTH_TOKEN           Bearer token for MCP HTTP transport
-
-Compatibility:
-  BROWSERBRIDGE_PAIRING_TOKEN, BROWSERBRIDGE_TOKEN,
-  BROWSERBRIDGE_WEBSOCKET_URL, BROWSERBRIDGE_WS_URL, WEBSOCKET_URL, and
-  BROWSERBRIDGE_REQUEST_TIMEOUT_MS are still accepted during the transition.
-`)
-}
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function resolveRenamedEnv ({ newName, oldNames, defaultValue }) {
   const newValue = envValue(newName)
@@ -216,7 +291,6 @@ function resolveRenamedEnv ({ newName, oldNames, defaultValue }) {
 
   for (const oldName of oldNames) {
     const oldValue = envValue(oldName)
-
     if (oldValue !== undefined) {
       return oldValue
     }

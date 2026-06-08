@@ -105,11 +105,11 @@ void describe('MCP page context resource helpers', () => {
     const config = getPageContextConfigFromEnv(
       {
         BRIJIO_WS_URL: 'ws://brijio.example:8787',
-        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://browserbridge.example:8787',
+        BROWSERBRIDGE_WEBSOCKET_URL: 'ws://legacy.example:8787',
         BRIJIO_PAIRING_TOKEN: 'new-token',
         BROWSERBRIDGE_PAIRING_TOKEN: 'old-token',
         BRIJIO_BROWSER_INSTANCE_ID: 'brijio-browser',
-        BROWSERBRIDGE_BROWSER_INSTANCE_ID: 'browserbridge-browser',
+        BROWSERBRIDGE_BROWSER_INSTANCE_ID: 'legacy-browser',
         BRIJIO_REQUEST_TIMEOUT_MS: '9000',
         BROWSERBRIDGE_REQUEST_TIMEOUT_MS: '1000'
       },

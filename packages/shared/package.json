@@ -1,5 +1,5 @@
 {
-  "name": "@browserbridge/shared",
+  "name": "@brijio/shared",
   "version": "0.1.0",
   "private": true,
   "description": "Shared Brijio protocol types, message schemas, and browser-agnostic logic.",

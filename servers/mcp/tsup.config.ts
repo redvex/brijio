@@ -3,16 +3,20 @@ import { copyFileSync, mkdirSync } from 'node:fs'
 
 export default defineConfig({
   entry: {
-    'bin/browserbridge': 'bin/browserbridge.mjs',
-    'http-server': 'src/http-server.ts'
+    'bin/brijio': 'bin/brijio.mjs'
   },
   format: ['esm'],
   target: 'node20',
   splitting: false,
-  // Bundle workspace deps into the output
+  // Bundle workspace deps and internal server modules into the single output
   noExternal: [
-    '@browserbridge/shared',
-    '@browserbridge/websocket'
+    '@brijio/shared',
+    '@brijio/websocket',
+    '../src/daemon.ts',
+    '../src/http-server.ts',
+    '../src/page-context.ts',
+    '../src/protocol.ts',
+    '../src/browser-list-tool.ts'
   ],
   // Keep npm deps and tsx runtime external
   external: [

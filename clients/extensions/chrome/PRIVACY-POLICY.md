@@ -51,4 +51,4 @@ If we change this policy, we will update the "Last updated" date above.
 ## Contact
 
 For questions about this privacy policy, open an issue at:
-https://github.com/redvex/browser-bridge/issues
+https://github.com/brijio/mcp/issues

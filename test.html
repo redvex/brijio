@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>BrowserBridge Form Test Page</title>
+    <title>Brijio Form Test Page</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -121,13 +121,13 @@
   </head>
   <body>
     <main>
-      <h1>BrowserBridge Form Test Page</h1>
+      <h1>Brijio Form Test Page</h1>
       <p class="intro">
-        Use this page to inspect BrowserBridge page context and test MCP
+        Use this page to inspect Brijio page context and test MCP
         `fill_input` against supported and unsupported form controls.
       </p>
 
-      <form id="browserbridge-test-form" action="#" method="post">
+      <form id="brijio-test-form" action="#" method="post">
         <fieldset>
           <legend>Supported text-writing controls</legend>
 
@@ -338,7 +338,7 @@
           </div>
         </fieldset>
 
-        <output id="event-log" for="browserbridge-test-form">
+        <output id="event-log" for="brijio-test-form">
           No input or change events yet.
         </output>
       </form>
@@ -346,7 +346,7 @@
 
     <script>
       const eventLog = document.querySelector("#event-log");
-      const form = document.querySelector("#browserbridge-test-form");
+      const form = document.querySelector("#brijio-test-form");
 
       form.addEventListener("submit", (event) => {
         event.preventDefault();

@@ -109,8 +109,8 @@ describe('repository tooling', () => {
       'Brijio MCP server for AI agent browser resources and tools.'
     )
     assert.deepEqual(packageJson.bin, {
-      brijio: 'dist/bin/browserbridge.js',
-      browserbridge: 'dist/bin/browserbridge.js'
+      brijio: 'dist/bin/brijio.js',
+      browserbridge: 'dist/bin/brijio.js'
     })
     assert.equal(
       packageJson.repository.url,

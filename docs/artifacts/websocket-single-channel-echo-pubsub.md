@@ -4,7 +4,7 @@
 
 `servers/websocket` now runs a local unauthenticated WebSocket server for the
 first approved transport milestone. It is a narrow echo and pub/sub server, not
-the final BrowserBridge session router.
+the final Brijio session router.
 
 ## Behavior
 
@@ -52,10 +52,10 @@ Unsupported envelopes return:
 
 ```sh
 pnpm install
-pnpm --filter @browserbridge/websocket dev
-pnpm --filter @browserbridge/websocket test
-pnpm --filter @browserbridge/websocket build
-pnpm --filter @browserbridge/websocket check
+pnpm --filter @brijio/websocket dev
+pnpm --filter @brijio/websocket test
+pnpm --filter @brijio/websocket build
+pnpm --filter @brijio/websocket check
 ```
 
 ## Environment
