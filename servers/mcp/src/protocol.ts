@@ -178,6 +178,7 @@ export type BrijioErrorCode =
   | 'stale_context'
   | 'page_navigated'
   | 'invalid_resource_uri'
+  | 'unsupported_scheme'
 
 export interface StaleContextDetail {
   id: string
@@ -257,6 +258,35 @@ export type ActionResultParseResult =
 export type BrowserListParseResult =
   | BrijioBrowserListResult
   | { ok: false, ignored: true }
+
+export interface NavigateToUrlResultData {
+  url: string
+  title: string
+  timestamp: string
+  redirected: boolean
+  navigationMs: number
+}
+
+export type BrijioNavigateToUrlResult =
+  BrijioResourceResult<NavigateToUrlResultData>
+
+export type NavigateToUrlParseResult =
+  | BrijioNavigateToUrlResult
+  | { ok: false, ignored: true }
+
+export function createNavigateToUrlEnvelope (
+  requestId: string,
+  url: string
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'navigate_to_url',
+      url
+    }
+  }
+}
 
 export function createGetPageContextEnvelope (
   requestId: string
@@ -531,6 +561,37 @@ export function parseBrowserListEnvelope (
   }
 }
 
+export function parseNavigateToUrlEnvelope (
+  value: unknown,
+  requestId: string
+): NavigateToUrlParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  if (value.payload.type !== 'navigate_to_url_response') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok === true) {
+    return parseNavigateToUrlSuccessPayload(value.payload)
+  }
+
+  if (value.payload.ok === false) {
+    return parseErrorPayload(value.payload, invalidResponse())
+  }
+
+  return invalidResponse()
+}
+
 export function parseRouterErrorEnvelope (
   value: unknown
 ): BrijioResourceResult<never> | { ok: false, ignored: true } {
@@ -677,6 +738,47 @@ function parseErrorPayload<T> (
       message: payload.error.message
     }
   }
+}
+
+export function unsupportedSchemeResponse (
+  scheme: string
+): BrijioResourceResult<never> {
+  return {
+    ok: false,
+    error: {
+      code: 'unsupported_scheme',
+      message: `URL scheme '${scheme}' is not supported. Only http and https are allowed.`
+    }
+  }
+}
+
+function parseNavigateToUrlSuccessPayload (
+  payload: Record<PropertyKey, unknown>
+): BrijioNavigateToUrlResult {
+  if (!isNavigateToUrlResultData(payload.data)) {
+    return invalidResponse()
+  }
+
+  return {
+    ok: true,
+    data: payload.data
+  }
+}
+
+export function isNavigateToUrlResultData (
+  value: unknown
+): value is NavigateToUrlResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    typeof value.url === 'string' &&
+    typeof value.title === 'string' &&
+    typeof value.timestamp === 'string' &&
+    typeof value.redirected === 'boolean' &&
+    typeof value.navigationMs === 'number'
+  )
 }
 
 export function invalidResponse (): BrijioResourceResult<never> {
@@ -913,7 +1015,8 @@ function isBrijioErrorCode (
     value === 'browser_error' ||
     value === 'stale_context' ||
     value === 'page_navigated' ||
-    value === 'invalid_resource_uri'
+    value === 'invalid_resource_uri' ||
+    value === 'unsupported_scheme'
   )
 }
 

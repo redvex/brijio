@@ -9,9 +9,13 @@ import {
   createSetCheckedEnvelope,
   createSubmitFormEnvelope,
   createWriteEditableEnvelope,
+  createNavigateToUrlEnvelope,
   parseActionResultEnvelope,
   parsePageContentEnvelope,
-  parsePageContextEnvelope
+  parsePageContextEnvelope,
+  parseNavigateToUrlEnvelope,
+  isNavigateToUrlResultData,
+  unsupportedSchemeResponse
 } from './protocol.js'
 
 void describe('MCP page context protocol helpers', () => {
@@ -679,3 +683,159 @@ function createRichPageContext (): unknown {
     }
   }
 }
+
+void describe('MCP navigate_to_url protocol helpers', () => {
+  void it('creates a navigate_to_url envelope with the request ID and url', () => {
+    assert.deepEqual(
+      createNavigateToUrlEnvelope('request-nav-1', 'https://example.com/'),
+      {
+        type: 'message',
+        id: 'request-nav-1',
+        payload: {
+          type: 'navigate_to_url',
+          url: 'https://example.com/'
+        }
+      }
+    )
+  })
+
+  void it('parses a successful matching navigate_to_url response', () => {
+    const result = parseNavigateToUrlEnvelope(
+      {
+        type: 'message',
+        id: 'nav-1',
+        payload: {
+          type: 'navigate_to_url_response',
+          ok: true,
+          data: {
+            url: 'https://example.com/',
+            title: 'Example Domain',
+            timestamp: '2026-06-08T10:00:00.000Z',
+            redirected: false,
+            navigationMs: 250
+          }
+        }
+      },
+      'nav-1'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        url: 'https://example.com/',
+        title: 'Example Domain',
+        timestamp: '2026-06-08T10:00:00.000Z',
+        redirected: false,
+        navigationMs: 250
+      }
+    })
+  })
+
+  void it('parses a matching navigate_to_url error response as browser_error', () => {
+    const result = parseNavigateToUrlEnvelope(
+      {
+        type: 'message',
+        id: 'nav-2',
+        payload: {
+          type: 'navigate_to_url_response',
+          ok: false,
+          error: {
+            code: 'navigation_failed',
+            message: 'DNS lookup failed.'
+          }
+        }
+      },
+      'nav-2'
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'browser_error',
+        message: 'DNS lookup failed.'
+      }
+    })
+  })
+
+  void it('ignores envelopes for a different request ID', () => {
+    const result = parseNavigateToUrlEnvelope(
+      {
+        type: 'message',
+        id: 'nav-3',
+        payload: {
+          type: 'navigate_to_url_response',
+          ok: true,
+          data: {
+            url: 'https://example.com/',
+            title: 'Example',
+            timestamp: '2026-06-08T10:00:00.000Z',
+            redirected: false,
+            navigationMs: 100
+          }
+        }
+      },
+      'nav-different'
+    )
+
+    assert.deepEqual(result, { ok: false, ignored: true })
+  })
+
+  void it('returns invalid_response for malformed navigate_to_url responses', () => {
+    const result = parseNavigateToUrlEnvelope(
+      {
+        type: 'message',
+        id: 'nav-4',
+        payload: {
+          type: 'navigate_to_url_response',
+          ok: true,
+          data: {
+            url: 'https://example.com/'
+          }
+        }
+      },
+      'nav-4'
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'invalid_response',
+        message: 'Received an invalid Brijio response.'
+      }
+    })
+  })
+
+  void it('validates navigate_to_url result data correctly', () => {
+    assert.equal(
+      isNavigateToUrlResultData({
+        url: 'https://example.com/',
+        title: 'Example',
+        timestamp: '2026-06-08T10:00:00.000Z',
+        redirected: false,
+        navigationMs: 250
+      }),
+      true
+    )
+  })
+
+  void it('rejects invalid navigate_to_url result data', () => {
+    assert.equal(
+      isNavigateToUrlResultData({
+        url: 'https://example.com/',
+        title: 'Example'
+      }),
+      false
+    )
+  })
+
+  void it('creates unsupported_scheme error response', () => {
+    const result = unsupportedSchemeResponse('ftp')
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'unsupported_scheme',
+        message: 'URL scheme \'ftp\' is not supported. Only http and https are allowed.'
+      }
+    })
+  })
+})
