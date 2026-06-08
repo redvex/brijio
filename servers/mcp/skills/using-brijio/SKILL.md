@@ -34,18 +34,18 @@ Skills are MCP resources. Read a skill's full instructions with
 skill://brijio/{skill_name}
 ```
 
-| Skill Name            | URI                                         | When to Use                                                     |
-| --------------------- | ------------------------------------------- | --------------------------------------------------------------- |
-| `using-brijio` | `skill://brijio/using-brijio` | Every session — orientation and tool reference                  |
-| `form-filling`        | `skill://brijio/form-filling`        | Any task involving filling out web forms                        |
-| `data-extraction`     | `skill://brijio/data-extraction`     | Any task involving extracting data from web pages               |
-| `web-qa`              | `skill://brijio/web-qa`              | Any task involving testing or verifying web app behavior        |
-| `navigation`          | `skill://brijio/navigation`          | Any task involving multi-step navigation or click-through flows |
-| `comparison`          | `skill://brijio/comparison`          | Comparing two pages or browser views side by side               |
-| `accessibility`       | `skill://brijio/accessibility`       | Auditing a page for accessibility issues                        |
-| `ecommerce`           | `skill://brijio/ecommerce`           | E-commerce checkout flows (cart, shipping, payment)             |
-| `onboarding`          | `skill://brijio/onboarding`          | New account registration and profile setup                      |
-| `monitoring`          | `skill://brijio/monitoring`          | Periodic page monitoring via cron jobs                          |
+| Skill Name        | URI                              | When to Use                                                     |
+| ----------------- | -------------------------------- | --------------------------------------------------------------- |
+| `using-brijio`    | `skill://brijio/using-brijio`    | Every session — orientation and tool reference                  |
+| `form-filling`    | `skill://brijio/form-filling`    | Any task involving filling out web forms                        |
+| `data-extraction` | `skill://brijio/data-extraction` | Any task involving extracting data from web pages               |
+| `web-qa`          | `skill://brijio/web-qa`          | Any task involving testing or verifying web app behavior        |
+| `navigation`      | `skill://brijio/navigation`      | Any task involving multi-step navigation or click-through flows |
+| `comparison`      | `skill://brijio/comparison`      | Comparing two pages or browser views side by side               |
+| `accessibility`   | `skill://brijio/accessibility`   | Auditing a page for accessibility issues                        |
+| `ecommerce`       | `skill://brijio/ecommerce`       | E-commerce checkout flows (cart, shipping, payment)             |
+| `onboarding`      | `skill://brijio/onboarding`      | New account registration and profile setup                      |
+| `monitoring`      | `skill://brijio/monitoring`      | Periodic page monitoring via cron jobs                          |
 
 ## Available Tools
 
@@ -102,15 +102,15 @@ subsequent tool calls.
 
 | User intent                                              | Skill to read                                        |
 | -------------------------------------------------------- | ---------------------------------------------------- |
-| "Fill in this form" / "Apply" / "Sign up"                | `skill://brijio/form-filling`                 |
-| "Get this data" / "Extract the table" / "Scrape"         | `skill://brijio/data-extraction`              |
-| "Test this page" / "Check if X works" / "Find bugs"      | `skill://brijio/web-qa`                       |
-| "Go to Settings → Privacy" / "Navigate to admin"         | `skill://brijio/navigation`                   |
-| "Compare staging vs prod" / "Check mobile vs desktop"    | `skill://brijio/comparison`                   |
-| "Check accessibility" / "Audit a11y" / "WCAG check"      | `skill://brijio/accessibility`                |
-| "Buy this" / "Checkout" / "Apply coupon"                 | `skill://brijio/ecommerce`                    |
-| "Sign up for X" / "Create account" / "Onboard"           | `skill://brijio/onboarding`                   |
-| "Monitor this page" / "Alert on changes" / "Price watch" | `skill://brijio/monitoring`                   |
+| "Fill in this form" / "Apply" / "Sign up"                | `skill://brijio/form-filling`                        |
+| "Get this data" / "Extract the table" / "Scrape"         | `skill://brijio/data-extraction`                     |
+| "Test this page" / "Check if X works" / "Find bugs"      | `skill://brijio/web-qa`                              |
+| "Go to Settings → Privacy" / "Navigate to admin"         | `skill://brijio/navigation`                          |
+| "Compare staging vs prod" / "Check mobile vs desktop"    | `skill://brijio/comparison`                          |
+| "Check accessibility" / "Audit a11y" / "WCAG check"      | `skill://brijio/accessibility`                       |
+| "Buy this" / "Checkout" / "Apply coupon"                 | `skill://brijio/ecommerce`                           |
+| "Sign up for X" / "Create account" / "Onboard"           | `skill://brijio/onboarding`                          |
+| "Monitor this page" / "Alert on changes" / "Price watch" | `skill://brijio/monitoring`                          |
 | Any other browser task                                   | Default to reading the page and using tools directly |
 
 ## Red Flags
