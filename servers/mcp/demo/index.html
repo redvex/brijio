@@ -908,7 +908,7 @@ a:hover { text-decoration: underline; }
 <dd><strong>watson@bakerstreet.uk</strong> — This is a fictional email address specified in the form prompt. It does not appear in the original text but is provided as a test for the <code>fill_input</code> tool's ability to handle email fields.</dd>
 
 <dt>Secret Passphrase</dt>
-<dd><strong>speckled band</strong> — The passphrase is given in the form prompt: "Enter the secret passphrase: <em>speckled band</em>." This tests the agent's ability to read the prompt text and enter the correct value in a password field.</dd>
+<dd><strong>speckled band</strong> — The passphrase is given in the form prompt: "Enter the public demo passphrase: <em>speckled band</em>." This tests the agent's ability to read prompt text and fill a normal text field without using real password controls.</dd>
 
 <dt>Income Amount (Dr. Roylott's annual income in pounds — number only)</dt>
 <dd><strong>750</strong> — Dr. Roylott's income is £750 per annum, as stated in the story and the financial details table. The field accepts a number only (no currency symbol).</dd>
@@ -1018,8 +1018,9 @@ a:hover { text-decoration: underline; }
 <label for="email-contact">Dr. Watson's fictional email (use watson@bakerstreet.uk)</label>
 <input id="email-contact" name="email_contact" type="email" placeholder="name@example.com">
 
-<label for="secret-passphrase">Enter the secret passphrase: <em>speckled band</em></label>
-<input id="secret-passphrase" name="secret_passphrase" type="password" placeholder="Enter passphrase">
+<label for="secret-passphrase">Enter the public demo passphrase: <em>speckled band</em></label>
+<input id="secret-passphrase" name="secret_passphrase" type="text" placeholder="Enter demo passphrase" autocomplete="off">
+<p class="note">This is intentionally a normal text field. Brijio does not fill real password controls.</p>
 
 <label for="story-search">Search for a detail in the story</label>
 <input id="story-search" name="story_search" type="search" placeholder="e.g. ventilator">
@@ -1206,12 +1207,8 @@ a:hover { text-decoration: underline; }
   }, 3000);
 })();
 
-// — Results display — self-verifying GET params —
-(function() {
-  var hash = window.location.hash;
-  if (hash !== '#results' && hash !== '#results/') return;
-
-  var params = new URLSearchParams(window.location.search);
+// — Results display — self-verifying form submission —
+function renderResults(params) {
   var resultsEl = document.getElementById('results-content');
 
   var answers = {
@@ -1222,7 +1219,7 @@ a:hover { text-decoration: underline; }
     death_year: { expected: /1881/, label: 'Year Julia died' },
     doctor_rank: { expected: /surgeon/i, label: 'Roylott\'s rank' },
     email_contact: { expected: /watson@bakerstreet\.uk/i, label: 'Email' },
-    secret_passphrase: { expected: /speckled band/i, label: 'Secret passphrase' },
+    secret_passphrase: { expected: /speckled band/i, label: 'Public demo passphrase' },
     income_amount: { expected: /^750$/, label: 'Income amount' },
     event_date: { expected: /1883-04/, label: 'Event date' },
     motive_explanation: { expected: /marry|income|mone|£|inherit/i, label: 'Motive explanation' },
@@ -1240,7 +1237,6 @@ a:hover { text-decoration: underline; }
     html += '<td class="' + (pass ? 'pass' : 'fail') + '">' + (pass ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
 
-  // Checkboxes
   var evidenceValues = params.getAll('evidence');
   var expectedEvidence = ['ventilator', 'saucer', 'safe'];
   for (var i = 0; i < expectedEvidence.length; i++) {
@@ -1249,7 +1245,7 @@ a:hover { text-decoration: underline; }
     html += '<tr><td>Evidence: ' + ev + '</td><td>' + (checked ? 'checked' : 'unchecked') + '</td>';
     html += '<td class="' + (checked ? 'pass' : 'fail') + '">' + (checked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
-  // Decoy checkboxes should NOT be checked
+
   var decoyEvidence = ['whistle', 'diary', 'medicine'];
   for (var j = 0; j < decoyEvidence.length; j++) {
     var dv = decoyEvidence[j];
@@ -1258,17 +1254,14 @@ a:hover { text-decoration: underline; }
     html += '<td class="' + (notChecked ? 'pass' : 'fail') + '">' + (notChecked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
 
-  // Radio: speckled_band
   var bandAnswer = params.get('speckled_band') || '';
   html += '<tr><td>What was the speckled band?</td><td>' + escapeHtml(bandAnswer) + '</td>';
   html += '<td class="' + (bandAnswer === 'snake' ? 'pass' : 'fail') + '">' + (bandAnswer === 'snake' ? '✅ Pass' : '❌ Fail') + '</td></tr>';
 
-  // Radio: whistle_time
   var timeAnswer = params.get('whistle_time') || '';
   html += '<tr><td>Time of whistle</td><td>' + escapeHtml(timeAnswer) + '</td>';
   html += '<td class="' + (timeAnswer === '3am' ? 'pass' : 'fail') + '">' + (timeAnswer === '3am' ? '✅ Pass' : '❌ Fail') + '</td></tr>';
 
-  // Multi-select: investigative_methods
   var methods = params.getAll('investigative_methods');
   var expectedMethods = ['observation', 'interview', 'stakeout', 'exterior'];
   for (var k = 0; k < expectedMethods.length; k++) {
@@ -1282,6 +1275,25 @@ a:hover { text-decoration: underline; }
   resultsEl.innerHTML = html;
   document.getElementById('results').style.display = 'block';
   document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+}
+
+function formParams() {
+  return new URLSearchParams(new FormData(document.getElementById('brijio-test-form')));
+}
+
+(function() {
+  var form = document.getElementById('brijio-test-form');
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+    var params = formParams();
+    var query = params.toString();
+    window.history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + '#results');
+    renderResults(params);
+  });
+
+  if (window.location.hash === '#results' || window.location.hash === '#results/') {
+    renderResults(new URLSearchParams(window.location.search));
+  }
 })();
 
 function escapeHtml(str) {
@@ -1308,7 +1320,7 @@ document.getElementById('btn-prefill').addEventListener('click', function() {
   document.getElementById('story-search').value = 'ventilator';
   document.getElementById('income-amount').value = '750';
   document.getElementById('event-date').value = '1883-04-06';
-  document.getElementById('motive-explanation').value = 'Dr. Roylott would lose £250 per year for each daughter who married. With both daughters married, his income would drop from £750 to £250.";
+  document.getElementById('motive-explanation').value = 'Dr. Roylott would lose £250 per year for each daughter who married. With both daughters married, his income would drop from £750 to £250.';
   document.getElementById('content-editable-area').textContent = 'The ventilator allowed the snake to pass from Dr. Roylott\'s room into Helen\'s bedroom. The bell-rope served as a bridge for the snake to descend onto the bed.';
   document.getElementById('chk-ventilator').checked = true;
   document.getElementById('chk-saucer').checked = true;

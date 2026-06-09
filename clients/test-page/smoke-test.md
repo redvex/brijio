@@ -27,7 +27,7 @@ Run these steps manually after starting `brijio demo`.
 - [ ] Fill `death_year` with "1881"
 - [ ] Fill `doctor_rank` with "surgeon"
 - [ ] Fill `email_contact` with "watson@bakerstreet.uk"
-- [ ] Fill `secret_passphrase` with "speckled band"
+- [ ] Fill `secret_passphrase` with "speckled band" (public demo text field; not a password control)
 - [ ] Fill `income_amount` with "750"
 - [ ] Fill `motive_explanation` with free-text answer mentioning financial motive
 - [ ] All filled values persist and are visible on the page
