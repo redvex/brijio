@@ -56,20 +56,20 @@ The `[agent]` positional argument selects the output format for a specific agent
 
 Supported agents:
 
-| Agent | `--print-config <agent>` | Config location / method |
-|-------|--------------------------|---------------------------|
+| Agent            | `--print-config <agent>`        | Config location / method                                          |
+| ---------------- | ------------------------------- | ----------------------------------------------------------------- |
 | `claude-desktop` | `--print-config claude-desktop` | `~/Library/Application Support/Claude/claude_desktop_config.json` |
-| `cursor` | `--print-config cursor` | `.cursor/mcp.json` or `~/.cursor/mcp.json` |
-| `vscode` | `--print-config vscode` | `.vscode/mcp.json` |
-| `cline` | `--print-config cline` | Cline settings UI |
-| `codex` | `--print-config codex` | `codex mcp add` shell command |
-| `hermes` | `--print-config hermes` | `~/.hermes/config.yaml` |
-| `claude-code` | `--print-config claude-code` | `claude mcp add` shell command |
-| `gemini` | `--print-config gemini` | `gemini mcp add` shell command |
-| `windsurf` | `--print-config windsurf` | `~/.codeium/windsurf/mcp_config.json` |
-| `zed` | `--print-config zed` | `.zed/settings.json` `context_servers` key |
-| `continue` | `--print-config continue` | `.continue/mcpServers/` YAML file |
-| `goose` | `--print-config goose` | `~/.config/goose/config.yaml` `extensions` key |
+| `cursor`         | `--print-config cursor`         | `.cursor/mcp.json` or `~/.cursor/mcp.json`                        |
+| `vscode`         | `--print-config vscode`         | `.vscode/mcp.json`                                                |
+| `cline`          | `--print-config cline`          | Cline settings UI                                                 |
+| `codex`          | `--print-config codex`          | `codex mcp add` shell command                                     |
+| `hermes`         | `--print-config hermes`         | `~/.hermes/config.yaml`                                           |
+| `claude-code`    | `--print-config claude-code`    | `claude mcp add` shell command                                    |
+| `gemini`         | `--print-config gemini`         | `gemini mcp add` shell command                                    |
+| `windsurf`       | `--print-config windsurf`       | `~/.codeium/windsurf/mcp_config.json`                             |
+| `zed`            | `--print-config zed`            | `.zed/settings.json` `context_servers` key                        |
+| `continue`       | `--print-config continue`       | `.continue/mcpServers/` YAML file                                 |
+| `goose`          | `--print-config goose`          | `~/.config/goose/config.yaml` `extensions` key                    |
 
 Aliases are accepted: `claude` → `claude-desktop`, `cur` → `cursor`, `vs` → `vscode`, `code` → `claude-code`.
 
@@ -257,10 +257,10 @@ Goose only supports `stdio` extensions (local subprocesses), not remote HTTP MCP
 
 ```
 ⚠  Goose only supports stdio-based MCP servers. Brijio runs as an HTTP server.
-   
+
    No direct configuration is possible. If Goose adds HTTP transport support,
    this output will be updated to provide a working config.
-   
+
    In the meantime, you can use a stdio-to-HTTP bridge (e.g. mcp-proxy)
    as a manual workaround — see https://github.com/nicholasgasior/mcp-proxy
 ```
@@ -299,15 +299,15 @@ Without `--dev`, the binary uses the full config pipeline (env vars, `.env` file
 
 Checks:
 
-| Check | What it validates |
-|-------|-------------------|
-| **Config load** | At least one of `$BRIJIO_ENV_FILE`, `$CWD/.env`, `~/.brijio/.env` exists and is parseable. |
-| **Tokens present** | `BRIJIO_PAIRING_TOKEN` and `MCP_HTTP_AUTH_TOKEN` are set (from env or `.env`). Fail if empty or placeholder (`replace-with-*`). |
-| **Ports free** | Ports 8787 and 8788 (or configured ports) are not already bound. Uses a brief `net.createServer` probe on each port. |
-| **WS reachable** | If a WS server is already running on the configured port, attempt a brief WebSocket handshake to confirm it responds. |
-| **MCP reachable** | If an MCP server is already running, `GET /health` on the configured port/path returns `{ "status": "ok" }`. |
-| **Extension connected** | If the WS server is reachable, `GET /health` on the WS port checks `extensions.count > 0`. |
-| **Network detection** | Detects Tailscale and/or mDNS availability. Checks: (1) `tailscale status --json` exits 0 → Tailscale is running; extract `TailscaleIPs[0]` as reachable address. (2) `os.networkInterfaces()` contains a `100.x.x.x` address → Tailscale IP available even if `tailscale` CLI not in PATH. (3) `dns.resolve('<hostname>.local')` succeeds → mDNS reachable on LAN. Prints detected addresses for use in `--print-config` URLs. |
+| Check                   | What it validates                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Config load**         | At least one of `$BRIJIO_ENV_FILE`, `$CWD/.env`, `~/.brijio/.env` exists and is parseable.                                                                                                                                                                                                                                                                                                                                      |
+| **Tokens present**      | `BRIJIO_PAIRING_TOKEN` and `MCP_HTTP_AUTH_TOKEN` are set (from env or `.env`). Fail if empty or placeholder (`replace-with-*`).                                                                                                                                                                                                                                                                                                 |
+| **Ports free**          | Ports 8787 and 8788 (or configured ports) are not already bound. Uses a brief `net.createServer` probe on each port.                                                                                                                                                                                                                                                                                                            |
+| **WS reachable**        | If a WS server is already running on the configured port, attempt a brief WebSocket handshake to confirm it responds.                                                                                                                                                                                                                                                                                                           |
+| **MCP reachable**       | If an MCP server is already running, `GET /health` on the configured port/path returns `{ "status": "ok" }`.                                                                                                                                                                                                                                                                                                                    |
+| **Extension connected** | If the WS server is reachable, `GET /health` on the WS port checks `extensions.count > 0`.                                                                                                                                                                                                                                                                                                                                      |
+| **Network detection**   | Detects Tailscale and/or mDNS availability. Checks: (1) `tailscale status --json` exits 0 → Tailscale is running; extract `TailscaleIPs[0]` as reachable address. (2) `os.networkInterfaces()` contains a `100.x.x.x` address → Tailscale IP available even if `tailscale` CLI not in PATH. (3) `dns.resolve('<hostname>.local')` succeeds → mDNS reachable on LAN. Prints detected addresses for use in `--print-config` URLs. |
 
 Output format:
 
@@ -358,7 +358,7 @@ The test lives in `servers/mcp/tests/banner-test.mjs` and runs as part of `pnpm 
 
 The runtime probes three network signals on startup and in `--doctor`:
 
-1. **Tailscale CLI** — Run `tailscale status --json` (2-second timeout). If it exits 0, parse the JSON and extract `TailscaleIPs[0]` (the `100.x.x.x` address). This is the most reliable signal: it confirms Tailscale is running *and* authenticated.
+1. **Tailscale CLI** — Run `tailscale status --json` (2-second timeout). If it exits 0, parse the JSON and extract `TailscaleIPs[0]` (the `100.x.x.x` address). This is the most reliable signal: it confirms Tailscale is running _and_ authenticated.
 
 2. **Tailscale interface fallback** — If the CLI is not in PATH but `os.networkInterfaces()` contains a `100.64.0.0/10` address, the machine has a Tailscale IP. Use this address but don't assume Tailscale is fully connected (could be in a partial state).
 
@@ -366,13 +366,13 @@ The runtime probes three network signals on startup and in `--doctor`:
 
 #### URL priority in `--print-config`
 
-| Condition | URL printed in config | URL in startup banner |
-|-----------|---------------------|----------------------|
-| `--dev` mode | `http://127.0.0.1:8788/mcp` | `ws://127.0.0.1:8787` / `http://127.0.0.1:8788/mcp` |
-| Tailscale detected | `http://100.x.x.x:8788/mcp` | `ws://100.x.x.x:8787` / `http://100.x.x.x:8788/mcp` |
-| mDNS detected (no Tailscale) | `http://<hostname>.local:8788/mcp` | Same |
-| Neither | `http://127.0.0.1:8788/mcp` | Same |
-| `MCP_HTTP_HOST` env var set | Uses that host (user override) | Uses that host |
+| Condition                    | URL printed in config              | URL in startup banner                               |
+| ---------------------------- | ---------------------------------- | --------------------------------------------------- |
+| `--dev` mode                 | `http://127.0.0.1:8788/mcp`        | `ws://127.0.0.1:8787` / `http://127.0.0.1:8788/mcp` |
+| Tailscale detected           | `http://100.x.x.x:8788/mcp`        | `ws://100.x.x.x:8787` / `http://100.x.x.x:8788/mcp` |
+| mDNS detected (no Tailscale) | `http://<hostname>.local:8788/mcp` | Same                                                |
+| Neither                      | `http://127.0.0.1:8788/mcp`        | Same                                                |
+| `MCP_HTTP_HOST` env var set  | Uses that host (user override)     | Uses that host                                      |
 
 When multiple paths are available (Tailscale + mDNS + localhost), the banner lists all reachable addresses. `--print-config <agent>` uses the best address (Tailscale > mDNS > localhost) but the config is still copy-pasteable — the user can edit the URL after paste.
 
@@ -399,7 +399,7 @@ Next steps:
 
 #### Why not just use `0.0.0.0`?
 
-Binding to `0.0.0.0` (the current default) listens on all interfaces but doesn't tell the user *which* address to use. Detection prints the specific reachable addresses so the user can pick the right one for their network topology. `--dev` overrides this to `127.0.0.1` only.
+Binding to `0.0.0.0` (the current default) listens on all interfaces but doesn't tell the user _which_ address to use. Detection prints the specific reachable addresses so the user can pick the right one for their network topology. `--dev` overrides this to `127.0.0.1` only.
 
 ## Mermaid diagram
 

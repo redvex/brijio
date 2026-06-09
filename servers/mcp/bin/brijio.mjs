@@ -3,6 +3,7 @@
 // Combined entry point for Brijio — starts both WebSocket and MCP servers.
 // Per ADR-0037: `npx @brijio/mcp` exposes the preferred `brijio` binary and
 // keeps `browserbridge` as a backwards-compatible alias for the transition window.
+// Per ADR-0038: --print-config, --doctor, --dev, and startup banner polish.
 //
 // Supports daemon lifecycle commands (install, uninstall, start, stop, restart,
 // status, logs) and auto-generates BRIJIO_PAIRING_TOKEN / MCP_HTTP_AUTH_TOKEN
@@ -12,14 +13,11 @@
 
 import { randomBytes } from 'node:crypto'
 import { basename } from 'node:path'
-// Static imports so tsup can bundle them. Server modules read process.env at
-// evaluation time, so we must configure env BEFORE these run — hence the
-// indirection through the main() function below.
-import { createWebSocketServer } from '@brijio/websocket/server'
-import {
-  getMcpHttpServerOptionsFromEnv,
-  startBrijioMcpHttpServer
-} from '../src/http-server.ts'
+import * as readline from 'node:readline'
+// Server modules read process.env at evaluation time, so they MUST be imported
+// AFTER env setup and ONLY when actually starting servers (run mode).
+// Using dynamic imports prevents ERR_MODULE_NOT_FOUND for --doctor / --print-config
+// which exit early and never need the server stack.
 
 const invokedAs = basename(process.argv[1] ?? 'brijio')
 const usingLegacyBinary = invokedAs === 'browserbridge'
@@ -43,14 +41,26 @@ if (usingLegacyBinary) {
 // ─── Load TypeScript daemon module ───────────────────────────────────────────
 // Daemon commands exit early, so dynamic import is fine — tsup externalises tsx.
 
-async function importDaemonModule () {
+async function importModule (path) {
   try {
     const { tsImport } = await import('tsx/esm/api')
-    return await tsImport('../src/daemon.ts', import.meta.url)
+    return await tsImport(path, import.meta.url)
   } catch {
-    return await import('../src/daemon.ts')
+    return await import(path)
   }
 }
+
+const [
+  daemonModule,
+  printConfigModule,
+  doctorModule,
+  startupBannerModule
+] = await Promise.all([
+  importModule('../src/daemon.ts'),
+  importModule('../src/print-config.ts'),
+  importModule('../src/doctor.ts'),
+  importModule('../src/startup-banner.ts')
+])
 
 const {
   applyBrijioEnv,
@@ -66,15 +76,62 @@ const {
   streamDaemonLogs,
   uninstallDaemon,
   usage
-} = await importDaemonModule()
+} = daemonModule
 
-// ─── Dispatch daemon commands ─────────────────────────────────────────────────
+const {
+  formatConfig,
+  formatInteractivePrompt,
+  formatDefaultJson,
+  resolveAgentName
+} = printConfigModule
+
+const { runDoctorChecks, formatDoctorReport } = doctorModule
+const { formatStartupBanner } = startupBannerModule
+
+// ─── Apply env early for --print-config / --doctor ───────────────────────────
+// These commands need token values but don't start servers.
+
+const loadedEnv = loadBrijioEnv()
+applyBrijioEnv(loadedEnv)
+
+const pairingTokenProvided = !!(
+  envValue('BRIJIO_PAIRING_TOKEN') ??
+  envValue('BROWSERBRIDGE_PAIRING_TOKEN') ??
+  envValue('BRIJIO_TOKEN')
+)
+
+const authTokenProvided = !!envValue('MCP_HTTP_AUTH_TOKEN')
+
+const configuredPairingToken = resolveRenamedEnv({
+  newName: 'BRIJIO_PAIRING_TOKEN',
+  oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BRIJIO_TOKEN'],
+  defaultValue: randomBytes(32).toString('base64url')
+})
+
+process.env.BRIJIO_PAIRING_TOKEN = configuredPairingToken
+process.env.BROWSERBRIDGE_PAIRING_TOKEN = configuredPairingToken
+
+if (!authTokenProvided) {
+  process.env.MCP_HTTP_AUTH_TOKEN = randomBytes(32).toString('base64url')
+}
+
+// ─── Parse command line ──────────────────────────────────────────────────────
 
 try {
   const command = parseDaemonCommand(process.argv.slice(2))
 
   if (command.name === 'help') {
     console.log(usage())
+    process.exit(0)
+  }
+
+  if (command.name === 'print-config') {
+    await handlePrintConfig(command)
+    process.exit(0)
+  }
+
+  if (command.name === 'doctor') {
+    await handleDoctor(loadedEnv.path)
     process.exit(0)
   }
 
@@ -136,36 +193,15 @@ try {
     console.log(await getDaemonLogs({ lines: command.lines }))
     process.exit(0)
   }
+
+  // ─── Dev mode: set env vars for 127.0.0.1 binding ──────────────────────────
+  if (command.name === 'run' && command.dev) {
+    process.env.WEBSOCKET_HOST = '127.0.0.1'
+    process.env.MCP_HTTP_HOST = '127.0.0.1'
+  }
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error))
   process.exit(1)
-}
-
-// ─── Interactive mode: apply env and start servers ────────────────────────────
-
-applyBrijioEnv(loadBrijioEnv())
-
-// ─── Auto-generate tokens if not set ─────────────────────────────────────────
-
-const pairingTokenProvided = !!(
-  envValue('BRIJIO_PAIRING_TOKEN') ??
-  envValue('BROWSERBRIDGE_PAIRING_TOKEN') ??
-  envValue('BRIJIO_TOKEN')
-)
-
-const authTokenProvided = !!envValue('MCP_HTTP_AUTH_TOKEN')
-
-const configuredPairingToken = resolveRenamedEnv({
-  newName: 'BRIJIO_PAIRING_TOKEN',
-  oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BRIJIO_TOKEN'],
-  defaultValue: randomBytes(32).toString('base64url')
-})
-
-process.env.BRIJIO_PAIRING_TOKEN = configuredPairingToken
-process.env.BROWSERBRIDGE_PAIRING_TOKEN = configuredPairingToken
-
-if (!authTokenProvided) {
-  process.env.MCP_HTTP_AUTH_TOKEN = randomBytes(32).toString('base64url')
 }
 
 // ─── Set sensible defaults for local-single-machine use ──────────────────────
@@ -195,57 +231,64 @@ process.env.BRIJIO_REQUEST_TIMEOUT_MS = configuredTimeoutMs
 process.env.BROWSERBRIDGE_REQUEST_TIMEOUT_MS = configuredTimeoutMs
 
 // ─── Start servers ────────────────────────────────────────────────────────────
-// Server modules were imported statically at the top. Now that process.env is
-// fully configured, call their factory functions to actually start listening.
+// Server modules are imported dynamically ONLY in run mode. This ensures
+// --doctor and --print-config never trigger the full server module cascade.
 
 const wsHost = process.env.WEBSOCKET_HOST
 const wsPort = Number(process.env.WEBSOCKET_PORT)
 const pairingToken = process.env.BRIJIO_PAIRING_TOKEN
 
-const wsServer = await createWebSocketServer({
-  host: wsHost,
-  port: wsPort,
-  pairingToken
-})
+let wsServer
+let mcpRuntime
 
-const mcpOptions = getMcpHttpServerOptionsFromEnv()
-const mcpRuntime = await startBrijioMcpHttpServer(mcpOptions)
+try {
+  const { createWebSocketServer } = await importModule('@brijio/websocket/server')
+  const { getMcpHttpServerOptionsFromEnv, startBrijioMcpHttpServer } = await importModule('../src/http-server.ts')
 
-// ─── Startup banner ──────────────────────────────────────────────────────────
+  wsServer = await createWebSocketServer({
+    host: wsHost,
+    port: wsPort,
+    pairingToken
+  })
 
-const displayWsHost = wsHost === '0.0.0.0' ? 'localhost' : wsHost
-const displayMcpHost = mcpOptions.host === '0.0.0.0' ? 'localhost' : mcpOptions.host
-
-const pairingLabel = pairingTokenProvided ? '' : '  [auto-generated]'
-const authLabel = authTokenProvided ? '' : '  [auto-generated]'
-
-const lines = [
-  '',
-  '🚀 Brijio ready!',
-  '',
-  `  WebSocket:    ws://${displayWsHost}:${wsPort}`,
-  `  MCP:         http://${displayMcpHost}:${mcpOptions.port}${mcpOptions.path}`,
-  '',
-  `  Pairing Token:    ${process.env.BRIJIO_PAIRING_TOKEN}${pairingLabel}`,
-  `  MCP Auth Token:   ${process.env.MCP_HTTP_AUTH_TOKEN}${authLabel}`
-]
-
-if (!pairingTokenProvided || !authTokenProvided) {
-  lines.push(
-    '',
-    '  ⚠  Auto-generated tokens change on restart. Set BRIJIO_PAIRING_TOKEN and',
-    '    MCP_HTTP_AUTH_TOKEN environment variables for persistent tokens.'
-  )
+  const mcpOptions = getMcpHttpServerOptionsFromEnv()
+  mcpRuntime = await startBrijioMcpHttpServer(mcpOptions)
+} catch (error) {
+  if (error instanceof Error && 'code' in error && error.code === 'EADDRINUSE') {
+    const port = 'port' in error && typeof error.port === 'number' ? error.port : wsPort
+    console.error([
+      '',
+      `❌ Brijio failed to start: port ${port} is already in use.`,
+      '',
+      '  Another process is using that port. You can:',
+      '',
+      '  • Run `brijio --doctor` to diagnose port conflicts',
+      '  • Set WEBSOCKET_PORT or MCP_HTTP_PORT to use a different port',
+      '  • Stop the conflicting process and try again',
+      ''
+    ].join('\n'))
+    process.exit(1)
+  }
+  throw error
 }
 
-lines.push(
-  '',
-  '  Connect your browser extension using the Pairing Token above.',
-  '  Configure your MCP client with the MCP URL and Auth Token.',
-  ''
-)
+// ─── Startup banner (ADR-0038: goes to stderr) ─────────────────────────────
 
-console.log(lines.join('\n'))
+const command = parseDaemonCommand(process.argv.slice(2))
+const isDev = command.name === 'run' && command.dev === true
+
+const banner = await formatStartupBanner({
+  wsPort,
+  mcpPort: Number(process.env.MCP_HTTP_PORT),
+  mcpPath: process.env.MCP_HTTP_PATH ?? '/mcp',
+  pairingToken: process.env.BRIJIO_PAIRING_TOKEN ?? '',
+  authToken: process.env.MCP_HTTP_AUTH_TOKEN ?? '',
+  pairingTokenProvided,
+  authTokenProvided,
+  dev: isDev
+})
+
+process.stderr.write(banner + '\n')
 
 // ─── Graceful shutdown ───────────────────────────────────────────────────────
 
@@ -271,6 +314,111 @@ async function gracefulShutdown () {
 
 process.on('SIGINT', gracefulShutdown)
 process.on('SIGTERM', gracefulShutdown)
+
+// ─── --print-config handler ──────────────────────────────────────────────────
+
+async function handlePrintConfig (command) {
+  const wsPort = Number(process.env.WEBSOCKET_PORT ?? '8787')
+  const mcpPort = Number(process.env.MCP_HTTP_PORT ?? '8788')
+  const mcpPath = process.env.MCP_HTTP_PATH ?? '/mcp'
+  const authToken = process.env.MCP_HTTP_AUTH_TOKEN ?? ''
+  const isDev = command.dev === true
+
+  // In dev mode, force localhost
+  let mcpHost = '127.0.0.1'
+  if (!isDev) {
+    try {
+      const { detectNetworkPaths } = await importModule('../src/network.ts')
+      const networkPaths = await detectNetworkPaths()
+      mcpHost = networkPaths.bestHost
+    } catch {
+      // fallback to localhost
+    }
+  }
+
+  const mcpUrl = `http://${mcpHost}:${mcpPort}${mcpPath}`
+  const wsUrl = `ws://${mcpHost}:${wsPort}`
+  const authTokenEnvVar = 'MCP_HTTP_AUTH_TOKEN'
+  const isEphemeral = !authTokenProvided
+
+  if (command.agent) {
+    // Agent specified directly — resolve and format
+    const canonical = resolveAgentName(command.agent)
+    if (canonical == null) {
+      console.error(`Unknown agent: "${command.agent}". Run "brijio --print-config" to see available agents.`)
+      process.exit(1)
+    }
+    const output = formatConfig(canonical, {
+      mcpUrl,
+      wsUrl,
+      authToken,
+      authTokenEnvVar,
+      isEphemeral,
+      isDev
+    })
+    process.stderr.write(output.stderr + '\n')
+    process.stdout.write(output.stdout + '\n')
+    return
+  }
+
+  // No agent specified — check if TTY for interactive prompt
+  if (process.stdin.isTTY) {
+    process.stderr.write(formatInteractivePrompt())
+    const answer = await readLineFromStdin()
+    const canonical = resolveAgentName(answer.trim())
+    if (canonical == null) {
+      console.error(`Unknown agent: "${answer.trim()}". Run "brijio --print-config" to see available agents.`)
+      process.exit(1)
+    }
+    const output = formatConfig(canonical, {
+      mcpUrl,
+      wsUrl,
+      authToken,
+      authTokenEnvVar,
+      isEphemeral,
+      isDev
+    })
+    process.stderr.write('\n' + output.stderr + '\n')
+    process.stdout.write(output.stdout + '\n')
+    return
+  }
+
+  // Not TTY — fall back to default JSON
+  const output = formatDefaultJson({
+    mcpUrl,
+    wsUrl,
+    authToken,
+    authTokenEnvVar,
+    isEphemeral,
+    isDev
+  })
+  process.stderr.write(output.stderr + '\n')
+  process.stdout.write(output.stdout + '\n')
+}
+
+function readLineFromStdin () {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stderr })
+    rl.question('', (answer) => {
+      rl.close()
+      resolve(answer)
+    })
+  })
+}
+
+// ─── --doctor handler ────────────────────────────────────────────────────────
+
+/** @param {string} [configPath] */
+async function handleDoctor (configPath) {
+  const mcpPort = Number(process.env.MCP_HTTP_PORT ?? '8788')
+  const wsPort = Number(process.env.WEBSOCKET_PORT ?? '8787')
+
+  const results = await runDoctorChecks({ mcpPort, wsPort, configPath })
+  console.log(formatDoctorReport(results))
+
+  const hasFailures = results.some(r => r.status === 'fail')
+  process.exit(hasFailures ? 1 : 0)
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
