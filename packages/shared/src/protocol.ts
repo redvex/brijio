@@ -22,6 +22,7 @@ export type BrowserCapability =
   | 'set_checked'
   | 'select_options'
   | 'submit_form'
+  | 'navigate'
 
 export interface BrowserPresence {
   browserInstanceId: string
@@ -852,7 +853,8 @@ function isBrowserCapability (value: unknown): value is BrowserCapability {
     value === 'fill_editable' ||
     value === 'set_checked' ||
     value === 'select_options' ||
-    value === 'submit_form'
+    value === 'submit_form' ||
+    value === 'navigate'
   )
 }
 

@@ -1377,7 +1377,8 @@ function createPresencePayload (): unknown {
       'fill_editable',
       'set_checked',
       'select_options',
-      'submit_form'
+      'submit_form',
+      'navigate'
     ]
   }
 }
