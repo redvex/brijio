@@ -21,7 +21,9 @@ body { margin: 0; background: Canvas; color: CanvasText; }
 .layout { display: flex; gap: 24px; align-items: flex-start; padding: 16px 20px; max-width: 1600px; margin: 0 auto; }
 .left-col { width: var(--left-width); min-width: 0; }
 .right-col { width: var(--right-width); min-width: 0; position: sticky; top: 16px; align-self: flex-start; max-height: 100vh; overflow-y: auto; }
-.left-col h1 { position: sticky; top: 0; z-index: 10; background: Canvas; padding: 12px 0 8px; margin: 0 0 16px; border-bottom: 2px solid var(--accent); }
+.sticky-page-header { position: sticky; top: 0; z-index: 10; background: Canvas; padding: 12px 0 8px; margin: 0 0 16px; border-bottom: 2px solid var(--accent); }
+.sticky-page-header h1 { margin: 0 0 10px; }
+.sticky-page-header .nav-links { padding-bottom: 4px; }
 h1, h2, h3 { line-height: 1.2; }
 .intro { max-width: 720px; }
 form { display: grid; gap: 24px; }
@@ -65,7 +67,16 @@ a:hover { text-decoration: underline; }
 <body>
 <div class="layout">
 <div class="left-col">
+<header class="sticky-page-header">
 <h1>Brijio Demo Page</h1>
+<nav class="nav-links" aria-label="Page sections">
+<a href="#story">Story</a>
+<a href="#table-data">Tables</a>
+<a href="#form">Form</a>
+<a href="#dynamic">Dynamic Content</a>
+<a href="#results">Results</a>
+</nav>
+</header>
 <p class="intro">This page verifies the full Brijio stack: browser extension, WebSocket server, and MCP tools. It follows a <strong>read and respond</strong> pattern — read the passage below, then fill in the form. Every answer can be determined from the text.</p>
 
 <section id="story" class="passage">
