@@ -254,8 +254,10 @@ const demoPort = getDemoPortFromEnv()
 let demoServerRuntime = null
 
 if (isDemo) {
-  const demoHost = process.env.WEBSOCKET_HOST ?? '127.0.0.1'
-  demoServerRuntime = await startDemoServer({ host: demoHost, port: demoPort })
+  // Demo server must bind to 0.0.0.0 to be reachable via Tailscale/lan.
+  // The WS and MCP hosts are set to 127.0.0.1 above for security, but
+  // the static demo page has no auth concerns — serve on all interfaces.
+  demoServerRuntime = await startDemoServer({ host: '0.0.0.0', port: demoPort })
 }
 
 // ─── Start servers ────────────────────────────────────────────────────────────
