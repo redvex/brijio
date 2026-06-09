@@ -264,7 +264,16 @@ function handleExtensionMessage (
     return
   }
 
-  logger.warn('invalid_message', { role: state.role, messageType: (message.payload as Record<string, unknown>)?.type })
+  const payload = message.payload as Record<string, unknown>
+  const missing: string[] = []
+  if (payload.type === 'browser_presence_announce') {
+    if (typeof payload.browserInstanceId !== 'string' || payload.browserInstanceId.length === 0) missing.push('browserInstanceId')
+    if (typeof payload.label !== 'string' || payload.label.length === 0) missing.push('label')
+    if (typeof payload.browserName !== 'string' || payload.browserName.length === 0) missing.push('browserName')
+    if (typeof payload.profileName !== 'string' || payload.profileName.length === 0) missing.push('profileName')
+    if (!Array.isArray(payload.capabilities)) missing.push('capabilities')
+  }
+  logger.warn('invalid_message', { role: state.role, messageType: payload.type as string, missingFields: missing, payload })
   sendJson(
     socket,
     createErrorEnvelope(
