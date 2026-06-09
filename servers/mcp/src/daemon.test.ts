@@ -69,8 +69,65 @@ void describe('daemon command parsing', () => {
   void it('leaves interactive server args untouched', () => {
     assert.deepEqual(parseDaemonCommand(['--port', '8788']), {
       name: 'run',
-      args: ['--port', '8788']
+      args: ['--port', '8788'],
+      dev: false
     })
+  })
+
+  void it('parses --print-config without agent', () => {
+    assert.deepEqual(parseDaemonCommand(['--print-config']), {
+      name: 'print-config'
+    })
+  })
+
+  void it('parses --print-config with agent', () => {
+    assert.deepEqual(parseDaemonCommand(['--print-config', 'claude-desktop']), {
+      name: 'print-config',
+      agent: 'claude-desktop'
+    })
+  })
+
+  void it('parses --print-config with agent alias', () => {
+    assert.deepEqual(parseDaemonCommand(['--print-config', 'claude']), {
+      name: 'print-config',
+      agent: 'claude'
+    })
+  })
+
+  void it('parses --print-config without agent when next arg is a flag', () => {
+    assert.deepEqual(parseDaemonCommand(['--print-config', '--dev']), {
+      name: 'print-config'
+    })
+  })
+
+  void it('parses --doctor', () => {
+    assert.deepEqual(parseDaemonCommand(['--doctor']), {
+      name: 'doctor'
+    })
+  })
+
+  void it('parses --dev flag for run mode', () => {
+    assert.deepEqual(parseDaemonCommand(['--dev']), {
+      name: 'run',
+      args: [],
+      dev: true
+    })
+  })
+
+  void it('parses --dev flag with other run args', () => {
+    assert.deepEqual(parseDaemonCommand(['--dev', '--port', '8788']), {
+      name: 'run',
+      args: ['--port', '8788'],
+      dev: true
+    })
+  })
+
+  void it('parses --help', () => {
+    assert.deepEqual(parseDaemonCommand(['--help']), { name: 'help' })
+  })
+
+  void it('parses -h', () => {
+    assert.deepEqual(parseDaemonCommand(['-h']), { name: 'help' })
   })
 })
 
