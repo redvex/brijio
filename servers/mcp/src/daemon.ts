@@ -17,7 +17,9 @@ import { execFile, spawn } from 'node:child_process'
 export type DaemonPlatform = 'darwin' | 'linux'
 
 export type DaemonCommand =
-  | { name: 'run', args: string[] }
+  | { name: 'run', args: string[], dev?: boolean }
+  | { name: 'print-config', agent?: string }
+  | { name: 'doctor' }
   | { name: 'install', wsPort?: number, mcpPort?: number }
   | { name: 'uninstall' }
   | { name: 'start' }
@@ -87,10 +89,43 @@ const label = 'com.redvex.brijio'
 const serviceName = 'brijio.service'
 
 export function parseDaemonCommand (args: string[]): DaemonCommand {
-  const [first, ...rest] = args
+  // Handle top-level flags before subcommands
+
+  // --help / -h
+  if (args.length === 1 && (args[0] === '--help' || args[0] === '-h')) {
+    return { name: 'help' }
+  }
+
+  // --print-config [agent]
+  if (args[0] === '--print-config') {
+    const agent = args[1]
+    // Only accept the positional arg if it doesn't look like a flag
+    if (agent !== undefined && !agent.startsWith('-')) {
+      return { name: 'print-config', agent }
+    }
+    return { name: 'print-config' }
+  }
+
+  // --doctor
+  if (args.length === 1 && args[0] === '--doctor') {
+    return { name: 'doctor' }
+  }
+
+  // Extract --dev flag, then proceed with subcommand parsing
+  let dev = false
+  const filteredArgs: string[] = []
+  for (const arg of args) {
+    if (arg === '--dev') {
+      dev = true
+    } else {
+      filteredArgs.push(arg)
+    }
+  }
+
+  const [first, ...rest] = filteredArgs
 
   if (first === undefined) {
-    return { name: 'run', args }
+    return { name: 'run', args: [], dev }
   }
 
   if (first === 'install') {
@@ -126,11 +161,12 @@ export function parseDaemonCommand (args: string[]): DaemonCommand {
     return parseLogsCommand(rest)
   }
 
-  if (first === 'help' || first === '--help' || first === '-h') {
+  if (first === 'help') {
     return { name: 'help' }
   }
 
-  return { name: 'run', args }
+  // Unknown args → run mode, using filtered args (with --dev removed)
+  return { name: 'run', args: filteredArgs, dev }
 }
 
 export function loadBrijioEnv (options: LoadBrijioEnvOptions = {}): LoadedBrijioEnv {
@@ -480,6 +516,9 @@ export function usage (): string {
 
 Usage:
   brijio                         Run WebSocket and MCP servers interactively
+  brijio --dev                   Run in dev mode (bind to 127.0.0.1 only)
+  brijio --print-config [agent]  Print MCP client config for an agent
+  brijio --doctor                Run diagnostic checks
   brijio install [--ws-port N] [--mcp-port N]
   brijio uninstall
   brijio start
