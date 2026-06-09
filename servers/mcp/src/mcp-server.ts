@@ -97,7 +97,7 @@ export async function createBrijioMcpServer (
         maxContentChunks: z
           .number()
           .optional()
-          .describe('Maximum readable content chunks to fetch. Defaults to 1.'),
+          .describe('Maximum readable content chunks to fetch. Defaults to 1, max 10.'),
         browserInstanceId: browserInstanceIdInput
       }
     },

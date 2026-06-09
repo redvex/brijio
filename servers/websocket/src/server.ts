@@ -338,7 +338,13 @@ function handleMcpMessage (
 ): void {
   if (isListBrowsersMessage(message.payload)) {
     const count = listRecordsForScope(presence, scopeKey).length
-    logger.info('list_browsers', { scopeKey: scopeKey.slice(0, 8), browserCount: count })
+    const allScopeKeys = [...new Set(Array.from(presence.values()).map((record) => record.scopeKey))]
+    logger.info('list_browsers', {
+      scopeKey: scopeKey.slice(0, 8),
+      browserCount: count,
+      allScopeKeys: allScopeKeys.map((k) => k.slice(0, 8)),
+      totalPresence: presence.size
+    })
     sendJson(socket, {
       type: 'message',
       id: message.id,

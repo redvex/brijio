@@ -156,14 +156,14 @@ void describe('MCP page reading tool', () => {
           throw new Error('context should not be requested')
         }
       },
-      { maxContentChunks: 6 }
+      { maxContentChunks: 11 }
     )
 
     assert.deepEqual(result, {
       ok: false,
       error: {
         code: 'invalid_tool_input',
-        message: 'maxContentChunks must be an integer from 0 through 5.'
+        message: 'maxContentChunks must be an integer from 0 through 10.'
       }
     })
   })

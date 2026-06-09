@@ -296,7 +296,7 @@ void describe('Brijio MCP HTTP server', () => {
           maxContentChunks: {
             type: 'number',
             description:
-              'Maximum readable content chunks to fetch. Defaults to 1.'
+              'Maximum readable content chunks to fetch. Defaults to 1, max 10.'
           }
         },
         additionalProperties: false,
@@ -972,7 +972,7 @@ void describe('Brijio MCP HTTP server', () => {
         {
           name: 'read_current_page',
           arguments: {
-            maxContentChunks: 6
+            maxContentChunks: 11
           }
         },
         undefined,
@@ -982,7 +982,7 @@ void describe('Brijio MCP HTTP server', () => {
         ok: false,
         error: {
           code: 'invalid_tool_input',
-          message: 'maxContentChunks must be an integer from 0 through 5.'
+          message: 'maxContentChunks must be an integer from 0 through 10.'
         }
       })
     } finally {

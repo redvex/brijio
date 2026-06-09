@@ -11,7 +11,7 @@ import {
 } from './protocol.js'
 
 const defaultMaxContentChunks = 1
-const maxAllowedContentChunks = 5
+const maxAllowedContentChunks = 10
 
 export type BrijioToolErrorCode =
   | BrijioErrorCode
@@ -113,7 +113,7 @@ function normalizeInput (
     maxContentChunks > maxAllowedContentChunks
   ) {
     return invalidToolInputResponse(
-      'maxContentChunks must be an integer from 0 through 5.'
+      `maxContentChunks must be an integer from 0 through ${maxAllowedContentChunks}.`
     )
   }
 
