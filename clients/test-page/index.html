@@ -45,6 +45,11 @@ th { background: color-mix(in srgb, var(--accent) 15%, transparent); }
 .results { background: color-mix(in srgb, var(--accent) 8%, Canvas); border-radius: 8px; padding: 20px; }
 .results .pass { color: var(--success); font-weight: 600; }
 .results .fail { color: var(--error); font-weight: 600; }
+.validation-pass, .validation-fail { border-radius: 6px; padding: 8px 10px; transition: background-color 120ms ease, box-shadow 120ms ease; }
+.validation-pass { background: color-mix(in srgb, var(--success) 18%, Canvas); box-shadow: inset 4px 0 0 var(--success); }
+.validation-fail { background: color-mix(in srgb, var(--error) 16%, Canvas); box-shadow: inset 4px 0 0 var(--error); }
+.validation-control-pass { border-color: var(--success) !important; box-shadow: 0 0 0 2px color-mix(in srgb, var(--success) 18%, transparent); }
+.validation-control-fail { border-color: var(--error) !important; box-shadow: 0 0 0 2px color-mix(in srgb, var(--error) 16%, transparent); }
 a { color: var(--accent); }
 a:hover { text-decoration: underline; }
 .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1211,21 +1216,23 @@ a:hover { text-decoration: underline; }
 function renderResults(params) {
   var resultsEl = document.getElementById('results-content');
 
+  clearInlineValidation();
+
   var answers = {
-    surname: { expected: /stoner/i, label: 'Helen\'s surname' },
-    detective_street: { expected: /baker/i, label: 'Holmes\'s street' },
-    county: { expected: /surrey/i, label: 'County of Stoke Moran' },
-    animal_one: { expected: /cheetah|baboon/i, label: 'Exotic animal' },
-    death_year: { expected: /1881/, label: 'Year Julia died' },
-    doctor_rank: { expected: /surgeon/i, label: 'Roylott\'s rank' },
-    email_contact: { expected: /watson@bakerstreet\.uk/i, label: 'Email' },
-    secret_passphrase: { expected: /speckled band/i, label: 'Public demo passphrase' },
-    income_amount: { expected: /^750$/, label: 'Income amount' },
-    event_date: { expected: /1883-04/, label: 'Event date' },
-    motive_explanation: { expected: /marry|income|mone|£|inherit/i, label: 'Motive explanation' },
-    content_editable_area: { expected: /ventilator|snake|bell.rope|bridge|roylott/i, label: 'Ventilator role description' },
-    location_select: { expected: /calcutta/, label: 'Roylott\'s practise location' },
-    transport_select: { expected: /train-cart|dog.cart/i, label: 'Transport method' }
+    surname: { expected: /stoner/i, label: 'Helen\'s surname', controlId: 'surname' },
+    detective_street: { expected: /baker/i, label: 'Holmes\'s street', controlId: 'detective-street' },
+    county: { expected: /surrey/i, label: 'County of Stoke Moran', controlId: 'county' },
+    animal_one: { expected: /cheetah|baboon/i, label: 'Exotic animal', controlId: 'animal-1' },
+    death_year: { expected: /1881/, label: 'Year Julia died', controlId: 'death-year' },
+    doctor_rank: { expected: /surgeon/i, label: 'Roylott\'s rank', controlId: 'doctor-rank' },
+    email_contact: { expected: /watson@bakerstreet\.uk/i, label: 'Email', controlId: 'email-contact' },
+    secret_passphrase: { expected: /speckled band/i, label: 'Public demo passphrase', controlId: 'secret-passphrase' },
+    income_amount: { expected: /^750$/, label: 'Income amount', controlId: 'income-amount' },
+    event_date: { expected: /1883-04/, label: 'Event date', controlId: 'event-date' },
+    motive_explanation: { expected: /marry|income|mone|£|inherit/i, label: 'Motive explanation', controlId: 'motive-explanation' },
+    content_editable_area: { expected: /ventilator|snake|bell.rope|bridge|roylott/i, label: 'Ventilator role description', controlId: 'content-editable-area' },
+    location_select: { expected: /calcutta/, label: 'Roylott\'s practise location', controlId: 'location-select' },
+    transport_select: { expected: /train-cart|dog.cart/i, label: 'Transport method', controlId: 'transport-select' }
   };
 
   var html = '<table><thead><tr><th>Question</th><th>Your Answer</th><th>Result</th></tr></thead><tbody>';
@@ -1234,6 +1241,7 @@ function renderResults(params) {
     var value = params.get(key) || '(not provided)';
     var a = answers[key];
     var pass = a.expected.test(value);
+    markControlValidation(a.controlId, pass);
     html += '<tr><td>' + a.label + '</td><td>' + escapeHtml(value) + '</td>';
     html += '<td class="' + (pass ? 'pass' : 'fail') + '">' + (pass ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
@@ -1243,6 +1251,7 @@ function renderResults(params) {
   for (var i = 0; i < expectedEvidence.length; i++) {
     var ev = expectedEvidence[i];
     var checked = evidenceValues.indexOf(ev) !== -1;
+    markChoiceValidation('chk-' + ev, checked);
     html += '<tr><td>Evidence: ' + ev + '</td><td>' + (checked ? 'checked' : 'unchecked') + '</td>';
     html += '<td class="' + (checked ? 'pass' : 'fail') + '">' + (checked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
@@ -1251,15 +1260,18 @@ function renderResults(params) {
   for (var j = 0; j < decoyEvidence.length; j++) {
     var dv = decoyEvidence[j];
     var notChecked = evidenceValues.indexOf(dv) === -1;
+    markChoiceValidation('chk-' + dv, notChecked);
     html += '<tr><td>Decoy: ' + dv + ' (should be unchecked)</td><td>' + (notChecked ? 'unchecked' : 'checked') + '</td>';
     html += '<td class="' + (notChecked ? 'pass' : 'fail') + '">' + (notChecked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
 
   var bandAnswer = params.get('speckled_band') || '';
+  markRadioGroupValidation('speckled_band', 'snake', bandAnswer);
   html += '<tr><td>What was the speckled band?</td><td>' + escapeHtml(bandAnswer) + '</td>';
   html += '<td class="' + (bandAnswer === 'snake' ? 'pass' : 'fail') + '">' + (bandAnswer === 'snake' ? '✅ Pass' : '❌ Fail') + '</td></tr>';
 
   var timeAnswer = params.get('whistle_time') || '';
+  markRadioGroupValidation('whistle_time', '3am', timeAnswer);
   html += '<tr><td>Time of whistle</td><td>' + escapeHtml(timeAnswer) + '</td>';
   html += '<td class="' + (timeAnswer === '3am' ? 'pass' : 'fail') + '">' + (timeAnswer === '3am' ? '✅ Pass' : '❌ Fail') + '</td></tr>';
 
@@ -1272,6 +1284,10 @@ function renderResults(params) {
     html += '<td class="' + (mChecked ? 'pass' : 'fail') + '">' + (mChecked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
 
+  var unexpectedMethods = ['chemical', 'disguise'];
+  var methodsPass = expectedMethods.every(function(value) { return methods.indexOf(value) !== -1; }) && unexpectedMethods.every(function(value) { return methods.indexOf(value) === -1; });
+  markControlValidation('methods-select', methodsPass);
+
   html += '</tbody></table>';
   resultsEl.innerHTML = html;
   document.getElementById('results').style.display = 'block';
@@ -1282,6 +1298,52 @@ function formParams() {
   var params = new URLSearchParams(new FormData(document.getElementById('brijio-test-form')));
   params.set('content_editable_area', document.getElementById('content-editable-area').textContent.trim());
   return params;
+}
+
+function clearInlineValidation() {
+  var marked = document.querySelectorAll('.validation-pass, .validation-fail, .validation-control-pass, .validation-control-fail');
+  for (var i = 0; i < marked.length; i++) {
+    marked[i].classList.remove('validation-pass', 'validation-fail', 'validation-control-pass', 'validation-control-fail');
+  }
+}
+
+function markValidationElement(element, pass) {
+  if (!element) return;
+  element.classList.remove('validation-pass', 'validation-fail');
+  element.classList.add(pass ? 'validation-pass' : 'validation-fail');
+}
+
+function markValidationControl(element, pass) {
+  if (!element) return;
+  element.classList.remove('validation-control-pass', 'validation-control-fail');
+  element.classList.add(pass ? 'validation-control-pass' : 'validation-control-fail');
+}
+
+function markControlValidation(controlId, pass) {
+  var control = document.getElementById(controlId);
+  var label = document.querySelector('label[for="' + controlId + '"]');
+  markValidationElement(label, pass);
+  markValidationControl(control, pass);
+}
+
+function markChoiceValidation(controlId, pass) {
+  var control = document.getElementById(controlId);
+  var label = control ? control.closest('label') : null;
+  markValidationElement(label, pass);
+}
+
+function markRadioGroupValidation(name, expectedValue, selectedValue) {
+  var controls = document.querySelectorAll('input[name="' + name + '"]');
+  for (var i = 0; i < controls.length; i++) {
+    var control = controls[i];
+    var isExpected = control.value === expectedValue;
+    var isSelected = control.value === selectedValue;
+    if (isExpected) {
+      markChoiceValidation(control.id, selectedValue === expectedValue);
+    } else if (isSelected) {
+      markChoiceValidation(control.id, false);
+    }
+  }
 }
 
 (function() {
@@ -1314,6 +1376,18 @@ function escapeHtml(str) {
 document.getElementById('btn-clear').addEventListener('click', function() {
   document.getElementById('brijio-test-form').reset();
   document.getElementById('content-editable-area').textContent = '';
+  clearInlineValidation();
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('results-content').innerHTML = '';
+});
+
+document.getElementById('brijio-test-form').addEventListener('reset', function() {
+  setTimeout(function() {
+    document.getElementById('content-editable-area').textContent = '';
+    clearInlineValidation();
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('results-content').innerHTML = '';
+  }, 0);
 });
 
 document.getElementById('btn-prefill').addEventListener('click', function() {
