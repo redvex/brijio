@@ -48,7 +48,7 @@ const MIME_TYPES: Record<string, string> = {
 function resolveDemoDir (): string {
   const envDir = process.env.BRIJIO_DEMO_DIR
   if ((envDir ?? '').trim() !== '') {
-    return resolve(envDir!)
+    return resolve(envDir as string)
   }
 
   // Walk up from this file's directory to find clients/test-page/index.html first
@@ -131,12 +131,12 @@ export async function startDemoServer (options: DemoServerOptions): Promise<Demo
         server,
         url,
         close: async () => {
-          await new Promise<void>((resClose, rejClose) => {
+          await new Promise<void>((_resolve, _reject) => {
             server.close((err) => {
               if (err != null) {
-                rejClose(err)
+                _reject(err)
               } else {
-                resClose()
+                _resolve()
               }
             })
           })
