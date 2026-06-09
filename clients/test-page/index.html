@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Brijio Demo — Read and Respond</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
 <style>
 :root {
   color-scheme: light dark;
@@ -13,16 +14,21 @@
   --accent-soft: #3366ff20;
   --success: #16a34a;
   --error: #dc2626;
+  --left-width: 62%;
+  --right-width: 38%;
 }
 body { margin: 0; background: Canvas; color: CanvasText; }
-main { max-width: 800px; margin: 0 auto; padding: 32px 20px 48px; }
+.layout { display: flex; gap: 24px; align-items: flex-start; padding: 16px 20px; max-width: 1600px; margin: 0 auto; }
+.left-col { width: var(--left-width); min-width: 0; }
+.right-col { width: var(--right-width); min-width: 0; position: sticky; top: 16px; align-self: flex-start; max-height: 100vh; overflow-y: auto; }
+.left-col h1 { position: sticky; top: 0; z-index: 10; background: Canvas; padding: 12px 0 8px; margin: 0 0 16px; border-bottom: 2px solid var(--accent); }
 h1, h2, h3 { line-height: 1.2; }
 .intro { max-width: 720px; }
 form { display: grid; gap: 24px; }
 fieldset { display: grid; gap: 16px; border: 1px solid color-mix(in srgb, CanvasText 22%, transparent); border-radius: 8px; padding: 18px; }
 legend { padding: 0 8px; font-weight: 700; }
 label, .control { display: grid; gap: 6px; }
-input, textarea, select { max-width: 420px; font: inherit; border: 1px solid color-mix(in srgb, CanvasText 28%, transparent); border-radius: 6px; padding: 8px 10px; background: Canvas; color: CanvasText; }
+input, textarea, select { max-width: 100%; font: inherit; border: 1px solid color-mix(in srgb, CanvasText 28%, transparent); border-radius: 6px; padding: 8px 10px; background: Canvas; color: CanvasText; }
 input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 input:disabled, textarea:disabled, select:disabled, button:disabled { opacity: 0.5; cursor: not-allowed; }
 button { font: inherit; padding: 10px 20px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; }
@@ -41,24 +47,21 @@ th { background: color-mix(in srgb, var(--accent) 15%, transparent); }
 .results .fail { color: var(--error); font-weight: 600; }
 a { color: var(--accent); }
 a:hover { text-decoration: underline; }
-.nav-links { display: flex; gap: 16px; flex-wrap: wrap; }
-.nav-links a { padding: 6px 12px; border: 1px solid color-mix(in srgb, CanvasText 20%, transparent); border-radius: 4px; text-decoration: none; }
+.nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-links a { padding: 4px 10px; border: 1px solid color-mix(in srgb, CanvasText 20%, transparent); border-radius: 4px; text-decoration: none; font-size: 0.85em; }
 .nav-links a:hover { background: var(--accent-soft); }
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  .left-col, .right-col { width: 100%; }
+  .right-col { position: static; max-height: none; }
+}
 </style>
 </head>
 <body>
-<main>
+<div class="layout">
+<div class="left-col">
 <h1>Brijio Demo Page</h1>
 <p class="intro">This page verifies the full Brijio stack: browser extension, WebSocket server, and MCP tools. It follows a <strong>read and respond</strong> pattern — read the passage below, then fill in the form. Every answer can be determined from the text.</p>
-<p class="intro">The passage is intentionally long to exercise Brijio's <strong>paginated content</strong> feature. If you call <code>read_current_page</code>, you should receive <code>truncated: true</code> and need to request subsequent chunks.</p>
-
-<nav class="nav-links">
-  <a href="#story">Story Passage</a>
-  <a href="#table-data">Data Tables</a>
-  <a href="#form">Response Form</a>
-  <a href="#dynamic">Dynamic Content</a>
-  <a href="#links">Navigation Links</a>
-</nav>
 
 <section id="story" class="passage">
 <h2>The Adventure of the Speckled Band</h2>
@@ -191,9 +194,7 @@ a:hover { text-decoration: underline; }
 <p class="dialogue">"It is a singular case," said Holmes, as we walked back to the station. "The speckled band! I should have known that no snake could have made the whistling sound which Miss Stoner described. It was the doctor himself who whistled, and the snake answered to his call. It is a case of the most diabolical ingenuity."</p>
 
 <p>And so ended the Adventure of the Speckled Band, one of the most remarkable cases in the career of Sherlock Holmes.</p>
-</section>
-
-<section id="table-data">
+</section><section id="table-data">
 <h2>Character &amp; Evidence Tables</h2>
 <p>The tables below contain structured data from the story. Read them carefully — form questions reference specific cells.</p>
 
@@ -258,10 +259,7 @@ a:hover { text-decoration: underline; }
 <tr><td>£1,100 total</td><td>Total if both daughters married</td><td>£750 + £250 + £250 = total income at risk; motive explained</td></tr>
 </tbody>
 </table>
-</section>
-
-
-<section id="extended-analysis">
+</section><section id="extended-analysis">
 <h2>Extended Analysis</h2>
 
 <h3>Scene-by-Scene Breakdown</h3>
@@ -394,10 +392,7 @@ a:hover { text-decoration: underline; }
 <tr><td>The Resident Patient</td><td>1893</td><td>Staged suicide</td><td>Partial</td><td>Blackmail</td><td>London</td></tr>
 </tbody>
 </table>
-</section>
-
-
-<section id="second-passage">
+</section><section id="second-passage">
 <h2>Supplementary Passage — A Scandal in Bohemia</h2>
 <p><em>By Arthur Conan Doyle (public domain worldwide). Included to ensure this page exceeds 128 KiB of rendered content, forcing multi-chunk <code>read_current_page</code> responses.</em></p>
 
@@ -556,9 +551,7 @@ a:hover { text-decoration: underline; }
 <tr><td>Edgware Road</td><td>A major road in northwest London; location of the Church of St. Monica where Irene and Godfrey marry</td><td>London</td><td>A Scandal in Bohemia</td></tr>
 </tbody>
 </table>
-</section>
-
-<section id="analysis">
+</section><section id="analysis">
 <h2>Detailed Literary Analysis</h2>
 
 <h3>Structural Analysis — The Speckled Band</h3>
@@ -615,9 +608,7 @@ a:hover { text-decoration: underline; }
 
 <h3>Publication History and Reception</h3>
 <p>The Adventure of the Speckled Band was first published in <em>Strand Magazine</em> in February 1892, with illustrations by Sidney Paget. It was the tenth story in the series and quickly became one of the most popular. Doyle himself considered it one of his best Sherlock Holmes stories, and in a 1927 list compiled for <em>The Strand</em>, he ranked it as his second-favourite Holmes story (after "The Red-Headed League"). The story has been adapted numerous times for stage, film, radio, and television, making it one of the most recognisable detective stories in the English language. Its key elements — the locked room, the exotic snake, the evil stepfather, and the brilliant deduction — have become archetypes of the mystery genre. The "speckled band" itself has entered the cultural lexicon as a metaphor for a hidden danger that is misunderstood or misidentified.</p>
-</section>
-
-<section id="reading-guide">
+</section><section id="reading-guide">
 <h2>Reading Comprehension Guide</h2>
 <p>This guide provides paragraph-by-paragraph annotations for both stories. Use it to verify your understanding before submitting the form. Each annotation identifies the key deductive steps, narrative techniques, and period details that a browser automation agent should be able to extract and reason about.</p>
 
@@ -671,9 +662,7 @@ a:hover { text-decoration: underline; }
 <tr><td>£1,000+ per annum</td><td>Upper-class / aristocratic income</td><td>~£127,000 (US$160,000)</td><td>The King of Bohemia's income would be far higher; this is the threshold for the gentry</td></tr>
 </tbody>
 </table>
-</section>
-
-<section id="historical-context">
+</section><section id="historical-context">
 <h2>Historical Context and Critical Reception</h2>
 
 <h3>Arthur Conan Doyle: The Physician Author</h3>
@@ -702,9 +691,7 @@ a:hover { text-decoration: underline; }
 
 <h3>A Note on the Text</h3>
 <p>The text of The Speckled Band used in this demo page is drawn from the original Strand Magazine publication of February 1892, which is in the public domain worldwide. The text has been lightly modernised for readability (standardising "shewed" to "showed," for example) but retains Doyle's original vocabulary, sentence structure, and narrative voice. Readers should be aware that some editions of the story contain minor textual variations — the 1892 book publication in The Adventures of Sherlock Holmes differs in small details from the Strand version, and subsequent editions have introduced further changes. The story used in the supplementary passage (A Scandal in Bohemia) is likewise from the original Strand publication (July 1891) and is in the public domain. Both stories are presented here in their complete form, unabridged and unexpurgated, as they would have been read by their original Victorian audience.</p>
-</section>
-
-<section id="deduction-reference">
+</section><section id="deduction-reference">
 <h2>Methods of Deduction — Complete Reference</h2>
 <p>The tables below catalogue every observable deduction made by Sherlock Holmes across both stories on this page. Each deduction follows the pattern: <strong>Observation</strong> → <strong>Inference</strong> → <strong>Conclusion</strong>. This reference is intended for browser automation agents testing the <code>read_current_page</code> tool: every cell should be extractable across paginated chunks.</p>
 
@@ -791,8 +778,109 @@ a:hover { text-decoration: underline; }
 </tbody>
 </table>
 </section>
+<h3>Public Domain Notice</h3>
+<p>Both stories reproduced on this page — "The Adventure of the Speckled Band" (first published in The Strand Magazine, February 1892) and "A Scandal in Bohemia" (first published in The Strand Magazine, July 1891) — are works by Sir Arthur Conan Doyle that have entered the public domain worldwide. They are reproduced here in full, without alteration to the original text, for the sole purpose of testing browser automation and MCP tool capabilities. No copyright infringement is intended or implied. The analysis, commentary, and form content are original to this demo page and are provided under the same terms as the Brijio project licence (AGPLv3). This notice itself serves as additional pagination content to ensure the page exceeds the 128 KiB threshold required for testing chunked read_current_page responses.</p>
+<section id="vocabulary">
+<h2>Victorian Language and Vocabulary Guide</h2>
+<p>The stories on this page contain numerous Victorian-era words and phrases that may be unfamiliar to modern readers. This guide defines each term as it is used in context, providing another rich data source for testing <code>read_current_page</code> pagination and extraction across different content types.</p>
 
-<section id="answer-key">
+<dl>
+<dt>familiar</dt>
+<dd>In Victorian usage, a "familiar" is a close companion or intimate associate. In The Speckled Band, Holmes describes his professional acquaintances and, by contrast, his one genuine friend, Watson — "I have ample evidence that you are a man with a familiar knowledge of my methods." The word also carries occult connotations (a witch's familiar spirit), which Doyle may have intended as a subtle echo of the story's supernatural atmosphere.</dd>
+
+<dt>peculiar</dt>
+<dd>Used frequently by both Holmes and Watson to mean "strange, unusual, or distinctive" rather than the modern sense of "particular." When Watson writes that "none of the cases which come to me present more peculiar features," he means none are stranger or more distinctive. Similarly, Holmes describes the ventilator as "very peculiar" — meaning it is highly unusual and suspicious, not merely particular.</dd>
+
+<dt>obstinate</dt>
+<dd>Stubborn, refusing to change one's mind or course of action. Roylott is described as "obstinate" in his refusal to make repairs to the house and in his violent resistance to any interference. The word carries a stronger sense of unreasonable stubbornness in Victorian English than in modern usage.</dd>
+
+<dt>ferocious</dt>
+<dd>Fierce, savage, or violently aggressive. Roylott's temper is described as "ferocious" — he beats his native servant to death in India and pursues a long-running feud with every neighbour in Surrey. The word conveys a level of violence that goes beyond mere anger into predatory brutality.</dd>
+
+<dt>gipsy (gypsy)</dt>
+<dd>The Romani people, traditionally itinerant communities who travelled throughout England. In The Speckled Band, Roylott allows gypsies to camp on his land, which both provides him with a cover for his criminal activities (the "speckled band" that Julia mentions could refer to a gypsy band) and adds to the terrifying atmosphere of the estate. The spelling "gipsy" was standard in Victorian English.</dd>
+
+<dt>dog-cart</dt>
+<dd>A light, two-wheeled horse-drawn carriage originally designed for transporting sporting dogs. In the story, Holmes and Watson hire a dog-cart at Leatherhead station to drive to Stoke Moran. Dog-carts were common in rural England and could be hired at railway stations for local journeys.</dd>
+
+<dt>ventilator</dt>
+<dd>A small opening or shaft between rooms designed to allow air circulation. In the story, the ventilator between Roylott's room and Helen's room is ostensibly for ventilation but actually serves as a passage for the snake. Victorian houses commonly had such openings, and their presence was not in itself unusual — which is precisely why Roylott was able to use one as a murder weapon without arousing suspicion.</dd>
+
+<dt>safe</dt>
+<dd>A locked metal box used for storing valuables. Roylott keeps a small safe in his bedroom, which Holmes deduces contains the snake when it is not being used for murder. The presence of a safe in a bedroom was unusual enough to attract Holmes's attention but common enough not to be immediately suspicious.</dd>
+
+<dt>swamp adder</dt>
+<dd>The deadliest snake in India, according to the story. In reality, there is no snake called a "swamp adder" — Doyle invented the species for dramatic effect. The description draws on contemporary Victorian beliefs about Indian wildlife and the dangers of the colonial environment. Herpetologists have debated which real snake Doyle may have had in mind, with candidates including the Indian saw-scaled viper and the king cobra, but the consensus is that the swamp adder is a fictional creation designed to serve the needs of the plot.</dd>
+
+<dt>morning dress</dt>
+<dd>Formal daytime attire worn by gentlemen in Victorian England. In A Scandal in Bohemia, the King of Bohemia arrives wearing morning dress, which signals his high social status. The term refers specifically to a specific cut of coat, waistcoat, and trousers — not simply "clothes worn in the morning."</dd>
+
+<dt>tradesman's entrance</dt>
+<dd>A side or rear door used by deliverymen and servants, rather than the main front door. In A Scandal in Bohemia, Holmes enters Briony Lodge through the tradesman's entrance while disguised, allowing him to observe Irene Adler without being seen by the servants at the front door.</dd>
+
+<dt>pairing</dt>
+<dd>In Victorian English, "pairing" can mean matching or joining together. In A Scandal in Bohemia, the term is used in the context of marriage — the King's proposed pairing with Princess Clotilde is the political match that the photograph threatens to disrupt.</dd>
+
+<dt>photograph</dt>
+<dd>In the 1880s, photography was still a relatively new technology. Cabinet photographs — small, mounted prints — were the standard format for personal portraits. The compromising photograph in A Scandal in Bohemia would have been a physical cabinet card, approximately 4.25 × 6.5 inches, mounted on heavy card stock. The photograph is central to the plot because it provides irrefutable visual evidence of the King's relationship with Irene Adler — evidence that could not be easily dismissed or explained away.</dd>
+
+<dt>bohemian</dt>
+<dd>Referring to Bohemia, a kingdom in central Europe (now part of the Czech Republic). The King's title — King of Bohemia — was a real historical title held by the Habsburg rulers of Austria-Hungary. The adjective "bohemian" also came to mean unconventional or artistic, a sense that Doyle likely intended as a double meaning: the King is both literally from Bohemia and metaphorically bohemian in his past relationship with Irene Adler.</dd>
+
+<dt>cabinet</dt>
+<dd>In the context of photographs, a "cabinet" is a specific size of mounted photograph. The cabinet photograph format (approximately 4.25 × 6.5 inches) was introduced in the 1860s and became the most popular format for portrait photography by the 1880s. Irene Adler's compromising photograph would have been in this format.</dd>
+
+<dt>adventuress</dt>
+<dd>A Victorian term for a woman who uses her charm, wit, or beauty to advance her social position, often through association with wealthy or powerful men. The King of Bohemia describes Irene Adler using this term, reflecting the Victorian double standard that condemned women for the same behaviour that was tolerated in men. Holmes's refusal to accept this characterisation — and his lasting respect for "the woman" — is one of the story's most progressive elements.</dd>
+</dl>
+
+<h3>Weights and Measures</h3>
+<p>The stories contain several references to Victorian-era measurements. This reference table converts them to modern equivalents for testing numerical extraction across paginated content.</p>
+<table>
+<thead><tr><th>Term</th><th>Story</th><th>Victorian Value</th><th>Modern Equivalent</th></tr></thead>
+<tbody>
+<tr><td>£750 per annum</td><td>Speckled Band</td><td>£750/year (Roylott's total income)</td><td>Approximately £95,000/year in 2024 terms</td></tr>
+<tr><td>£250 per annum</td><td>Speckled Band</td><td>£250/year (each daughter's marriage settlement)</td><td>Approximately £32,000/year in 2024 terms</td></tr>
+<tr><td>£1000 per annum</td><td>Speckled Band</td><td>£1000/year (Mrs. Stoner's former income)</td><td>Approximately £127,000/year in 2024 terms</td></tr>
+<tr><td>half a sovereign</td><td>Speckled Band</td><td>10 shillings (half of a gold sovereign)</td><td>Approximately £50 in 2024 terms</td></tr>
+<tr><td>dog-cart</td><td>Speckled Band</td><td>Two-wheeled carriage, ~4 mph on roads</td><td>Comparable to a 30-minute local taxi ride</td></tr>
+<tr><td>7:15 AM</td><td>Speckled Band</td><td>Helen's arrival at Baker Street</td><td>Early morning consultation — unusual for Holmes</td></tr>
+<tr><td>third of a mile</td><td>Speckled Band</td><td>Distance from Leatherhead station to Stoke Moran</td><td>Approximately 500 metres or 1600 feet</td></tr>
+</tbody>
+</table>
+</section><section id="timeline">
+<h2>Complete Timeline of Events</h2>
+<p>This chronological timeline merges events from both The Speckled Band and A Scandal in Bohemia, providing a unified reference for testing pagination and cross-referencing tools. Each entry includes a date, source, and brief description. The timeline extends from the earliest backstory events through the resolution of each narrative.</p>
+
+<h3>Backstory Events (Chronological Order)</h3>
+<table>
+<thead><tr><th>Date</th><th>Story</th><th>Event</th></tr></thead>
+<tbody>
+<tr><td>c. 1840</td><td>The Speckled Band</td><td>Dr. Grimesby Roylott born into the Surrey squirearchy, one of the oldest families in England. The Roylotts of Stoke Moran were once among the richest families in Surrey, owning extensive lands and properties throughout the county.</td></tr>
+<tr><td>c. 1855</td><td>The Speckled Band</td><td>Roylott completes his medical education and obtains his degree. He enters practice in London, but his violent temper and unconventional behaviour soon make it impossible for him to maintain a position in England. He journeys to Calcutta, India, where he obtains a commission as a surgeon in the Indian Army.</td></tr>
+<tr><td>c. 1858–1860</td><td>The Speckled Band</td><td>Roylott serves in the Indian Army, practising medicine in Calcutta. He acquires a reputation for violent behaviour, including a conviction for assaulting a native butler whom he beat to death. He also begins collecting exotic animals, including a cheetah and a baboon, which he ships back to England.</td></tr>
+<tr><td>c. 1860</td><td>The Speckled Band</td><td>While still in India, Roylott marries Mrs. Stoner, the widow of Major-General Stoner. Mrs. Stoner has two young daughters, Helen and Julia. The marriage brings Roylott control over Mrs. Stoner's fortune, a substantial sum including an income of not less than a thousand a year.</td></tr>
+<tr><td>c. 1862</td><td>The Speckled Band</td><td>Roylott returns to England with his wife and her two daughters. The family settles at Stoke Moran, the old family manor house in Surrey. Roylott renovations the house, including the installation of a ventilator between his bedroom and the adjacent room.</td></tr>
+<tr><td>c. 1865</td><td>The Speckled Band</td><td>Mrs. Roylott (née Stoner) dies in a railway accident. Her will stipulates that each daughter shall receive an annual income of two hundred and fifty pounds upon marriage. Until that time, the income remains under Roylott's control as their guardian. This financial arrangement becomes the motive for Roylott's crimes.</td></tr>
+<tr><td>c. 1870</td><td>The Speckled Band</td><td>Following his wife's death, Roylott becomes increasingly reclusive and violent. He abandons any attempt at a professional career and begins a long period of decline into brutality and isolation. He quarrels with every neighbour who ventures near the Stoke Moran estate and acquires further exotic animals that roam the grounds.</td></tr>
+<tr><td>c. 1880–1881</td><td>The Speckled Band</td><td>Helen's twin sister Julia becomes engaged to be married to a Royal Navy officer. Roylott, aware that Julia's marriage will cost him two hundred and fifty pounds per year, begins planning her murder. He modifies the ventilator between his room and Julia's room, installs a false bell-rope, and acquires a swamp adder from India — the deadliest snake in the subcontinent, according to his own account.</td></tr>
+<tr><td>early April, 1881</td><td>The Speckled Band</td><td>Julia Stoner hears a low, clear whistle at about three in the morning. She comes into Helen's room, visibly terrified, and speaks the words "Oh, my God! Helen! It was the band! The speckled band!" before dying in agony. A surgeon examines her body and declares the cause of death to be unknown — no visible wounds, no trace of violence, and no ascertainable cause. Roylott's plan has succeeded perfectly.</td></tr>
+<tr><td>c. 1881–1883</td><td>The Speckled Band</td><td>Helen lives alone at Stoke Moran with her stepfather. She becomes increasingly fearful and withdrawn, but cannot leave without a marriage. Roylott, meanwhile, has been using the same method — the snake through the ventilator — for over two years without detection. Helen sleeps in Julia's old room, but Roylott has not yet attempted to use the snake on her.</td></tr>
+<tr><td>March 1883</td><td>A Scandal in Bohemia</td><td>During the same general period, Sherlock Holmes receives a visit from the King of Bohemia. Irene Adler has a photograph that could compromise the King's upcoming marriage to Princess Clotilde of Scandinavia. Holmes employs a series of disguises and stratagems to locate the photograph, but Irene Adler outmanoeuvres him — she recognises his disguise and leaves the country with her new husband, Godfrey Norton, taking the photograph with her but promising never to use it. Holmes is deeply impressed and keeps her photograph as a memento, referring to her always as "the woman."</td></tr>
+<tr><td>early April 7, 1883</td><td>The Speckled Band</td><td>Helen Stoner becomes engaged to be married to a gentleman named Percy Armitage. Shortly after announcing the engagement, Roylott begins the process of forcing Helen to move into Julia's old bedroom — the room with the ventilator, the false bell-rope, and the clamped bed. Helen realises that she is in mortal danger and resolves to seek help from Sherlock Holmes.</td></tr>
+<tr><td>April 8, 1883 (morning)</td><td>The Speckled Band</td><td>Helen Stoner travels to London and arrives at 221B Baker Street at 7:15 AM. She tells her story to Holmes and Watson. Holmes is immediately interested and agrees to investigate. He asks Helen to return to Stoke Moran and leave her window open that evening so that he and Watson can enter the house undetected.</td></tr>
+<tr><td>April 8, 1883 (afternoon)</td><td>The Speckled Band</td><td>Holmes visits the offices of Mrs. Stoner's trustees and examines the financial terms of her will. He also visits the Surrey Assizes to research Roylott's criminal record. In the afternoon, he and Watson travel to Leatherhead by train and then by dog-cart to Stoke Moran.</td></tr>
+<tr><td>April 8, 1883 (evening)</td><td>The Speckled Band</td><td>Holmes and Watson arrive at Stoke Moran and conduct a thorough examination of the premises. Holmes inspects both bedrooms, the ventilator, the bell-rope, the clamped bed, and Roylott's room (finding the saucer of milk and the safe). He identifies the method of murder and tells Helen that he will stay overnight in her room to confirm his theory.</td></tr>
+<tr><td>April 9, 1883 (2:00 AM)</td><td>The Speckled Band</td><td>Holmes and Watson wait in Julia's room in the dark. At approximately 3:00 AM, they hear a low, clear whistle — the same sound Julia heard before her death. A light appears through the ventilator, followed by a hissing sound. Holmes strikes at the bell-rope with his cane, driving the snake back through the ventilator into Roylott's room. The enraged snake bites Roylott, killing him. The case is solved.</td></tr>
+<tr><td>April 9, 1883 (morning)</td><td>The Speckled Band</td><td>Holmes and Watson enter Roylott's room and find him dead, the speckled band — the swamp adder — coiled around his head. Holmes explains the entire method and motive to Watson and Helen. The snake is returned to the safe. Helen is liberated from her stepfather's tyranny and can now marry without fear.</td></tr>
+</tbody>
+</table>
+
+<h3>Key Temporal Cross-References</h3>
+<p>The timeline above demonstrates several important temporal relationships between the two stories. Both stories are set in the 1880s, with Holmes at the height of his powers. The Speckled Band (April 1883) occurs shortly after the events of A Scandal in Bohemia (March 1883), and both involve Holmes's distinctive method of investigation: careful observation, logical deduction, and decisive action. The contrast between the two stories is instructive: in The Speckled Band, Holmes acts to prevent a future crime (Helen's murder), while in A Scandal in Bohemia, he is reacting to a past event (the photograph). In both cases, however, his success depends on his ability to see what others miss — the ventilator that connects the rooms, the bell-rope that does not ring a bell, the photograph hidden behind a sliding panel.</p>
+
+<p>The dual timeline also reveals differences in tone and theme. The Speckled Band is a story of violence, danger, and death — a locked-room murder mystery with a gothic atmosphere. A Scandal in Bohemia is a story of wit, charm, and romance — a comedy of manners in which the detective is outsmarted by his quarry. Both stories, however, share Holmes's core values: intelligence, observation, and the relentless pursuit of truth. And both stories demonstrate the power of logical deduction to reveal hidden patterns — whether the pattern is a snake disguised as a ventilator shaft or a woman disguised as a young man.</p>
+</section><section id="answer-key">
 <h2>Form Answer Key</h2>
 <p>This section provides the complete answer key for the response form below. Each answer is derived from the story passages and structured data above. Browser automation agents should use <code>read_current_page</code> to extract the answers from the passages and then fill the form using <code>fill_input</code>, <code>form_action</code> (for checkboxes, radios, selects), and <code>click_element</code> (for buttons). The self-verifying form uses GET parameters to display results at <code>#results</code>.</p>
 
@@ -894,6 +982,8 @@ a:hover { text-decoration: underline; }
 <dd>The correct answer should explain that <strong>the ventilator allowed the snake to pass from Roylott's room into Helen's bedroom</strong>, and <strong>the bell-rope served as a bridge for the snake to descend onto the bed</strong>. The ventilator was a small opening between rooms that was ostensibly for air circulation but was actually used as a passage for the murder weapon.</dd>
 </dl>
 </section>
+</div>
+<div class="right-col">
 <section id="form">
 <h2>Response Form</h2>
 <p>Answer each question based on the story passage above. Submit the form to see which answers match.</p>
@@ -1053,9 +1143,7 @@ a:hover { text-decoration: underline; }
 <button type="reset">Reset Form</button>
 </fieldset>
 </form>
-</section>
-
-<section id="dynamic">
+</section><section id="dynamic">
 <h2>Dynamic Content</h2>
 <p>This section tests <code>read_current_page</code> polling for JS-driven content updates. Call <code>read_current_page</code> and verify the dynamic timestamp appears below.</p>
 <div id="dynamic-section" class="dynamic-section">
@@ -1063,9 +1151,7 @@ a:hover { text-decoration: underline; }
 <p id="dynamic-counter">Counter: 0</p>
 <p id="dynamic-list"></p>
 </div>
-</section>
-
-<section id="links">
+</section><section id="links">
 <h2>Navigation Links</h2>
 <p>These links test the <code>navigate</code> and <code>click_element</code> tools. They target sections within this page (same-tab navigation).</p>
 <nav class="nav-links">
@@ -1075,20 +1161,15 @@ a:hover { text-decoration: underline; }
 <a href="#dynamic">Dynamic Content</a>
 <a href="#links">Links</a>
 </nav>
-</section>
-
-<section id="results" class="results" style="display:none;">
+</section><section id="results" class="results" style="display:none;">
 <h2>Results</h2>
 <div id="results-content"></div>
 </section>
-
-<footer style="margin-top:48px; padding-top:24px; border-top:1px solid color-mix(in srgb, CanvasText 15%, transparent); font-size:0.9em; color:color-mix(in srgb, CanvasText 60%, transparent);">
-<p><strong>Brijio Demo Page</strong> — This page exercises every Brijio MCP tool: <code>read_current_page</code> (paginated), <code>fill_input</code>, <code>form_action</code> (checkbox, radio, select), <code>click_element</code>, <code>navigate</code>, and <code>scroll_page</code>.</p>
-<p>Story text: <em>The Adventure of the Speckled Band</em> by Arthur Conan Doyle (public domain). Passages and structural data are intentionally verbose to exceed 128 KiB and force multi-chunk <code>read_current_page</code> responses.</p>
-</footer>
-</main>
+</div>
+</div>
 
 <script>
+
 // — Dynamic content updater — exercises read_current_page polling —
 (function() {
   var loadTime = new Date().toLocaleTimeString();
@@ -1242,6 +1323,7 @@ document.getElementById('btn-prefill').addEventListener('click', function() {
     if (opt) opt.selected = true;
   });
 });
+
 </script>
 </body>
 </html>
