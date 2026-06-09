@@ -270,36 +270,56 @@ const pairingToken = process.env.BRIJIO_PAIRING_TOKEN
 
 let wsServer
 let mcpRuntime
+let demoAttachedToExistingDaemon = false
 
-try {
-  const { createWebSocketServer } = await importModule('@brijio/websocket/server')
-  const { getMcpHttpServerOptionsFromEnv, startBrijioMcpHttpServer } = await importModule('../src/http-server.ts')
-
-  wsServer = await createWebSocketServer({
-    host: wsHost,
-    port: wsPort,
-    pairingToken
-  })
-
-  const mcpOptions = getMcpHttpServerOptionsFromEnv()
-  mcpRuntime = await startBrijioMcpHttpServer(mcpOptions)
-} catch (error) {
-  if (error instanceof Error && 'code' in error && error.code === 'EADDRINUSE') {
-    const port = 'port' in error && typeof error.port === 'number' ? error.port : wsPort
-    console.error([
-      '',
-      `❌ Brijio failed to start: port ${port} is already in use.`,
-      '',
-      '  Another process is using that port. You can:',
-      '',
-      '  • Run `brijio --doctor` to diagnose port conflicts',
-      '  • Set WEBSOCKET_PORT or MCP_HTTP_PORT to use a different port',
-      '  • Stop the conflicting process and try again',
-      ''
-    ].join('\n'))
-    process.exit(1)
+// In demo mode, check if the daemon is already running before starting WS/MCP.
+// This avoids the SO_REUSEPORT issue where both processes bind the same port
+// but with different pairing tokens, causing scope mismatches.
+if (isDemo) {
+  try {
+    const healthUrl = `http://127.0.0.1:${wsPort}/health`
+    const response = await fetch(healthUrl, { signal: AbortSignal.timeout(1500) })
+    if (response.ok) {
+      demoAttachedToExistingDaemon = true
+      console.log('Brijio daemon is already running. Starting demo server only.')
+    }
+  } catch {
+    // Daemon not reachable — proceed with full stack startup
   }
-  throw error
+}
+
+if (!demoAttachedToExistingDaemon) {
+  try {
+    const { createWebSocketServer } = await importModule('@brijio/websocket/server')
+    const { getMcpHttpServerOptionsFromEnv, startBrijioMcpHttpServer } = await importModule('../src/http-server.ts')
+
+    wsServer = await createWebSocketServer({
+      host: wsHost,
+      port: wsPort,
+      pairingToken
+    })
+
+    const mcpOptions = getMcpHttpServerOptionsFromEnv()
+    mcpRuntime = await startBrijioMcpHttpServer(mcpOptions)
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'EADDRINUSE') {
+      const port = 'port' in error && typeof error.port === 'number' ? error.port : wsPort
+      console.error([
+        '',
+        `❌ Brijio failed to start: port ${port} is already in use.`,
+        '',
+        '  Another process is using that port. You can:',
+        '',
+        '  • Run `brijio --doctor` to diagnose port conflicts',
+        '  • Set WEBSOCKET_PORT or MCP_HTTP_PORT to use a different port',
+        '  • Stop the conflicting process and try again',
+        ''
+      ].join('\n'))
+      process.exit(1)
+    } else {
+      throw error
+    }
+  }
 }
 
 // ─── Startup banner (ADR-0038: goes to stderr) ─────────────────────────────
@@ -317,7 +337,8 @@ const banner = await formatStartupBanner({
   authTokenProvided,
   dev: isDev,
   demo: isDemo,
-  demoPort: isDemo ? demoPort : undefined
+  demoPort: isDemo ? demoPort : undefined,
+  demoAttachedToExistingDaemon
 })
 
 process.stderr.write(banner + '\n')
@@ -332,10 +353,15 @@ async function gracefulShutdown () {
 
   console.log('\nShutting down...')
 
-  const closePromises = [
-    wsServer.close(),
-    mcpRuntime.close()
-  ]
+  const closePromises = []
+
+  if (wsServer) {
+    closePromises.push(wsServer.close())
+  }
+
+  if (mcpRuntime) {
+    closePromises.push(mcpRuntime.close())
+  }
 
   if (demoServerRuntime !== null) {
     closePromises.push(demoServerRuntime.close())
