@@ -2,6 +2,8 @@
 
 The Chrome extension is the first Brijio browser client.
 
+For the complete and current list of Brijio capabilities, browser support status, and product boundaries, see the [canonical capability matrix](../../docs/project/CAPABILITY_MATRIX.md).
+
 It must remain user-controlled:
 
 - The user manually starts and stops the bridge through the extension toolbar
