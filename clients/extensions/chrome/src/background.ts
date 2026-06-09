@@ -8,6 +8,7 @@ import {
   type BrijioSocket,
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
+  type FormSubmitTarget,
   stringValue,
   requireString,
   createBrowserInstanceId,
@@ -155,32 +156,34 @@ const controller = new BrijioBackgroundController({
     }
   },
   pageActions: {
-    async click (target) {
-      return await performActiveTabClick(target)
+    async click (target, pageContextId) {
+      return await performActiveTabClick(target, pageContextId)
     },
-    async writeText (target, text) {
-      return await performActiveTabWriteText(target, text)
+    async writeText (target, text, pageContextId) {
+      return await performActiveTabWriteText(target, text, pageContextId)
     },
-    async setChecked (target, checked) {
-      return await performActiveTabSetChecked(target, checked)
+    async setChecked (target, checked, pageContextId) {
+      return await performActiveTabSetChecked(target, checked, pageContextId)
     },
-    async selectOptions (target, values) {
-      return await performActiveTabSelectOptions(target, values)
+    async selectOptions (target, values, pageContextId) {
+      return await performActiveTabSelectOptions(target, values, pageContextId)
     },
-    async submitForm (target) {
-      return await performActiveTabSubmitForm(target)
+    async submitForm (target, pageContextId) {
+      return await performActiveTabSubmitForm(target, pageContextId)
     }
   },
   timers: createGlobalTimers()
 })
 
 async function performActiveTabClick (
-  target: ClickActionTarget
+  target: ClickActionTarget,
+  pageContextId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
       type: 'perform_click',
-      target
+      target,
+      ...(pageContextId !== undefined ? { pageContextId } : {})
     },
     chromeDeps
   )
@@ -188,13 +191,15 @@ async function performActiveTabClick (
 
 async function performActiveTabWriteText (
   target: WriteTextActionTarget | WriteTextEditableTarget,
-  text: string
+  text: string,
+  pageContextId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
       type: 'perform_write_text',
       target,
-      text
+      text,
+      ...(pageContextId !== undefined ? { pageContextId } : {})
     },
     chromeDeps
   )
@@ -202,13 +207,15 @@ async function performActiveTabWriteText (
 
 async function performActiveTabSetChecked (
   target: WriteTextActionTarget,
-  checked: boolean
+  checked: boolean,
+  pageContextId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
       type: 'perform_set_checked',
       target,
-      checked
+      checked,
+      ...(pageContextId !== undefined ? { pageContextId } : {})
     },
     chromeDeps
   )
@@ -216,25 +223,29 @@ async function performActiveTabSetChecked (
 
 async function performActiveTabSelectOptions (
   target: WriteTextActionTarget,
-  values: string[]
+  values: string[],
+  pageContextId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
       type: 'perform_select_options',
       target,
-      values
+      values,
+      ...(pageContextId !== undefined ? { pageContextId } : {})
     },
     chromeDeps
   )
 }
 
-async function performActiveTabSubmitForm (target: {
-  formId: string
-}): Promise<PageActionResult> {
+async function performActiveTabSubmitForm (
+  target: FormSubmitTarget,
+  pageContextId?: number
+): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
       type: 'perform_submit_form',
-      target
+      target,
+      ...(pageContextId !== undefined ? { pageContextId } : {})
     },
     chromeDeps
   )

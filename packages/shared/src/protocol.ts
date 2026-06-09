@@ -94,15 +94,31 @@ export interface ClickActionTarget {
   expectedRole?: string
 }
 
-export interface WriteTextActionTarget {
+export interface FormControlTarget {
   formId: string
   controlId: string
+  /** Optional: validate the control's visible label/text matches before acting */
+  expectedLabel?: string
 }
 
-export interface WriteTextEditableTarget {
+export interface EditableActionTarget {
   kind: 'editable'
   id: string
+  /** Optional: validate the editable element's visible text/aria-label matches */
+  expectedText?: string
 }
+
+export interface FormSubmitTarget {
+  formId: string
+  /** Optional: validate the form contains an expected heading or label */
+  expectedLabel?: string
+}
+
+/** @deprecated Use FormControlTarget instead — WriteTextActionTarget is now FormControlTarget with optional expectedLabel */
+export type WriteTextActionTarget = FormControlTarget
+
+/** @deprecated Use EditableActionTarget instead — WriteTextEditableTarget is now EditableActionTarget with optional expectedText */
+export type WriteTextEditableTarget = EditableActionTarget
 
 export interface PerformClickAction {
   type: 'click'
@@ -117,25 +133,24 @@ export interface PerformWriteTextAction {
 
 export interface PerformSetCheckedAction {
   type: 'set_checked'
-  target: WriteTextActionTarget
+  target: FormControlTarget
   checked: boolean
 }
 
 export interface PerformSelectOptionsAction {
   type: 'select_options'
-  target: WriteTextActionTarget
+  target: FormControlTarget
   values: string[]
 }
 
 export interface PerformSubmitFormAction {
   type: 'submit_form'
-  target: {
-    formId: string
-  }
+  target: FormSubmitTarget
 }
 
 export interface PerformActionRequest {
   type: 'perform_action'
+  pageContextId?: number
   action:
   | PerformClickAction
   | PerformWriteTextAction
@@ -209,6 +224,7 @@ export interface PageAction {
 }
 
 export interface PageContext {
+  pageContextId?: number
   url: string
   title: string
   timestamp: string
@@ -280,6 +296,7 @@ export type ActionResultErrorCode =
   | 'target_option_disabled'
   | 'action_failed'
   | 'stale_context'
+  | 'page_navigated'
 
 export interface PageContextResponse {
   type: 'page_context_response'
@@ -362,6 +379,14 @@ export interface StaleContextDetail {
   foundHref?: string
   expectedRole?: string
   foundRole?: string
+  expectedLabel?: string
+  foundLabel?: string
+  expectedType?: string
+  foundType?: string
+  formId?: string
+  controlId?: string
+  previousContextId?: number
+  currentContextId?: number
 }
 
 export interface ActionResultErrorResponse {
