@@ -4,6 +4,10 @@ The Safari Web Extension brings full Brijio functionality to Safari,
 using `@brijio/shared` for browser-agnostic logic and Safari-specific
 adapters for API differences.
 
+For the complete and current list of Brijio capabilities, browser support
+status, and product boundaries, see the
+[canonical capability matrix](../../docs/project/CAPABILITY_MATRIX.md).
+
 ## Architecture
 
 The Safari extension follows the same adapter pattern as the Chrome extension.
