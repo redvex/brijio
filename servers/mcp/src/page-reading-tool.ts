@@ -11,6 +11,7 @@ import {
 } from './protocol.js'
 
 const defaultMaxContentChunks = 1
+const defaultStartContentIndex = 1
 const maxAllowedContentChunks = 10
 
 export type BrijioToolErrorCode =
@@ -34,6 +35,7 @@ export type BrijioToolResult<T> =
 export interface ReadCurrentPageInput {
   includeContent?: boolean
   maxContentChunks?: number
+  startContentIndex?: number
   browserInstanceId?: unknown
 }
 
@@ -50,6 +52,7 @@ export type ReadCurrentPageResult =
 interface NormalizedReadCurrentPageInput {
   includeContent: boolean
   maxContentChunks: number
+  startContentIndex: number
   browserInstanceId?: string
 }
 
@@ -92,6 +95,7 @@ export async function readCurrentPage (
     config,
     contextResult.data,
     normalizedInput.data.maxContentChunks,
+    normalizedInput.data.startContentIndex,
     normalizedInput.data.browserInstanceId
   )
 }
@@ -101,6 +105,7 @@ function normalizeInput (
 ): BrijioToolResult<NormalizedReadCurrentPageInput> {
   const includeContent = input.includeContent ?? true
   const maxContentChunks = input.maxContentChunks ?? defaultMaxContentChunks
+  const startContentIndex = input.startContentIndex ?? defaultStartContentIndex
   const browserInstanceId = normalizeBrowserInstanceId(input.browserInstanceId)
 
   if (typeof includeContent !== 'boolean') {
@@ -117,6 +122,15 @@ function normalizeInput (
     )
   }
 
+  if (
+    !Number.isInteger(startContentIndex) ||
+    startContentIndex < 1
+  ) {
+    return invalidToolInputResponse(
+      'startContentIndex must be a positive integer.'
+    )
+  }
+
   if (!browserInstanceId.ok) {
     return browserInstanceId
   }
@@ -126,6 +140,7 @@ function normalizeInput (
     data: {
       includeContent,
       maxContentChunks,
+      startContentIndex,
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
         : {})
@@ -137,10 +152,11 @@ async function readContentChunks (
   config: BrijioPageContextConfig,
   context: PageContext,
   maxContentChunks: number,
+  startContentIndex: number,
   browserInstanceId?: string
 ): Promise<ReadCurrentPageResult> {
   const content: PageContent[] = []
-  let nextIndex = context.content.firstIndex
+  let nextIndex = startContentIndex
 
   for (let count = 0; count < maxContentChunks; count += 1) {
     const contentResult = await getCurrentPageContent(

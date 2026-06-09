@@ -98,6 +98,12 @@ export async function createBrijioMcpServer (
           .number()
           .optional()
           .describe('Maximum readable content chunks to fetch. Defaults to 1, max 10.'),
+        startContentIndex: z
+          .number()
+          .optional()
+          .describe(
+            '1-based index of the first content chunk to fetch. Use the nextContentIndex from a previous truncated response to continue reading. Defaults to 1.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
