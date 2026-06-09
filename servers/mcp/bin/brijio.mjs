@@ -95,6 +95,11 @@ const {
   startDemoServer
 } = demoServerModule
 
+// ─── Determine if demo mode before parsing ───────────────────────────────────
+// Must be at module scope because the demo server startup code runs outside
+// the try/catch that parses the command. process.argv[2] is the subcommand.
+const isDemo = process.argv[2] === 'demo'
+
 // ─── Apply env early for --print-config / --doctor ───────────────────────────
 // These commands need token values but don't start servers.
 
@@ -207,8 +212,7 @@ try {
     process.env.MCP_HTTP_HOST = '127.0.0.1'
   }
 
-  const isDemo = command.name === 'demo'
-  // Demo mode also binds to 127.0.0.1 like dev mode
+  // Demo mode: set env vars for 127.0.0.1 binding
   if (isDemo) {
     process.env.WEBSOCKET_HOST = '127.0.0.1'
     process.env.MCP_HTTP_HOST = '127.0.0.1'
