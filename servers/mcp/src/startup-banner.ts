@@ -23,6 +23,10 @@ export interface BannerOptions {
   authTokenProvided: boolean
   /** Dev mode flag — forces 127.0.0.1 */
   dev: boolean
+  /** Demo mode flag — include demo page URL in banner */
+  demo?: boolean
+  /** Demo page port (only shown when demo is true) */
+  demoPort?: number
 }
 
 /**
@@ -38,7 +42,9 @@ export async function formatStartupBanner (options: BannerOptions): Promise<stri
     authToken,
     pairingTokenProvided,
     authTokenProvided,
-    dev
+    dev,
+    demo,
+    demoPort
   } = options
 
   let networkPaths: NetworkPaths | undefined
@@ -66,11 +72,20 @@ export async function formatStartupBanner (options: BannerOptions): Promise<stri
       urlEntries.push(`  ${addr.label.padEnd(12)} WS: ${wsUrl}   MCP: ${mcpUrl}`)
     }
     lines.push(...urlEntries)
+
+    if (demo === true && demoPort !== undefined) {
+      lines.push(`  Demo page:   http://${networkPaths.bestHost ?? '127.0.0.1'}:${demoPort}/`)
+    }
   } else {
     const displayWsHost = dev ? '127.0.0.1' : 'localhost'
     const displayMcpHost = dev ? '127.0.0.1' : 'localhost'
     lines.push(`  WebSocket:    ws://${displayWsHost}:${wsPort}`)
     lines.push(`  MCP:         http://${displayMcpHost}:${mcpPort}${mcpPath}`)
+  }
+
+  if (demo === true && demoPort !== undefined) {
+    const displayDemoHost = dev ? '127.0.0.1' : 'localhost'
+    lines.push(`  Demo page:   http://${displayDemoHost}:${demoPort}/`)
   }
 
   lines.push('')

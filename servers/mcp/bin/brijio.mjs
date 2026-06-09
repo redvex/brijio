@@ -54,12 +54,14 @@ const [
   daemonModule,
   printConfigModule,
   doctorModule,
-  startupBannerModule
+  startupBannerModule,
+  demoServerModule
 ] = await Promise.all([
   importModule('../src/daemon.ts'),
   importModule('../src/print-config.ts'),
   importModule('../src/doctor.ts'),
-  importModule('../src/startup-banner.ts')
+  importModule('../src/startup-banner.ts'),
+  importModule('../src/demo-server.ts')
 ])
 
 const {
@@ -87,6 +89,11 @@ const {
 
 const { runDoctorChecks, formatDoctorReport } = doctorModule
 const { formatStartupBanner } = startupBannerModule
+
+const {
+  getDemoPortFromEnv,
+  startDemoServer
+} = demoServerModule
 
 // ─── Apply env early for --print-config / --doctor ───────────────────────────
 // These commands need token values but don't start servers.
@@ -199,6 +206,13 @@ try {
     process.env.WEBSOCKET_HOST = '127.0.0.1'
     process.env.MCP_HTTP_HOST = '127.0.0.1'
   }
+
+  const isDemo = command.name === 'demo'
+  // Demo mode also binds to 127.0.0.1 like dev mode
+  if (isDemo) {
+    process.env.WEBSOCKET_HOST = '127.0.0.1'
+    process.env.MCP_HTTP_HOST = '127.0.0.1'
+  }
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error))
   process.exit(1)
@@ -229,6 +243,16 @@ const configuredTimeoutMs = resolveRenamedEnv({
 })
 process.env.BRIJIO_REQUEST_TIMEOUT_MS = configuredTimeoutMs
 process.env.BROWSERBRIDGE_REQUEST_TIMEOUT_MS = configuredTimeoutMs
+
+// ─── Start demo server (only in demo mode) ──────────────────────────────────
+
+const demoPort = getDemoPortFromEnv()
+let demoServerRuntime = null
+
+if (isDemo) {
+  const demoHost = process.env.WEBSOCKET_HOST ?? '127.0.0.1'
+  demoServerRuntime = await startDemoServer({ host: demoHost, port: demoPort })
+}
 
 // ─── Start servers ────────────────────────────────────────────────────────────
 // Server modules are imported dynamically ONLY in run mode. This ensures
@@ -285,7 +309,9 @@ const banner = await formatStartupBanner({
   authToken: process.env.MCP_HTTP_AUTH_TOKEN ?? '',
   pairingTokenProvided,
   authTokenProvided,
-  dev: isDev
+  dev: isDev,
+  demo: isDemo,
+  demoPort: isDemo ? demoPort : undefined
 })
 
 process.stderr.write(banner + '\n')
@@ -300,11 +326,17 @@ async function gracefulShutdown () {
 
   console.log('\nShutting down...')
 
+  const closePromises = [
+    wsServer.close(),
+    mcpRuntime.close()
+  ]
+
+  if (demoServerRuntime !== null) {
+    closePromises.push(demoServerRuntime.close())
+  }
+
   try {
-    await Promise.all([
-      wsServer.close(),
-      mcpRuntime.close()
-    ])
+    await Promise.all(closePromises)
   } catch (err) {
     console.error('Error during shutdown:', err)
   }

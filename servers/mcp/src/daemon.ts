@@ -18,6 +18,7 @@ export type DaemonPlatform = 'darwin' | 'linux'
 
 export type DaemonCommand =
   | { name: 'run', args: string[], dev?: boolean }
+  | { name: 'demo' }
   | { name: 'print-config', agent?: string }
   | { name: 'doctor' }
   | { name: 'install', wsPort?: number, mcpPort?: number }
@@ -130,6 +131,11 @@ export function parseDaemonCommand (args: string[]): DaemonCommand {
 
   if (first === 'install') {
     return parseInstallCommand(rest)
+  }
+
+  if (first === 'demo') {
+    ensureNoArgs(first, rest)
+    return { name: 'demo' }
   }
 
   if (first === 'uninstall') {
@@ -516,6 +522,7 @@ export function usage (): string {
 
 Usage:
   brijio                         Run WebSocket and MCP servers interactively
+  brijio demo                    Run servers with the demo page for quick verification
   brijio --dev                   Run in dev mode (bind to 127.0.0.1 only)
   brijio --print-config [agent]  Print MCP client config for an agent
   brijio --doctor                Run diagnostic checks
