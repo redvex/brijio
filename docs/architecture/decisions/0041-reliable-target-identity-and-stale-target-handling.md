@@ -14,7 +14,7 @@ BrowserBridge uses short-lived positional IDs (`bb-1`, `bb-2`, etc.) generated b
 
 ### Gap 2: Post-navigation invalidation is invisible
 
-After a click that triggers navigation, **every cached ID from the previous `read_current_page` is invalid** — not just the clicked element. The agent has no signal that its entire page-context snapshot is stale. Today, subsequent calls using old IDs may silently target wrong elements or return `target_not_found`, giving the agent no structured way to understand *why* things broke.
+After a click that triggers navigation, **every cached ID from the previous `read_current_page` is invalid** — not just the clicked element. The agent has no signal that its entire page-context snapshot is stale. Today, subsequent calls using old IDs may silently target wrong elements or return `target_not_found`, giving the agent no structured way to understand _why_ things broke.
 
 ### Gap 3: `target_not_found` conflates stale IDs with missing elements
 
@@ -40,6 +40,7 @@ export interface FormControlTarget {
 - `expectedLabel`: Matches the visible label or placeholder text of the control (substring, case-insensitive). Extracted from `<label>`, `aria-label`, `title`, or `placeholder`.
 
 When validation fails, returns:
+
 ```ts
 {
   ok: false,
@@ -63,7 +64,7 @@ When validation fails, returns:
 
 ```ts
 export interface EditableActionTarget {
-  kind: 'editable';
+  kind: "editable";
   id: string;
   /** Optional: validate the editable element's visible text/aria-label matches */
   expectedText?: string;
@@ -108,6 +109,7 @@ When an action tool receives IDs from a `page_context_id` that no longer matches
 This is **separate from** `stale_context`. A `page_navigated` error is definitive: the entire previous snapshot is invalid. A `stale_context` error means the page might have shifted minimally — re-reading might produce similar IDs, or the agent might choose to omit validation and proceed anyway.
 
 **Implementation:**
+
 - Content script maintains a `pageContextVersion` counter starting at 1, stored in the content script's module scope.
 - `read_current_page` includes `pageContextId: pageContextVersion` in its response under `data.context`.
 - Every action request envelope that carries positional IDs (`perform_action` with `click`, `write_text`, `set_checked`, `select_options`, `submit_form`) includes an optional `pageContextId` field.
@@ -118,11 +120,11 @@ This is **separate from** `stale_context`. A `page_navigated` error is definitiv
 
 Today, `target_not_found` means "no element at that position". Split into:
 
-| Error code | Meaning | Agent behavior |
-|---|---|---|
-| `stale_context` | Element exists at position but doesn't match validation fields | Re-read and retry with fresh IDs |
-| `page_navigated` | Page navigated since read; all IDs are invalid | Re-read; entire snapshot is stale |
-| `target_not_found` | No element at that position at all (ID out of range) | Likely a bug; re-read to verify |
+| Error code         | Meaning                                                        | Agent behavior                    |
+| ------------------ | -------------------------------------------------------------- | --------------------------------- |
+| `stale_context`    | Element exists at position but doesn't match validation fields | Re-read and retry with fresh IDs  |
+| `page_navigated`   | Page navigated since read; all IDs are invalid                 | Re-read; entire snapshot is stale |
+| `target_not_found` | No element at that position at all (ID out of range)           | Likely a bug; re-read to verify   |
 
 The distinction gives agents clear recovery guidance.
 
@@ -131,21 +133,27 @@ The distinction gives agents clear recovery guidance.
 Each action tool gains its validation field plus `pageContextId`:
 
 #### `click_element`
+
 Already has `expectedText`, `expectedHref`, `expectedRole`. **Add**: `pageContextId` (optional integer).
 
 #### `fill_input`
+
 **Add**: `expectedLabel` (optional string), `pageContextId` (optional integer).
 
 #### `fill_editable`
+
 **Add**: `expectedText` (optional string), `pageContextId` (optional integer).
 
 #### `set_checked`
+
 **Add**: `expectedLabel` (optional string), `pageContextId` (optional integer).
 
 #### `select_options`
+
 **Add**: `expectedLabel` (optional string), `pageContextId` (optional integer).
 
 #### `submit_form`
+
 **Add**: `expectedLabel` (optional string), `pageContextId` (optional integer).
 
 ### 5. Update `read_current_page` response
@@ -173,9 +181,10 @@ Each `perform_action` sub-type gains `pageContextId`:
 
 ```ts
 type PerformActionRequest = {
-  type: 'perform_action';
-  pageContextId?: number;   // <-- new optional field
-  action: PerformClickAction
+  type: "perform_action";
+  pageContextId?: number; // <-- new optional field
+  action:
+    | PerformClickAction
     | PerformWriteTextAction
     | PerformSetCheckedAction
     | PerformSelectOptionsAction
@@ -200,9 +209,9 @@ Add to content script:
 
 ```ts
 // Increment page context version on navigation
-window.addEventListener('pageshow', () => {
-  pageContextVersion++
-})
+window.addEventListener("pageshow", () => {
+  pageContextVersion++;
+});
 ```
 
 ## Alternatives Considered
@@ -230,6 +239,7 @@ Skip the navigation detection and only use per-field validation. **Rejected**: A
 ## Consequences
 
 **Positive:**
+
 - All six action tools gain stale-context protection — no more silent wrong-button clicks or wrong-field fills
 - `page_navigated` gives agents a definitive "reset your mental model" signal after navigation
 - Clear error taxonomy (`stale_context` vs `page_navigated` vs `target_not_found`) enables targeted agent recovery strategies
@@ -237,17 +247,20 @@ Skip the navigation detection and only use per-field validation. **Rejected**: A
 - `pageContextId` is a lightweight integer, negligible payload impact
 
 **Negative:**
+
 - Every action tool schema gains optional fields — MCP clients need updates to use them
 - `pageshow` event covers full navigations but not SPA re-renders — agents still need `stale_context` validation for those
 - `expectedLabel` matching is fuzzy (substring, case-insensitive) and can produce false positives with very short labels like `"OK"` — but agents can pass more specific labels
 
 **Neutral:**
+
 - Protocol version unchanged — all additions are optional/backward compatible
 - Content script gains a `pageContextVersion` module-scoped counter and a `pageshow` listener
 
 ## Implementation Plan
 
 ### Phase 1: Protocol types and error codes
+
 1. Add `pageContextId` to `PerformActionRequest` in `packages/shared/src/protocol.ts`
 2. Add `page_navigated` to `ActionResultErrorCode` union in `packages/shared/src/protocol.ts`
 3. Add `expectedLabel` to `FormControlTarget` and `FormSubmitTarget` in protocol types
@@ -255,30 +268,42 @@ Skip the navigation detection and only use per-field validation. **Rejected**: A
 5. Add `pageContextId` to `PageContextResponse` shape
 
 ### Phase 2: Content script — page context version
+
 1. Add `pageContextVersion` counter in content script module scope
 2. Increment on `pageshow` event
 3. Include `pageContextId` in `read_current_page` response
 4. Check `pageContextId` in action handlers, return `page_navigated` on mismatch
 
 ### Phase 3: Content script — validation for all action types
+
 1. Add `expectedLabel` validation to form control target resolution (`fill_input`, `set_checked`, `select_options`)
 2. Add `expectedText` validation to editable target resolution (`fill_editable`)
 3. Add `expectedLabel` validation to form submit target resolution (`submit_form`)
 4. Return `stale_context` with `detail` on validation failure
 
-### Phase 4: MCP server — schema and tool updates
+### Phase 4: Extension entry points
+
+1. Chrome background script (`clients/extensions/chrome/src/background.ts`) — forward `pageContextId` and new validation fields (`expectedLabel` on `FormControlTarget`/`FormSubmitTarget`, `expectedText` on `EditableActionTarget`) in `perform_action` envelopes
+2. Safari background entry (`clients/extensions/safari/src/background-entry.ts`) — same passthrough as Chrome for `pageContextId` and validation fields
+3. Chrome content script entry (`clients/extensions/chrome/src/content.ts`) — register `pageshow` event listener to increment shared `pageContextVersion`
+4. Safari content script entry (`clients/extensions/safari/src/content-script-entry.ts`) — register `pageshow` event listener to increment shared `pageContextVersion`
+
+### Phase 5: MCP server — schema and tool updates
+
 1. Add `pageContextId`, `expectedLabel`/`expectedText` to all action tool Zod schemas
 2. Pass `pageContextId` through to WebSocket envelope
 3. Pass validation fields through to content script
 4. Map `page_navigated` error code in MCP result
 
-### Phase 5: Tests
+### Phase 6: Tests
+
 1. Unit tests in `content-handler.test.ts` for each action type's validation
 2. Unit tests for `page_navigated` detection (pageContextId mismatch)
 3. Integration tests for error propagation through MCP → WS → extension → content script
 4. Negative tests: omitting validation fields preserves current behavior
 
-### Phase 6: Documentation
+### Phase 7: Documentation
+
 1. Update ADR 0036 to note it is extended by ADR 0041
 2. Update BrowserBridge skill guidance to recommend always passing validation fields
 3. Document `page_navigated` recovery strategy for agent consumers
