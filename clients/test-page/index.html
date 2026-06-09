@@ -1168,16 +1168,6 @@ a:hover { text-decoration: underline; }
 <p id="dynamic-counter">Counter: 0</p>
 <p id="dynamic-list"></p>
 </div>
-</section><section id="links">
-<h2>Navigation Links</h2>
-<p>These links test the <code>navigate</code> and <code>click_element</code> tools. They target sections within this page (same-tab navigation).</p>
-<nav class="nav-links">
-<a href="#story">Story (top)</a>
-<a href="#table-data">Tables</a>
-<a href="#form">Form</a>
-<a href="#dynamic">Dynamic Content</a>
-<a href="#links">Links</a>
-</nav>
 </section><section id="results" class="results" style="display:none;">
 <h2>Results</h2>
 <div id="results-content"></div>
@@ -1201,16 +1191,16 @@ a:hover { text-decoration: underline; }
   // Dynamic list — adds a new item every 3 seconds, up to 10
   var listEl = document.getElementById('dynamic-list');
   var listItems = [
-    'Dr. Roylott kept exotic animals at Stoke Moran',
-    'The ventilator was the snake\'s entry point',
-    'Helen\'s bedroom had a dummy bell-rope',
-    'Julia died two years before Helen visited Holmes',
-    'The swamp adder is the deadliest snake in India',
-    'Holmes struck the snake with his cane',
-    'Roylott\'s income was £750 per year',
-    'The story is set in April 1883',
-    'Mrs. Farintosh recommended Holmes to Helen',
-    'Watson is the narrator of this adventure'
+    'Live fixture event: demo-widget-mounted',
+    'Live fixture event: websocket-channel-ready',
+    'Live fixture event: polling-snapshot-queued',
+    'Live fixture event: viewport-metadata-refreshed',
+    'Live fixture event: accessibility-tree-sampled',
+    'Live fixture event: stable-selector-cache-warmed',
+    'Live fixture event: form-controls-indexed',
+    'Live fixture event: scroll-boundary-observed',
+    'Live fixture event: synthetic-latency-check-complete',
+    'Live fixture event: dynamic-content-cycle-finished'
   ];
   var nextItem = 0;
   setInterval(function() {
