@@ -27,6 +27,8 @@ export interface BannerOptions {
   demo?: boolean
   /** Demo page port (only shown when demo is true) */
   demoPort?: number
+  /** Demo attached to an already-running daemon (WS/MCP skipped) */
+  demoAttachedToExistingDaemon?: boolean
 }
 
 /**
@@ -44,7 +46,8 @@ export async function formatStartupBanner (options: BannerOptions): Promise<stri
     authTokenProvided,
     dev,
     demo,
-    demoPort
+    demoPort,
+    demoAttachedToExistingDaemon
   } = options
 
   let networkPaths: NetworkPaths | undefined
@@ -63,7 +66,24 @@ export async function formatStartupBanner (options: BannerOptions): Promise<stri
     ''
   ]
 
-  if (networkPaths != null && !dev) {
+  if (demoAttachedToExistingDaemon === true) {
+    // Demo attached to an already-running daemon — only show demo URL.
+    // WS/MCP URLs and tokens belong to the daemon process, not this one.
+    if (demoPort !== undefined) {
+      const demoHost = networkPaths?.bestHost ?? (dev ? '127.0.0.1' : 'localhost')
+      lines.push(`  Demo page:   http://${demoHost}:${demoPort}/`)
+      if (networkPaths != null && !dev) {
+        for (const addr of networkPaths.addresses) {
+          if (addr.host !== networkPaths.bestHost) {
+            lines.push(`               http://${addr.host}:${demoPort}/`)
+          }
+        }
+      }
+    }
+    lines.push('')
+    lines.push('  Connected to existing Brijio daemon on WS port ' + String(wsPort) + '.')
+    lines.push('  Run `brijio status` or `brijio logs` to inspect the daemon.')
+  } else if (networkPaths != null && !dev) {
     // Show all reachable addresses
     const urlEntries: string[] = []
     for (const addr of networkPaths.addresses) {
@@ -83,41 +103,45 @@ export async function formatStartupBanner (options: BannerOptions): Promise<stri
     lines.push(`  MCP:         http://${displayMcpHost}:${mcpPort}${mcpPath}`)
   }
 
-  if (demo === true && demoPort !== undefined) {
-    const displayDemoHost = dev ? '127.0.0.1' : 'localhost'
-    lines.push(`  Demo page:   http://${displayDemoHost}:${demoPort}/`)
-  }
+  if (demoAttachedToExistingDaemon !== true) {
+    if (demo === true && demoPort !== undefined) {
+      const displayDemoHost = dev ? '127.0.0.1' : 'localhost'
+      lines.push(`  Demo page:   http://${displayDemoHost}:${demoPort}/`)
+    }
 
-  lines.push('')
+    lines.push('')
 
-  // Token display
-  const pairingLabel = pairingTokenProvided ? '' : '  [ephemeral]'
-  const authLabel = authTokenProvided ? '' : '  [ephemeral]'
+    // Token display
+    const pairingLabel = pairingTokenProvided ? '' : '  [ephemeral]'
+    const authLabel = authTokenProvided ? '' : '  [ephemeral]'
 
-  lines.push(`  Pairing Token:  ${pairingToken}${pairingLabel}`)
-  lines.push(`  MCP Auth Token: ${authToken}${authLabel}`)
+    lines.push(`  Pairing Token:  ${pairingToken}${pairingLabel}`)
+    lines.push(`  MCP Auth Token: ${authToken}${authLabel}`)
 
-  if (!pairingTokenProvided || !authTokenProvided) {
+    if (!pairingTokenProvided || !authTokenProvided) {
+      lines.push(
+        '',
+        '  ⚠  Ephemeral tokens change on restart. Set BRIJIO_PAIRING_TOKEN and',
+        '    MCP_HTTP_AUTH_TOKEN environment variables for persistent tokens.'
+      )
+    }
+
+    if (dev) {
+      lines.push(
+        '',
+        '  🔧 Dev mode — binding to 127.0.0.1 only'
+      )
+    }
+
     lines.push(
       '',
-      '  ⚠  Ephemeral tokens change on restart. Set BRIJIO_PAIRING_TOKEN and',
-      '    MCP_HTTP_AUTH_TOKEN environment variables for persistent tokens.'
+      '  Connect your browser extension using the Pairing Token above.',
+      '  Configure your MCP client with the MCP URL and Auth Token.',
+      ''
     )
+  } else {
+    lines.push('')
   }
-
-  if (dev) {
-    lines.push(
-      '',
-      '  🔧 Dev mode — binding to 127.0.0.1 only'
-    )
-  }
-
-  lines.push(
-    '',
-    '  Connect your browser extension using the Pairing Token above.',
-    '  Configure your MCP client with the MCP URL and Auth Token.',
-    ''
-  )
 
   return lines.join('\n')
 }
