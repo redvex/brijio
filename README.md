@@ -551,15 +551,15 @@ Open the printed demo URL (default: `http://localhost:8789/`) in any browser. Th
 
 ### Quick Checks
 
-| MCP Tool | Test | Expected Result |
-|---|---|---|
-| `read_current_page` | Read the page | Multiple chunks; story text present in early chunks |
-| `fill_input` | Fill `surname` with "Stoner" | Field shows "Stoner" |
-| `form_action` (checkbox) | Check `chk-ventilator` | Checkbox checked |
-| `form_action` (radio) | Select `radio-snake` | Radio selected |
-| `form_action` (select) | Select `calcutta` in `location-select` | Dropdown shows "Calcutta, India" |
-| `click_element` | Click `btn-prefill` | All fields populate with correct answers |
-| `click_element` | Click `btn-submit` | URL updates with GET params; results section appears |
+| MCP Tool                 | Test                                   | Expected Result                                      |
+| ------------------------ | -------------------------------------- | ---------------------------------------------------- |
+| `read_current_page`      | Read the page                          | Multiple chunks; story text present in early chunks  |
+| `fill_input`             | Fill `surname` with "Stoner"           | Field shows "Stoner"                                 |
+| `form_action` (checkbox) | Check `chk-ventilator`                 | Checkbox checked                                     |
+| `form_action` (radio)    | Select `radio-snake`                   | Radio selected                                       |
+| `form_action` (select)   | Select `calcutta` in `location-select` | Dropdown shows "Calcutta, India"                     |
+| `click_element`          | Click `btn-prefill`                    | All fields populate with correct answers             |
+| `click_element`          | Click `btn-submit`                     | URL updates with GET params; results section appears |
 
 For the full checklist, see [`clients/test-page/smoke-test.md`](clients/test-page/smoke-test.md).
 

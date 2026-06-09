@@ -37,6 +37,7 @@ Migrate and substantially extend `test.html` into `clients/test-page/index.html`
 **Passage** — a well-known public-domain short story, long enough to span at least two pagination chunks when `read_current_page` is called (i.e., the rendered page content should exceed 128 KiB after normalisation).
 
 The story must be:
+
 - **Public domain** — no licensing restrictions (e.g., works by Edgar Allan Poe, Arthur Conan Doyle, Lewis Carroll, or other pre-1929 authors).
 - **Recognisable** — agents and developers should be able to identify the source text, making verification intuitive.
 - **Content-rich** — containing specific names, numbers, dates, colours, and sequential events that form the basis for form questions.
@@ -47,26 +48,26 @@ The full text is included inline in `index.html` (not loaded from an external UR
 
 **Response form** — one section per input type Brijio supports, each clearly labelled:
 
-| Section | Input type | MCP tools exercised |
-|---|---|---|
-| Short text | `<input type="text">` | `fill_input` |
-| Email | `<input type="email">` | `fill_input` |
-| Password | `<input type="password">` | `fill_input` |
-| Search | `<input type="search">` | `fill_input` |
-| Textarea | `<textarea>` | `fill_input` |
-| Number | `<input type="number">` | `fill_input` |
-| Date | `<input type="date">` | `fill_input` |
-| Checkboxes | `<input type="checkbox">` (multi) | `form_action` (checkbox) |
-| Radio buttons | `<input type="radio">` (grouped) | `form_action` (radio) |
-| Single select | `<select>` | `form_action` (select) / `select_element` |
-| Multi-select | `<select multiple>` | `form_action` (select) / `select_element` |
-| Contenteditable | `<div contenteditable>` | `fill_input` (rich) |
-| Links | `<a href>` | `click_element` / `navigate` |
-| Buttons | `<button>` | `click_element` |
-| Disabled controls | `disabled` inputs/buttons | Verify graceful handling |
-| Dynamic DOM | JS-driven content insertion | `read_current_page` (poll) |
-| Table | `<table>` with structured data | `read_current_page` |
-| Navigation | Same-tab link, redirect chain | `navigate` |
+| Section           | Input type                        | MCP tools exercised                       |
+| ----------------- | --------------------------------- | ----------------------------------------- |
+| Short text        | `<input type="text">`             | `fill_input`                              |
+| Email             | `<input type="email">`            | `fill_input`                              |
+| Password          | `<input type="password">`         | `fill_input`                              |
+| Search            | `<input type="search">`           | `fill_input`                              |
+| Textarea          | `<textarea>`                      | `fill_input`                              |
+| Number            | `<input type="number">`           | `fill_input`                              |
+| Date              | `<input type="date">`             | `fill_input`                              |
+| Checkboxes        | `<input type="checkbox">` (multi) | `form_action` (checkbox)                  |
+| Radio buttons     | `<input type="radio">` (grouped)  | `form_action` (radio)                     |
+| Single select     | `<select>`                        | `form_action` (select) / `select_element` |
+| Multi-select      | `<select multiple>`               | `form_action` (select) / `select_element` |
+| Contenteditable   | `<div contenteditable>`           | `fill_input` (rich)                       |
+| Links             | `<a href>`                        | `click_element` / `navigate`              |
+| Buttons           | `<button>`                        | `click_element`                           |
+| Disabled controls | `disabled` inputs/buttons         | Verify graceful handling                  |
+| Dynamic DOM       | JS-driven content insertion       | `read_current_page` (poll)                |
+| Table             | `<table>` with structured data    | `read_current_page`                       |
+| Navigation        | Same-tab link, redirect chain     | `navigate`                                |
 
 **Pagination verification:** The story length ensures that `read_current_page` returns `content.truncated: true`, requiring the agent to request subsequent chunks via `browser://page/current/content/2`, `browser://page/current/content/3`, etc. Form questions reference facts from later chunks specifically, guaranteeing that agents must exercise multi-chunk reads to answer correctly.
 
@@ -86,6 +87,7 @@ Add `clients/test-page/smoke-test.md` — a Markdown checklist listing each MCP 
 
 ```markdown
 ## 1. Page reading
+
 - [ ] Call `read_current_page` → expect `content.truncated: true` (story spans multiple chunks)
 - [ ] Request chunk 2 via `browser://page/current/content/2` → expect continuation of story text
 - [ ] Call `read_current_page` → expect passage text containing "Speckled Band"
@@ -93,10 +95,11 @@ Add `clients/test-page/smoke-test.md` — a Markdown checklist listing each MCP 
 - [ ] Call `read_current_page` after dynamic update → expect "Content loaded at HH:MM"
 
 ## 2. Form filling
+
 - [ ] Call `fill_input` on `#surname` with "Stoner" → expect field value "Stoner"
 - [ ] Call `form_action` checkbox "whistle" → expect checked
 - [ ] Call `form_action` select "location" value "Surrey" → expect selected
-...
+      ...
 ```
 
 This is meant as a human-readable reference for agent operators, not a machine-executable test harness. The agent follows the steps and verifies each outcome visually or via tool response. CI integration tests continue to use the existing `integration.test.ts` harness.
@@ -109,7 +112,7 @@ This is meant as a human-readable reference for agent operators, not a machine-e
 
 Add a section to the project README:
 
-```markdown
+````markdown
 ## Verify in 2 minutes
 
 1. Install: `npx @brijio/mcp`
@@ -128,6 +131,8 @@ Add a section to the project README:
 docker compose --profile test up
 # Open http://localhost:8789/
 ```
+````
+
 </details>
 ```
 
@@ -138,6 +143,7 @@ Delete the root `test.html` file. It is superseded entirely by `clients/test-pag
 ## Consequences
 
 ### Positive
+
 - **Zero-Docker onboarding** — `brijio demo` gives a full-stack verification path without containers.
 - **Pagination coverage** — the story length forces multi-chunk `read_current_page` reads, exercising the paginated content protocol (ADR 0008/0009).
 - **Comprehensive coverage** — every MCP action type has a fixture, not just text inputs.
@@ -147,12 +153,14 @@ Delete the root `test.html` file. It is superseded entirely by `clients/test-pag
 - **CI continuity** — existing Docker-based CI unaffected; same content, different delivery.
 
 ### Negative
+
 - **Additional process responsibility** — `brijio demo` adds a static HTTP server to the daemon's responsibilities (mitigated: single-port, no dynamic logic, only started for the `demo` subcommand).
 - **Maintenance surface** — demo page must be kept in sync with tool changes (mitigated: page is simple static HTML with no build step).
 - **Page size** — the inline story makes `index.html` large (~20+ KB of prose). This is intentional to exercise pagination, but it makes editing less convenient (mitigated: story text is in a clearly marked `<section>`, easily swapped for another public-domain work).
 - **No dynamic backend** — form submission uses GET params and client-side JS only; no server-side validation. This limits testing of POST flows and file uploads (deferred to P1.6 file upload support and P6.1 E2E fixture tests).
 
 ### Neutral
+
 - ADR 0029's "test page is Docker-only" decision is superseded by this ADR.
 - `test.html` is removed; its useful content is merged into `clients/test-page/index.html`.
 - The `BRIJIO_DEMO_PORT` env var (default `8789`) joins the existing port configuration family (`BRIJIO_WS_PORT`, `BRIJIO_MCP_PORT`).
