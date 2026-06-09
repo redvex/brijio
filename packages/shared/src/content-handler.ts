@@ -338,16 +338,26 @@ function performSetChecked (
     }
   }
 
-  const changed = control.checked !== checked
+  const initialChecked = control.checked
 
-  if (changed) {
+  if (initialChecked !== checked) {
     if (type === 'radio' && checked) {
       uncheckRadioGroup(control, document)
     }
 
-    control.checked = checked
-    dispatchElementEvent(control, 'input')
-    dispatchElementEvent(control, 'change')
+    clickCheckableControl(control, checked)
+  }
+
+  const changed = initialChecked !== control.checked
+
+  if (control.checked !== checked) {
+    return {
+      ok: false,
+      error: {
+        code: 'action_failed',
+        message: 'Unable to set the requested checked state.'
+      }
+    }
   }
 
   return {
@@ -359,6 +369,31 @@ function performSetChecked (
       changed
     }
   }
+}
+
+function clickCheckableControl (
+  control: HTMLInputElement,
+  checked: boolean
+): void {
+  const label = control.closest('label') as HTMLElement | null
+
+  if (label !== null) {
+    label.click()
+  }
+
+  if (control.checked === checked) {
+    return
+  }
+
+  control.click()
+
+  if (control.checked === checked) {
+    return
+  }
+
+  control.checked = checked
+  dispatchElementEvent(control, 'input')
+  dispatchElementEvent(control, 'change')
 }
 
 function performSelectOptions (
