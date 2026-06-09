@@ -115,11 +115,13 @@ export interface ClickElementActionResultData {
 export interface FillInputTarget {
   formId: string
   controlId: string
+  expectedLabel?: string
 }
 
 export interface EditableTarget {
   kind: 'editable'
   id: string
+  expectedText?: string
 }
 
 export type WriteTextTarget = FillInputTarget | EditableTarget
@@ -145,6 +147,7 @@ export interface SelectOptionsActionResultData {
 
 export interface SubmitFormTarget {
   formId: string
+  expectedLabel?: string
 }
 
 export interface SubmitFormActionResultData {
@@ -164,6 +167,7 @@ export type BrijioErrorCode =
   | 'invalid_response'
   | 'browser_error'
   | 'stale_context'
+  | 'page_navigated'
   | 'invalid_resource_uri'
   | 'unsupported_scheme'
 
@@ -176,6 +180,14 @@ export interface StaleContextDetail {
   foundHref?: string
   expectedRole?: string
   foundRole?: string
+  expectedLabel?: string
+  foundLabel?: string
+  expectedType?: string
+  foundType?: string
+  formId?: string
+  controlId?: string
+  previousContextId?: number
+  currentContextId?: number
 }
 
 export type BrijioResourceResult<T> =
@@ -295,13 +307,15 @@ export function createGetPageContentEnvelope (
 
 export function createClickElementEnvelope (
   requestId: string,
-  target: ClickElementTarget
+  target: ClickElementTarget,
+  pageContextId?: number
 ): WebSocketEnvelope {
   return {
     type: 'message',
     id: requestId,
     payload: {
       type: 'perform_action',
+      ...(pageContextId !== undefined ? { pageContextId } : {}),
       action: {
         type: 'click',
         target
@@ -313,13 +327,15 @@ export function createClickElementEnvelope (
 export function createFillInputEnvelope (
   requestId: string,
   target: FillInputTarget,
-  text: string
+  text: string,
+  pageContextId?: number
 ): WebSocketEnvelope {
   return {
     type: 'message',
     id: requestId,
     payload: {
       type: 'perform_action',
+      ...(pageContextId !== undefined ? { pageContextId } : {}),
       action: {
         type: 'write_text',
         target,
@@ -332,13 +348,15 @@ export function createFillInputEnvelope (
 export function createWriteEditableEnvelope (
   requestId: string,
   target: EditableTarget,
-  text: string
+  text: string,
+  pageContextId?: number
 ): WebSocketEnvelope {
   return {
     type: 'message',
     id: requestId,
     payload: {
       type: 'perform_action',
+      ...(pageContextId !== undefined ? { pageContextId } : {}),
       action: {
         type: 'write_text',
         target,
@@ -351,13 +369,15 @@ export function createWriteEditableEnvelope (
 export function createSetCheckedEnvelope (
   requestId: string,
   target: FillInputTarget,
-  checked: boolean
+  checked: boolean,
+  pageContextId?: number
 ): WebSocketEnvelope {
   return {
     type: 'message',
     id: requestId,
     payload: {
       type: 'perform_action',
+      ...(pageContextId !== undefined ? { pageContextId } : {}),
       action: {
         type: 'set_checked',
         target,
@@ -370,13 +390,15 @@ export function createSetCheckedEnvelope (
 export function createSelectOptionsEnvelope (
   requestId: string,
   target: FillInputTarget,
-  values: string[]
+  values: string[],
+  pageContextId?: number
 ): WebSocketEnvelope {
   return {
     type: 'message',
     id: requestId,
     payload: {
       type: 'perform_action',
+      ...(pageContextId !== undefined ? { pageContextId } : {}),
       action: {
         type: 'select_options',
         target,
@@ -388,13 +410,15 @@ export function createSelectOptionsEnvelope (
 
 export function createSubmitFormEnvelope (
   requestId: string,
-  target: SubmitFormTarget
+  target: SubmitFormTarget,
+  pageContextId?: number
 ): WebSocketEnvelope {
   return {
     type: 'message',
     id: requestId,
     payload: {
       type: 'perform_action',
+      ...(pageContextId !== undefined ? { pageContextId } : {}),
       action: {
         type: 'submit_form',
         target
@@ -684,6 +708,20 @@ function parseErrorPayload<T> (
     }
   }
 
+  if (code === 'page_navigated') {
+    const detail = isStaleContextDetail(payload.error.detail)
+      ? payload.error.detail
+      : undefined
+    return {
+      ok: false,
+      error: {
+        code: 'page_navigated',
+        message: payload.error.message,
+        ...(detail !== undefined ? { detail } : {})
+      }
+    }
+  }
+
   return {
     ok: false,
     error: {
@@ -967,6 +1005,7 @@ function isBrijioErrorCode (
     value === 'invalid_response' ||
     value === 'browser_error' ||
     value === 'stale_context' ||
+    value === 'page_navigated' ||
     value === 'invalid_resource_uri' ||
     value === 'unsupported_scheme'
   )
@@ -988,11 +1027,29 @@ function isStaleContextDetail (value: unknown): value is StaleContextDetail {
     'expectedHref',
     'foundHref',
     'expectedRole',
-    'foundRole'
+    'foundRole',
+    'expectedLabel',
+    'foundLabel',
+    'expectedType',
+    'foundType',
+    'formId',
+    'controlId'
   ]
 
   for (const key of optionalStrings) {
     if (value[key] !== undefined && typeof value[key] !== 'string') {
+      return false
+    }
+  }
+
+  // Optional number fields
+  const optionalNumbers: Array<keyof StaleContextDetail> = [
+    'previousContextId',
+    'currentContextId'
+  ]
+
+  for (const key of optionalNumbers) {
+    if (value[key] !== undefined && typeof value[key] !== 'number') {
       return false
     }
   }
@@ -1101,7 +1158,19 @@ function isClickElementTarget (value: unknown): value is ClickElementTarget {
 }
 
 function isFillInputTarget (value: unknown): value is FillInputTarget {
-  return hasStringProperties(value, ['formId', 'controlId'])
+  if (!hasStringProperties(value, ['formId', 'controlId'])) {
+    return false
+  }
+
+  if (
+    isRecord(value) &&
+    value.expectedLabel !== undefined &&
+    typeof value.expectedLabel !== 'string'
+  ) {
+    return false
+  }
+
+  return true
 }
 
 function isEditableTarget (value: unknown): value is EditableTarget {
@@ -1109,7 +1178,18 @@ function isEditableTarget (value: unknown): value is EditableTarget {
     return false
   }
 
-  return value.kind === 'editable' && typeof value.id === 'string'
+  if (value.kind !== 'editable' || typeof value.id !== 'string') {
+    return false
+  }
+
+  if (
+    value.expectedText !== undefined &&
+    typeof value.expectedText !== 'string'
+  ) {
+    return false
+  }
+
+  return true
 }
 
 function isWriteTextTarget (value: unknown): value is WriteTextTarget {
@@ -1117,7 +1197,19 @@ function isWriteTextTarget (value: unknown): value is WriteTextTarget {
 }
 
 function isSubmitFormTarget (value: unknown): value is SubmitFormTarget {
-  return hasStringProperties(value, ['formId'])
+  if (!hasStringProperties(value, ['formId'])) {
+    return false
+  }
+
+  if (
+    isRecord(value) &&
+    value.expectedLabel !== undefined &&
+    typeof value.expectedLabel !== 'string'
+  ) {
+    return false
+  }
+
+  return true
 }
 
 function hasStringProperties (value: unknown, properties: string[]): boolean {

@@ -157,6 +157,12 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: for actions, validate element role matches before clicking.'
           ),
+        pageContextId: z
+          .number()
+          .optional()
+          .describe(
+            'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -195,6 +201,18 @@ export async function createBrijioMcpServer (
         text: z
           .string()
           .describe('Text to write into the targeted form control.'),
+        expectedLabel: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: validate the form control label contains this substring (case-insensitive) before writing. Stale IDs will return stale_context error.'
+          ),
+        pageContextId: z
+          .number()
+          .optional()
+          .describe(
+            'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -228,6 +246,18 @@ export async function createBrijioMcpServer (
         text: z
           .string()
           .describe('Text to write into the targeted contenteditable surface.'),
+        expectedText: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: validate the editable element visible text contains this substring (case-insensitive) before writing. Stale IDs will return stale_context error.'
+          ),
+        pageContextId: z
+          .number()
+          .optional()
+          .describe(
+            'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -264,6 +294,18 @@ export async function createBrijioMcpServer (
             'Short-lived Brijio form control ID from the latest page context.'
           ),
         checked: z.boolean().describe('Desired checked state.'),
+        expectedLabel: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: validate the form control label contains this substring (case-insensitive) before acting. Stale IDs will return stale_context error.'
+          ),
+        pageContextId: z
+          .number()
+          .optional()
+          .describe(
+            'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -302,6 +344,18 @@ export async function createBrijioMcpServer (
         values: z
           .array(z.string())
           .describe('Option values to select in the targeted select control.'),
+        expectedLabel: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: validate the select control label contains this substring (case-insensitive) before acting. Stale IDs will return stale_context error.'
+          ),
+        pageContextId: z
+          .number()
+          .optional()
+          .describe(
+            'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -330,6 +384,18 @@ export async function createBrijioMcpServer (
           .string()
           .describe(
             'Short-lived Brijio form ID from the latest page context.'
+          ),
+        expectedLabel: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: validate the form label/heading contains this substring (case-insensitive) before submitting. Stale IDs will return stale_context error.'
+          ),
+        pageContextId: z
+          .number()
+          .optional()
+          .describe(
+            'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           ),
         browserInstanceId: browserInstanceIdInput
       }

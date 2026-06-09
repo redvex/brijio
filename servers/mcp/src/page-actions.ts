@@ -7,7 +7,8 @@ import {
   type BrijioSubmitFormResult,
   type ClickElementTarget,
   type EditableTarget,
-  type FillInputTarget
+  type FillInputTarget,
+  type SubmitFormTarget
 } from './protocol.js'
 import {
   requestClickElement as defaultRequestClickElement,
@@ -57,7 +58,8 @@ export interface BrijioPageActionsConfig {
 export async function clickCurrentPageElement (
   config: BrijioPageActionsConfig,
   target: ClickElementTarget,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  pageContextId?: number
 ): Promise<BrijioClickElementResult> {
   const requestClickElement =
     config.requestClickElement ?? defaultRequestClickElement
@@ -67,7 +69,8 @@ export async function clickCurrentPageElement (
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
-    target
+    target,
+    pageContextId
   })
 }
 
@@ -75,7 +78,8 @@ export async function fillCurrentPageInput (
   config: BrijioPageActionsConfig,
   target: FillInputTarget,
   text: string,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  pageContextId?: number
 ): Promise<BrijioFillInputResult> {
   const requestFillInput = config.requestFillInput ?? defaultRequestFillInput
 
@@ -85,7 +89,8 @@ export async function fillCurrentPageInput (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
-    text
+    text,
+    pageContextId
   })
 }
 
@@ -93,7 +98,8 @@ export async function fillCurrentPageEditable (
   config: BrijioPageActionsConfig,
   target: EditableTarget,
   text: string,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  pageContextId?: number
 ): Promise<BrijioFillInputResult> {
   const requestWriteEditable =
     config.requestWriteEditable ?? defaultRequestWriteEditable
@@ -104,7 +110,8 @@ export async function fillCurrentPageEditable (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
-    text
+    text,
+    pageContextId
   })
 }
 
@@ -112,7 +119,8 @@ export async function setCurrentPageChecked (
   config: BrijioPageActionsConfig,
   target: FillInputTarget,
   checked: boolean,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  pageContextId?: number
 ): Promise<BrijioSetCheckedResult> {
   const requestSetChecked =
     config.requestSetChecked ?? defaultRequestSetChecked
@@ -123,7 +131,8 @@ export async function setCurrentPageChecked (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
-    checked
+    checked,
+    pageContextId
   })
 }
 
@@ -131,7 +140,8 @@ export async function selectCurrentPageOptions (
   config: BrijioPageActionsConfig,
   target: FillInputTarget,
   values: string[],
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  pageContextId?: number
 ): Promise<BrijioSelectOptionsResult> {
   const requestSelectOptions =
     config.requestSelectOptions ?? defaultRequestSelectOptions
@@ -142,14 +152,16 @@ export async function selectCurrentPageOptions (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
-    values
+    values,
+    pageContextId
   })
 }
 
 export async function submitCurrentPageForm (
   config: BrijioPageActionsConfig,
-  formId: string,
-  browserInstanceId?: string
+  target: SubmitFormTarget,
+  browserInstanceId?: string,
+  pageContextId?: number
 ): Promise<BrijioSubmitFormResult> {
   const requestSubmitForm =
     config.requestSubmitForm ?? defaultRequestSubmitForm
@@ -159,9 +171,8 @@ export async function submitCurrentPageForm (
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
-    target: {
-      formId
-    }
+    target,
+    pageContextId
   })
 }
 

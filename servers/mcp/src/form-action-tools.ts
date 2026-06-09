@@ -11,7 +11,8 @@ import {
   type FillInputTarget,
   type SelectOptionsActionResultData,
   type SetCheckedActionResultData,
-  type SubmitFormActionResultData
+  type SubmitFormActionResultData,
+  type SubmitFormTarget
 } from './protocol.js'
 import { type BrijioToolResult } from './page-reading-tool.js'
 
@@ -19,25 +20,33 @@ export interface SetCheckedInput {
   formId?: unknown
   controlId?: unknown
   checked?: unknown
+  expectedLabel?: unknown
   browserInstanceId?: unknown
+  pageContextId?: unknown
 }
 
 export interface SelectOptionsInput {
   formId?: unknown
   controlId?: unknown
   values?: unknown
+  expectedLabel?: unknown
   browserInstanceId?: unknown
+  pageContextId?: unknown
 }
 
 export interface SubmitFormInput {
   formId?: unknown
+  expectedLabel?: unknown
   browserInstanceId?: unknown
+  pageContextId?: unknown
 }
 
 export interface FillEditableInput {
   id?: unknown
   text?: unknown
+  expectedText?: unknown
   browserInstanceId?: unknown
+  pageContextId?: unknown
 }
 
 export type SetCheckedResult =
@@ -70,7 +79,8 @@ export async function setChecked (
     config,
     targetResult.data.target,
     input.checked,
-    targetResult.data.browserInstanceId
+    targetResult.data.browserInstanceId,
+    targetResult.data.pageContextId
   )
 }
 
@@ -95,7 +105,8 @@ export async function selectOptions (
     config,
     targetResult.data.target,
     input.values,
-    targetResult.data.browserInstanceId
+    targetResult.data.browserInstanceId,
+    targetResult.data.pageContextId
   )
 }
 
@@ -115,10 +126,36 @@ export async function submitForm (
     return browserInstanceId
   }
 
+  if (
+    input.expectedLabel !== undefined &&
+    typeof input.expectedLabel !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'expectedLabel must be a string when provided.'
+    )
+  }
+
+  if (
+    input.pageContextId !== undefined &&
+    typeof input.pageContextId !== 'number'
+  ) {
+    return invalidToolInputResponse(
+      'pageContextId must be a number when provided.'
+    )
+  }
+
+  const target: SubmitFormTarget = {
+    formId: input.formId,
+    ...(input.expectedLabel !== undefined
+      ? { expectedLabel: input.expectedLabel }
+      : {})
+  }
+
   return await submitCurrentPageForm(
     config,
-    input.formId,
-    browserInstanceId.data
+    target,
+    browserInstanceId.data,
+    input.pageContextId !== undefined ? input.pageContextId : undefined
   )
 }
 
@@ -140,7 +177,8 @@ export async function fillEditable (
     config,
     targetResult.data.target,
     input.text,
-    targetResult.data.browserInstanceId
+    targetResult.data.browserInstanceId,
+    targetResult.data.pageContextId
   )
 }
 
@@ -149,6 +187,7 @@ function normalizeFormControlTarget (
 ): BrijioToolResult<{
     target: FillInputTarget
     browserInstanceId?: string
+    pageContextId?: number
   }> {
   if (typeof input.formId !== 'string' || input.formId.length === 0) {
     return invalidToolInputResponse('formId must be a non-empty string.')
@@ -169,15 +208,39 @@ function normalizeFormControlTarget (
     return browserInstanceId
   }
 
+  if (
+    input.expectedLabel !== undefined &&
+    typeof input.expectedLabel !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'expectedLabel must be a string when provided.'
+    )
+  }
+
+  if (
+    input.pageContextId !== undefined &&
+    typeof input.pageContextId !== 'number'
+  ) {
+    return invalidToolInputResponse(
+      'pageContextId must be a number when provided.'
+    )
+  }
+
   return {
     ok: true,
     data: {
       target: {
         formId: input.formId,
-        controlId: input.controlId
+        controlId: input.controlId,
+        ...(input.expectedLabel !== undefined
+          ? { expectedLabel: input.expectedLabel }
+          : {})
       },
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
+        : {}),
+      ...(input.pageContextId !== undefined
+        ? { pageContextId: input.pageContextId }
         : {})
     }
   }
@@ -188,6 +251,7 @@ function normalizeEditableTarget (
 ): BrijioToolResult<{
     target: EditableTarget
     browserInstanceId?: string
+    pageContextId?: number
   }> {
   if (typeof input.id !== 'string' || input.id.length === 0) {
     return invalidToolInputResponse('id must be a non-empty string.')
@@ -201,15 +265,39 @@ function normalizeEditableTarget (
     return browserInstanceId
   }
 
+  if (
+    input.expectedText !== undefined &&
+    typeof input.expectedText !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'expectedText must be a string when provided.'
+    )
+  }
+
+  if (
+    input.pageContextId !== undefined &&
+    typeof input.pageContextId !== 'number'
+  ) {
+    return invalidToolInputResponse(
+      'pageContextId must be a number when provided.'
+    )
+  }
+
   return {
     ok: true,
     data: {
       target: {
         kind: 'editable',
-        id: input.id
+        id: input.id,
+        ...(input.expectedText !== undefined
+          ? { expectedText: input.expectedText }
+          : {})
       },
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
+        : {}),
+      ...(input.pageContextId !== undefined
+        ? { pageContextId: input.pageContextId }
         : {})
     }
   }

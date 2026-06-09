@@ -339,6 +339,11 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Target collection from the latest page context: link or action.'
+          },
+          pageContextId: {
+            type: 'number',
+            description:
+              'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           }
         },
         required: ['kind', 'id'],
@@ -358,10 +363,20 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Short-lived Brijio form control ID from the latest page context.'
           },
+          expectedLabel: {
+            type: 'string',
+            description:
+              'Optional: validate the form control label contains this substring (case-insensitive) before writing. Stale IDs will return stale_context error.'
+          },
           formId: {
             type: 'string',
             description:
               'Short-lived Brijio form ID from the latest page context.'
+          },
+          pageContextId: {
+            type: 'number',
+            description:
+              'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           },
           text: {
             type: 'string',
@@ -380,10 +395,20 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional Brijio browser instance ID to target.'
           },
+          expectedText: {
+            type: 'string',
+            description:
+              'Optional: validate the editable element visible text contains this substring (case-insensitive) before writing. Stale IDs will return stale_context error.'
+          },
           id: {
             type: 'string',
             description:
               'Short-lived Brijio editable target ID from the latest page context.'
+          },
+          pageContextId: {
+            type: 'number',
+            description:
+              'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           },
           text: {
             type: 'string',
@@ -412,10 +437,20 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Short-lived Brijio form control ID from the latest page context.'
           },
+          expectedLabel: {
+            type: 'string',
+            description:
+              'Optional: validate the form control label contains this substring (case-insensitive) before acting. Stale IDs will return stale_context error.'
+          },
           formId: {
             type: 'string',
             description:
               'Short-lived Brijio form ID from the latest page context.'
+          },
+          pageContextId: {
+            type: 'number',
+            description:
+              'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           }
         },
         required: ['formId', 'controlId', 'checked'],
@@ -435,10 +470,20 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Short-lived Brijio form control ID from the latest page context.'
           },
+          expectedLabel: {
+            type: 'string',
+            description:
+              'Optional: validate the select control label contains this substring (case-insensitive) before acting. Stale IDs will return stale_context error.'
+          },
           formId: {
             type: 'string',
             description:
               'Short-lived Brijio form ID from the latest page context.'
+          },
+          pageContextId: {
+            type: 'number',
+            description:
+              'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           },
           values: {
             type: 'array',
@@ -461,10 +506,20 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional Brijio browser instance ID to target.'
           },
+          expectedLabel: {
+            type: 'string',
+            description:
+              'Optional: validate the form label/heading contains this substring (case-insensitive) before submitting. Stale IDs will return stale_context error.'
+          },
           formId: {
             type: 'string',
             description:
               'Short-lived Brijio form ID from the latest page context.'
+          },
+          pageContextId: {
+            type: 'number',
+            description:
+              'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           }
         },
         required: ['formId'],

@@ -105,20 +105,23 @@ export interface PageReaderAdapter {
 }
 
 export interface PageActionAdapter {
-  click: (target: ClickActionTarget) => Promise<PageActionResult>
+  click: (target: ClickActionTarget, pageContextId?: number) => Promise<PageActionResult>
   writeText: (
     target: WriteTextActionTarget | WriteTextEditableTarget,
     text: string,
+    pageContextId?: number,
   ) => Promise<PageActionResult>
   setChecked: (
     target: WriteTextActionTarget,
     checked: boolean,
+    pageContextId?: number,
   ) => Promise<PageActionResult>
   selectOptions: (
     target: WriteTextActionTarget,
     values: string[],
+    pageContextId?: number,
   ) => Promise<PageActionResult>
-  submitForm: (target: { formId: string }) => Promise<PageActionResult>
+  submitForm: (target: { formId: string, expectedLabel?: string }, pageContextId?: number) => Promise<PageActionResult>
 }
 
 export type PageNavigationResult =
@@ -400,7 +403,11 @@ export class BrijioBackgroundController {
     if (isPerformActionEnvelope(message)) {
       this.pendingRequestCount++
       try {
-        await this.handlePerformActionRequest(message.id, message.payload.action)
+        await this.handlePerformActionRequest(
+          message.id,
+          message.payload.action,
+          message.payload.pageContextId
+        )
       } finally {
         this.pendingRequestCount--
       }
@@ -503,10 +510,12 @@ export class BrijioBackgroundController {
       type: 'submit_form'
       target: {
         formId: string
+        expectedLabel?: string
       }
-    }
+    },
+    pageContextId?: number
   ): Promise<void> {
-    const result = await this.performPageAction(action)
+    const result = await this.performPageAction(action, pageContextId)
 
     if (!result.ok) {
       this.socket?.send(
@@ -591,35 +600,40 @@ export class BrijioBackgroundController {
       type: 'submit_form'
       target: {
         formId: string
+        expectedLabel?: string
       }
-    }
+    },
+    pageContextId?: number
   ): Promise<PageActionResult> {
     if (action.type === 'click') {
-      return await this.options.pageActions.click(action.target)
+      return await this.options.pageActions.click(action.target, pageContextId)
     }
 
     if (action.type === 'write_text') {
       return await this.options.pageActions.writeText(
         action.target,
-        action.text
+        action.text,
+        pageContextId
       )
     }
 
     if (action.type === 'set_checked') {
       return await this.options.pageActions.setChecked(
         action.target,
-        action.checked
+        action.checked,
+        pageContextId
       )
     }
 
     if (action.type === 'select_options') {
       return await this.options.pageActions.selectOptions(
         action.target,
-        action.values
+        action.values,
+        pageContextId
       )
     }
 
-    return await this.options.pageActions.submitForm(action.target)
+    return await this.options.pageActions.submitForm(action.target, pageContextId)
   }
 
   private async handleInvalidPerformActionRequest (

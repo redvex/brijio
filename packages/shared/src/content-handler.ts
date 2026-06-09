@@ -2,6 +2,9 @@ import {
   type ActionResultData,
   type ActionResultErrorCode,
   type ClickActionTarget,
+  type FormControlTarget,
+  type EditableActionTarget,
+  type FormSubmitTarget,
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
@@ -9,13 +12,34 @@ import {
   type SetCheckedActionResultData,
   type StaleContextDetail,
   type SubmitFormActionResultData,
-  type WriteTextActionResultData,
-  type WriteTextActionTarget,
-  type WriteTextEditableTarget
+  type WriteTextActionResultData
 } from './protocol.js'
 
 import { extractPageContent, extractPageContext } from './page-context.js'
 import { chunkReadableContent } from './page-content.js'
+
+/** Module-scoped page context version; incremented on navigation (pageshow). */
+let pageContextVersion = 1
+
+/** Register a pageshow listener to increment pageContextVersion on navigation. */
+export function registerPageNavigationListener (): void {
+  if (typeof window === 'undefined') {
+    return
+  }
+  window.addEventListener('pageshow', () => {
+    pageContextVersion++
+  })
+}
+
+/** Get the current pageContextVersion (for testing and embedding in responses). */
+export function getPageContextVersion (): number {
+  return pageContextVersion
+}
+
+/** Reset pageContextVersion (for testing only). */
+export function resetPageContextVersion (value = 1): void {
+  pageContextVersion = value
+}
 
 export type ContentRequest =
   | {
@@ -32,27 +56,30 @@ export type ContentRequest =
   | {
     type: 'perform_click'
     target: ClickActionTarget
+    pageContextId?: number
   }
   | {
     type: 'perform_write_text'
-    target: WriteTextActionTarget | WriteTextEditableTarget
+    target: FormControlTarget | EditableActionTarget
     text: string
+    pageContextId?: number
   }
   | {
     type: 'perform_set_checked'
-    target: WriteTextActionTarget
+    target: FormControlTarget
     checked: boolean
+    pageContextId?: number
   }
   | {
     type: 'perform_select_options'
-    target: WriteTextActionTarget
+    target: FormControlTarget
     values: string[]
+    pageContextId?: number
   }
   | {
     type: 'perform_submit_form'
-    target: {
-      formId: string
-    }
+    target: FormSubmitTarget
+    pageContextId?: number
   }
 
 export type ContentResponse =
@@ -90,17 +117,40 @@ export function handleContentRequest (
 ): ContentResponse {
   try {
     if (request.type === 'extract_page_context') {
+      const context = extractPageContext({
+        document: environment.document,
+        locationHref: environment.locationHref,
+        title: environment.title,
+        selectedText: environment.selectedText,
+        now: environment.now,
+        previewMaxBytes: request.previewMaxBytes,
+        defaultMaxPayloadBytes: request.defaultMaxPayloadBytes
+      })
       return {
         ok: true,
-        data: extractPageContext({
-          document: environment.document,
-          locationHref: environment.locationHref,
-          title: environment.title,
-          selectedText: environment.selectedText,
-          now: environment.now,
-          previewMaxBytes: request.previewMaxBytes,
-          defaultMaxPayloadBytes: request.defaultMaxPayloadBytes
-        })
+        data: {
+          ...context,
+          pageContextId: pageContextVersion
+        }
+      }
+    }
+
+    // Check pageContextId staleness for all action requests
+    if ('pageContextId' in request && request.pageContextId !== undefined) {
+      if (request.pageContextId !== pageContextVersion) {
+        return {
+          ok: false,
+          error: {
+            code: 'page_navigated',
+            message: `The page has navigated since the last read (context ${request.pageContextId} vs current ${pageContextVersion}). Call read_current_page to get fresh context.`,
+            detail: {
+              id: '',
+              kind: 'page',
+              previousContextId: request.pageContextId,
+              currentContextId: pageContextVersion
+            }
+          }
+        }
       }
     }
 
@@ -181,7 +231,7 @@ export function handleContentRequest (
 }
 
 function performWriteText (
-  target: WriteTextActionTarget | WriteTextEditableTarget,
+  target: FormControlTarget | EditableActionTarget,
   text: string,
   document: Document
 ): ContentResponse {
@@ -198,6 +248,11 @@ function performWriteText (
   }
 
   if (isEditableTarget(target)) {
+    const staleError = validateEditableTarget(target, element)
+    if (staleError !== null) {
+      return staleError
+    }
+
     try {
       const editable = element as HTMLElement
       editable.focus?.()
@@ -253,6 +308,14 @@ function performWriteText (
     }
   }
 
+  // Validate stale context for form control targets
+  if (!isEditableTarget(target)) {
+    const staleError = validateFormControlTarget(target, element, document)
+    if (staleError !== null) {
+      return staleError
+    }
+  }
+
   try {
     const control = element as HTMLInputElement | HTMLTextAreaElement
     control.focus?.()
@@ -289,7 +352,7 @@ function performWriteText (
 }
 
 function performSetChecked (
-  target: WriteTextActionTarget,
+  target: FormControlTarget,
   checked: boolean,
   document: Document
 ): ContentResponse {
@@ -303,6 +366,11 @@ function performSetChecked (
         message: 'No matching checkable target was found.'
       }
     }
+  }
+
+  const staleError = validateFormControlTarget(target, element, document)
+  if (staleError !== null) {
+    return staleError
   }
 
   if (element.hasAttribute('disabled')) {
@@ -397,7 +465,7 @@ function clickCheckableControl (
 }
 
 function performSelectOptions (
-  target: WriteTextActionTarget,
+  target: FormControlTarget,
   values: string[],
   document: Document
 ): ContentResponse {
@@ -411,6 +479,11 @@ function performSelectOptions (
         message: 'No matching select target was found.'
       }
     }
+  }
+
+  const staleError = validateFormControlTarget(target, element, document)
+  if (staleError !== null) {
+    return staleError
   }
 
   if (element.hasAttribute('disabled')) {
@@ -523,7 +596,7 @@ function setOptionSelected (option: HTMLOptionElement, selected: boolean): void 
 }
 
 function performSubmitForm (
-  target: { formId: string },
+  target: FormSubmitTarget,
   document: Document
 ): ContentResponse {
   const form = findFormTarget(target.formId, document)
@@ -536,6 +609,11 @@ function performSubmitForm (
         message: 'No matching form target was found.'
       }
     }
+  }
+
+  const staleError = validateFormSubmitTarget(target, form, document)
+  if (staleError !== null) {
+    return staleError
   }
 
   if (typeof form.requestSubmit !== 'function') {
@@ -625,7 +703,7 @@ function performClick (
 }
 
 function findWriteTextTarget (
-  target: WriteTextActionTarget | WriteTextEditableTarget,
+  target: FormControlTarget | EditableActionTarget,
   document: Document
 ): Element | null {
   if (isEditableTarget(target)) {
@@ -636,7 +714,7 @@ function findWriteTextTarget (
 }
 
 function findFormControlTarget (
-  target: WriteTextActionTarget,
+  target: FormControlTarget,
   document: Document
 ): Element | null {
   const formIndex = parseTargetId(target.formId)
@@ -807,6 +885,185 @@ function getElementVisibleText (element: Element): string {
   return (element.textContent ?? '').trim()
 }
 
+/** Get the visible label for a form control element. */
+function getControlLabel (element: Element, document: Document): string {
+  // Try explicit <label for="...">
+  const id = element.getAttribute('id')
+  if (id !== null && id !== '') {
+    const label = document.querySelector(`label[for="${CSS.escape(id)}"]`)
+    if (label !== null) {
+      return (label.textContent ?? '').trim()
+    }
+  }
+
+  // Try wrapping <label>
+  const wrappingLabel = element.closest('label')
+  if (wrappingLabel !== null) {
+    return (wrappingLabel.textContent ?? '').trim()
+  }
+
+  // Try aria-label
+  const ariaLabel = element.getAttribute('aria-label')
+  if (ariaLabel !== null && ariaLabel !== '') {
+    return ariaLabel.trim()
+  }
+
+  // Try title
+  const title = element.getAttribute('title')
+  if (title !== null && title !== '') {
+    return title.trim()
+  }
+
+  // Try placeholder
+  const placeholder = element.getAttribute('placeholder')
+  if (placeholder !== null && placeholder !== '') {
+    return placeholder.trim()
+  }
+
+  return ''
+}
+
+/** Get the visible label for a form element. */
+function getFormLabel (form: HTMLFormElement, document: Document): string {
+  // Try a heading inside or near the form
+  const heading = form.querySelector('h1, h2, h3, h4, h5, h6')
+  if (heading !== null) {
+    return (heading.textContent ?? '').trim()
+  }
+
+  // Try aria-label
+  const ariaLabel = form.getAttribute('aria-label')
+  if (ariaLabel !== null && ariaLabel !== '') {
+    return ariaLabel.trim()
+  }
+
+  // Try a preceding heading sibling
+  const previousSibling = form.previousElementSibling
+  if (previousSibling !== null && /^H[1-6]$/i.test(previousSibling.tagName)) {
+    return (previousSibling.textContent ?? '').trim()
+  }
+
+  // Try legend inside fieldset
+  const legend = form.querySelector('legend')
+  if (legend !== null) {
+    return (legend.textContent ?? '').trim()
+  }
+
+  // Try title attribute
+  const title = form.getAttribute('title')
+  if (title !== null && title !== '') {
+    return title.trim()
+  }
+
+  return ''
+}
+
+/** Validate form control target against expectedLabel. */
+function validateFormControlTarget (
+  target: FormControlTarget,
+  element: Element,
+  document: Document
+): ContentResponse | null {
+  if (target.expectedLabel === undefined || target.expectedLabel === '') {
+    return null
+  }
+
+  const foundLabel = getControlLabel(element, document)
+  const expected = target.expectedLabel.toLowerCase()
+  const found = foundLabel.toLowerCase()
+
+  if (found.includes(expected)) {
+    return null
+  }
+
+  const inputType = element.tagName.toLowerCase() === 'input'
+    ? (element.getAttribute('type') ?? 'text').toLowerCase()
+    : element.tagName.toLowerCase()
+
+  return {
+    ok: false,
+    error: {
+      code: 'stale_context',
+      message: `Form control ${target.controlId} in form ${target.formId} does not match expected target. Expected label containing "${target.expectedLabel}", found "${foundLabel}". Call read_current_page and retry with fresh IDs.`,
+      detail: {
+        id: target.controlId,
+        kind: 'form_control',
+        formId: target.formId,
+        controlId: target.controlId,
+        expectedLabel: target.expectedLabel,
+        foundLabel,
+        expectedType: inputType,
+        foundType: inputType
+      }
+    }
+  }
+}
+
+/** Validate editable target against expectedText. */
+function validateEditableTarget (
+  target: EditableActionTarget,
+  element: Element
+): ContentResponse | null {
+  if (target.expectedText === undefined || target.expectedText === '') {
+    return null
+  }
+
+  const foundText = getElementVisibleText(element)
+  const expected = target.expectedText.toLowerCase()
+  const found = foundText.toLowerCase()
+
+  if (found.includes(expected)) {
+    return null
+  }
+
+  return {
+    ok: false,
+    error: {
+      code: 'stale_context',
+      message: `Editable target ${target.id} does not match expected target. Expected text containing "${target.expectedText}", found "${foundText}". Call read_current_page and retry with fresh IDs.`,
+      detail: {
+        id: target.id,
+        kind: 'editable',
+        expectedText: target.expectedText,
+        foundText
+      }
+    }
+  }
+}
+
+/** Validate form submit target against expectedLabel. */
+function validateFormSubmitTarget (
+  target: FormSubmitTarget,
+  form: HTMLFormElement,
+  document: Document
+): ContentResponse | null {
+  if (target.expectedLabel === undefined || target.expectedLabel === '') {
+    return null
+  }
+
+  const foundLabel = getFormLabel(form, document)
+  const expected = target.expectedLabel.toLowerCase()
+  const found = foundLabel.toLowerCase()
+
+  if (found.includes(expected)) {
+    return null
+  }
+
+  return {
+    ok: false,
+    error: {
+      code: 'stale_context',
+      message: `Form ${target.formId} does not match expected target. Expected label containing "${target.expectedLabel}", found "${foundLabel}". Call read_current_page and retry with fresh IDs.`,
+      detail: {
+        id: target.formId,
+        kind: 'form',
+        expectedLabel: target.expectedLabel,
+        foundLabel
+      }
+    }
+  }
+}
+
 function getImplicitRole (element: Element): string {
   const tag = element.tagName.toLowerCase()
 
@@ -897,8 +1154,8 @@ function dispatchElementEvent (
 }
 
 function isEditableTarget (
-  target: WriteTextActionTarget | WriteTextEditableTarget
-): target is WriteTextEditableTarget {
+  target: FormControlTarget | EditableActionTarget
+): target is EditableActionTarget {
   return 'kind' in target && target.kind === 'editable'
 }
 

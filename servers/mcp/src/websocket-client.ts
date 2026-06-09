@@ -54,30 +54,36 @@ export interface PageContentRequestOptions extends PageContextRequestOptions {
 
 export interface ClickElementRequestOptions extends PageContextRequestOptions {
   target: ClickElementTarget
+  pageContextId?: number
 }
 
 export interface FillInputRequestOptions extends PageContextRequestOptions {
   target: FillInputTarget
   text: string
+  pageContextId?: number
 }
 
 export interface WriteEditableRequestOptions extends PageContextRequestOptions {
   target: EditableTarget
   text: string
+  pageContextId?: number
 }
 
 export interface SetCheckedRequestOptions extends PageContextRequestOptions {
   target: FillInputTarget
   checked: boolean
+  pageContextId?: number
 }
 
 export interface SelectOptionsRequestOptions extends PageContextRequestOptions {
   target: FillInputTarget
   values: string[]
+  pageContextId?: number
 }
 
 export interface SubmitFormRequestOptions extends PageContextRequestOptions {
   target: SubmitFormTarget
+  pageContextId?: number
 }
 
 export interface NavigateToUrlRequestOptions extends PageContextRequestOptions {
@@ -126,7 +132,7 @@ export async function requestClickElement (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createClickElementEnvelope(requestId, options.target),
+    requestEnvelope: createClickElementEnvelope(requestId, options.target, options.pageContextId),
     parseEnvelope: (value) => parseClickActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
@@ -145,7 +151,8 @@ export async function requestFillInput (
     requestEnvelope: createFillInputEnvelope(
       requestId,
       options.target,
-      options.text
+      options.text,
+      options.pageContextId
     ),
     parseEnvelope: (value) => parseFillActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -165,7 +172,8 @@ export async function requestWriteEditable (
     requestEnvelope: createWriteEditableEnvelope(
       requestId,
       options.target,
-      options.text
+      options.text,
+      options.pageContextId
     ),
     parseEnvelope: (value) => parseWriteTextActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -185,7 +193,8 @@ export async function requestSetChecked (
     requestEnvelope: createSetCheckedEnvelope(
       requestId,
       options.target,
-      options.checked
+      options.checked,
+      options.pageContextId
     ),
     parseEnvelope: (value) => parseSetCheckedActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -205,7 +214,8 @@ export async function requestSelectOptions (
     requestEnvelope: createSelectOptionsEnvelope(
       requestId,
       options.target,
-      options.values
+      options.values,
+      options.pageContextId
     ),
     parseEnvelope: (value) => parseSelectOptionsActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -222,7 +232,7 @@ export async function requestSubmitForm (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createSubmitFormEnvelope(requestId, options.target),
+    requestEnvelope: createSubmitFormEnvelope(requestId, options.target, options.pageContextId),
     parseEnvelope: (value) => parseSubmitFormActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
