@@ -291,6 +291,11 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'number',
             description:
               'Maximum readable content chunks to fetch. Defaults to 1, max 10.'
+          },
+          startContentIndex: {
+            type: 'number',
+            description:
+              '1-based index of the first content chunk to fetch. Use the nextContentIndex from a previous truncated response to continue reading. Defaults to 1.'
           }
         },
         additionalProperties: false,

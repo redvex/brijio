@@ -168,6 +168,99 @@ void describe('MCP page reading tool', () => {
     })
   })
 
+  void it('starts reading from the specified startContentIndex', async () => {
+    const requestedContentIndexes: number[] = []
+
+    const result = await readCurrentPage(
+      {
+        websocketUrl: 'ws://127.0.0.1:8787',
+        timeoutMs: 5000,
+        requestPageContext: async () => ({
+          ok: true,
+          data: createPageContext()
+        }),
+        requestPageContent: async (options) => {
+          requestedContentIndexes.push(options.index)
+          return {
+            ok: true,
+            data: createPageContent(options.index, options.index === 3)
+          }
+        }
+      },
+      { startContentIndex: 3, maxContentChunks: 2 }
+    )
+
+    assert.deepEqual(requestedContentIndexes, [3, 4])
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        context: createPageContext(),
+        content: [createPageContent(3, true), createPageContent(4, false)],
+        contentTruncated: false,
+        nextContentIndex: null
+      }
+    })
+  })
+
+  void it('resumes reading using nextContentIndex from a previous response', async () => {
+    const requestedContentIndexes: number[] = []
+
+    const result = await readCurrentPage(
+      {
+        websocketUrl: 'ws://127.0.0.1:8787',
+        timeoutMs: 5000,
+        requestPageContext: async () => ({
+          ok: true,
+          data: createPageContext()
+        }),
+        requestPageContent: async (options) => {
+          requestedContentIndexes.push(options.index)
+          return {
+            ok: true,
+            data: createPageContent(options.index, true)
+          }
+        }
+      },
+      { startContentIndex: 3, maxContentChunks: 3 }
+    )
+
+    assert.deepEqual(requestedContentIndexes, [3, 4, 5])
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        context: createPageContext(),
+        content: [
+          createPageContent(3, true),
+          createPageContent(4, true),
+          createPageContent(5, true)
+        ],
+        contentTruncated: true,
+        nextContentIndex: 6
+      }
+    })
+  })
+
+  void it('returns invalid tool input for non-positive startContentIndex', async () => {
+    const result = await readCurrentPage(
+      {
+        websocketUrl: 'ws://127.0.0.1:8787',
+        timeoutMs: 5000,
+        requestPageContext: async () => {
+          throw new Error('context should not be requested')
+        }
+      },
+      { startContentIndex: 0 }
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'invalid_tool_input',
+        message: 'startContentIndex must be a positive integer.'
+      }
+    })
+  })
+
   void it('returns context request errors without requesting content', async () => {
     const result = await readCurrentPage(
       {
