@@ -34,16 +34,7 @@ The demo server is started only when the `demo` subcommand is used — not for `
 
 Migrate and substantially extend `test.html` into `clients/test-page/index.html`. The page follows a "read and respond" pattern — a passage of text followed by a form whose questions can only be answered by reading that text. This exercises both page reading and form interaction in one flow.
 
-**Passage** — a well-known public-domain short story, long enough to span at least two pagination chunks when `read_current_page` is called (i.e., the rendered page content should exceed 128 KiB after normalisation).
-
-The story must be:
-- **Public domain** — no licensing restrictions (e.g., works by Edgar Allan Poe, Arthur Conan Doyle, Lewis Carroll, or other pre-1929 authors).
-- **Recognisable** — agents and developers should be able to identify the source text, making verification intuitive.
-- **Content-rich** — containing specific names, numbers, dates, colours, and sequential events that form the basis for form questions.
-
-Recommended choice: **"The Adventure of the Speckled Band"** by Arthur Conan Doyle (public domain worldwide). It contains named characters (Helen Stoner, Dr. Grimesby Roylott, Mrs. Hudson), specific locations (Stoke Moran, Surrey), precise numbers (£750 annuity, two years prior, 4:30 AM), distinctive colours (speckled band), and a clear narrative sequence — ideal for extracting deterministic answers.
-
-The full text is included inline in `index.html` (not loaded from an external URL) so the page is self-contained and works offline.
+**Passage** — a short fictional story (2-3 paragraphs) containing specific facts: names, numbers, dates, colours, order of events. Chosen to be self-contained; no external knowledge required.
 
 **Response form** — one section per input type Brijio supports, each clearly labelled:
 
@@ -68,8 +59,6 @@ The full text is included inline in `index.html` (not loaded from an external UR
 | Table | `<table>` with structured data | `read_current_page` |
 | Navigation | Same-tab link, redirect chain | `navigate` |
 
-**Pagination verification:** The story length ensures that `read_current_page` returns `content.truncated: true`, requiring the agent to request subsequent chunks via `browser://page/current/content/2`, `browser://page/current/content/3`, etc. Form questions reference facts from later chunks specifically, guaranteeing that agents must exercise multi-chunk reads to answer correctly.
-
 ### 3. Submission and verification
 
 The `<form>` uses `method="GET"` and submits to a `/results` hash-route on the same page. A small inline script reads `window.location.search`, parses the query string, and renders a results summary showing:
@@ -86,16 +75,14 @@ Add `clients/test-page/smoke-test.md` — a Markdown checklist listing each MCP 
 
 ```markdown
 ## 1. Page reading
-- [ ] Call `read_current_page` → expect `content.truncated: true` (story spans multiple chunks)
-- [ ] Request chunk 2 via `browser://page/current/content/2` → expect continuation of story text
-- [ ] Call `read_current_page` → expect passage text containing "Speckled Band"
-- [ ] Call `read_current_page` → expect table with structured data rows
+- [ ] Call `read_current_page` → expect passage text containing "Elena Varga"
+- [ ] Call `read_current_page` → expect table with 4 data rows
 - [ ] Call `read_current_page` after dynamic update → expect "Content loaded at HH:MM"
 
 ## 2. Form filling
-- [ ] Call `fill_input` on `#surname` with "Stoner" → expect field value "Stoner"
-- [ ] Call `form_action` checkbox "whistle" → expect checked
-- [ ] Call `form_action` select "location" value "Surrey" → expect selected
+- [ ] Call `fill_input` on `#surname` with "Varga" → expect field value "Varga"
+- [ ] Call `form_action` checkbox "blue" → expect checked
+- [ ] Call `form_action` select "year" value "2024" → expect selected
 ...
 ```
 
@@ -116,10 +103,9 @@ Add a section to the project README:
 2. Start demo: `brijio demo`
 3. Open the demo page URL printed in the banner.
 4. In your MCP client, call `list_browsers` → should show your connected browser.
-5. Call `read_current_page` → should see the story text with `content.truncated: true`.
-6. Request the next content chunk → should continue the story.
-7. Call `fill_input` on any field → should update the page.
-8. Follow `clients/test-page/smoke-test.md` for a full walkthrough.
+5. Call `read_current_page` → should see the passage text.
+6. Call `fill_input` on any field → should update the page.
+7. Follow `clients/test-page/smoke-test.md` for a full walkthrough.
 
 <details>
 <summary>Docker alternative</summary>
@@ -139,17 +125,14 @@ Delete the root `test.html` file. It is superseded entirely by `clients/test-pag
 
 ### Positive
 - **Zero-Docker onboarding** — `brijio demo` gives a full-stack verification path without containers.
-- **Pagination coverage** — the story length forces multi-chunk `read_current_page` reads, exercising the paginated content protocol (ADR 0008/0009).
 - **Comprehensive coverage** — every MCP action type has a fixture, not just text inputs.
 - **Agent-verifiable** — the "read and respond" pattern gives agents a realistic end-to-end task with deterministic expected results.
-- **Recognisable content** — using a well-known public-domain story makes it intuitive for developers and agents to verify correctness.
 - **Single source of truth** — `clients/test-page/` is the only demo content directory; both `brijio demo` and Docker serve from it.
 - **CI continuity** — existing Docker-based CI unaffected; same content, different delivery.
 
 ### Negative
 - **Additional process responsibility** — `brijio demo` adds a static HTTP server to the daemon's responsibilities (mitigated: single-port, no dynamic logic, only started for the `demo` subcommand).
 - **Maintenance surface** — demo page must be kept in sync with tool changes (mitigated: page is simple static HTML with no build step).
-- **Page size** — the inline story makes `index.html` large (~20+ KB of prose). This is intentional to exercise pagination, but it makes editing less convenient (mitigated: story text is in a clearly marked `<section>`, easily swapped for another public-domain work).
 - **No dynamic backend** — form submission uses GET params and client-side JS only; no server-side validation. This limits testing of POST flows and file uploads (deferred to P1.6 file upload support and P6.1 E2E fixture tests).
 
 ### Neutral
