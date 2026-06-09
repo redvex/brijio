@@ -441,7 +441,7 @@ async function connectAndAuth (url: string): Promise<WebSocket> {
       label: 'Chrome Integration',
       browserName: 'Chrome',
       profileName: 'Default',
-      capabilities: ['page_context', 'page_content', 'click', 'fill_input', 'fill_editable', 'set_checked', 'select_options', 'submit_form']
+      capabilities: ['page_context', 'page_content', 'click', 'fill_input', 'fill_editable', 'set_checked', 'select_options', 'submit_form', 'navigate']
     }
   }))
 
