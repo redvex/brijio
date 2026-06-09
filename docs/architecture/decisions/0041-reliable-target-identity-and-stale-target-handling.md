@@ -1,6 +1,6 @@
 # ADR 0041: Reliable Target Identity and Stale-Target Handling
 
-**Status:** Proposed
+**Status:** Implemented
 **Date:** 2026-06-09
 **Supersedes:** ADR 0036 (extends stale-context validation to all action tools)
 
@@ -259,54 +259,54 @@ Skip the navigation detection and only use per-field validation. **Rejected**: A
 
 ## Implementation Plan
 
-### Phase 1: Protocol types and error codes
+### Phase 1: Protocol types and error codes ✅
 
-1. Add `pageContextId` to `PerformActionRequest` in `packages/shared/src/protocol.ts`
-2. Add `page_navigated` to `ActionResultErrorCode` union in `packages/shared/src/protocol.ts`
-3. Add `expectedLabel` to `FormControlTarget` and `FormSubmitTarget` in protocol types
-4. Add `expectedText` to `EditableActionTarget` in protocol types
-5. Add `pageContextId` to `PageContextResponse` shape
+1. Add `pageContextId` to `PerformActionRequest` in `packages/shared/src/protocol.ts` ✅
+2. Add `page_navigated` to `ActionResultErrorCode` union in `packages/shared/src/protocol.ts` ✅
+3. Add `expectedLabel` to `FormControlTarget` and `FormSubmitTarget` in protocol types ✅
+4. Add `expectedText` to `EditableActionTarget` in protocol types ✅
+5. Add `pageContextId` to `PageContextResponse` shape ✅
 
-### Phase 2: Content script — page context version
+### Phase 2: Content script — page context version ✅
 
-1. Add `pageContextVersion` counter in content script module scope
-2. Increment on `pageshow` event
-3. Include `pageContextId` in `read_current_page` response
-4. Check `pageContextId` in action handlers, return `page_navigated` on mismatch
+1. Add `pageContextVersion` counter in content script module scope ✅
+2. Increment on `pageshow` event ✅
+3. Include `pageContextId` in `read_current_page` response ✅
+4. Check `pageContextId` in action handlers, return `page_navigated` on mismatch ✅
 
-### Phase 3: Content script — validation for all action types
+### Phase 3: Content script — validation for all action types ✅
 
-1. Add `expectedLabel` validation to form control target resolution (`fill_input`, `set_checked`, `select_options`)
-2. Add `expectedText` validation to editable target resolution (`fill_editable`)
-3. Add `expectedLabel` validation to form submit target resolution (`submit_form`)
-4. Return `stale_context` with `detail` on validation failure
+1. Add `expectedLabel` validation to form control target resolution (`fill_input`, `set_checked`, `select_options`) ✅
+2. Add `expectedText` validation to editable target resolution (`fill_editable`) ✅
+3. Add `expectedLabel` validation to form submit target resolution (`submit_form`) ✅
+4. Return `stale_context` with `detail` on validation failure ✅
 
-### Phase 4: Extension entry points
+### Phase 4: Extension entry points ✅
 
-1. Chrome background script (`clients/extensions/chrome/src/background.ts`) — forward `pageContextId` and new validation fields (`expectedLabel` on `FormControlTarget`/`FormSubmitTarget`, `expectedText` on `EditableActionTarget`) in `perform_action` envelopes
-2. Safari background entry (`clients/extensions/safari/src/background-entry.ts`) — same passthrough as Chrome for `pageContextId` and validation fields
-3. Chrome content script entry (`clients/extensions/chrome/src/content.ts`) — register `pageshow` event listener to increment shared `pageContextVersion`
-4. Safari content script entry (`clients/extensions/safari/src/content-script-entry.ts`) — register `pageshow` event listener to increment shared `pageContextVersion`
+1. Chrome background script (`clients/extensions/chrome/src/background.ts`) — forward `pageContextId` and new validation fields (`expectedLabel` on `FormControlTarget`/`FormSubmitTarget`, `expectedText` on `EditableActionTarget`) in `perform_action` envelopes ✅
+2. Safari background entry (`clients/extensions/safari/src/background-entry.ts`) — same passthrough as Chrome for `pageContextId` and validation fields ✅
+3. Chrome content script entry (`clients/extensions/chrome/src/content.ts`) — register `pageshow` event listener to increment shared `pageContextVersion` ✅
+4. Safari content script entry (`clients/extensions/safari/src/content-script-entry.ts`) — register `pageshow` event listener to increment shared `pageContextVersion` ✅
 
-### Phase 5: MCP server — schema and tool updates
+### Phase 5: MCP server — schema and tool updates ✅
 
-1. Add `pageContextId`, `expectedLabel`/`expectedText` to all action tool Zod schemas
-2. Pass `pageContextId` through to WebSocket envelope
-3. Pass validation fields through to content script
-4. Map `page_navigated` error code in MCP result
+1. Add `pageContextId`, `expectedLabel`/`expectedText` to all action tool Zod schemas ✅
+2. Pass `pageContextId` through to WebSocket envelope ✅
+3. Pass validation fields through to content script ✅
+4. Map `page_navigated` error code in MCP result ✅
 
-### Phase 6: Tests
+### Phase 6: Tests ✅
 
-1. Unit tests in `content-handler.test.ts` for each action type's validation
-2. Unit tests for `page_navigated` detection (pageContextId mismatch)
-3. Integration tests for error propagation through MCP → WS → extension → content script
-4. Negative tests: omitting validation fields preserves current behavior
+1. Unit tests in `content-handler.test.ts` for each action type's validation ✅
+2. Unit tests for `page_navigated` detection (pageContextId mismatch) ✅
+3. Integration tests for error propagation through MCP → WS → extension → content script ✅
+4. Negative tests: omitting validation fields preserves current behavior ✅
 
-### Phase 7: Documentation
+### Phase 7: Documentation ✅
 
-1. Update ADR 0036 to note it is extended by ADR 0041
-2. Update BrowserBridge skill guidance to recommend always passing validation fields
-3. Document `page_navigated` recovery strategy for agent consumers
+1. Update ADR 0036 to note it is extended by ADR 0041 ✅
+2. Update BrowserBridge skill guidance to recommend always passing validation fields ✅
+3. Document `page_navigated` recovery strategy for agent consumers ✅
 
 ## Verification
 
