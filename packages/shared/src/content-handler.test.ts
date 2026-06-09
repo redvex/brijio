@@ -3,6 +3,8 @@ import { describe, it } from 'node:test'
 import { parseHTML } from 'linkedom'
 import {
   handleContentRequest,
+  getPageContextVersion,
+  resetPageContextVersion,
   type ContentEnvironment
 } from './content-handler.js'
 
@@ -894,6 +896,509 @@ void describe('content handler request handler', () => {
 
     assert.equal(response.ok, true)
     assert.equal(clickedHref, '/second')
+  })
+
+  // ── pageContextVersion tests ─────────────────────────────────────
+
+  void it('getPageContextVersion starts at 1', () => {
+    resetPageContextVersion(1)
+    assert.equal(getPageContextVersion(), 1)
+  })
+
+  void it('resetPageContextVersion sets the counter to an arbitrary value', () => {
+    resetPageContextVersion(5)
+    assert.equal(getPageContextVersion(), 5)
+    // Clean up
+    resetPageContextVersion(1)
+  })
+
+  void it('resetPageContextVersion defaults to 1 when called without arguments', () => {
+    resetPageContextVersion(10)
+    resetPageContextVersion()
+    assert.equal(getPageContextVersion(), 1)
+  })
+
+  // ── page_navigated error tests ───────────────────────────────────
+
+  void it('returns page_navigated when pageContextId does not match pageContextVersion', () => {
+    resetPageContextVersion(3)
+    const { document } = parseHTML('<main><form><input type="text" /></form></main>')
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace',
+        pageContextId: 1
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected page_navigated error')
+      return
+    }
+    assert.equal(response.error.code, 'page_navigated')
+    assert.equal(
+      response.error.message.includes('context 1'),
+      true
+    )
+    assert.equal(
+      response.error.message.includes('current 3'),
+      true
+    )
+
+    // Clean up
+    resetPageContextVersion(1)
+  })
+
+  void it('proceeds normally when pageContextId matches pageContextVersion', () => {
+    resetPageContextVersion(3)
+    const { document } = parseHTML(
+      '<main><form><input type="text" /></form></main>'
+    )
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace',
+        pageContextId: 3
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+
+    // Clean up
+    resetPageContextVersion(1)
+  })
+
+  void it('proceeds normally when pageContextId is not provided', () => {
+    resetPageContextVersion(5)
+    const { document } = parseHTML(
+      '<main><form><input type="text" /></form></main>'
+    )
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+
+    // Clean up
+    resetPageContextVersion(1)
+  })
+
+  void it('returns page_navigated for submit_form when context is stale', () => {
+    resetPageContextVersion(3)
+    const { document } = parseHTML('<main><form></form></main>')
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_submit_form',
+        target: { formId: 'bb-1' },
+        pageContextId: 1
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected page_navigated error')
+      return
+    }
+    assert.equal(response.error.code, 'page_navigated')
+
+    // Clean up
+    resetPageContextVersion(1)
+  })
+
+  // ── validateFormControlTarget tests ───────────────────────────────
+  // Note: linkedom does not support CSS.escape, so we use aria-label
+  // or wrapping <label> elements instead of <label for="..."> to
+  // exercise getControlLabel in the test environment.
+
+  void it('write_text succeeds when expectedLabel matches the control label', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Full Name <input type="text" /></label>
+        </form>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1',
+          expectedLabel: 'full name'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+  })
+
+  void it('write_text returns stale_context when expectedLabel does not match', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Full Name <input type="text" /></label>
+        </form>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1',
+          expectedLabel: 'email address'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected stale_context error')
+      return
+    }
+    assert.equal(response.error.code, 'stale_context')
+    assert.equal(
+      response.error.message.includes('Expected label containing'),
+      true
+    )
+    assert.equal(
+      response.error.message.includes('"email address"'),
+      true
+    )
+  })
+
+  void it('write_text skips expectedLabel validation when expectedLabel is empty', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Full Name <input type="text" /></label>
+        </form>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1',
+          expectedLabel: ''
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+  })
+
+  void it('set_checked returns stale_context when expectedLabel does not match', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>I agree <input type="checkbox" /></label>
+        </form>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_set_checked',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1',
+          expectedLabel: 'disagree'
+        },
+        checked: true
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected stale_context error')
+      return
+    }
+    assert.equal(response.error.code, 'stale_context')
+  })
+
+  void it('select_options returns stale_context when expectedLabel does not match', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Favorite Color
+            <select><option value="red">Red</option></select>
+          </label>
+        </form>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_select_options',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1',
+          expectedLabel: 'size'
+        },
+        values: ['red']
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected stale_context error')
+      return
+    }
+    assert.equal(response.error.code, 'stale_context')
+  })
+
+  // ── validateEditableTarget tests ──────────────────────────────────
+
+  void it('write_text to editable succeeds when expectedText matches', () => {
+    const { document } = parseHTML(`
+      <main>
+        <div contenteditable="true" role="textbox" aria-label="Notes">Draft notes</div>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          kind: 'editable',
+          id: 'bb-1',
+          expectedText: 'draft'
+        },
+        text: 'Updated'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+  })
+
+  void it('write_text to editable returns stale_context when expectedText does not match', () => {
+    const { document } = parseHTML(`
+      <main>
+        <div contenteditable="true" role="textbox" aria-label="Notes">Draft notes</div>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          kind: 'editable',
+          id: 'bb-1',
+          expectedText: 'final version'
+        },
+        text: 'Updated'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected stale_context error')
+      return
+    }
+    assert.equal(response.error.code, 'stale_context')
+    assert.equal(
+      response.error.message.includes('Expected text containing'),
+      true
+    )
+    assert.equal(
+      response.error.message.includes('"final version"'),
+      true
+    )
+  })
+
+  void it('write_text to editable skips expectedText validation when empty', () => {
+    const { document } = parseHTML(`
+      <main>
+        <div contenteditable="true" role="textbox" aria-label="Notes">Draft</div>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          kind: 'editable',
+          id: 'bb-1',
+          expectedText: ''
+        },
+        text: 'Updated'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+  })
+
+  // ── validateFormSubmitTarget tests ────────────────────────────────
+
+  void it('submit_form succeeds when expectedLabel matches the form heading', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <h2>Contact Details</h2>
+          <input type="text" name="name" />
+        </form>
+      </main>
+    `)
+    const form = document.querySelector('form') as HTMLFormElement & {
+      requestSubmit: () => void
+    }
+    let submitted = false
+    form.requestSubmit = () => {
+      submitted = true
+    }
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_submit_form',
+        target: {
+          formId: 'bb-1',
+          expectedLabel: 'contact'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(submitted, true)
+  })
+
+  void it('submit_form returns stale_context when expectedLabel does not match', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <h2>Contact Details</h2>
+          <input type="text" name="name" />
+        </form>
+      </main>
+    `)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_submit_form',
+        target: {
+          formId: 'bb-1',
+          expectedLabel: 'payment'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected stale_context error')
+      return
+    }
+    assert.equal(response.error.code, 'stale_context')
+    assert.equal(
+      response.error.message.includes('Expected label containing'),
+      true
+    )
+    assert.equal(
+      response.error.message.includes('"payment"'),
+      true
+    )
+  })
+
+  void it('submit_form skips expectedLabel validation when expectedLabel is empty', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <h2>Contact Details</h2>
+        </form>
+      </main>
+    `)
+    const form = document.querySelector('form') as HTMLFormElement & {
+      requestSubmit: () => void
+    }
+    let submitted = false
+    form.requestSubmit = () => {
+      submitted = true
+    }
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_submit_form',
+        target: {
+          formId: 'bb-1',
+          expectedLabel: ''
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(submitted, true)
+  })
+
+  void it('submit_form matches expectedLabel against aria-label', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form aria-label="Search Form">
+          <input type="text" name="q" />
+        </form>
+      </main>
+    `)
+    const form = document.querySelector('form') as HTMLFormElement & {
+      requestSubmit: () => void
+    }
+    let submitted = false
+    form.requestSubmit = () => {
+      submitted = true
+    }
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_submit_form',
+        target: {
+          formId: 'bb-1',
+          expectedLabel: 'search'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(submitted, true)
   })
 })
 
