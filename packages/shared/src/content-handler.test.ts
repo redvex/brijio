@@ -376,15 +376,30 @@ void describe('content handler request handler', () => {
     })
   })
 
-  void it('sets checkbox checked state by form-control id', () => {
-    const { document } = parseHTML(
-      '<main><form><input type="checkbox" /></form></main>'
-    )
+  void it('sets checkbox checked state by clicking the wrapper label path', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label class="picasso-checkbox">
+            <span class="MuiCheckbox-root">
+              <span>
+                <input id="understand" name="understand" type="checkbox" />
+                <span class="visual-box"></span>
+              </span>
+            </span>
+            <span>I understand that this is a controlled checkbox.</span>
+          </label>
+        </form>
+      </main>
+    `)
     const checkbox = document.querySelector('input') as HTMLInputElement
+    const visual = document.querySelector('.MuiCheckbox-root') as HTMLElement
+    const label = document.querySelector('label') as HTMLLabelElement
     const dispatchedEvents: string[] = []
 
     checkbox.addEventListener('input', () => dispatchedEvents.push('input'))
     checkbox.addEventListener('change', () => dispatchedEvents.push('change'))
+    label.addEventListener('click', () => visual.classList.add('Mui-checked'))
 
     const response = handleContentRequest(
       {
@@ -411,6 +426,7 @@ void describe('content handler request handler', () => {
       }
     })
     assert.equal(checkbox.checked, true)
+    assert.equal(visual.classList.contains('Mui-checked'), true)
     assert.deepEqual(dispatchedEvents, ['input', 'change'])
   })
 

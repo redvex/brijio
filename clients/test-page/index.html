@@ -52,6 +52,14 @@ th { background: color-mix(in srgb, var(--accent) 15%, transparent); }
 .validation-fail { background: color-mix(in srgb, var(--error) 16%, Canvas); box-shadow: inset 4px 0 0 var(--error); }
 .validation-control-pass { border-color: var(--success) !important; box-shadow: 0 0 0 2px color-mix(in srgb, var(--success) 18%, transparent); }
 .validation-control-fail { border-color: var(--error) !important; box-shadow: 0 0 0 2px color-mix(in srgb, var(--error) 16%, transparent); }
+.demo-controlled-checkbox { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.demo-mui-outer { display: inline-flex; align-items: center; }
+.demo-mui-root { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; border: 2px solid color-mix(in srgb, CanvasText 45%, transparent); transition: background-color 120ms ease, border-color 120ms ease; }
+.demo-mui-label { display: inline-flex; align-items: center; position: relative; }
+.demo-mui-input { position: absolute; width: 22px; height: 22px; margin: 0; opacity: 0; cursor: pointer; }
+.demo-mui-box { width: 14px; height: 14px; border-radius: 2px; background: transparent; }
+.demo-mui-root.Mui-checked { background: var(--accent); border-color: var(--accent); }
+.demo-mui-root.Mui-checked .demo-mui-box::after { content: '✓'; display: block; color: white; font-size: 13px; line-height: 14px; text-align: center; font-weight: 700; }
 a { color: var(--accent); }
 a:hover { text-decoration: underline; }
 .nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -1073,6 +1081,22 @@ a:hover { text-decoration: underline; }
 </fieldset>
 
 <fieldset>
+<legend>Framework-Style Checkbox</legend>
+<p class="note">This Material UI/Toptal-style checkbox only updates its visible checkmark when the wrapping label is clicked. It verifies that Brijio uses the human click path for controlled checkbox widgets.</p>
+<label class="picasso-checkbox demo-controlled-checkbox">
+<span class="inline-flex demo-mui-outer">
+<span class="demo-mui-root" aria-disabled="false">
+<span class="demo-mui-label">
+<input class="demo-mui-input" id="understand" name="understand" type="checkbox" value="yes">
+<span class="demo-mui-box" aria-hidden="true"></span>
+</span>
+</span>
+</span>
+<span>I understand that I am testing a framework-controlled checkbox whose visible state depends on clicking the wrapping label.</span>
+</label>
+</fieldset>
+
+<fieldset>
 <legend>Radio Buttons — Select one</legend>
 <p class="note">What was the "speckled band" that Julia described?</p>
 
@@ -1266,6 +1290,11 @@ function renderResults(params) {
     html += '<td class="' + (notChecked ? 'pass' : 'fail') + '">' + (notChecked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
   }
 
+  var understandChecked = params.get('understand') === 'yes';
+  markChoiceValidation('understand', understandChecked);
+  html += '<tr><td>Framework-style checkbox acknowledgement</td><td>' + (understandChecked ? 'checked' : 'unchecked') + '</td>';
+  html += '<td class="' + (understandChecked ? 'pass' : 'fail') + '">' + (understandChecked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+
   var bandAnswer = params.get('speckled_band') || '';
   markRadioGroupValidation('speckled_band', 'snake', bandAnswer);
   html += '<tr><td>What was the speckled band?</td><td>' + escapeHtml(bandAnswer) + '</td>';
@@ -1380,6 +1409,7 @@ document.getElementById('btn-clear').addEventListener('click', function() {
   clearInlineValidation();
   document.getElementById('results').style.display = 'none';
   document.getElementById('results-content').innerHTML = '';
+  syncControlledCheckboxVisual();
 });
 
 document.getElementById('brijio-test-form').addEventListener('reset', function() {
@@ -1388,6 +1418,7 @@ document.getElementById('brijio-test-form').addEventListener('reset', function()
     clearInlineValidation();
     document.getElementById('results').style.display = 'none';
     document.getElementById('results-content').innerHTML = '';
+    syncControlledCheckboxVisual();
   }, 0);
 });
 
@@ -1409,6 +1440,8 @@ document.getElementById('btn-prefill').addEventListener('click', function() {
   document.getElementById('chk-saucer').checked = true;
   document.getElementById('chk-safe').checked = true;
   document.getElementById('chk-cigar').checked = true;
+  document.getElementById('understand').checked = true;
+  syncControlledCheckboxVisual();
   document.getElementById('radio-snake').checked = true;
   document.getElementById('time-3am').checked = true;
   document.getElementById('location-select').value = 'calcutta';
@@ -1418,6 +1451,22 @@ document.getElementById('btn-prefill').addEventListener('click', function() {
     if (opt) opt.selected = true;
   });
 });
+
+function syncControlledCheckboxVisual() {
+  var input = document.getElementById('understand');
+  var root = document.querySelector('.demo-mui-root');
+  if (!input || !root) return;
+  root.classList.toggle('Mui-checked', input.checked);
+}
+
+(function() {
+  var label = document.querySelector('.demo-controlled-checkbox');
+  if (!label) return;
+  label.addEventListener('click', function() {
+    setTimeout(syncControlledCheckboxVisual, 0);
+  });
+  syncControlledCheckboxVisual();
+})();
 
 </script>
 </body>
