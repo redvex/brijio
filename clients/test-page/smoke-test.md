@@ -30,6 +30,7 @@ Run these steps manually after starting `brijio demo`.
 - [ ] Fill `secret_passphrase` with "speckled band" (public demo text field; not a password control)
 - [ ] Fill `income_amount` with "750"
 - [ ] Fill `motive_explanation` with free-text answer mentioning financial motive
+- [ ] Use `fill_editable` to fill the contenteditable ventilator-role description with a short answer mentioning the ventilator and snake
 - [ ] All filled values persist and are visible on the page
 
 ## `form_action` — Checkboxes

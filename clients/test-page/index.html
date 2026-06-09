@@ -1223,6 +1223,7 @@ function renderResults(params) {
     income_amount: { expected: /^750$/, label: 'Income amount' },
     event_date: { expected: /1883-04/, label: 'Event date' },
     motive_explanation: { expected: /marry|income|mone|£|inherit/i, label: 'Motive explanation' },
+    content_editable_area: { expected: /ventilator|snake|bell.rope|bridge|roylott/i, label: 'Ventilator role description' },
     location_select: { expected: /calcutta/, label: 'Roylott\'s practise location' },
     transport_select: { expected: /train-cart|dog.cart/i, label: 'Transport method' }
   };
@@ -1278,7 +1279,9 @@ function renderResults(params) {
 }
 
 function formParams() {
-  return new URLSearchParams(new FormData(document.getElementById('brijio-test-form')));
+  var params = new URLSearchParams(new FormData(document.getElementById('brijio-test-form')));
+  params.set('content_editable_area', document.getElementById('content-editable-area').textContent.trim());
+  return params;
 }
 
 (function() {
@@ -1292,7 +1295,12 @@ function formParams() {
   });
 
   if (window.location.hash === '#results' || window.location.hash === '#results/') {
-    renderResults(new URLSearchParams(window.location.search));
+    var params = new URLSearchParams(window.location.search);
+    var editableValue = params.get('content_editable_area');
+    if (editableValue) {
+      document.getElementById('content-editable-area').textContent = editableValue;
+    }
+    renderResults(params);
   }
 })();
 
