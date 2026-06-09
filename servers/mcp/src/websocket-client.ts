@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import WebSocket, { type RawData } from 'ws'
 import {
   type BrijioClickElementResult,
@@ -371,7 +372,8 @@ async function requestBrijio<T> (options: {
     return authRequiredResponse()
   }
 
-  wsLogger.debug('ws_connecting', { url: options.websocketUrl })
+  const tokenScopeKey = createHash('sha256').update(options.pairingToken).digest('hex')
+  wsLogger.debug('ws_connecting', { url: options.websocketUrl, scopeKey: tokenScopeKey.slice(0, 8) })
 
   return await new Promise((resolve) => {
     const socket = new WebSocket(options.websocketUrl)
