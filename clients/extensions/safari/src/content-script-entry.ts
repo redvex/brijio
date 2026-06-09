@@ -8,6 +8,7 @@
 
 import {
   handleContentRequest,
+  registerPageNavigationListener,
   type ContentRequest,
   type ContentResponse
 } from '@brijio/shared'
@@ -29,6 +30,10 @@ interface BrowserRuntimeApi {
 }
 
 declare const browser: BrowserRuntimeApi | undefined
+
+// Per ADR 0041, register a pageshow listener so content-handler
+// increments pageContextVersion on back/forward navigation.
+registerPageNavigationListener()
 
 if (typeof browser !== 'undefined') {
   browser.runtime.onMessage.addListener(

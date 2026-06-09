@@ -14,6 +14,7 @@ import {
   type ClickActionTarget,
   type WriteTextActionTarget,
   type WriteTextEditableTarget,
+  type FormSubmitTarget,
   type PageActionResult,
   stringValue,
   requireString,
@@ -46,42 +47,45 @@ const safariDeps: ActiveTabDeps = {
 }
 
 const pageActions = {
-  async click (target: ClickActionTarget): Promise<PageActionResult> {
+  async click (target: ClickActionTarget, pageContextId?: number): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
-      { type: 'perform_click', target },
+      { type: 'perform_click', target, ...(pageContextId !== undefined ? { pageContextId } : {}) },
       safariDeps
     )
   },
   async writeText (
     target: WriteTextActionTarget | WriteTextEditableTarget,
-    text: string
+    text: string,
+    pageContextId?: number
   ): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
-      { type: 'perform_write_text', target, text },
+      { type: 'perform_write_text', target, text, ...(pageContextId !== undefined ? { pageContextId } : {}) },
       safariDeps
     )
   },
   async setChecked (
     target: WriteTextActionTarget,
-    checked: boolean
+    checked: boolean,
+    pageContextId?: number
   ): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
-      { type: 'perform_set_checked', target, checked },
+      { type: 'perform_set_checked', target, checked, ...(pageContextId !== undefined ? { pageContextId } : {}) },
       safariDeps
     )
   },
   async selectOptions (
     target: WriteTextActionTarget,
-    values: string[]
+    values: string[],
+    pageContextId?: number
   ): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
-      { type: 'perform_select_options', target, values },
+      { type: 'perform_select_options', target, values, ...(pageContextId !== undefined ? { pageContextId } : {}) },
       safariDeps
     )
   },
-  async submitForm (target: { formId: string }): Promise<PageActionResult> {
+  async submitForm (target: FormSubmitTarget, pageContextId?: number): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
-      { type: 'perform_submit_form', target },
+      { type: 'perform_submit_form', target, ...(pageContextId !== undefined ? { pageContextId } : {}) },
       safariDeps
     )
   }

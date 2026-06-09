@@ -12,7 +12,9 @@ export interface FillInputInput {
   formId?: unknown
   controlId?: unknown
   text?: unknown
+  expectedLabel?: unknown
   browserInstanceId?: unknown
+  pageContextId?: unknown
 }
 
 export type FillInputResult =
@@ -32,7 +34,8 @@ export async function fillInput (
     config,
     normalizedInput.data.target,
     normalizedInput.data.text,
-    normalizedInput.data.browserInstanceId
+    normalizedInput.data.browserInstanceId,
+    normalizedInput.data.pageContextId
   )
 }
 
@@ -42,6 +45,7 @@ function normalizeInput (
     target: FillInputTarget
     text: string
     browserInstanceId?: string
+    pageContextId?: number
   }> {
   if (typeof input.formId !== 'string' || input.formId.length === 0) {
     return invalidToolInputResponse('formId must be a non-empty string.')
@@ -66,16 +70,40 @@ function normalizeInput (
     return browserInstanceId
   }
 
+  if (
+    input.expectedLabel !== undefined &&
+    typeof input.expectedLabel !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'expectedLabel must be a string when provided.'
+    )
+  }
+
+  if (
+    input.pageContextId !== undefined &&
+    typeof input.pageContextId !== 'number'
+  ) {
+    return invalidToolInputResponse(
+      'pageContextId must be a number when provided.'
+    )
+  }
+
   return {
     ok: true,
     data: {
       target: {
         formId: input.formId,
-        controlId: input.controlId
+        controlId: input.controlId,
+        ...(input.expectedLabel !== undefined
+          ? { expectedLabel: input.expectedLabel }
+          : {})
       },
       text: input.text,
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
+        : {}),
+      ...(input.pageContextId !== undefined
+        ? { pageContextId: input.pageContextId }
         : {})
     }
   }
