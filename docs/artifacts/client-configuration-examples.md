@@ -385,3 +385,27 @@ If your MCP client cannot connect:
    Tailscale or mDNS address instead of `127.0.0.1`.
 5. **Review client permissions** — some clients (e.g. Cline) require explicit
    approval before connecting to remote MCP servers.
+
+---
+
+## Verification Status
+
+All config blocks in this document are derived from the `--print-config` CLI
+output (ADR-0038) which is the authoritative source. The following table tracks
+which configs have been manually end-to-end tested against a running Brijio
+instance.
+
+| Client         | Format verified by `--print-config` | End-to-end tested | Notes                                    |
+| -------------- | ----------------------------------- | ----------------- | ---------------------------------------- |
+| Claude Desktop | ✅                                  | ⬜ Not yet        |                                          |
+| Cursor         | ✅                                  | ⬜ Not yet        |                                          |
+| VS Code        | ✅                                  | ⬜ Not yet        |                                          |
+| Cline          | ✅                                  | ⬜ Not yet        |                                          |
+| Codex CLI      | ✅                                  | ⬜ Not yet        |                                          |
+| Hermes         | ✅                                  | ⬜ Not yet        |                                          |
+| Claude Code    | ✅                                  | ⬜ Not yet        |                                          |
+| Gemini CLI     | ✅                                  | ⬜ Not yet        |                                          |
+| Windsurf       | ✅                                  | ⬜ Not yet        |                                          |
+| Zed            | ✅                                  | ⬜ Not yet        |                                          |
+| Continue       | ✅                                  | ⬜ Not yet        |                                          |
+| Goose          | N/A (not supported)                 | N/A               | Explicit unsupported note and workaround |
