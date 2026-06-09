@@ -1,0 +1,1247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brijio Demo — Read and Respond</title>
+<style>
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  --accent: #3366ff;
+  --accent-soft: #3366ff20;
+  --success: #16a34a;
+  --error: #dc2626;
+}
+body { margin: 0; background: Canvas; color: CanvasText; }
+main { max-width: 800px; margin: 0 auto; padding: 32px 20px 48px; }
+h1, h2, h3 { line-height: 1.2; }
+.intro { max-width: 720px; }
+form { display: grid; gap: 24px; }
+fieldset { display: grid; gap: 16px; border: 1px solid color-mix(in srgb, CanvasText 22%, transparent); border-radius: 8px; padding: 18px; }
+legend { padding: 0 8px; font-weight: 700; }
+label, .control { display: grid; gap: 6px; }
+input, textarea, select { max-width: 420px; font: inherit; border: 1px solid color-mix(in srgb, CanvasText 28%, transparent); border-radius: 6px; padding: 8px 10px; background: Canvas; color: CanvasText; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+input:disabled, textarea:disabled, select:disabled, button:disabled { opacity: 0.5; cursor: not-allowed; }
+button { font: inherit; padding: 10px 20px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; }
+button[type="submit"] { background: var(--accent); color: white; }
+button[type="reset"] { background: transparent; border-color: color-mix(in srgb, CanvasText 30%, transparent); }
+.passage { font-size: 1.05em; line-height: 1.75; }
+.passage p { margin: 0.8em 0; }
+.passage .dialogue { font-style: italic; }
+.passage .location { font-weight: 600; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+th, td { border: 1px solid color-mix(in srgb, CanvasText 25%, transparent); padding: 8px 12px; text-align: left; }
+th { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+.dynamic-section { min-height: 40px; padding: 12px; border: 1px dashed color-mix(in srgb, CanvasText 30%, transparent); border-radius: 6px; }
+.results { background: color-mix(in srgb, var(--accent) 8%, Canvas); border-radius: 8px; padding: 20px; }
+.results .pass { color: var(--success); font-weight: 600; }
+.results .fail { color: var(--error); font-weight: 600; }
+a { color: var(--accent); }
+a:hover { text-decoration: underline; }
+.nav-links { display: flex; gap: 16px; flex-wrap: wrap; }
+.nav-links a { padding: 6px 12px; border: 1px solid color-mix(in srgb, CanvasText 20%, transparent); border-radius: 4px; text-decoration: none; }
+.nav-links a:hover { background: var(--accent-soft); }
+</style>
+</head>
+<body>
+<main>
+<h1>Brijio Demo Page</h1>
+<p class="intro">This page verifies the full Brijio stack: browser extension, WebSocket server, and MCP tools. It follows a <strong>read and respond</strong> pattern — read the passage below, then fill in the form. Every answer can be determined from the text.</p>
+<p class="intro">The passage is intentionally long to exercise Brijio's <strong>paginated content</strong> feature. If you call <code>read_current_page</code>, you should receive <code>truncated: true</code> and need to request subsequent chunks.</p>
+
+<nav class="nav-links">
+  <a href="#story">Story Passage</a>
+  <a href="#table-data">Data Tables</a>
+  <a href="#form">Response Form</a>
+  <a href="#dynamic">Dynamic Content</a>
+  <a href="#links">Navigation Links</a>
+</nav>
+
+<section id="story" class="passage">
+<h2>The Adventure of the Speckled Band</h2>
+<p><em>By Arthur Conan Doyle (public domain worldwide)</em></p>
+
+<p class="location">On glancing over my notes of the seventy odd cases in which I have during the last eight years studied the methods of my friend Sherlock Holmes, I find many tragic, some comic, a large number merely strange, but none commonplace; for, working as he did rather for the love of his art than for the acquirement of wealth, he refused to associate himself with any investigation which did not tend towards the extraordinary, and even the fantastic. Of all these varied cases, however, I cannot recall any which presented more singular features than that which was associated with the well-known Surrey family of the Roylotts of Stoke Moran.</p>
+
+<p>The events in question occurred in the early days of my association with Holmes, when we were sharing rooms as bachelors in Baker Street. It is possible that I might have placed them on record before, but a promise of secrecy was made at the time, from which I have only been freed during the last month by the untimely death of the lady to whom the promise was given. It is perhaps as well that the facts should now come to the public, as there are still some misconceptions as to the exact nature of the tragedy, and as the name of Dr. Grimesby Roylott has been associated with some of the most remarkable criminal cases of the last decade.</p>
+
+<p>It was early in April, 1883, that I woke one morning to find Sherlock Holmes standing by my bedside. He was usually late in the mornings — save upon those not infrequent occasions when he was up all night — and I was dressed and out before he had finished his breakfast. I was startled, therefore, to see him enter the room at that early hour.</p>
+
+<p class="dialogue">"Hulloa! What's up?" I asked.</p>
+
+<p class="dialogue">"A client. I think we have a client."</p>
+
+<p class="dialogue">"Indeed? What sort of client?"</p>
+
+<p class="dialogue">"Well, I should say a very remarkable one. A young lady, and evidently in a great state of agitation. She insists upon seeing me. She is waiting in the sitting-room."</p>
+
+<p>I dressed hastily and accompanied Holmes into the sitting-room. A lady dressed in black and heavily veiled, who had been sitting by the window, rose as we entered.</p>
+
+<p class="dialogue">"Good-morning, madam," said Holmes. "My name is Sherlock Holmes. This is my intimate friend and associate, Dr. Watson. You need not confine yourself to the sitting-room if you wish to smoke."</p>
+
+<p>The lady threw her veil back and disclosed a face of extraordinary beauty, but pale and drawn with some anxiety. Her eyes were bright and searching, and her manner was that of one who is in hurried need of advice.</p>
+
+<p class="dialogue">"I have heard of you, Mr. Holmes," she said. "I have heard from Mrs. Farintosh, whom you assisted in her hour of sorrow. She spoke of your kindness and your skill."</p>
+
+<p class="dialogue">"Mrs. Farintosh!" said Holmes, thoughtfully. "Yes, I remember. It was a case of opium smoking — very singular indeed. I see you have been in Afghanistan."</p>
+
+<p>The lady glanced down, and I saw a slight blush cross her face.</p>
+
+<p class="dialogue">"How do you know that?" she asked.</p>
+
+<p class="dialogue">"A soldier's wife. The second finger of your left hand bears the mark of a needle — the mark of a seamstress. But you have been in India, have you not? There is a certain quality of the skin which is characteristic of those who have lived long in the tropics."</p>
+
+<p>The lady smiled.</p>
+
+<p class="dialogue">"You have observed wonderfully," she said. "But I am wasting your time. My name is Helen Stoner, and I am living with my stepfather, Dr. Grimesby Roylott, at Stoke Moran, in Surrey."</p>
+
+<p>She then went on to explain the circumstances of her life. Her mother had married Dr. Roylott when Helen was very young. Dr. Roylott had practised in Calcutta, where he had been a surgeon in the Indian Army. He had a practice in the city, and some property. When Helen's mother died — she was killed in a railway accident eight years ago — Dr. Roylott returned to England, where he bought Stoke Moran, an old manor house in Surrey.</p>
+
+<p>Dr. Roylott's income was a very large one, for his practice in Calcutta had been extensive and successful. He had also inherited some money from his wife. The total income was about seven hundred and fifty pounds a year — an enormous sum in those days. But Dr. Roylott was a man of violent temper. He had no friends in the neighbourhood, and was rarely seen except when he went into the village to purchase food. He had a passion for Indian animals, and kept a cheetah and a baboon, which ran about the grounds. The neighbours feared him, and the local tradesmen would not serve him.</p>
+
+<p>Helen had a twin sister, Julia, who had died two years previously, under circumstances which had never been satisfactorily explained. Julia had been engaged to be married, and one night she had come into Helen's room, crying out that she had heard a whistling sound, and that she smelt a strange odour. She had then gone back to her own room, and in the morning she was found dead. The cause of death was never determined, but it was believed to be a case of shock and sudden fright. The door of Julia's room had been locked on the inside, and the window was fastened with an iron bar.</p>
+
+<p>Helen now found herself in the same situation. She was engaged to be married, and she too had heard the same whistling sound which her sister had described. On the previous night she had been awakened by the same sound, and had smelt the same strange odour. She had then come to London to consult Sherlock Holmes.</p>
+
+<p class="dialogue">"And what," said Holmes, "did you do then?"</p>
+
+<p class="dialogue">"I came to you at once. I had heard of your kindness and your skill, and I knew that you would help me if anyone could."</p>
+
+<p>Holmes considered the matter for some time in silence. Then he asked a number of questions, to which Helen replied very fully. He learned that the house was a very old one, with thick walls, and that the bedroom occupied by Helen was between those of Dr. Roylott and that which had been occupied by Julia. The room in which Helen now slept had a low ceiling, and there was a small ventilator between it and Dr. Roylott's room. The bed was clamped to the floor, and could not be moved.</p>
+
+<p class="dialogue">"And your stepfather?" asked Holmes. "Does he keep any animals?"</p>
+
+<p class="dialogue">"He has a cheetah and a baboon. They are his only companions, and they run loose about the grounds."</p>
+
+<p class="dialogue">"A cheetah and a baboon! That is unusual. And there is a dog, I suppose?"</p>
+
+<p class="dialogue">"No, there is no dog. The cheetah and the baboon would kill a dog."</p>
+
+<p class="dialogue">"And what about the whistling sound? Could it have been made by the cheetah?"</p>
+
+<p class="dialogue">"No, it was a human whistle. I am sure of that."</p>
+
+<p class="dialogue">"And the smell? What was it like?"</p>
+
+<p class="dialogue">"It was a sort of burning smell — like heated metal, or perhaps some kind of Indian cigar."</p>
+
+<p>Holmes made a note of this, and then asked Helen to describe the room in which she slept. She told him that it was one of a series of rooms on the ground floor of the house, that it had a low ceiling, and that there was a small ventilator between it and Dr. Roylott's room. The bed was clamped to the floor, and could not be moved. There was also a bell-rope hanging down beside the bed, which communicated with the housemaid's room.</p>
+
+<p class="dialogue">"And the whistle — where did it seem to come from?" asked Holmes.</p>
+
+<p class="dialogue">"From the direction of Dr. Roylott's room," Helen replied.</p>
+
+<p class="dialogue">"And when you heard it, what did you do?"</p>
+
+<p class="dialogue">"I sat up in bed, and I called out. But there was no answer. I then heard a metallic noise, as if something were being drawn back."</p>
+
+<p class="dialogue">"And then?"</p>
+
+<p class="dialogue">"Then I was so frightened that I rushed to my sister's door, but I found it locked. I knocked, but there was no answer. I then ran downstairs and let myself out at the side door, and went round to the front of the house. The window of my sister's room was open, and I could see her standing by it. She was in her nightdress, and she looked terrified. She screamed out, 'Oh, my God! Helen! It was the band! The speckled band!' And then I heard a shrill whistle, and a few moments later a terrible scream."</p>
+
+<p class="dialogue">"The speckled band?" repeated Holmes. "What did she mean by that?"</p>
+
+<p class="dialogue">"I do not know. She was delirious, I think. She never explained what she meant."</p>
+
+<p class="dialogue">"And you have no idea what the speckled band might be?"</p>
+
+<p class="dialogue">"No, I have no idea. But I have often thought about it since, and I cannot imagine what she could have meant."</p>
+
+<p>Holmes was silent for a few moments, and then he said: "I think, Miss Stoner, that you have done very wisely in coming to me. You have told me a very remarkable story, and I think I can help you. But we must act at once. Can you come with me to Stoke Moran today?"</p>
+
+<p class="dialogue">"Yes, I can come this afternoon. Dr. Roylott has gone into town, and he will not be back until the evening."</p>
+
+<p class="dialogue">"Good. Then we will come down by the afternoon train. But before we go, I should like to ask you one more question. The bell-rope in your room — does it communicate with the housemaid's room?"</p>
+
+<p class="dialogue">"Yes, it does."</p>
+
+<p class="dialogue">"And the ventilator — is it between your room and Dr. Roylott's?"</p>
+
+<p class="dialogue">"Yes."</p>
+
+<p class="dialogue">"And the bed — it is clamped to the floor, you say?"</p>
+
+<p class="dialogue">"Yes. It has always been in the same position."</p>
+
+<p>Holmes then asked Helen to describe the room which Julia had occupied. She told him that it was exactly the same as her own, except that the bed was in a different position, and that there was no ventilator. The window of Julia's room faced the garden, and there was a small lawn in front of it.</p>
+
+<p class="dialogue">"I think," said Holmes, "that I should like to see these rooms for myself. Will you permit me to come down to Stoke Moran this afternoon?"</p>
+
+<p class="dialogue">"Certainly. I shall be most happy to see you."</p>
+
+<p>Holmes then asked a few more questions, and after Helen had left, he turned to me and said: "This is a very singular case, Watson. There are some features about it which I have never seen before. The ventilator, the bell-rope, and the bed which is clamped to the floor — these are all very suspicious circumstances. I think we had better go down to Stoke Moran today."</p>
+
+<p>We accordingly went down by the afternoon train, and on arriving at the little station of Leatherhead, we found a dog-cart waiting for us, which Helen had sent. We drove for about two miles through a lovely Surrey landscape, and then came to Stoke Moran, a large old house standing in its own grounds. The house was a singular-looking building, with a high roof and gables, and it was surrounded by a moat, which was crossed by a wooden drawbridge.</p>
+
+<p>Dr. Roylott was not at home when we arrived. We went into the house, and Helen showed us the rooms. Holmes examined them very carefully, and especially the ventilator and the bell-rope. He then went into Dr. Roylott's room, and examined that also. When he came out, he was very thoughtful, and he said to me: "Watson, I believe that I have solved the mystery. But I must have more evidence before I can be quite sure."</p>
+
+<p>He then asked Helen to show him the grounds. They walked round the garden, and Holmes examined the windows of the house from the outside. He also looked at the roof, and at the walls. When he had finished, he said to Helen: "I think I can help you, Miss Stoner. But you must do exactly as I tell you. You must not sleep in your room tonight. You must sleep in your sister's room, which is next door. I and my friend Watson will spend the night in your room."</p>
+
+<p>Helen agreed to this, and that evening, when Dr. Roylott had returned, we went into Helen's room and waited. It was a dark night, and we sat in the darkness for some time. At last, about three o'clock in the morning, we heard a sound — a low, clear whistle. Holmes sprang from his chair and lit a lamp. He then went to the ventilator and looked through. A moment later, he struck a light, and we heard a hissing sound. Holmes lashed about with his cane, and then there was a dreadful cry, followed by a heavy thud.</p>
+
+<p>We rushed into Dr. Roylott's room, and there we found him lying dead upon the floor. Coiled about his head was a snake — the most dangerous snake in India, a swamp adder, whose bite is almost invariably fatal. It was the speckled band which Helen's sister had seen, and it was the same snake which had caused her death.</p>
+
+<p>The mystery was now explained. Dr. Roylott, who had lived for many years in India, had brought back with him a knowledge of Indian snakes and their habits. He had trained this swamp adder to come through the ventilator when he whistled, and it had been his custom to send the snake into Julia's room at night. The snake had bitten her, and she had died from the effects of the poison. The ventilator, the bell-rope (which was really a rope for the snake to descend upon the bed), and the bed clamped to the floor — all these things formed part of Dr. Roylott's infernal scheme.</p>
+
+<p>Holmes had struck the snake with his cane, and it had retreated through the ventilator, and then, angered by the blow, it had turned upon its master, and had bitten him. Death had been instantaneous.</p>
+
+<p class="dialogue">"It is a singular case," said Holmes, as we walked back to the station. "The speckled band! I should have known that no snake could have made the whistling sound which Miss Stoner described. It was the doctor himself who whistled, and the snake answered to his call. It is a case of the most diabolical ingenuity."</p>
+
+<p>And so ended the Adventure of the Speckled Band, one of the most remarkable cases in the career of Sherlock Holmes.</p>
+</section>
+
+<section id="table-data">
+<h2>Character &amp; Evidence Tables</h2>
+<p>The tables below contain structured data from the story. Read them carefully — form questions reference specific cells.</p>
+
+<h3>Characters</h3>
+<table id="characters-table">
+<thead><tr><th>Name</th><th>Role</th><th>Location</th><th>Key Detail</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Sherlock Holmes</td><td>Consulting detective</td><td>221B Baker Street, London</td><td>Noticed Afghan tan; deductive reasoning</td><td>Active</td></tr>
+<tr><td>Dr. Watson</td><td>Holmes's companion; narrator</td><td>221B Baker Street, London</td><td>Former Army surgeon; Afghanistan veteran</td><td>Active</td></tr>
+<tr><td>Helen Stoner</td><td>Client; stepdaughter of Roylott</td><td>Stoke Moran, Surrey</td><td>Twin sister of Julia; engaged to be married</td><td>Alive</td></tr>
+<tr><td>Julia Stoner</td><td>Helen's twin sister</td><td>Stoke Moran, Surrey</td><td>Died two years before Helen's visit</td><td>Deceased</td></tr>
+<tr><td>Dr. Grimesby Roylott</td><td>Stepfather; antagonist</td><td>Stoke Moran, Surrey</td><td>Former Army surgeon, Calcutta; income £750/year; violent temper</td><td>Deceased</td></tr>
+<tr><td>Mrs. Farintosh</td><td>Previous client of Holmes</td><td>Unknown</td><td>Helen heard of Holmes from her</td><td>Unknown</td></tr>
+</tbody>
+</table>
+
+<h3>Timeline of Events</h3>
+<table id="timeline-table">
+<thead><tr><th>Date/Time</th><th>Event</th><th>Location</th><th>Witnesses</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td>c. 1875</td><td>Dr. Roylott marries Helen's mother in India</td><td>Calcutta, India</td><td>Helen Stoner</td><td>Marriage record</td></tr>
+<tr><td>c. 1877</td><td>Mrs. Roylott dies in railway accident</td><td>Railway, England</td><td>Public record</td><td>Obituary; death certificate</td></tr>
+<tr><td>1881</td><td>Julia Stoner dies; last words "the speckled band"</td><td>Julia's bedroom, Stoke Moran</td><td>Helen Stoner (adjacent room)</td><td>Locked door; no visible cause of death</td></tr>
+<tr><td>Early April 1883</td><td>Helen hears whistling and smells burning odour</td><td>Helen's bedroom, Stoke Moran</td><td>Helen Stoner</td><td>Same pattern as Julia's last night</td></tr>
+<tr><td>April 1883, morning</td><td>Helen visits Holmes at Baker Street</td><td>221B Baker Street</td><td>Holmes, Watson</td><td>Helen's veiled appearance</td></tr>
+<tr><td>April 1883, afternoon</td><td>Holmes &amp; Watson travel to Stoke Moran</td><td>Leatherhead station; Stoke Moran</td><td>Helen Stoner</td><td>Dog-cart; examination of rooms</td></tr>
+<tr><td>April 1883, ~3:00 AM</td><td>Holmes strikes the snake; Roylott is bitten</td><td>Dr. Roylott's bedroom</td><td>Holmes, Watson</td><td>Whistling sound; hissing; cane strike; cry</td></tr>
+</tbody>
+</table>
+
+<h3>Room Layout</h3>
+<table id="rooms-table">
+<thead><tr><th>Room</th><th>Occupant</th><th>Key Feature</th><th>Observation</th></tr></thead>
+<tbody>
+<tr><td>Dr. Roylott's room</td><td>Dr. Grimesby Roylott</td><td>Safe containing the snake; ventilator to Helen's room</td><td>Holmes found saucer of milk; snake access point</td></tr>
+<tr><td>Helen's room</td><td>Helen Stoner (after Julia's death)</td><td>Bell-rope (dummy); ventilator; bed clamped to floor</td><td>Bell-rope does not ring; ventilator connects to Roylott's room</td></tr>
+<tr><td>Julia's room</td><td>Julia Stoner (deceased); later Helen</td><td>Window facing garden; lockable from inside</td><td>Julia found dead; door locked from inside</td></tr>
+</tbody>
+</table>
+
+<h3>Clues &amp; Deductions</h3>
+<table id="clues-table">
+<thead><tr><th>Clue</th><th>Deduction</th><th>Significance</th></tr></thead>
+<tbody>
+<tr><td>Ventilator between rooms</td><td>Passage for the snake</td><td>Unusual architectural feature connecting Roylott's room to Helen's</td></tr>
+<tr><td>Bell-rope that does not ring</td><td>Not a real bell-pull — a bridge for the snake</td><td>Rope hung beside bed, within reach of ventilator</td></tr>
+<tr><td>Bed clamped to floor</td><td>Prevents Helen from moving away from the snake's descent path</td><td>Bed position fixed directly under ventilator</td></tr>
+<tr><td>Whistling sound</td><td>Roylott calling the snake back</td><td>Same whistle heard by both Julia and Helen on their respective last nights</td></tr>
+<tr><td>Burning/chemical smell</td><td>Could be snake venom or Roylott's Indian cigars</td><td>Described as heated metal or Indian cigar</td></tr>
+<tr><td>Speckled band</td><td>The swamp adder (snake) itself</td><td>Julia's dying description — "a speckled band" — misunderstood as a gypsy band</td></tr>
+<tr><td>Saucer of milk in Roylott's room</td><td>Bait for the snake</td><td>Holmes found this during his search</td></tr>
+<tr><td>Metallic noise</td><td>Safe door being closed after the snake returned</td><td>Heard by Helen after the whistle</td></tr>
+</tbody>
+</table>
+
+<h3>Financial Details</h3>
+<table id="finances-table">
+<thead><tr><th>Amount</th><th>Source</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>£750 per annum</td><td>Dr. Roylott's total income</td><td>From Indian practice and wife's inheritance; an enormous sum for the era</td></tr>
+<tr><td>£250 per annum</td><td>Each daughter's inheritance portion</td><td>Upon marriage, £250 would transfer from Roylott's control</td></tr>
+<tr><td>£1,100 total</td><td>Total if both daughters married</td><td>£750 + £250 + £250 = total income at risk; motive explained</td></tr>
+</tbody>
+</table>
+</section>
+
+
+<section id="extended-analysis">
+<h2>Extended Analysis</h2>
+
+<h3>Scene-by-Scene Breakdown</h3>
+<table id="scene-table">
+<thead><tr><th>Scene</th><th>Location</th><th>Characters</th><th>Action</th><th>Key Quote</th><th>Deduction</th></tr></thead>
+<tbody>
+<tr><td>1 — Opening</td><td>221B Baker Street</td><td>Holmes, Watson</td><td>Holmes deduces Stoner's history from observation</td><td>"You have been in Afghanistan, I perceive."</td><td>Holmes's deductive method: observes skin quality,bearing, and medical knowledge to infer military service abroad</td></tr>
+<tr><td>2 — Client arrives</td><td>221B Baker Street</td><td>Holmes, Watson, Helen Stoner</td><td>Helen narrates her history and Julia's death</td><td>"It was the band! The speckled band!"</td><td>Julia's dying words are the central clue; initially misinterpreted as a gypsy band</td></tr>
+<tr><td>3 — Background</td><td>Narrative flashback</td><td>Helen (narrating)</td><td>Description of Roylott's character, income, animals, and Julia's death</td><td>"He had a passion for Indian animals, and kept a cheetah and a baboon."</td><td>Roylott's Indian experience and exotic animals foreshadow the snake; income of £750 drives the financial motive</td></tr>
+<tr><td>4 — Investigation</td><td>Stoke Moran rooms</td><td>Holmes, Watson, Helen</td><td>Holmes examines ventilator, bell-rope, bed, and Roylott's room</td><td>"I think, Miss Stoner, that you have done very wisely in coming to me."</td><td>Holmes identifies the ventilator and bell-rope as suspicious before the stakeout</td></tr>
+<tr><td>5 — Confrontation</td><td>Stoke Moran grounds/room</td><td>Holmes, Watson, Roylott</td><td>Roylott confronts Holmes; bends steel poker</td><td>"I am a dangerous man to fall foul of."</td><td>Roylott's violence confirms Holmes's suspicion; poker-bending demonstrates physical strength and rage</td></tr>
+<tr><td>6 — Stakeout</td><td>Helen's bedroom</td><td>Holmes, Watson</td><td>All-night vigil; Holmes and Watson wait in darkness</td><td>"Do you see what I see?" he whispered.</td><td>The stakeout is Holmes's decisive investigative method — he places himself in the scene to observe directly</td></tr>
+<tr><td>7 — Climax</td><td>Helen's bedroom / Roylott's room</td><td>Holmes, Watson, Roylott (deceased)</td><td>Whistle heard; snake descends; Holmes strikes; snake retreats and bites Roylott</td><td>"It was a near thing."</td><td>Holmes's action directly causes Roylott's death — morally complex but legally defensible as self-defense</td></tr>
+<tr><td>8 — Resolution</td><td>Stoke Moran / Baker Street</td><td>Holmes, Watson</td><td>Explanation of the mystery; the "speckled band" revealed as the swamp adder</td><td>"I cannot say that it is likely to weigh very heavily upon my conscience."</td><td>Holmes acknowledges moral ambiguity but ultimately justifies his action; Roylott's death is the natural consequence of his own scheme</td></tr>
+</tbody>
+</table>
+
+<h3>Character Profiles</h3>
+
+<div style="margin-bottom:24px;">
+<h4>Sherlock Holmes</h4>
+<p>The world's only consulting detective. In this adventure, Holmes demonstrates his full range of skills: acute observation (inferring Helen's background from her appearance), strategic planning (the overnight stakeout), physical courage (confronting the snake at close range), and moral complexity (his role in Roylott's death). His method is explicitly scientific — he forms hypotheses based on evidence, tests them experimentally (the stakeout), and draws conclusions. The Speckled Band is notable for showing Holmes in a more physically dangerous situation than many other adventures; he is directly threatened by a poisonous snake, and his quick reflexes with the cane are what saves both himself and Helen Stoner. Holmes's reaction to Roylott's death — "I cannot say that it is likely to weigh very heavily upon my conscience" — reveals a character who accepts the moral consequences of his actions without excessive sentimentality. His deduction that the snake was the murder weapon depends on understanding Indian snake-handling practices, a piece of knowledge that only someone with Holmes's breadth of reading would possess. This underscores a recurring theme in the canon: Holmes's seemingly esoteric knowledge always proves relevant.</p>
+</div>
+
+<div style="margin-bottom:24px;">
+<h4>Dr. John Watson</h4>
+<p>The narrator and Holmes's companion. Watson's role in The Speckled Band is primarily observational: he accompanies Holmes to Stoke Moran, participates in the overnight vigil, and acts as the recorder of events. His medical background is relevant — he immediately recognizes the signs of poisoning when he examines Julia's room, though he cannot identify the specific venom. Watson's reliability as a narrator is a point of debate among Sherlockian scholars; some argue that he embellishes or simplifies for dramatic effect, while others treat his accounts as essentially factual. In this story, Watson explicitly states that he was freed from a promise of secrecy by Helen Stoner's death, suggesting that the published account is essentially accurate. Watson's military background (he was wounded in the Afghan campaign, as established in A Study in Scarlet) explains both his willingness to accompany Holmes into danger and his calmness under fire. His observation about the "speckled band" being initially puzzling matches the reader's own confusion, making him an effective surrogate for the audience.</p>
+</div>
+
+<div style="margin-bottom:24px;">
+<h4>Helen Stoner</h4>
+<p>The client and victim-in-waiting. Helen is a young woman of considerable courage — she defies her stepfather's prohibition to seek Holmes's help, and she agrees to the dangerous plan of letting Holmes and Watson spend the night in her room. Her description of the events leading to Julia's death is remarkably detailed and precise for someone under extreme duress, which is what makes her such an effective witness. Helen's physical appearance — veiled, pale, trembling — establishes her as a classic Victorian damsel in distress, but her actions throughout the story reveal a woman of considerable agency. She travels alone to London, she provides specific details about the house layout, and she follows Holmes's instructions to sleep in Julia's room. The fact that Helen is Julia's twin adds an extra layer of pathos: she knows that whatever killed her sister may kill her next, and the anniversary of Julia's death is approaching. Helen's name itself is suggestive: "Stoner" evokes both the Stoke Moran setting and the stone-like determination she shows in seeking help.</p>
+</div>
+
+<div style="margin-bottom:24px;">
+<h4>Dr. Grimesby Roylott</h4>
+<p>The antagonist and murderer. Roylott is one of the most physically imposing villains in the canon: tall, broad, with a large face seamed with a thousand wrinkles and a deep-set, bilious eye. His background as an Army surgeon in India provides both the means (knowledge of Indian snakes) and the motive (financial pressure from his stepdaughters' marriages). Roylott's murder scheme is among the most elaborate in the canon: he trains a swamp adder to descend through a ventilator along a fake bell-rope, bite the occupant of the adjacent bed, and then return to his room on command. The scheme has several failure points — the snake could refuse to return, the bite might not be fatal, or a trace of venom could be detected — but Roylott's medical knowledge gives him confidence that the bite of a swamp adder would be both swift and difficult to trace. Roylott's violence extends beyond his family: he is known to have beaten a native butler to death in India (a detail that establishes his capacity for murder), and he bends a steel poker in front of Holmes to demonstrate his strength. His death at the fangs of his own snake is a fitting form of poetic justice: the weapon he created destroys its creator.</p>
+</div>
+
+<div style="margin-bottom:24px;">
+<h4>Julia Stoner</h4>
+<p>Though dead for two years before the main action of the story begins, Julia is central to the mystery. Her dying words — "It was the band! The speckled band!" — are the key clue that Holmes must interpret. Julia's death shares several features with Helen's near-death experience: the whistling sound, the burning smell, and the timing (both incidents occur near the time of the victim's planned wedding). Julia's role is essentially that of the first victim in a pattern crime: her death establishes the method, and Helen's current danger provides the urgency. The locked-room aspect of Julia's death — her door was found locked from the inside — is a classic mystery trope that Holmes resolves by recognizing that the murder weapon (the snake) could pass through the ventilator, making a locked door irrelevant. Julia's character, though barely sketched, stands as a warning to Helen and the reader: this mystery has already claimed one life.</p>
+</div>
+
+<h3>Thematic Analysis</h3>
+
+<div style="margin-bottom:24px;">
+<h4>The Colonial Legacy</h4>
+<p>The Speckled Band is deeply steeped in the colonial attitudes and anxieties of late Victorian Britain. Dr. Roylott's Indian background is not merely a biographical detail — it is the source of both his danger (the snake) and his wealth (his Indian practice). The story suggests that India is a place of forbidden knowledge and exotic threats that can be brought back to England and turned against innocent people. Roylott's cheetah and baboon, running loose on the Surrey grounds, are colonial imports that terrify the neighbours, much as Roylott himself does. The "speckled band" is itself a colonial artifact — a snake from the Indian subcontinent, used as a murder weapon by a man who learned to handle it during his years of imperial service. This colonial framing, while common in Victorian fiction, raises questions about the story's assumptions: India is portrayed as a place of danger and corruption, and Roylott's Indian experience is what makes him both wealthy and lethal. Modern readers may find these colonial tropes problematic, but they are integral to the story's logic and atmosphere.</p>
+</div>
+
+<div style="margin-bottom:24px;">
+<h4>The Locked-Room Mystery</h4>
+<p>The locked-room puzzle is one of the oldest and most enduring tropes in detective fiction, and The Speckled Band is one of its classic iterations. Julia Stoner died in a room that was locked from the inside, with no apparent means of entry or exit for a murderer. The window was fastened with an iron bar; the door was locked; there was no secret passage. The solution — that the murder weapon was a snake that could pass through a small ventilator — transforms the locked room from an impossibility into a demonstration of Holmes's unique ability to see what others cannot. The ventilator, which would be dismissed by most investigators as an irrelevant architectural feature, becomes the critical clue. This pattern — an apparently irrelevant detail that unlocks the entire mystery — is central to Holmes's method and to the genre of detective fiction that Conan Doyle helped to create. The locked-room structure also serves a narrative function: it creates suspense and seemingly impossible odds, making Holmes's eventual solution all the more impressive.</p>
+</div>
+
+<div style="margin-bottom:24px;">
+<h4>Financial Motive and Gender</h4>
+<p>The financial motive at the heart of The Speckled Band reflects Victorian anxieties about inheritance, marriage, and women's economic independence. Dr. Roylott's income of £750 per year is dependent on his late wife's estate, which includes provisions for her daughters: each daughter receives £250 per year upon her marriage. If both daughters marry, Roylott's income would drop significantly — from £750 to £250 per year (the original sum without the additions from his wife's settlement). This financial pressure is what drives Roylott to murder Julia and attempt to murder Helen. The story thus constructs marriage as a threat to male financial control, and Roylott's violence as a perversion of the patriarchal system. Helen and Julia are caught between two versions of male authority: the oppressive control of their stepfather and the protective authority of Sherlock Holmes. The story never questions the underlying system of male guardianship that gives Roylott power over his stepdaughters; it simply replaces one guardian with a better one.</p>
+</div>
+
+<h3>Vocabulary &amp; Period Terms</h3>
+<table id="vocabulary-table">
+<thead><tr><th>Term</th><th>Definition</th><th>Usage in Story</th></tr></thead>
+<tbody>
+<tr><td>Billet</td><td>A written order; lodgings</td><td>Holmes mentions billets in military context</td></tr>
+<tr><td>Cheetah</td><td>A large spotted cat native to Africa and parts of Asia</td><td>One of Roylott's exotic pets; roams the grounds</td></tr>
+<tr><td>Cravat</td><td>A necktie or neckcloth</td><td>Part of Victorian male dress; noted in character descriptions</td></tr>
+<tr><td>Dog-cart</td><td>A light two-wheeled carriage drawn by one horse</td><td>Transport from Leatherhead station to Stoke Moran</td></tr>
+<tr><td>Fathomer</td><td>One who measures depth; metaphorically, one who investigates deeply</td><td>Holmes as the ultimate fathomer of human motivation</td></tr>
+<tr><td>Gables</td><td>The triangular portion of a wall between the edges of a dual-pitched roof</td><td>Architectural feature of Stoke Moran</td></tr>
+<tr><td>Moat</td><td>A deep, broad ditch surrounding a building, typically filled with water</td><td>Stoke Moran is surrounded by a moat crossed by a drawbridge</td></tr>
+<tr><td>Swamp adder</td><td>A fictional venomous snake; likely inspired by the Indian cobra or krait</td><td>The actual "speckled band" — the murder weapon</td></tr>
+<tr><td>Per annum</td><td>Per year (Latin)</td><td>Roylott's income is stated as £750 per annum</td></tr>
+<tr><td>Veil</td><td>A piece of fine material worn over the face for concealment</td><td>Helen wears a heavy veil when visiting Holmes, suggesting both grief and fear</td></tr>
+<tr><td>Opium</td><td>A narcotic drug derived from the opium poppy</td><td>Referenced in connection with Mrs. Farintosh's case</td></tr>
+<tr><td>Seized</td><td>Gripped firmly; taken hold of suddenly</td><td>Roylott seizes the poker to demonstrate his strength</td></tr>
+<tr><td>Commissionaire</td><td>A commissioned officer; also an attendant in uniform</td><td>Referenced as part of the London urban context</td></tr>
+<tr><td>Bilious</td><td>Relating to bile; appearing irritable or suffering from excess bile</td><td>Roylott's eyes are described as bilious</td></tr>
+<tr><td>Drawbridge</td><td>A bridge that can be raised or lowered over a moat</td><td>The crossing at Stoke Moran</td></tr>
+<tr><td>Annum</td><td>Year (Latin)</td><td>Used in financial descriptions of income</td></tr>
+<tr><td>Fatal</td><td>Causing death</td><td>The swamp adder's bite is described as almost invariably fatal</td></tr>
+<tr><td>Delirious</td><td>In an acutely disturbed state of mind; feverish confusion</td><td>Julia's state when she said "the speckled band"</td></tr>
+<tr><td>Clamped</td><td>Fastened firmly in position</td><td>The bed is clamped to the floor, preventing Helen from moving it</td></tr>
+<tr><td>Ventilated</td><td>Having ventilation openings; provided with fresh air</td><td>The ventilator between rooms is the key architectural clue</td></tr>
+</tbody>
+</table>
+
+<h3>Supplementary Data — Incomes &amp; Prices in 1883</h3>
+<table id="prices-table">
+<thead><tr><th>Item / Income</th><th>Amount (£)</th><th>Modern Equivalent (approx.)</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Dr. Roylott's annual income</td><td>£750</td><td>~£95,000</td><td>Landed gentry income; funded by Indian practice and wife's inheritance</td></tr>
+<tr><td>Each daughter's marriage portion</td><td>£250/yr</td><td>~£32,000</td><td>Would transfer from Roylott's control upon marriage</td></tr>
+<tr><td>Total at risk if both marry</td><td>£500/yr</td><td>~£63,000</td><td>Two-thirds of Roylott's income — powerful motive for murder</td></tr>
+<tr><td>Holmes's fee (typical)</td><td>Varies</td><td>Varies</td><td>Often took cases pro bono for interesting problems</td></tr>
+<tr><td>Dog-cart hire (Leatherhead to Stoke Moran)</td><td>~5s</td><td>~£30</td><td>A few shillings for a two-mile journey</td></tr>
+<tr><td>London lodging (Baker Street)</td><td>~£80/yr</td><td>~£10,000</td><td>Holmes and Watson share rooms as bachelors</td></tr>
+<tr><td>Railway ticket (London to Leatherhead)</td><td>~3s 6d</td><td>~£22</td><td>Third-class return</td></tr>
+<tr><td>Victorian middle-class income</td><td>£150–300/yr</td><td>~£19,000–38,000</td><td>Benchmark for comfortable living</td></tr>
+<tr><td>Victorian working-class income</td><td>£25–50/yr</td><td>~£3,200–6,400</td><td>Bare subsistence level</td></tr>
+<tr><td>Horse (suitable for dog-cart)</td><td>~£30</td><td>~£3,800</td><td>Purchase price; upkeep additional</td></tr>
+<tr><td>Annual upkeep for cheetah/baboon</td><td>Unknown</td><td>Unknown</td><td>Roylott's unusual expense; likely fed from local game</td></tr>
+</tbody>
+</table>
+
+<h3>Comparative Mystery Index — Sherlock Holmes Stories</h3>
+<table id="stories-table">
+<thead><tr><th>Story</th><th>Year</th><th>Murder Method</th><th>Locked Room?</th><th>Motive</th><th>Setting</th></tr></thead>
+<tbody>
+<tr><td>A Scandal in Bohemia</td><td>1891</td><td>None (blackmail)</td><td>No</td><td>Political / personal</td><td>London &amp; Bohemia</td></tr>
+<tr><td>The Red-Headed League</td><td>1891</td><td>Bank tunnel robbery</td><td>No</td><td>Financial</td><td>London</td></tr>
+<tr><td>A Case of Identity</td><td>1891</td><td>Impersonation</td><td>No</td><td>Financial (inheritance)</td><td>London</td></tr>
+<tr><td>The Boscombe Valley Mystery</td><td>1891</td><td>Bludgeoning</td><td>No</td><td>Blackmail / revenge</td><td>Herefordshire</td></tr>
+<tr><td>The Five Orange Pips</td><td>1891</td><td>Drowning (staged)</td><td>No</td><td>Revenge (Ku Klux Klan)</td><td>London &amp; East Sussex</td></tr>
+<tr><td>The Man with the Twisted Lip</td><td>1891</td><td>None (disappearance)</td><td>No</td><td>Deception</td><td>London</td></tr>
+<tr><td>The Blue Carbuncle</td><td>1892</td><td>Assault / theft</td><td>No</td><td>Financial</td><td>London</td></tr>
+<tr><td>The Speckled Band</td><td>1892</td><td>Snake venom</td><td>Yes</td><td>Financial (inheritance)</td><td>Surrey</td></tr>
+<tr><td>The Engineer's Thumb</td><td>1892</td><td>Mutilation</td><td>Partial</td><td>Industrial espionage</td><td>Bedfordshire / Berkshire</td></tr>
+<tr><td>The Noble Bachelor</td><td>1892</td><td>None (disappearance)</td><td>No</td><td>Deception</td><td>London</td></tr>
+<tr><td>The Beryl Coronet</td><td>1892</td><td>Theft / blackmail</td><td>No</td><td>Financial</td><td>London</td></tr>
+<tr><td>The Copper Beeches</td><td>1892</td><td>Confinement</td><td>No</td><td>Control / deception</td><td>Hampshire</td></tr>
+<tr><td>Silver Blaze</td><td>1892</td><td>Animal death (horse)</td><td>No</td><td>Financial (betting)</td><td>Dartmoor, Devon</td></tr>
+<tr><td>The Yellow Face</td><td>1893</td><td>None (misunderstanding)</td><td>No</td><td>Racial / personal</td><td>Norbury, Surrey</td></tr>
+<tr><td>The Stockbroker's Clerk</td><td>1893</td><td>Fraud</td><td>No</td><td>Financial</td><td>London</td></tr>
+<tr><td>The Gloria Scott</td><td>1893</td><td>Mutiny / murder</td><td>No</td><td>Freedom / revenge</td><td>High seas; Sussex</td></tr>
+<tr><td>The Musgrave Ritual</td><td>1893</td><td>Exposure / greed</td><td>Partial (cellar)</td><td>Treasure / historical</td><td>Sussex</td></tr>
+<tr><td>The Reigate Squires</td><td>1893</td><td>Blackmail / murder</td><td>No</td><td>Concealment</td><td>Surrey</td></tr>
+<tr><td>The Crooked Man</td><td>1893</td><td>Political betrayal</td><td>No</td><td>Revenge</td><td>Aldershot; India (flashback)</td></tr>
+<tr><td>The Resident Patient</td><td>1893</td><td>Staged suicide</td><td>Partial</td><td>Blackmail</td><td>London</td></tr>
+</tbody>
+</table>
+</section>
+
+
+<section id="second-passage">
+<h2>Supplementary Passage — A Scandal in Bohemia</h2>
+<p><em>By Arthur Conan Doyle (public domain worldwide). Included to ensure this page exceeds 128 KiB of rendered content, forcing multi-chunk <code>read_current_page</code> responses.</em></p>
+
+<p>To Sherlock Holmes she is always <em>the</em> woman. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex. It was not that he felt any emotion akin to love for Irene Adler. All emotions, and that one particularly, were abhorrent to his cold, precise, but admirably balanced mind. He was, I take it, the most perfect reasoning and observing machine that the world has seen, but as a lover he would have placed himself in a false position. He never spoke of the softer passions, save with a gibe and a sneer. They were admirable things for the observer — excellent for drawing the veil from men's motives and actions. But for the trained reasoner to admit such things into his own delicate and finely adjusted temperament was to introduce a distracting factor which might throw a doubt upon all his mental results. Grit in a sensitive instrument, or a crack in one of his own high-power lenses, would not be more disturbing than a strong emotion in a nature such as his. And yet there was but one woman to him, and that woman was the late Irene Adler, of dubious and questionable memory.</p>
+
+<p>I had seen little of Holmes lately. My marriage had drifted us away from each other. My own complete happiness, and the home-centred interests which rise up around the man who once finds himself master of his own establishment, were sufficient to absorb all my attention, while Holmes, who loathed every form of society with his whole Bohemian soul, remained in our lodgings in Baker Street, buried among his old books, and alternating from week to week between cocaine and ambition, the drowsiness of the drug, and the fierce energy of his own keen nature. He was still, as ever, deeply attracted by the study of crime, and occupied his immense faculties and extraordinary powers of observation in following out those clues, and clearing up those mysteries, which had been abandoned as hopeless by the official police. From time to time I heard some vague account of his doings: of his summons to Odessa in the case of the Trepoff murder, of his clearing up of the singular tragedy of the Atkinson brothers at Trincomalee, and finally of the mission which he had accomplished so delicately and successfully for the reigning family of Holland. Beyond these signs of his activity, however, which I merely shared with all the readers of the daily press, I knew little of my former friend and companion.</p>
+
+<p>One night — it was on the twentieth of March, 1888 — I was returning from a journey to a patient (for I had now returned to civil practice), when my way led me through Baker Street. As I passed the well-remembered door, I was seized with a keen desire to see Holmes again, and to know how he was employing his extraordinary powers. His rooms were brilliantly lit, and, even as I looked up, I saw his tall, spare figure pass twice in a dark silhouette against the blind. He was pacing the room swiftly, eagerly, with his head sunk upon his chest and his hands clasped behind him. To me, who knew his every mood and habit, his attitude and manner told their own story. He was at work again. He had risen out of his drug-created dreams and was hot upon the scent of some new problem. I rang the bell and was shown up to the chamber which had formerly been in part my own.</p>
+
+<p>His manner was not effusive. It seldom was; but he was glad, I think, to see me. With hardly a word spoken, but with a kindly eye, he waved me to an armchair, threw across his case of cigars, and indicated a spirit case and a gasogene in the corner. Then he stood before the fire and looked me over in his singular introspective fashion.</p>
+
+<p class="dialogue">"Wedlock suits you," he remarked. "I think, Watson, that you have put on seven and a half pounds since I saw you."</p>
+
+<p class="dialogue">"Seven!" I answered.</p>
+
+<p class="dialogue">"Indeed, I should have thought a little more. Just a trifle more, I fancy, Watson. And in practice again, I observe. You did not tell me that you intended to go into harness."</p>
+
+<p class="dialogue">"Then, how do you know?"</p>
+
+<p class="dialogue">"I see it, I deduce it. How often have I said to you that when you have eliminated the impossible, whatever remains, <em>however improbable</em>, must be the truth?"</p>
+
+<p class="dialogue">"I have heard you say it."</p>
+
+<p class="dialogue">"Well, then, you must yourself have observed how your ankle has been turning in, and how your boot has been wearing at the side. These signs of your recent practice are unmistakable."</p>
+
+<p>I laughed as I handed him my cigarette case. "I trust that I am not in the habit of wearing out my soles quite so rapidly," said I. "But tell me, Holmes, what is the meaning of it? Some extraordinary case, I presume?"</p>
+
+<p class="dialogue">"No, no; no crime," said he. "Nothing but a very singular and interesting little problem. In fact, it is not a case at all. It is merely a business matter, and yet I think that you will find it interesting. The facts are briefly these: Some five years ago, during a lengthy visit to Warsaw, I had the pleasure of making the acquaintance of the well-known adventuress, Irene Adler. You may remember the name — it is one which is familiar enough to the public. The King of Bohemia, it appears, was at that time the Crown Prince, and he became involved — how deeply I need not say — with this young woman. The liaison lasted for some months, and then, as the King's duties called him away, it was broken off. The King thought no more of the matter, and believed that the episode was at an end. He had, however, given the lady a photograph of himself, and a letter — both of which would be very compromising if made public. He made some attempts to recover them, but the lady retained them, and it now appears that she has them still."</p>
+
+<p class="dialogue">"And what does she propose to do with them?" I asked.</p>
+
+<p class="dialogue">"She proposes to send them to the King's intended bride — the Princess Clotilde of Scandinavia — on the day that the engagement is made public. The marriage would then be broken off, and the King would be exposed to the ridicule of Europe."</p>
+
+<p class="dialogue">"But why does she wish to do this?"</p>
+
+<p class="dialogue">"Because the King has refused to comply with certain conditions which she has laid down. She demands a sum of money, and certain assurances, which he is not prepared to give. It is, in short, a case of blackmail — or, at least, it will become one if the photograph is not recovered before the marriage is announced."</p>
+
+<p class="dialogue">"And the King has come to you?"</p>
+
+<p class="dialogue">"He has sent a representative — Count von Kramm, a Bohemian nobleman, who is now waiting below. But I have no doubt that the King himself will call upon me before long."</p>
+
+<p>Holmes was right. A few minutes later, a tall, powerfully built man entered the room. He wore a heavy ulster and a travelling cap, which was pulled down over his eyes, and he carried a stick with a thick rubber pad at the end. He bowed to Holmes, and then, turning to me, he said: "I regret that I am compelled to keep my identity a secret, but the matter is of such importance that I must ask you to excuse me."</p>
+
+<p class="dialogue">"I can quite understand," said Holmes. "Your Majesty has, I believe, been good enough to call upon me."</p>
+
+<p>The man started. "You know me, then?" he said.</p>
+
+<p class="dialogue">"No, but I perceive that the room contains a person of very considerable ability, who can hardly be other than the King of Bohemia. The mask is very thin, your Majesty. The beard, the hat, the spectacles — they are but a disguise. Your Majesty will, I hope, excuse my candour."</p>
+
+<p>The King looked at Holmes in amazement. "You are a very remarkable man, Mr. Holmes," he said. "I have heard of your extraordinary powers, but I did not think that they were quite equal to this."</p>
+
+<p class="dialogue">"It is a simple matter," said Holmes. "Your Majesty's portrait has been in all the illustrated papers. I recognized you at once."</p>
+
+<p>The King then told his story in detail. He had become involved with Irene Adler in Warsaw, and had given her a photograph and several letters. The lady had refused to return them, and now threatened to send them to the Princess Clotilde, his intended bride, on the day that the engagement was announced. The King had offered large sums of money, but the lady had refused them all. He had even sent agents to recover the photograph by force, but they had failed.</p>
+
+<p class="dialogue">"And you have no copy?" asked Holmes.</p>
+
+<p class="dialogue">"None."</p>
+
+<p class="dialogue">"Then we must obtain the original. Have you the address of the lady?"</p>
+
+<p class="dialogue">"She is living at St. John's Wood, in a house called Briony Lodge."</p>
+
+<p class="dialogue">"And the photograph is there?"</p>
+
+<p class="dialogue">"I am convinced of it. She would not dare to leave it out of her own keeping. It is her one weapon against me."</p>
+
+<p class="dialogue">"Then I shall call upon her to-morrow morning," said Holmes. "Your Majesty must not be surprised if I ask you to remain in the background. I may need your assistance, but I must conduct the investigation in my own way."</p>
+
+<p>The King agreed, and after leaving his address, departed. Holmes then turned to me and said: "I think, Watson, that I shall take a stroll round the neighbourhood of St. John's Wood this evening, and see what I can learn about the lady and her habits. I should like you to meet me here to-morrow at four, and we will then see what can be done."</p>
+
+<p>The next morning, I received a note from Holmes, asking me to meet him at St. John's Wood at two o'clock. I went there, and found him waiting for me near Briony Lodge. He was disguised as an old groom, and he had been making inquiries about the lady's household. He had learned that she had a male companion, a lawyer named Godfrey Norton, of the Inner Temple, who visited her frequently, and that she was in the habit of going out for drives in the afternoon.</p>
+
+<p class="dialogue">"They are going to be married," said Holmes, as we watched the house. "Come, Watson, we must follow them."</p>
+
+<p>We took a cab and followed the carriage to the Church of St. Monica, in the Edgware Road. Here we found that the lady and the gentleman had been married, and that they were now on their way back to Briony Lodge.</p>
+
+<p class="dialogue">"Well, Watson," said Holmes, as we drove back, "the case has become somewhat complicated. The lady is now Mrs. Godfrey Norton, and her husband is a lawyer. He will no doubt advise her as to the best means of dealing with the King's demands. But I have a plan."</p>
+
+<p>Holmes's plan was to create a diversion at Briony Lodge, in order to gain access to the house and find the photograph. He arranged for a group of men to create a disturbance outside the house, and then, disguised as a clergyman, he rushed in and pretended to help the lady. While he was inside, he was able to ascertain the hiding-place of the photograph. He had noticed that, when the alarm was given, the lady had rushed to a recess in the wall, and had pushed something into it. This, he concluded, was the hiding-place of the photograph.</p>
+
+<p class="dialogue">"I have found it, Watson," he said, as we walked back to Baker Street. "The photograph is concealed in a recess in the wall of her sitting-room, behind a sliding panel. I shall go there to-morrow morning and obtain it."</p>
+
+<p>But when we arrived at Briony Lodge the next morning, we found that the lady had already left. She had taken the photograph with her, and had left a note for the King, saying that she would not send the photograph to the Princess, as she was now a married woman and had no further use for it. She wished the King well, and hoped that he would be happy in his marriage.</p>
+
+<p>The King was much relieved, and he offered Holmes a handsome reward. But Holmes refused it, and asked instead for the photograph of Irene Adler, which the King had in his possession. This the King gave him, and Holmes kept it ever after as a souvenir of the lady who had outwitted him.</p>
+
+<p class="dialogue">"When I speak of her," he said, "I shall always speak of her as <em>the</em> woman."</p>
+
+<p>And so ended the Adventure of the Scandal in Bohemia. It was one of the few cases in which Sherlock Holmes had been outwitted, and he never forgot it. Irene Adler remained, in his estimation, the most capable woman he had ever met, and he always spoke of her with the greatest respect and admiration.</p>
+
+<h3>Cross-Story Character Index</h3>
+<p>The table below references characters from both The Speckled Band and A Scandal in Bohemia. Read-and-respond form questions may reference any character below.</p>
+<table id="cross-story-table">
+<thead><tr><th>Name</th><th>Story</th><th>Role</th><th>Key Trait</th><th>Relationship</th></tr></thead>
+<tbody>
+<tr><td>Sherlock Holmes</td><td>Both</td><td>Consulting detective</td><td>Cold, precise, observant</td><td>Central protagonist</td></tr>
+<tr><td>Dr. John Watson</td><td>Both</td><td>Narrator; companion</td><td>Loyal, observant, medical background</td><td>Holmes's friend and biographer</td></tr>
+<tr><td>Irene Adler</td><td>Scandal in Bohemia</td><td>Adventuress; opera singer</td><td>Clever, resourceful, beautiful</td><td>Outwits Holmes; "the woman"</td></tr>
+<tr><td>King of Bohemia (Wilhelm Gottsreich Sigismond von Ormstein)</td><td>Scandal in Bohemia</td><td>Client; monarch</td><td>Proud, anxious, disguised</td><td>Former lover of Irene Adler</td></tr>
+<tr><td>Godfrey Norton</td><td>Scandal in Bohemia</td><td>Barrister; Irene's husband</td><td>Practical, decisive</td><td>Marries Irene Adler during the story</td></tr>
+<tr><td>Helen Stoner</td><td>Speckled Band</td><td>Client; victim</td><td>Brave, determined, desperate</td><td>Stepdaughter of Roylott</td></tr>
+<tr><td>Julia Stoner</td><td>Speckled Band</td><td>Deceased; first victim</td><td>Dying words: "the speckled band"</td><td>Helen's twin sister</td></tr>
+<tr><td>Dr. Grimesby Roylott</td><td>Speckled Band</td><td>Antagonist; murderer</td><td>Violent, cunning, Indian background</td><td>Stepfather of Helen and Julia</td></tr>
+<tr><td>Mrs. Farintosh</td><td>Speckled Band</td><td>Former client (mentioned)</td><td>Unknown</td><td>Recommended Holmes to Helen</td></tr>
+<tr><td>Mrs. Roylott</td><td>Speckled Band</td><td>Deceased; Helen's mother</td><td>Wealthy, married for money</td><td>Died in a railway accident</td></tr>
+<tr><td>Count von Kramm</td><td>Scandal in Bohemia</td><td>King's representative (disguise)</td><td>Noble bearing</td><td>Actually the King of Bohemia in disguise</td></tr>
+<tr><td>Mr. Athelney Jones</td><td>Scandal in Bohemia (mentioned)</td><td>Police investigator</td><td>Professional, conventional</td><td>Referenced as typical police method</td></tr>
+<tr><td>Princess Clotilde of Scandinavia</td><td>Scandal in Bohemia</td><td>King's intended bride</td><td>Unknown (never appears)</td><td>Threatened by Irene's photograph</td></tr>
+<tr><td>Mrs. Hudson</td><td>Both (implied)</td><td>Landlady of 221B</td><td>Tolerant, motherly</td><td>Holmes and Watson's landlady</td></tr>
+<tr><td>Inspector Lestrade</td><td>Speckled Band (implied)</td><td>Scotland Yard inspector</td><td>Methodical, conventional</td><td>Would have been called if not for Holmes</td></tr>
+<tr><td>The swamp adder</td><td>Speckled Band</td><td>Murder weapon; snake</td><td>Venomous; trained to descend via ventilator</td><td>Roylott's instrument of murder</td></tr>
+<tr><td>Cheetah</td><td>Speckled Band</td><td>Roylott's pet</td><td>Fast, predatory</td><td>Terrifies the neighbourhood</td></tr>
+<tr><td>Baboon</td><td>Speckled Band</td><td>Roylott's pet</td><td>Aggressive, unpredictable</td><td>Also roams the grounds at Stoke Moran</td></tr>
+<tr><td>The photograph</td><td>Scandal in Bohemia</td><td>McCuffin; evidence</td><td>Compromising</td><td>The object everyone seeks</td></tr>
+<tr><td>The ventilator</td><td>Speckled Band</td><td>Architectural feature; murder conduit</td><td>Small, connects Roylott's room to Helen's</td><td>Key physical evidence in the locked-room mystery</td></tr>
+<tr><td>The bell-rope</td><td>Speckled Band</td><td>Fake bell-pull; snake bridge</td><td>Does not ring; hangs beside bed</td><td>Used by snake to descend to the bed</td></tr>
+<tr><td>Briony Lodge</td><td>Scandal in Bohemia</td><td>Irene Adler's residence</td><td>Well-appointed villa in St. John's Wood</td><td>Scene of Holmes's failed burglary attempt</td></tr>
+<tr><td>Stoke Moran</td><td>Speckled Band</td><td>Roylott's manor house</td><td>Old, dark, moated, gothic</td><td>Scene of the crime</td></tr>
+<tr><td>221B Baker Street</td><td>Both</td><td>Holmes's lodgings</td><td>Iconic, cosy, book-filled</td><td>Starting point of every investigation</td></tr>
+<tr><td>The Church of St. Monica</td><td>Scandal in Bohemia</td><td>Wedding venue</td><td>Edgware Road church</td><td>Where Irene and Godfrey are married</td></tr>
+<tr><td>Leatherhead station</td><td>Speckled Band</td><td>Railway station</td><td>Nearest station to Stoke Moran</td><td>Where Helen sends the dog-cart</td></tr>
+<tr><td>The steel poker</td><td>Speckled Band</td><td>Object</td><td>Bent by Roylott to demonstrate strength</td><td>Holmes straightens it afterwards</td></tr>
+<tr><td>The saucer of milk</td><td>Speckled Band</td><td>Object</td><td>Found in Roylott's room</td><td>Bait for the snake</td></tr>
+</tbody>
+</table>
+
+<h3>Period Details &amp; Setting Reference</h3>
+<p>Victorian England in the 1880s: a time of gas lamps, hansom cabs, and rapid social change. The details below enrich the read-and-respond form with period-specific knowledge tests.</p>
+<table id="period-table">
+<thead><tr><th>Element</th><th>Description</th><th>Location</th><th>Story</th></tr></thead>
+<tbody>
+<tr><td>Hansom cab</td><td>A two-wheeled carriage drawn by one horse; the driver sat behind on a high seat; passengers entered through doors at the front</td><td>London streets</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Dog-cart</td><td>A light, two-wheeled open carriage with seating for two, drawn by one horse; used for short country journeys</td><td>Surrey countryside</td><td>The Speckled Band</td></tr>
+<tr><td>Gasogene</td><td>A device for aerating water, producing carbonated water from soda and tartaric acid; standard in well-appointed Victorian homes</td><td>221B Baker Street</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Ulster coat</td><td>A long, loose overcoat with a cape; named after Ulster, Ireland; standard winter garb for Victorian gentlemen</td><td>London; on the King</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Spirit case</td><td>A small cabinet or stand holding decanters of spirits (whisky, brandy, etc.); found in Victorian sitting-rooms</td><td>221B Baker Street</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Moat</td><td>A deep, wide ditch surrounding a building, often filled with water; typical of old English manor houses</td><td>Stoke Moran</td><td>The Speckled Band</td></tr>
+<tr><td>Drawbridge</td><td>A bridge that can be raised or lowered over a moat; in the story, the only crossing to Stoke Moran</td><td>Stoke Moran</td><td>The Speckled Band</td></tr>
+<tr><td>Gables</td><td>The triangular upper portion of a wall at the end of a pitched roof; an architectural feature of many Victorian houses</td><td>Stoke Moran</td><td>The Speckled Band</td></tr>
+<tr><td>Bell-pull</td><td>A rope or handle connected to a bell, used to summon servants; in the story, the bell-pull is a fake — a bridge for the snake</td><td>Helen's bedroom</td><td>The Speckled Band</td></tr>
+<tr><td>Ventilator</td><td>A small opening between rooms for air circulation; in the story, a passage for the snake between Roylott's room and Helen's</td><td>Between bedrooms</td><td>The Speckled Band</td></tr>
+<tr><td>Veil</td><td>A piece of fine fabric worn over the face; Helen wears a heavy veil to conceal her distress when visiting Holmes</td><td>221B Baker Street</td><td>The Speckled Band</td></tr>
+<tr><td>Cheque-book</td><td>A book of blank cheques used for banking payments; Holmes often receives payment by cheque</td><td>London banking</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Telegram</td><td>A message sent by telegraph; the fastest means of communication in the 1880s</td><td>Throughout England</td><td>Both</td></tr>
+<tr><td>Cocaine solution</td><td>Holmes's seven-percent solution of cocaine, injected for stimulation when no case occupied him; a legal habit at the time</td><td>221B Baker Street</td><td>A Scandal in Bohemia (mentioned)</td></tr>
+<tr><td>Opium den</td><td>An establishment where opium was smoked; Holmes investigates such dens in other stories (The Man with the Twisted Lip)</td><td>East London</td><td>Referenced in The Speckled Band</td></tr>
+<tr><td>Indian Army</td><td>The British Indian Army; Roylott served as a surgeon, gaining knowledge of Indian snakes and practices</td><td>Calcutta, India</td><td>The Speckled Band</td></tr>
+<tr><td>Swamp adder</td><td>A fictional venomous snake described by Doyle; likely inspired by the Indian cobra or krait; in the story, "the deadliest snake in India"</td><td>Roylott's safe / the ventilator</td><td>The Speckled Band</td></tr>
+<tr><td>Crate of books</td><td>Holmes's rooms are filled with books and reference materials; his index of biographies is legendary</td><td>221B Baker Street</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Photograph (carte de visite)</td><td>A small photograph mounted on card; the compromising photograph of the King and Irene Adler</td><td>Briony Lodge / Irene's possession</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Shilling</td><td>A British coin worth 12 pence; £1 = 20 shillings; used for small purchases and fares</td><td>London economy</td><td>Both</td></tr>
+<tr><td>Pound sterling</td><td>The British unit of currency; Roylott's income of £750/year was substantial for the era</td><td>Victorian economy</td><td>The Speckled Band</td></tr>
+<tr><td>Guinea</td><td>21 shillings; used for professional fees and luxury goods; slightly more than a pound</td><td>Professional fees</td><td>Both</td></tr>
+<tr><td>Inner Temple</td><td>One of the four Inns of Court in London; where barristers train and practise; Godfrey Norton's professional home</td><td>London legal district</td><td>A Scandal in Bohemia</td></tr>
+<tr><td>Edgware Road</td><td>A major road in northwest London; location of the Church of St. Monica where Irene and Godfrey marry</td><td>London</td><td>A Scandal in Bohemia</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="analysis">
+<h2>Detailed Literary Analysis</h2>
+
+<h3>Structural Analysis — The Speckled Band</h3>
+<p>The Speckled Band follows a classic five-act structure that Conan Doyle refined across dozens of stories. Understanding this structure is key to appreciating how the mystery unfolds, and the table below breaks down each act with its corresponding narrative function, the key events that occur, and the emotional arc that the reader experiences. This structural analysis is essential reading for the form questions that follow.</p>
+
+<table id="structure-table">
+<thead><tr><th>Act</th><th>Narrative Function</th><th>Key Events</th><th>Emotional Arc</th><th>Pages (approx.)</th><th>Holmes's Method</th></tr></thead>
+<tbody>
+<tr><td>Prologue / Frame</td><td>Establish Watson as narrator; frame the story as a retrospective account</td><td>Watson introduces the case as one of seventy he has recorded; emphasizes its singular nature</td><td>Calm, reflective — the reader is in safe hands with Watson as guide</td><td>1-2</td><td>None — Watson sets the scene</td></tr>
+<tr><td>Act I — The Client</td><td>Introduce the mystery and the stakes</td><td>Helen Stoner arrives at Baker Street; she is veiled, trembling, and desperate; she tells the story of Julia's death and her own fear</td><td>Rising anxiety — the reader shares Helen's urgency and fear; the locked-room mystery is established</td><td>2-8</td><td>Observation of Helen's appearance; deductive reasoning about her history; careful note-taking of all details</td></tr>
+<tr><td>Act II — Investigation</td><td>Gather physical evidence and test hypotheses</td><td>Holmes and Watson travel to Stoke Moran; they examine the rooms (ventilator, bell-rope, clamped bed); they see the cheetah and baboon; they meet Roylott, who threatens them</td><td>Tension — Roylott's threat raises the personal danger; the investigation phase gives the reader clues</td><td>8-15</td><td>Physical inspection of the rooms; analysis of architectural features; observation of Roylott's behaviour; inference from the dummy bell-rope and ventilator</td></tr>
+<tr><td>Act III — The Stakeout</td><td>Test the hypothesis under controlled conditions</td><td>Holmes and Watson wait in darkness in Helen's room; they hear the whistle; they see the snake descend</td><td>Peak suspense — the dark room, the waiting, the sound, and the reveal of the snake create maximum tension</td><td>15-20</td><td>Controlled experiment — Holmes places himself in the scene to observe the mechanism of the crime directly</td></tr>
+<tr><td>Act IV — Resolution</td><td>Resolve the mystery and deliver justice</td><td>Holmes strikes the snake with his cane; it retreats and bites Roylott; Roylott dies; Holmes explains the entire mechanism</td><td>Catharsis — the mystery is solved, the villain is punished, and Helen is saved; but there is moral complexity in Roylott's death</td><td>20-25</td><td>Deductive synthesis — Holmes connects all the clues (ventilator, bell-rope, saucer of milk, whistling) into a complete explanation</td></tr>
+<tr><td>Epilogue</td><td>Reflect on the moral implications; close the frame</td><td>Holmes acknowledges the moral ambiguity; the story returns to Baker Street; Watson closes the narrative</td><td>Reflection — the reader is left to consider Holmes's role in Roylott's death and the nature of justice</td><td>25-28</td><td>Philosophical reflection — Holmes's famous statement about conscience</td></tr>
+</tbody>
+</table>
+
+<h3>Comparative Analysis — Locked-Room Mechanics</h3>
+<p>The locked-room mystery is one of the most enduring subgenres of detective fiction. In The Speckled Band, the "locked room" is Julia's bedroom — a room with a locked door and a fastened window, yet somehow the murderer gained access. The table below compares the Speckled Band's solution to other classic locked-room mechanisms, showing how Doyle's innovation — using a living murder weapon that can pass through a small opening — differs from the more common approaches.</p>
+
+<table id="locked-room-table">
+<thead><tr><th>Story</th><th>Author</th><th>Year</th><th>Locked-Room Mechanism</th><th>How Holmes (or detective) solves it</th><th>Distinguishing feature</th></tr></thead>
+<tbody>
+<tr><td>The Speckled Band</td><td>Arthur Conan Doyle</td><td>1892</td><td>Snake passes through ventilator; door locked from inside</td><td>Observes ventilator and dummy bell-rope; stakes out the room</td><td>Living murder weapon — animal rather than human or mechanical device</td></tr>
+<tr><td>The Murders in the Rue Morgue</td><td>Edgar Allan Poe</td><td>1841</td><td>Orangutan enters through window; door locked from inside</td><td>Dupin deduces non-human agency from the impossible strength and lack of motive</td><td>Also uses an animal, but the animal is the murderer, not a weapon controlled by a human</td></tr>
+<tr><td>The Yellow Room</td><td>Gaston Leroux</td><td>1907</td><td>Attacker enters and exits through a hidden passage</td><td>Rouletabille deduces the passage from architectural anomalies</td><td>The passage is invisible to casual inspection, similar to the ventilator</td></tr>
+<tr><td>The Judas Window</td><td>Carter Dickson</td><td>1938</td><td>Crossbow bolt fired through a window that appears locked</td><td>H.M. demonstrates how the window can be opened from outside</td><td>Optical illusion — the room appears locked but is not</td></tr>
+<tr><td>The Three Coffins</td><td>John Dickson Carr</td><td>1935</td><td>Victim shot in a locked room with no weapon found</td><td>Dr. Fell gives famous locked-room lecture cataloguing all possible methods</td><td>Meta-analysis — the novel contains a chapter listing every known locked-room method</td></tr>
+<tr><td>The King Is Dead</td><td>Ellery Queen</td><td>1952</td><td>Self-inflicted wound staged as murder</td><td>Queen deduces the timing and positioning prove self-infliction</td><td>The "locked room" is not a murder at all</td></tr>
+<tr><td>And Then There Were None</td><td>Agatha Christie</td><td>1939</td><td>No locked room — but no apparent murderer either</td><td>The solution is the narrator was the murderer all along</td><td>The "impossible" element is not a locked room but an impossible sequence of murders</td></tr>
+<tr><td>The Hollow Man</td><td>John Dickson Carr</td><td>1935</td><td>Two impossible murders in locked rooms</td><td>Dr. Fell explains both through misdirection about timing</td><td>Twin impossible crimes — doubles the challenge for the reader</td></tr>
+</tbody>
+</table>
+
+<h3>Narrative Voice and Reliability — Watson as Narrator</h3>
+<p>One of the most discussed aspects of the Sherlock Holmes canon is the reliability of Dr. Watson as narrator. Watson is both a participant in the events and the recorder of them, which creates a tension between his role as witness and his role as storyteller. In The Speckled Band, Watson explicitly addresses this by stating that he was freed from a promise of secrecy by Helen Stoner's death, suggesting that his account is essentially truthful. However, scholars have noted several curious features of Watson's narration that raise questions about its completeness.</p>
+
+<p>First, there is the question of timing. Watson states that the events occurred in "the early days" of his association with Holmes, when they were sharing rooms in Baker Street. This would place the story around 1881-82, yet Watson describes events with a level of detail that seems extraordinary for a retrospective account written years later. How does he remember the exact words of conversations, the precise layout of rooms, and the minute details of the investigation? Either Watson kept contemporaneous notes (which he does not mention), or he is reconstructing from memory with a degree of artistic licence.</p>
+
+<p>Second, there is the question of Watson's presence. In several key scenes, Watson is present but largely passive — he observes but does not act. During the stakeout, for example, Watson sits in the dark room while Holmes does all the observing and deducing. This raises the question: is Watson's account accurate, or does he embellish Holmes's actions to make a better story? The description of Holmes striking the snake in the dark, the hissing sound, and Roylott's cry — are these precisely as Watson experienced them, or have they been sharpened by the narrative demands of a detective story?</p>
+
+<p>Third, there is the moral dimension. Holmes's actions directly cause Roylott's death. By striking the snake, he sends it back through the ventilator into Roylott's room, where it bites and kills its master. Holmes acknowledges this: "I cannot say that it is likely to weigh very heavily upon my conscience." Watson, as narrator, presents this as a just outcome — Roylott was, after all, a murderer. But the reader may wonder whether Holmes had any obligation to warn Roylott, or whether his role in the death is morally different from the murder that Roylott himself committed. Watson does not explore this question, which is itself a form of narrative selection — what he chooses to include and exclude shapes the reader's moral judgement.</p>
+
+<p>These issues of narrative reliability are not unique to The Speckled Band. They run through the entire Holmes canon and have given rise to a rich tradition of "Sherlockian scholarship" (also called "Sherlockian studies" or "the Grand Game"), in which readers treat the stories as historical documents and attempt to reconcile apparent contradictions in dates, names, and events. The Speckled Band, with its precise dates and detailed descriptions, is a particularly fertile text for this kind of analysis, because the very specificity of Watson's account invites the reader to check it for consistency.</p>
+
+<h3>The Science and Pseudoscience of The Speckled Band</h3>
+<p>Conan Doyle was a physician by training, and his medical knowledge shows in the precision of his descriptions. The swamp adder, however, is a fictional snake — there is no species known by that name, and no Indian snake that matches Doyle's description of "the deadliest snake in India." This has led to much speculation about what real snake Doyle may have had in mind. Candidates include the Indian cobra (Naja naja), the king cobra (Ophiophagus hannah), the common krait (Bungarus caeruleus), and the Russell's viper (Daboia russelii). Each has problems: cobras do not typically climb, kraits are small and their bites are not always immediately fatal, and vipers are heavy-bodied and unlikely to be carried through a ventilator. The most likely candidate is the Indian cobra, which is sometimes called the "hooded snake" and can be trained (or at least conditioned) to respond to stimuli, though Doyle's description of a snake that comes when whistled for is almost certainly an exaggeration.</p>
+
+<p>More problematic from a scientific standpoint is the snake's behaviour in the story. Doyle describes the snake as descending through a ventilator along a bell-rope, biting the occupant of the bed below, and then returning to its master's room on command. While snakes can be conditioned to associate sounds with food (which would explain the whistle), they are not trainable in the way that, say, a dog is. The snake in the story behaves more like a trained animal than a wild snake would. Doyle was aware of this limitation — he has Holmes describe Roylott as having "a considerable knowledge of Indian snakes" and training the snake over a period of time, which gives the mechanism a veneer of plausibility even if it stretches the facts somewhat.</p>
+
+<p>The locked-room aspect of the story is more scientifically sound. Snakes can indeed pass through very small openings — a snake can compress its body to fit through a gap that seems impossible for its size. The ventilator in Roylott's room would not need to be large for a snake to pass through. The use of a saucer of milk as bait is less plausible — snakes do not drink milk — but this detail may be a deliberate red herring, intended to make the reader think of a cat rather than a snake. The smell of burning that Helen notices could be explained by Roylott's Indian cigars (he is described as a heavy smoker), though it could also be the smell of the snake's venom, which some species can spray as a defensive mechanism.</p>
+
+<p>The medical aspects of the story are generally accurate. Julia Stoner's death from snake venom is plausible — many venomous snakes have bites that cause rapid death, and the lack of visible puncture marks could be explained by the small size of the fangs. The symptoms that Helen describes — the whistling sound, the burning smell, the metallic noise — are also consistent with what she might experience if a snake were entering her room through a ventilator: the whistle would be Roylott's signal, the smell would be from his cigar or the snake itself, and the metallic noise would be the safe door being closed after the snake returned. Doyle's medical training shows in these details, which are precise enough to be convincing without being so technical as to alienate the general reader.</p>
+
+<h3>Publication History and Reception</h3>
+<p>The Adventure of the Speckled Band was first published in <em>Strand Magazine</em> in February 1892, with illustrations by Sidney Paget. It was the tenth story in the series and quickly became one of the most popular. Doyle himself considered it one of his best Sherlock Holmes stories, and in a 1927 list compiled for <em>The Strand</em>, he ranked it as his second-favourite Holmes story (after "The Red-Headed League"). The story has been adapted numerous times for stage, film, radio, and television, making it one of the most recognisable detective stories in the English language. Its key elements — the locked room, the exotic snake, the evil stepfather, and the brilliant deduction — have become archetypes of the mystery genre. The "speckled band" itself has entered the cultural lexicon as a metaphor for a hidden danger that is misunderstood or misidentified.</p>
+</section>
+
+<section id="reading-guide">
+<h2>Reading Comprehension Guide</h2>
+<p>This guide provides paragraph-by-paragraph annotations for both stories. Use it to verify your understanding before submitting the form. Each annotation identifies the key deductive steps, narrative techniques, and period details that a browser automation agent should be able to extract and reason about.</p>
+
+<h3>The Speckled Band — Paragraph Annotations</h3>
+<table id="annotation-table">
+<thead><tr><th>Paragraph</th><th>Summary</th><th>Deductive Significance</th><th>Period Detail</th></tr></thead>
+<tbody>
+<tr><td>Opening (pp. 1-2)</td><td>Watson introduces the case as one of the most singular he has recorded, noting that Holmes's cases varied from tragic to comic to merely strange</td><td>Establishes the retrospective frame — Watson is writing years after the events; the promise of secrecy has been released by Helen's death</td><td>The format of the introduction — a case file from among "seventy-odd" — reflects the Victorian practice of case note-taking among physicians</td></tr>
+<tr><td>Holmes's early rising (p. 3)</td><td>Watson is surprised to find Holmes standing by his bedside early in the morning; Holmes usually rises late unless he has been up all night</td><td>Holmes's unusual behaviour signals the importance and urgency of the case; his alertness contrasts with his drug-induced lethargy in other stories</td><td>The domestic detail of shared lodgings — two bachelors in Baker Street — reflects the common Victorian arrangement for professional men of moderate means</td></tr>
+<tr><td>The arrival of Helen Stoner (pp. 4-8)</td><td>A veiled woman arrives in a state of great agitation; Holmes deduces her history from her appearance — she has been in India, she is a seamstress (from the needle mark on her finger), and she has been travelling on the railway (from the return ticket in her glove)</td><td>Holmes's deductive method is showcased: he observes small details (needle mark, ticket, skin quality) and infers large truths (occupation, recent travel, geographic history). This is the most famous sequence of deductions in the story and establishes Holmes's credibility</td><td>The railway ticket in the glove is a period detail — Victorian women carried tickets in their gloves; the needle mark identifies a sewing occupation; the "second finger" reference may be an error (Doyle probably meant the forefinger)</td></tr>
+<tr><td>Helen's narrative (pp. 9-20)</td><td>Helen describes her stepfather (Dr. Roylott), his time in India, his income, his violent temper, his exotic animals, and the death of her sister Julia</td><td>This is the longest single passage of narration in the story; it provides all the background information that the reader (and Holmes) needs; key details include: the £750 income, the cheetah and baboon, the locked-room death, and the whistling sound</td><td>The £750 annual income is significant — it represents a comfortable upper-middle-class living; the Indian animals reflect the Victorian fascination with exotic imports; the violent stepfather is a common Victorian literary trope</td></tr>
+<tr><td>Roylott's entrance (pp. 21-23)</td><td>Roylott bursts into Baker Street, grabs Holmes's poker, bends it into a curve, and storms out, warning Holmes to stay away from Stoke Moran</td><td>Roylott's violence confirms his character as established by Helen; the bending of the poker demonstrates his physical strength and his capacity for intimidation; Holmes's response (straightening the poker) demonstrates his own resilience and quiet confidence</td><td>The poker-bending is a classic example of Victorian sensational writing — it establishes Roylott as a physical threat and creates immediate dramatic tension</td></tr>
+<tr><td>The journey to Stoke Moran (pp. 24-28)</td><td>Holmes and Watson travel by train to Leatherhead, then by dog-cart to Stoke Moran; they examine the grounds and meet Helen, who has moved to Julia's room</td><td>The journey serves as a transition from the urban setting of Baker Street to the rural gothic of Stoke Moran; Holmes's observation of the building exterior (the roof, the walls) provides additional evidence</td><td>The dog-cart is a specific type of light carriage; Leatherhead is a real station in Surrey; the journey by train and carriage was the standard mode of Victorian country travel</td></tr>
+<tr><td>The examination of the rooms (pp. 29-35)</td><td>Holmes examines Helen's room with extraordinary attention: the ventilator, the bell-rope (which does not ring a bell), the clamped bed, and then Roylott's room (the saucer of milk, the small safe, the dog-whip)</td><td>This is the key investigative scene; Holmes's observations form the basis of his deductive solution; the ventilator and bell-rope are the two physical clues that connect the rooms and enable the snake mechanism</td><td>The saucer of milk — snakes do not drink milk, but this detail serves as a red herring suggesting a cat; the dog-whip could be used to control the snake; the safe is where the snake is kept during the day</td></tr>
+<tr><td>The stakeout (pp. 36-40)</td><td>Holmes and Watson wait in the dark in Helen's room; at about 3 AM, they hear a whistle; a light appears in the ventilator; then a hissing sound; Holmes strikes out with his cane</td><td>The climax of the story; the stakeout is Holmes's controlled experiment — he places himself in the position of the victim to observe the mechanism of the crime directly; the sequence of sounds (whistle, hiss, strike, cry) builds maximum tension</td><td>The darkness and the sounds create a gothic atmosphere typical of Victorian suspense writing; the wait in the dark room is one of the most frequently adapted scenes in the Holmes canon</td></tr>
+<tr><td>The resolution (pp. 41-45)</td><td>Roylott is found dead, bitten by his own snake; Holmes explains the entire mechanism — the ventilator, the bell-rope, the snake, and the whistle; he acknowledges moral responsibility but does not regret his action</td><td>The resolution ties together all the clues: the ventilator (passage for the snake), the bell-rope (bridge for the snake to descend), the clamped bed (preventing Helen from moving away from the snake's descent point), the saucer of milk (bait for the snake), and the whistle (signal for the snake to return)</td><td>Holmes's statement about conscience reflects the Victorian (and specifically Doyle's) view of justice — that the punishment should fit the crime, and that those who live by violence die by it</td></tr>
+</tbody>
+</table>
+
+<h3>A Scandal in Bohemia — Paragraph Annotations</h3>
+<table id="scandal-annotation-table">
+<thead><tr><th>Paragraph</th><th>Summary</th><th>Deductive Significance</th><th>Period Detail</th></tr></thead>
+<tbody>
+<tr><td>Opening (pp. 1-3)</td><td>Watson introduces Irene Adler as "the woman" — the only woman to ever outwit Holmes; Watson explains Holmes's attitude towards emotion and love</td><td>The introduction establishes the central theme: that emotion and intellectual detachment are at odds; Holmes's refusal to feel romantic attachment is presented as a professional necessity rather than a personal deficiency</td><td>The term "the woman" becomes one of the most famous phrases in the canon; Watson's description of Holmes's cocaine use was standard for the period (now seen as problematic)</td></tr>
+<tr><td>Watson's visit (pp. 4-7)</td><td>Watson visits Baker Street; Holmes deduces that Watson has been in practice again from his appearance (weight, boot wear, ankle)</td><td>This is a classic deduction sequence; Holmes reads Watson's entire recent history from small physical details; the deduction about the boot demonstrates Holmes's method in miniature</td><td>The weight observation (seven and a half pounds) reflects the Victorian awareness of domestic comfort leading to weight gain; the boot deduction references Watson's previous military service and current civilian practice</td></tr>
+<tr><td>The King's visit (pp. 8-12)</td><td>The King of Bohemia arrives disguised as Count von Kramm; Holmes sees through the disguise immediately; the King explains the situation with Irene Adler and the photograph</td><td>Holmes's instant recognition of the King demonstrates his observational abilities; the King's narrative provides the case details: Irene Adler has a compromising photograph and threatens to release it</td><td>The concept of a compromising photograph was particularly scandalous in the Victorian era; the King's disguise is thin, suggesting that royalty cannot truly conceal its bearing regardless of costume</td></tr>
+<tr><td>The investigation at Briony Lodge (pp. 13-17)</td><td>Holmes investigates in disguise (as an old groom) and discovers that Irene Adler is about to marry Godfrey Norton; he creates a diversion (a staged fight) to gain entry to the house</td><td>The disguise and the diversion are Holmes's primary investigative tools in this story; he uses deception and social engineering rather than pure deduction; the staged fight is one of the more physical sequences in the canon</td><td>The disguise as a groom reflects Victorian class structures — a groom would be invisible to the household; the staged fight with the "fire" cry is a common Victorian urban scene</td></tr>
+<tr><td>The fire alarm (pp. 18-20)</td><td>Holmes creates a fire alarm to test where Irene will go for the photograph; she goes to the recess in the wall, revealing the hiding place</td><td>This is the key deductive moment: Holmes uses a controlled experiment (the staged fire) to test a hypothesis (that Irene will go to the photograph when threatened); the experiment works, but it also reveals Holmes's methodology to Irene</td><td>Fire alarms and fire insurance were common Victorian urban concerns; the cry of "fire" in a crowded street would have been taken very seriously</td></tr>
+<tr><td>Irene's countermove (pp. 21-24)</td><td>When Holmes returns the next morning to retrieve the photograph, he finds that Irene has left, taking the photograph with her and leaving a letter explaining that she will not use it now that she is married</td><td>Irene's countermove is what makes this story unique in the canon — the quarry outwits the hunter; she has observed Holmes during his disguise, recognized him, and taken steps to protect herself; Holmes is genuinely impressed</td><td>Irene's marriage to Godfrey Norton gives her the social protection she needs; in Victorian society, a married woman had different legal and social standing than a single woman</td></tr>
+<tr><td>The resolution (pp. 25-27)</td><td>Instead of the King's reward, Holmes asks for the photograph of Irene Adler; the King gives it to him; Watson notes that Holmes always referred to her thereafter as "the woman"</td><td>Holmes's request for the photograph is a private, personal gesture — it shows that he was affected by the encounter more than his rationalist philosophy would admit; the photograph becomes a souvenir of his one defeat</td><td>The King's offer of a monetary reward and Holmes's refusal in favour of the photograph is a classic Holmesian touch — he values the intellectual encounter more than the financial reward</td></tr>
+</tbody>
+</table>
+
+<h3>Extended Financial Appendix — Victorian Money</h3>
+<p>Understanding Victorian money is essential for understanding the stakes in The Speckled Band. Roylott's motive is entirely financial — he stands to lose £500 per year (two-thirds of his income) if both stepdaughters marry. The table below provides a comprehensive reference for Victorian monetary values, with modern equivalents based on the Retail Price Index.</p>
+<table id="money-table">
+<thead><tr><th>Amount</th><th>Victorian Reference</th><th>Modern Equivalent (2025)</th><th>Context</th></tr></thead>
+<tbody>
+<tr><td>£750 per annum</td><td>Dr. Roylott's total income</td><td>~£95,000 (US$120,000)</td><td>Upper-middle-class income; sufficient for a country house with servants and exotic animals</td></tr>
+<tr><td>£250 per annum</td><td>Each daughter's marriage portion</td><td>~£32,000 (US$40,000)</td><td>The amount that would transfer from Roylott's control upon each marriage; the financial motive for murder</td></tr>
+<tr><td>£500 per annum</td><td>Total at risk if both daughters marry</td><td>~£63,000 (US$80,000)</td><td>Two-thirds of Roylott's income; a devastating loss for a man accustomed to luxury</td></tr>
+<tr><td>1 shilling (1s)</td><td>12 pence; one-twentieth of a pound</td><td>~£6 (US$7.50)</td><td>A common unit for small purchases; a dog-cart ride might cost a few shillings</td></tr>
+<tr><td>1 guinea (21s)</td><td>1 pound 1 shilling</td><td>~£130 (US$165)</td><td>Used for professional fees and luxury goods; a "guinea" was slightly more prestigious than a pound</td></tr>
+<tr><td>£1</td><td>20 shillings; 240 pence</td><td>~£127 (US$160)</td><td>The basic unit of currency; a working-class family might earn £25-50 per year</td></tr>
+<tr><td>3s 6d (three and six)</td><td>Railway ticket (London to Leatherhead)</td><td>~£22 (US$28)</td><td>Third-class return ticket for Holmes and Watson's journey</td></tr>
+<tr><td>5s (five shillings)</td><td>Dog-cart hire (short journey)</td><td>~£32 (US$40)</td><td>Two-mile journey from Leatherhead station to Stoke Moran</td></tr>
+<tr><td>£80 per annum</td><td>London lodging (Baker Street)</td><td>~£10,000 (US$13,000)</td><td>Holmes and Watson's shared rooms; a reasonable rent for central London</td></tr>
+<tr><td>£25-50 per annum</td><td>Working-class income</td><td>~£3,200-6,400 (US$4,000-8,000)</td><td>Bare subsistence level; a servant might earn £20-30 per year plus board</td></tr>
+<tr><td>£150-300 per annum</td><td>Middle-class income</td><td>~£19,000-38,000 (US$24,000-48,000)</td><td>Comfortable living for a professional man with a family; Watson's practice income</td></tr>
+<tr><td>£30</td><td>Cost of a horse</td><td>~£3,800 (US$4,800)</td><td>Purchase price only; upkeep (feed, stabling, farrier) would be additional</td></tr>
+<tr><td>£1,000+ per annum</td><td>Upper-class / aristocratic income</td><td>~£127,000 (US$160,000)</td><td>The King of Bohemia's income would be far higher; this is the threshold for the gentry</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="historical-context">
+<h2>Historical Context and Critical Reception</h2>
+
+<h3>Arthur Conan Doyle: The Physician Author</h3>
+<p>Sir Arthur Ignatius Conan Doyle was born on 22 May 1859 at 11 Picardy Place, Edinburgh, Scotland. The son of Charles Altamont Doyle, an alcoholic civil servant and artist, and Mary Foley Doyle, a well-educated woman who instilled in her son a love of literature and storytelling, young Arthur grew up in a household that was both creative and turbulent. His father's alcoholism and eventual institutionalisation cast a long shadow over Doyle's early life, and some scholars have suggested that the figure of Dr. Grimesby Roylott — a violent, alcoholic man who terrorises his stepdaughters — may draw on Doyle's own childhood experiences of paternal instability. Whether or not this is the case, the theme of domestic tyranny that runs through The Speckled Band certainly reflects a Victorian social concern with the vulnerability of women within the household, particularly when the male head of the family is absent, incapacitated, or abusive.</p>
+
+<p>Doyle was educated at Stonyhurst College, a Jesuit boarding school in Lancashire, where he developed interests in literature, sport, and the art of deduction that would later surface in Sherlock Holmes. He went on to study medicine at the University of Edinburgh, where he was taught by Dr. Joseph Bell, a surgeon renowned for his ability to diagnose patients' occupations and histories from minute physical details. Bell's method — observation, deduction, and verification — became the model for Holmes's own investigative technique, and Doyle acknowledged his debt to Bell both publicly and privately throughout his career. The connection between Bell and Holmes is explicitly made in The Speckled Band, where Holmes's deduction of Helen Stoner's history from her appearance mirrors Bell's famous classroom demonstrations.</p>
+
+<p>After completing his medical degree in 1881, Doyle practised as a doctor in Southsea, near Portsmouth, where he also began writing fiction. His first Sherlock Holmes novel, A Study in Scarlet, was published in 1887, but it was the series of short stories that began appearing in The Strand Magazine in 1891 that made Holmes a household name. The Speckled Band, published in February 1892, was the tenth story in the series and one of the most popular from the start. Doyle wrote it at a time when he was increasingly frustrated with Holmes's popularity, which he felt overshadowed his more "serious" literary work, including the historical novels that he considered his best writing. Despite his ambivalence, he continued to write Holmes stories for nearly forty years, producing a total of four novels and fifty-six short stories.</p>
+
+<h3>The Victorian Context: Gender, Violence, and the Law</h3>
+<p>The Speckled Band was written and published during a period of intense social change in Britain. The Married Women's Property Acts of 1870, 1882, and 1893 had gradually expanded women's legal rights, allowing married women to own property, keep their earnings, and enter into contracts in their own name. Before these Acts, a married woman's legal identity was subsumed into her husband's — she could not own property, sign contracts, or sue in her own name. This legal framework is the backdrop for The Speckled Band, in which Dr. Roylott's financial control over his stepdaughters' inheritance is the motive for murder. The £250 per year that each daughter receives upon marriage is not merely a sum — it represents the legal and financial independence that marriage grants to a Victorian woman. Roylott's desire to prevent these marriages is not just about money; it is about maintaining the patriarchal control that the law had traditionally given him. Holmes, by contrast, represents a new kind of male authority — one based on reason and justice rather than force and intimidation.</p>
+
+<p>The story also reflects Victorian anxieties about the safety of women in the home. Before the establishment of professional police forces and domestic violence laws, women had little protection from violent family members. Helen Stoner's situation — trapped in an isolated house with a violent stepfather, unable to seek legal redress — would have been recognisable to many Victorian readers, particularly those involved in the growing movement for women's rights and legal reform. The fact that Helen takes the extraordinary step of travelling to London to consult a private detective, rather than going to the police, reflects the Victorian reality that the police were often unable or unwilling to intervene in domestic matters. Holmes, as a private detective operating outside the formal legal system, offers a form of justice that the official system cannot provide — a fantasy of protection that was deeply appealing to Victorian readers.</p>
+
+<h3>The Colonial Context: India and the Exotic</h3>
+<p>The British Empire is an inescapable presence in The Speckled Band. Dr. Roylott's background as a surgeon in the Indian Army, his ownership of exotic Indian animals, and his use of an Indian snake as a murder weapon all reflect the Victorian fascination with and fear of the colonies. India, in particular, occupied a unique place in the British imagination: it was the "jewel in the crown" of the Empire, a source of immense wealth and cultural fascination, but also a place of danger, disease, and moral corruption. Roylott's Indian experience has made him both wealthy (his practice in Calcutta provided the foundation of his fortune) and dangerous (he has acquired knowledge and animals that give him the means of murder). The story thus constructs India as a source of both wealth and threat — a dual role that was typical of Victorian imperial fiction.</p>
+
+<p>The "speckled band" itself is the most explicit symbol of the colonial threat. The swamp adder — a fictional snake that Doyle describes as "the deadliest snake in India" — represents the danger that the colonies can bring back to England. Just as Roylott has imported his cheetah and baboon from India, so too he has imported his method of murder: a technique that no English detective, unfamiliar with Indian snake-handling practices, would be likely to suspect. Holmes's ability to solve the case depends on his own wide reading and his knowledge of the broader world — he is, in a sense, the antidote to the same colonial knowledge that Roylott uses as a weapon. The story thus presents two responses to the colonial encounter: Roylott's, which uses it for personal gain and violence, and Holmes's, which uses it for understanding and justice.</p>
+
+<h3>Critical Reception and Legacy</h3>
+<p>From its first publication in The Strand Magazine in February 1892, The Speckled Band was recognised as one of the best Sherlock Holmes stories. Reviewers praised its atmospheric setting, its ingenious locked-room puzzle, and its memorable villain. Sidney Paget's illustrations — including the famous image of Holmes examining the ventilator with a candle — became iconic representations of the detective. The story was reprinted numerous times during Doyle's lifetime and has since been adapted for every medium: stage, film, radio, television, and video games. In 1924, Doyle adapted it for the stage, and it became one of the most frequently performed Holmes plays. The 1931 film adaptation, starring Raymond Massey as Holmes, is considered one of the best early Holmes films.</p>
+
+<p>Modern criticism of The Speckled Band has focused on several areas. Feminist readings have highlighted the story's treatment of women as victims and the patriarchal structures that enable Roylott's violence. Postcolonial readings have examined the colonial assumptions underlying the story's treatment of India as a source of exotic danger. Structuralist readings have analysed the story's locked-room mechanics and its place in the tradition of detective fiction. And reader-response critics have explored the enduring popularity of the story's atmosphere of gothic suspense. Despite these varied critical approaches, the story's fundamental appeal remains straightforward: it is a well-constructed mystery with a memorable setting, a vivid villain, and a satisfying resolution in which intelligence triumphs over violence.</p>
+
+<p>Doyle himself ranked The Speckled Band as his second-favourite Holmes story, after The Red-Headed League. In a letter to The Strand Magazine, he wrote: "I have a kindly feeling for 'The Speckled Band,' because it contains one of those curious little problems which are not wholly beyond the range of possibility." This modest description belies the story's enduring power: the locked room, the venomous snake, the evil stepfather, and the brilliant detective who sees what no one else can — these elements have made The Speckled Band one of the most universally recognised and frequently adapted stories in the English language. Its influence can be traced in virtually every locked-room mystery written since its publication, from the golden age of detective fiction to the modern psychological thriller.</p>
+
+<h3>A Note on the Text</h3>
+<p>The text of The Speckled Band used in this demo page is drawn from the original Strand Magazine publication of February 1892, which is in the public domain worldwide. The text has been lightly modernised for readability (standardising "shewed" to "showed," for example) but retains Doyle's original vocabulary, sentence structure, and narrative voice. Readers should be aware that some editions of the story contain minor textual variations — the 1892 book publication in The Adventures of Sherlock Holmes differs in small details from the Strand version, and subsequent editions have introduced further changes. The story used in the supplementary passage (A Scandal in Bohemia) is likewise from the original Strand publication (July 1891) and is in the public domain. Both stories are presented here in their complete form, unabridged and unexpurgated, as they would have been read by their original Victorian audience.</p>
+</section>
+
+<section id="deduction-reference">
+<h2>Methods of Deduction — Complete Reference</h2>
+<p>The tables below catalogue every observable deduction made by Sherlock Holmes across both stories on this page. Each deduction follows the pattern: <strong>Observation</strong> → <strong>Inference</strong> → <strong>Conclusion</strong>. This reference is intended for browser automation agents testing the <code>read_current_page</code> tool: every cell should be extractable across paginated chunks.</p>
+
+<h3>The Speckled Band — Deductions</h3>
+<table id="deduction-speckled">
+<thead><tr><th>Deduction ID</th><th>Observation</th><th>Inference</th><th>Conclusion</th><th>Verify With</th></tr></thead>
+<tbody>
+<tr><td>SB-D01</td><td>Helen has marks on her glove (a return ticket) and a mark on her finger (a needle prick)</td><td>She has been travelling by train recently; she does needlework</td><td>Helen has come to London by train from Surrey</td><td>Story text: "second finger" and "return ticket"</td></tr>
+<tr><td>SB-D02</td><td>Helen's skin has a particular quality; she mentions India</td><td>She has lived in a tropical climate</td><td>Helen has been to India with Dr. Roylott</td><td>Story text: "a considerable time in the tropics"</td></tr>
+<tr><td>SB-D03</td><td>Holmes notices that the bell-rope does not ring a bell</td><td>If it does not connect to a bell, it has another purpose</td><td>The bell-rope is a device for the snake to descend upon the bed</td><td>Story text: "the bell-rope... did not communicate with any wire"</td></tr>
+<tr><td>SB-D04</td><td>The ventilator connects Helen's room to Roylott's room</td><td>A ventilator between bedrooms is unusual; it may serve as a passage</td><td>The ventilator allows the snake to travel between rooms</td><td>Story text: "a small ventilator between it and Dr. Roylott's room"</td></tr>
+<tr><td>SB-D05</td><td>The bed is clamped to the floor and cannot be moved</td><td>Someone has deliberately prevented Helen from moving the bed away from the ventilator</td><td>The bed is positioned directly under the snake's descent path on purpose</td><td>Story text: "the bed was clamped to the floor"</td></tr>
+<tr><td>SB-D06</td><td>A saucer of milk is found in Roylott's room</td><td>Milk is not typical for Roylott's diet; it must be for an animal</td><td>The milk is bait for the snake, which is kept in Roylott's room</td><td>Story text: "a saucer of milk"</td></tr>
+<tr><td>SB-D07</td><td>Roylott has a safe in his room</td><td>A safe in a bedroom is unusual; it may contain valuables or something dangerous</td><td>The safe contains the snake when it is not being used</td><td>Story text: "a small safe"</td></tr>
+<tr><td>SB-D08</td><td>A whistling sound is heard at 3 AM</td><td>A whistling sound from the ventilator at a specific time suggests a signal</td><td>Roylott is whistling to summon the snake through the ventilator</td><td>Story text: "a low, clear whistle"</td></tr>
+<tr><td>SB-D09</td><td>A metallic noise follows the whistle</td><td>A metallic sound could be a door closing — a safe door</td><td>The safe door is being closed after the snake has been released</td><td>Story text: "a metallic noise, as if something were being drawn back"</td></tr>
+<tr><td>SB-D10</td><td>Julia's dying words: "the speckled band"</td><td>"Speckled" suggests something with a pattern; "band" could mean a group of people (gyps) or a band around something</td><td>The "speckled band" is the snake — its body has a speckled pattern</td><td>Story text: Julia's final words</td></tr>
+<tr><td>SB-D11</td><td>Roylott keeps a cheetah and a baboon</td><td>Exotic animals suggest experience with and knowledge of dangerous creatures</td><td>Roylott's Indian experience gives him knowledge of how to handle dangerous animals, including snakes</td><td>Story text: "a cheetah and a baboon"</td></tr>
+<tr><td>SB-D12</td><td>Roylott's income of £750/year would drop to £250 if both daughters marry</td><td>The financial loss of £500/year is a powerful motive for preventing the marriages</td><td>Roylott has a clear financial motive for murder</td><td>Story text: financial details</td></tr>
+</tbody>
+</table>
+
+<h3>A Scandal in Bohemia — Deductions</h3>
+<table id="deduction-scandal">
+<thead><tr><th>Deduction ID</th><th>Observation</th><th>Inference</th><th>Conclusion</th><th>Verify With</th></tr></thead>
+<tbody>
+<tr><td>SOB-D01</td><td>Watson has put on seven and a half pounds; his boot is wearing at the side; his ankle turns in</td><td>Weight gain suggests domestic comfort; uneven boot wear suggests a sedentary lifestyle with limited walking</td><td>Watson has returned to a comfortable civilian medical practice</td><td>Story text: "seven and a half pounds"</td></tr>
+<tr><td>SOB-D02</td><td>The visitor (King of Bohemia) wears a heavy ulster, travelling cap, and a mask</td><td>The disguise is too elaborate for ordinary travel; the mask suggests a desire for concealment beyond normal privacy</td><td>The visitor is a person of importance who wishes to remain anonymous</td><td>Story text: description of the visitor's attire</td></tr>
+<tr><td>SOB-D03</td><td>Holmes recognises the King despite his disguise</td><td>The King's portrait has been widely published; his bearing and manner are unmistakable</td><td>The visitor is Wilhelm Gottsreich Sigismond von Ormstein, King of Bohemia</td><td>Story text: "the mask is very thin, your Majesty"</td></tr>
+<tr><td>SOB-D04</td><td>Irene Adler enters a building with Godfrey Norton; they are followed to a church</td><td>A man and woman visiting a church together suggests a wedding</td><td>Irene Adler and Godfrey Norton are getting married</td><td>Story text: the church scene</td></tr>
+<tr><td>SOB-D05</td><td>Irene rushes to a recess in the wall during the staged fire alarm</td><td>If she is protecting something, the recess is where she keeps the photograph</td><td>The photograph is concealed in the wall recess behind a sliding panel</td><td>Story text: "she rushed to the recess"</td></tr>
+<tr><td>SOB-D06</td><td>Irene leaves a note and the photograph is gone the next morning</td><td>She has outmanoeuvred Holmes by recognising his disguise and anticipating his plan</td><td>Irene Adler is the one person who has defeated Sherlock Holmes</td><td>Story text: the letter left by Irene</td></tr>
+<tr><td>SOB-D07</td><td>Irene addresses Holmes as "Mr. Sherlock Holmes" in her letter despite his disguise</td><td>She recognised him during the staged fire alarm</td><td>Irene saw through Holmes's clergyman disguise as easily as he saw through the King's</td><td>Story text: "the well-known actress"</td></tr>
+<tr><td>SOB-D08</td><td>Holmes refuses the King's reward and asks for Irene's photograph instead</td><td>The monetary reward is less valuable to Holmes than the photograph as a memento</td><td>Holmes values the intellectual encounter over financial gain; the photograph is a personal souvenir</td><td>Story text: "I ask for nothing but the photograph"</td></tr>
+</tbody>
+</table>
+
+<h3>Complete Cross-Reference Index</h3>
+<p>The following index maps every named entity in both stories to its first mention and all subsequent appearances. Use this table to verify that <code>read_current_page</code> correctly handles paginated content — entries near the end of the index should appear in later chunks.</p>
+<table id="cross-reference-index">
+<thead><tr><th>Entity</th><th>First Mention</th><th>Category</th><th>Stories</th></tr></thead>
+<tbody>
+<tr><td>Sherlock Holmes</td><td>Speckled Band paragraph 1 / Scandal paragraph 1</td><td>Person</td><td>Both</td></tr>
+<tr><td>Dr. John Watson</td><td>Speckled Band paragraph 1 / Scandal paragraph 1</td><td>Person</td><td>Both</td></tr>
+<tr><td>Helen Stoner</td><td>Speckled Band paragraph 4</td><td>Person</td><td>Speckled Band</td></tr>
+<tr><td>Julia Stoner</td><td>Speckled Band paragraph 9</td><td>Person</td><td>Speckled Band</td></tr>
+<tr><td>Dr. Grimesby Roylott</td><td>Speckled Band paragraph 12</td><td>Person</td><td>Speckled Band</td></tr>
+<tr><td>Mrs. Farintosh</td><td>Speckled Band paragraph 6</td><td>Person (mentioned)</td><td>Speckled Band</td></tr>
+<tr><td>Swamp adder</td><td>Speckled Band paragraph 40</td><td>Animal</td><td>Speckled Band</td></tr>
+<tr><td>Cheetah</td><td>Speckled Band paragraph 15</td><td>Animal</td><td>Speckled Band</td></tr>
+<tr><td>Baboon</td><td>Speckled Band paragraph 15</td><td>Animal</td><td>Speckled Band</td></tr>
+<tr><td>Irene Adler</td><td>Scandal paragraph 1</td><td>Person</td><td>Scandal in Bohemia</td></tr>
+<tr><td>King of Bohemia (Wilhelm Gottsreich Sigismond von Ormstein)</td><td>Scandal paragraph 10</td><td>Person</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Godfrey Norton</td><td>Scandal paragraph 14</td><td>Person</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Count von Kramm</td><td>Scandal paragraph 10</td><td>Person (disguise)</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Princess Clotilde of Scandinavia</td><td>Scandal paragraph 10</td><td>Person (mentioned)</td><td>Scandal in Bohemia</td></tr>
+<tr><td>221B Baker Street</td><td>Speckled Band paragraph 1 / Scandal paragraph 1</td><td>Location</td><td>Both</td></tr>
+<tr><td>Stoke Moran</td><td>Speckled Band paragraph 5</td><td>Location</td><td>Speckled Band</td></tr>
+<tr><td>Leatherhead station</td><td>Speckled Band paragraph 24</td><td>Location</td><td>Speckled Band</td></tr>
+<tr><td>Surrey</td><td>Speckled Band paragraph 1</td><td>Location</td><td>Speckled Band</td></tr>
+<tr><td>Calcutta</td><td>Speckled Band paragraph 12</td><td>Location</td><td>Speckled Band</td></tr>
+<tr><td>Briony Lodge</td><td>Scandal paragraph 12</td><td>Location</td><td>Scandal in Bohemia</td></tr>
+<tr><td>St. John's Wood</td><td>Scandal paragraph 11</td><td>Location</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Church of St. Monica</td><td>Scandal paragraph 16</td><td>Location</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Edgware Road</td><td>Scandal paragraph 16</td><td>Location</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Inner Temple</td><td>Scandal paragraph 14</td><td>Location</td><td>Scandal in Bohemia</td></tr>
+<tr><td>The ventilator</td><td>Speckled Band paragraph 28</td><td>Object / Clue</td><td>Speckled Band</td></tr>
+<tr><td>The bell-rope</td><td>Speckled Band paragraph 29</td><td>Object / Clue</td><td>Speckled Band</td></tr>
+<tr><td>The clamped bed</td><td>Speckled Band paragraph 30</td><td>Object / Clue</td><td>Speckled Band</td></tr>
+<tr><td>The saucer of milk</td><td>Speckled Band paragraph 33</td><td>Object / Clue</td><td>Speckled Band</td></tr>
+<tr><td>The photograph</td><td>Scandal paragraph 10</td><td>Object / McCuffin</td><td>Scandal in Bohemia</td></tr>
+<tr><td>The letter</td><td>Scandal paragraph 10</td><td>Object</td><td>Scandal in Bohemia</td></tr>
+<tr><td>The steel poker</td><td>Speckled Band paragraph 22</td><td>Object</td><td>Speckled Band</td></tr>
+<tr><td>The dog-cart</td><td>Speckled Band paragraph 24</td><td>Transport</td><td>Speckled Band</td></tr>
+<tr><td>The hansom cab</td><td>Scandal paragraph 15</td><td>Transport</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Cocaine (7% solution)</td><td>Scandal paragraph 1</td><td>Substance</td><td>Scandal in Bohemia (mentioned)</td></tr>
+<tr><td>£750 per annum</td><td>Speckled Band paragraph 13</td><td>Financial</td><td>Speckled Band</td></tr>
+<tr><td>£250 per annum</td><td>Speckled Band paragraph 13</td><td>Financial</td><td>Speckled Band</td></tr>
+<tr><td>The Str AND Magazine</td><td>Publication context</td><td>Publication</td><td>Both</td></tr>
+<tr><td>April 1883</td><td>Speckled Band paragraph 3</td><td>Date</td><td>Speckled Band</td></tr>
+<tr><td>March 20, 1888</td><td>Scandal paragraph 3</td><td>Date</td><td>Scandal in Bohemia</td></tr>
+<tr><td>Mrs. Hudson</td><td>Implied (landlady)</td><td>Person (implied)</td><td>Both</td></tr>
+<tr><td>Mrs. Roylott</td><td>Speckled Band paragraph 11</td><td>Person (deceased)</td><td>Speckled Band</td></tr>
+</tbody>
+</table>
+</section>
+
+<section id="answer-key">
+<h2>Form Answer Key</h2>
+<p>This section provides the complete answer key for the response form below. Each answer is derived from the story passages and structured data above. Browser automation agents should use <code>read_current_page</code> to extract the answers from the passages and then fill the form using <code>fill_input</code>, <code>form_action</code> (for checkboxes, radios, selects), and <code>click_element</code> (for buttons). The self-verifying form uses GET parameters to display results at <code>#results</code>.</p>
+
+<h3>Short Text Answers</h3>
+<dl>
+<dt>Surname (What was Helen's surname before marriage?)</dt>
+<dd><strong>Stoner</strong> — Helen is referred to as "Helen Stoner" throughout the story. Her stepfather is Dr. Grimesby Roylott, but her birth surname is Stoner (from her mother's first marriage to Major-General Stoner, as described in the extended character profile above).</dd>
+
+<dt>Detective Street (On which street does Sherlock Holmes live?)</dt>
+<dd><strong>Baker Street</strong> — Holmes lives at 221B Baker Street, London. This address is mentioned in both stories on this page and is one of the most famous fictional addresses in English literature.</dd>
+
+<dt>County (In which English county is Stoke Moran located?)</dt>
+<dd><strong>Surrey</strong> — The story explicitly states that Stoke Moran is in Surrey. Holmes and Watson travel to Leatherhead station in Surrey and then take a dog-cart to the manor house.</dd>
+
+<dt>Animal (Name one of Dr. Roylott's exotic animals, other than the snake)</dt>
+<dd><strong>Cheetah</strong> or <strong>Baboon</strong> — Both are mentioned in the story. Dr. Roylott keeps a cheetah and a baboon, which run loose on the grounds of Stoke Moran and terrify the neighbours. Accept either answer.</dd>
+
+<dt>Death Year (In what year did Julia Stoner die?)</dt>
+<dd><strong>1881</strong> — Helen states that Julia died "two years" before her visit to Holmes. Since Helen's visit occurs in early April 1883, Julia's death would have been in 1881. The timeline table above confirms this date.</dd>
+
+<dt>Doctor Rank (What was Dr. Roylott's rank in the Indian Army?)</dt>
+<dd><strong>Surgeon</strong> — The story describes Roylott as having practised as a surgeon in the Indian Army at Calcutta. He held the rank of surgeon, which was a medical officer position rather than a combat command.</dd>
+
+<dt>Email (Dr. Watson's fictional email)</dt>
+<dd><strong>watson@bakerstreet.uk</strong> — This is a fictional email address specified in the form prompt. It does not appear in the original text but is provided as a test for the <code>fill_input</code> tool's ability to handle email fields.</dd>
+
+<dt>Secret Passphrase</dt>
+<dd><strong>speckled band</strong> — The passphrase is given in the form prompt: "Enter the secret passphrase: <em>speckled band</em>." This tests the agent's ability to read the prompt text and enter the correct value in a password field.</dd>
+
+<dt>Income Amount (Dr. Roylott's annual income in pounds — number only)</dt>
+<dd><strong>750</strong> — Dr. Roylott's income is £750 per annum, as stated in the story and the financial details table. The field accepts a number only (no currency symbol).</dd>
+
+<dt>Event Date (The approximate date Holmes visited Stoke Moran)</dt>
+<dd><strong>1883-04-06</strong> — The story is set in early April 1883. The date field is pre-filled with this value; the agent should verify the pre-fill and submit it.</dd>
+</dl>
+
+<h3>Checkboxes — Evidence Found in Dr. Roylott's Room</h3>
+<p>The correct answers for the checkboxes are based on the story text and the clues table in the Extended Analysis section above.</p>
+<dl>
+<dt>Ventilator connecting to Helen's room</dt>
+<dd><strong>Checked ✓</strong> — Holmes explicitly observes the ventilator between the rooms during his investigation.</dd>
+<dt>Saucer of milk</dt>
+<dd><strong>Checked ✓</strong> — Holmes finds a saucer of milk in Roylott's room, which he deduces is bait for the snake.</dd>
+<dt>Locked safe</dt>
+<dd><strong>Checked ✓</strong> — The safe is mentioned in Roylott's room; Holmes deduces that it contains the snake when it is not being used.</dd>
+<dt>Dog whistle</dt>
+<dd><strong>Unchecked ✗</strong> — No dog whistle is mentioned in the story. This is a distractor.</dd>
+<dt>False bell-rope</dt>
+<dd><Strong>Checked ✓</Strong> — The bell-rope does not connect to a bell; Holmes identifies it as a bridge for the snake to descend upon the bed.</dd>
+<dt>Diary with dates of the crimes</dt>
+<dd><strong>Unchecked ✗</strong> — No diary is mentioned. This is a distractor.</dd>
+<dt>Indian cigar butts</dt>
+<dd><strong>Checked ✓</strong> — The burning smell that Helen notices is suggested to be from Roylott's Indian cigars (though it could also be from the snake). The story mentions Roylott's cigars as a possible explanation for the smell. This is a borderline answer that could go either way; the form accepts it as correct because the cigars are explicitly mentioned in the story context.</dd>
+<dt>Medicine bottles</dt>
+<dd><strong>Unchecked ✗</strong> — No medicine bottles are mentioned. This is a distractor.</dd>
+</dl>
+
+<h3>Radio Buttons</h3>
+<dl>
+<dt>What was the "speckled band"?</dt>
+<dd><strong>A swamp adder (snake)</strong> — The "speckled band" is the snake itself, a swamp adder that Roylott trained to descend through the ventilator and bite the occupant of the adjacent bed. Julia's dying words "the speckled band" refer to the pattern on the snake's body, not to a gypsy band (a common misinterpretation) or any other object.</dd>
+
+<dt>What time did Holmes and Watson hear the whistle?</dt>
+<dd><strong>3:00 AM</strong> — The story states that the whistle was heard at about three o'clock in the morning. Holmes and Watson had been waiting in the dark room for several hours before the sound came.</dd>
+</dl>
+
+<h3>Dropdown Selects</h3>
+<dl>
+<dt>Where did Dr. Roylott previously practise medicine?</dt>
+<dd><strong>Calcutta, India</strong> — The story states that Dr. Roylott practised as a surgeon in Calcutta, India, where he also acquired his knowledge of Indian snakes and his exotic animals.</dd>
+
+<dt>How did Holmes and Watson travel to Stoke Moran?</dt>
+<dd><strong>Train then dog-cart</strong> — They took the train from London to Leatherhead station, and then a dog-cart (a light two-wheeled carriage) from Leatherhead to Stoke Moran. Helen Stoner had arranged for the dog-cart to meet them at the station.</dd>
+</dl>
+
+<h3>Multi-Select: Investigative Methods</h3>
+<p>The correct answers for the investigative methods that Holmes actually used are:</p>
+<dl>
+<dt>Careful observation of the room</dt>
+<dd><strong>Selected ✓</strong> — Holmes examines every detail of the rooms at Stoke Moran, including the ventilator, the bell-rope, the clamped bed, and the contents of Roylott's room.</dd>
+<dt>Interview with Helen Stoner</dt>
+<dd><strong>Selected ✓</strong> — Holmes interviews Helen at length at Baker Street, gathering all the background information about Roylott, Julia's death, and the house layout.</dd>
+<dt>Staying overnight (stakeout)</dt>
+<dd><strong>Selected ✓</strong> — Holmes and Watson spend the night in Helen's room, waiting for the snake to appear. This is the decisive investigative action that confirms Holmes's hypothesis.</dd>
+<dt>Examination of the building exterior</dt>
+<dd><strong>Selected ✓</strong> — Holmes examines the exterior of Stoke Moran, including the roof and walls, before entering the house.</dd>
+<dt>Chemical analysis of the odour</dt>
+<dd><strong>Unselected ✗</strong> — Holmes does not perform chemical analysis in this story. This is a distractor.</dd>
+<dt>Going undercover in disguise</dt>
+<dd><strong>Unselected ✗</strong> — Holmes does not go undercover in this story (unlike A Scandal in Bohemia, where he does). This is a distractor.</dd>
+</dl>
+
+<h3>Free-Text Response</h3>
+<dl>
+<dt>Motive Explanation</dt>
+<dd>The correct answer should mention that <strong>Dr. Roylott would lose £250 per year for each daughter who married</strong>, reducing his income from £750 to £500 or even £250. This financial motive — protecting his income and controlling his stepdaughters' inheritance — is the reason he murdered Julia and attempted to murder Helen. Acceptable answers must reference the financial motive (marriage, income, inheritance, or the specific amounts).</dd>
+
+<dt>Ventilator Role</dt>
+<dd>The correct answer should explain that <strong>the ventilator allowed the snake to pass from Roylott's room into Helen's bedroom</strong>, and <strong>the bell-rope served as a bridge for the snake to descend onto the bed</strong>. The ventilator was a small opening between rooms that was ostensibly for air circulation but was actually used as a passage for the murder weapon.</dd>
+</dl>
+</section>
+<section id="form">
+<h2>Response Form</h2>
+<p>Answer each question based on the story passage above. Submit the form to see which answers match.</p>
+
+<form id="brijio-test-form" method="GET" action="#results">
+
+<fieldset>
+<legend>Short Text Answers</legend>
+
+<label for="surname">What was Helen's surname before marriage?</label>
+<input id="surname" name="surname" type="text" placeholder="e.g. Watson">
+
+<label for="detective-street">On which street does Sherlock Holmes live?</label>
+<input id="detective-street" name="detective_street" type="text" placeholder="e.g. Baker Street">
+
+<label for="county">In which English county is Stoke Moran located?</label>
+<input id="county" name="county" type="text" placeholder="e.g. Surrey">
+
+<label for="animal-1">Name one of Dr. Roylott's exotic animals (other than the snake).</label>
+<input id="animal-1" name="animal_one" type="text" placeholder="e.g. cheetah">
+
+<label for="death-year">In what year did Julia Stoner die?</label>
+<input id="death-year" name="death_year" type="text" placeholder="e.g. 1881">
+
+<label for="doctor-rank">What was Dr. Roylott's rank in the Indian Army?</label>
+<input id="doctor-rank" name="doctor_rank" type="text" placeholder="e.g. surgeon">
+</fieldset>
+
+<fieldset>
+<legend>Contact &amp; Numeric Fields</legend>
+
+<label for="email-contact">Dr. Watson's fictional email (use watson@bakerstreet.uk)</label>
+<input id="email-contact" name="email_contact" type="email" placeholder="name@example.com">
+
+<label for="secret-passphrase">Enter the secret passphrase: <em>speckled band</em></label>
+<input id="secret-passphrase" name="secret_passphrase" type="password" placeholder="Enter passphrase">
+
+<label for="story-search">Search for a detail in the story</label>
+<input id="story-search" name="story_search" type="search" placeholder="e.g. ventilator">
+
+<label for="income-amount">Dr. Roylott's annual income in pounds (number only)</label>
+<input id="income-amount" name="income_amount" type="number" min="0" max="10000" placeholder="750">
+
+<label for="event-date">The approximate date Holmes visited Stoke Moran (April 1883)</label>
+<input id="event-date" name="event_date" type="date" value="1883-04-06">
+</fieldset>
+
+<fieldset>
+<legend>Free-Text Response</legend>
+
+<label for="motive-explanation">In your own words, explain Dr. Roylott's motive for sending the snake.</label>
+<textarea id="motive-explanation" name="motive_explanation" rows="4" placeholder="Write 2-3 sentences explaining the financial motive..."></textarea>
+
+<label for="content-editable-area">Write a brief description of the ventilator's role in the mystery.</label>
+<div id="content-editable-area" contenteditable="true" style="min-height:80px; border:1px solid color-mix(in srgb, CanvasText 28%, transparent); border-radius:6px; padding:8px 10px; max-width:600px; background:Canvas; color:CanvasText;"></div>
+</fieldset>
+
+<fieldset>
+<legend>Checkboxes — Select all that apply</legend>
+<p class="note">Which of the following were found in Dr. Roylott's room?</p>
+
+<label><input id="chk-ventilator" name="evidence" type="checkbox" value="ventilator"> A ventilator connecting to Helen's room</label>
+<label><input id="chk-saucer" name="evidence" type="checkbox" value="saucer"> A saucer of milk</label>
+<label><input id="chk-safe" name="evidence" type="checkbox" value="safe"> A locked safe</label>
+<label><input id="chk-whistle" name="evidence" type="checkbox" value="whistle"> A dog whistle</label>
+<label><input id="chk-bellrope" name="evidence" type="checkbox" value="bellrope"> A false bell-rope</label>
+<label><input id="chk-diary" name="evidence" type="checkbox" value="diary"> A diary with dates of the crimes</label>
+<label><input id="chk-cigar" name="evidence" type="checkbox" value="cigar"> Indian cigar butts</label>
+<label><input id="chk-medicine" name="evidence" type="checkbox" value="medicine"> Medicine bottles</label>
+</fieldset>
+
+<fieldset>
+<legend>Radio Buttons — Select one</legend>
+<p class="note">What was the "speckled band" that Julia described?</p>
+
+<label><input id="radio-gypsy" name="speckled_band" type="radio" value="gypsy"> A gypsy band that camped on the grounds</label>
+<label><input id="radio-snake" name="speckled_band" type="radio" value="snake"> A swamp adder (snake)</label>
+<label><input id="radio-rope" name="speckled_band" type="radio" value="rope"> A rope used to lower something from the ventilator</label>
+<label><input id="radio-scarf" name="speckled_band" type="radio" value="scarf"> A spotted scarf worn by Dr. Roylott</label>
+
+<p class="note" style="margin-top:16px">What time did Holmes and Watson hear the whistle?</p>
+
+<label><input id="time-1am" name="whistle_time" type="radio" value="1am"> 1:00 AM</label>
+<label><input id="time-2am" name="whistle_time" type="radio" value="2am"> 2:00 AM</label>
+<label><input id="time-3am" name="whistle_time" type="radio" value="3am"> 3:00 AM</label>
+<label><input id="time-4am" name="whistle_time" type="radio" value="4am"> 4:00 AM</label>
+</fieldset>
+
+<fieldset>
+<legend>Dropdown Select</legend>
+
+<label for="location-select">Where did Dr. Roylott previously practise medicine?</label>
+<select id="location-select" name="location_select">
+<option value="">— Select a location —</option>
+<option value="london">London, England</option>
+<option value="calcutta">Calcutta, India</option>
+<option value="bombay">Bombay, India</option>
+<option value="edinburgh">Edinburgh, Scotland</option>
+<option value="paris">Paris, France</option>
+</select>
+
+<label for="transport-select">How did Holmes and Watson travel to Stoke Moran?</label>
+<select id="transport-select" name="transport_select">
+<option value="">— Select transport —</option>
+<option value="train-cart">Train then dog-cart</option>
+<option value="carriage">Horse-drawn carriage from Baker Street</option>
+<option value="walking">They walked</option>
+<option value="train-only">Train only</option>
+</select>
+</fieldset>
+
+<fieldset>
+<legend>Multi-Select Dropdown</legend>
+
+<label for="methods-select">Which investigative methods did Holmes use? (Hold Ctrl/Cmd to select multiple)</label>
+<select id="methods-select" name="investigative_methods" multiple style="min-height:100px;">
+<option value="observation">Careful observation of the room</option>
+<option value="interview">Interview with Helen Stoner</option>
+<option value="stakeout">Staying overnight (stakeout) in Helen's room</option>
+<option value="chemical">Chemical analysis of the odour</option>
+<option value="exterior">Examination of the building exterior</option>
+<option value="disguise">Going undercover in disguise</option>
+</select>
+</fieldset>
+
+<fieldset>
+<legend>Disabled Controls</legend>
+<p class="note">These controls are disabled. Agents should handle them gracefully without error.</p>
+
+<label for="disabled-text">Disabled text input</label>
+<input id="disabled-text" name="disabled_text" type="text" value="This field is locked" disabled>
+
+<label for="disabled-select">Disabled select</label>
+<select id="disabled-select" name="disabled_select" disabled>
+<option value="locked">Cannot change this</option>
+</select>
+
+<button type="button" disabled id="disabled-button">Disabled Button</button>
+</fieldset>
+
+<fieldset>
+<legend>Links &amp; Buttons</legend>
+
+<div class="nav-links">
+<a href="#story">Jump to Story</a>
+<a href="#table-data">Jump to Tables</a>
+<a href="#form">Jump to Form</a>
+<a href="#dynamic">Jump to Dynamic Content</a>
+<button type="button" id="btn-clear" style="font:inherit; padding:6px 12px; border-radius:4px; border:1px solid color-mix(in srgb, CanvasText 20%, transparent); cursor:pointer;">Clear All Fields</button>
+<button type="button" id="btn-prefill" style="font:inherit; padding:6px 12px; border-radius:4px; border:1px solid color-mix(in srgb, CanvasText 20%, transparent); cursor:pointer;">Prefill Correct Answers</button>
+</div>
+</fieldset>
+
+<fieldset>
+<legend>Submit</legend>
+<button type="submit" id="btn-submit">Submit Answers</button>
+<button type="reset">Reset Form</button>
+</fieldset>
+</form>
+</section>
+
+<section id="dynamic">
+<h2>Dynamic Content</h2>
+<p>This section tests <code>read_current_page</code> polling for JS-driven content updates. Call <code>read_current_page</code> and verify the dynamic timestamp appears below.</p>
+<div id="dynamic-section" class="dynamic-section">
+<p id="dynamic-timestamp">Waiting for page load...</p>
+<p id="dynamic-counter">Counter: 0</p>
+<p id="dynamic-list"></p>
+</div>
+</section>
+
+<section id="links">
+<h2>Navigation Links</h2>
+<p>These links test the <code>navigate</code> and <code>click_element</code> tools. They target sections within this page (same-tab navigation).</p>
+<nav class="nav-links">
+<a href="#story">Story (top)</a>
+<a href="#table-data">Tables</a>
+<a href="#form">Form</a>
+<a href="#dynamic">Dynamic Content</a>
+<a href="#links">Links</a>
+</nav>
+</section>
+
+<section id="results" class="results" style="display:none;">
+<h2>Results</h2>
+<div id="results-content"></div>
+</section>
+
+<footer style="margin-top:48px; padding-top:24px; border-top:1px solid color-mix(in srgb, CanvasText 15%, transparent); font-size:0.9em; color:color-mix(in srgb, CanvasText 60%, transparent);">
+<p><strong>Brijio Demo Page</strong> — This page exercises every Brijio MCP tool: <code>read_current_page</code> (paginated), <code>fill_input</code>, <code>form_action</code> (checkbox, radio, select), <code>click_element</code>, <code>navigate</code>, and <code>scroll_page</code>.</p>
+<p>Story text: <em>The Adventure of the Speckled Band</em> by Arthur Conan Doyle (public domain). Passages and structural data are intentionally verbose to exceed 128 KiB and force multi-chunk <code>read_current_page</code> responses.</p>
+</footer>
+</main>
+
+<script>
+// — Dynamic content updater — exercises read_current_page polling —
+(function() {
+  var loadTime = new Date().toLocaleTimeString();
+  document.getElementById('dynamic-timestamp').textContent = 'Content loaded at ' + loadTime;
+
+  var counter = 0;
+  setInterval(function() {
+    counter += 1;
+    document.getElementById('dynamic-counter').textContent = 'Counter: ' + counter;
+  }, 5000);
+
+  // Dynamic list — adds a new item every 3 seconds, up to 10
+  var listEl = document.getElementById('dynamic-list');
+  var listItems = [
+    'Dr. Roylott kept exotic animals at Stoke Moran',
+    'The ventilator was the snake\'s entry point',
+    'Helen\'s bedroom had a dummy bell-rope',
+    'Julia died two years before Helen visited Holmes',
+    'The swamp adder is the deadliest snake in India',
+    'Holmes struck the snake with his cane',
+    'Roylott\'s income was £750 per year',
+    'The story is set in April 1883',
+    'Mrs. Farintosh recommended Holmes to Helen',
+    'Watson is the narrator of this adventure'
+  ];
+  var nextItem = 0;
+  setInterval(function() {
+    if (nextItem < listItems.length) {
+      var li = document.createElement('div');
+      li.textContent = '• ' + listItems[nextItem];
+      listEl.appendChild(li);
+      nextItem += 1;
+    }
+  }, 3000);
+})();
+
+// — Results display — self-verifying GET params —
+(function() {
+  var hash = window.location.hash;
+  if (hash !== '#results' && hash !== '#results/') return;
+
+  var params = new URLSearchParams(window.location.search);
+  var resultsEl = document.getElementById('results-content');
+
+  var answers = {
+    surname: { expected: /stoner/i, label: 'Helen\'s surname' },
+    detective_street: { expected: /baker/i, label: 'Holmes\'s street' },
+    county: { expected: /surrey/i, label: 'County of Stoke Moran' },
+    animal_one: { expected: /cheetah|baboon/i, label: 'Exotic animal' },
+    death_year: { expected: /1881/, label: 'Year Julia died' },
+    doctor_rank: { expected: /surgeon/i, label: 'Roylott\'s rank' },
+    email_contact: { expected: /watson@bakerstreet\.uk/i, label: 'Email' },
+    secret_passphrase: { expected: /speckled band/i, label: 'Secret passphrase' },
+    income_amount: { expected: /^750$/, label: 'Income amount' },
+    event_date: { expected: /1883-04/, label: 'Event date' },
+    motive_explanation: { expected: /marry|income|mone|£|inherit/i, label: 'Motive explanation' },
+    location_select: { expected: /calcutta/, label: 'Roylott\'s practise location' },
+    transport_select: { expected: /train-cart|dog.cart/i, label: 'Transport method' }
+  };
+
+  var html = '<table><thead><tr><th>Question</th><th>Your Answer</th><th>Result</th></tr></thead><tbody>';
+
+  for (var key in answers) {
+    var value = params.get(key) || '(not provided)';
+    var a = answers[key];
+    var pass = a.expected.test(value);
+    html += '<tr><td>' + a.label + '</td><td>' + escapeHtml(value) + '</td>';
+    html += '<td class="' + (pass ? 'pass' : 'fail') + '">' + (pass ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+  }
+
+  // Checkboxes
+  var evidenceValues = params.getAll('evidence');
+  var expectedEvidence = ['ventilator', 'saucer', 'safe'];
+  for (var i = 0; i < expectedEvidence.length; i++) {
+    var ev = expectedEvidence[i];
+    var checked = evidenceValues.indexOf(ev) !== -1;
+    html += '<tr><td>Evidence: ' + ev + '</td><td>' + (checked ? 'checked' : 'unchecked') + '</td>';
+    html += '<td class="' + (checked ? 'pass' : 'fail') + '">' + (checked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+  }
+  // Decoy checkboxes should NOT be checked
+  var decoyEvidence = ['whistle', 'diary', 'medicine'];
+  for (var j = 0; j < decoyEvidence.length; j++) {
+    var dv = decoyEvidence[j];
+    var notChecked = evidenceValues.indexOf(dv) === -1;
+    html += '<tr><td>Decoy: ' + dv + ' (should be unchecked)</td><td>' + (notChecked ? 'unchecked' : 'checked') + '</td>';
+    html += '<td class="' + (notChecked ? 'pass' : 'fail') + '">' + (notChecked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+  }
+
+  // Radio: speckled_band
+  var bandAnswer = params.get('speckled_band') || '';
+  html += '<tr><td>What was the speckled band?</td><td>' + escapeHtml(bandAnswer) + '</td>';
+  html += '<td class="' + (bandAnswer === 'snake' ? 'pass' : 'fail') + '">' + (bandAnswer === 'snake' ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+
+  // Radio: whistle_time
+  var timeAnswer = params.get('whistle_time') || '';
+  html += '<tr><td>Time of whistle</td><td>' + escapeHtml(timeAnswer) + '</td>';
+  html += '<td class="' + (timeAnswer === '3am' ? 'pass' : 'fail') + '">' + (timeAnswer === '3am' ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+
+  // Multi-select: investigative_methods
+  var methods = params.getAll('investigative_methods');
+  var expectedMethods = ['observation', 'interview', 'stakeout', 'exterior'];
+  for (var k = 0; k < expectedMethods.length; k++) {
+    var m = expectedMethods[k];
+    var mChecked = methods.indexOf(m) !== -1;
+    html += '<tr><td>Method: ' + m + '</td><td>' + (mChecked ? 'checked' : 'unchecked') + '</td>';
+    html += '<td class="' + (mChecked ? 'pass' : 'fail') + '">' + (mChecked ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+  }
+
+  html += '</tbody></table>';
+  resultsEl.innerHTML = html;
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+})();
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+// — Button handlers —
+document.getElementById('btn-clear').addEventListener('click', function() {
+  document.getElementById('brijio-test-form').reset();
+  document.getElementById('content-editable-area').textContent = '';
+});
+
+document.getElementById('btn-prefill').addEventListener('click', function() {
+  document.getElementById('surname').value = 'Stoner';
+  document.getElementById('detective-street').value = 'Baker Street';
+  document.getElementById('county').value = 'Surrey';
+  document.getElementById('animal-1').value = 'cheetah';
+  document.getElementById('death-year').value = '1881';
+  document.getElementById('doctor-rank').value = 'surgeon';
+  document.getElementById('email-contact').value = 'watson@bakerstreet.uk';
+  document.getElementById('secret-passphrase').value = 'speckled band';
+  document.getElementById('story-search').value = 'ventilator';
+  document.getElementById('income-amount').value = '750';
+  document.getElementById('event-date').value = '1883-04-06';
+  document.getElementById('motive-explanation').value = 'Dr. Roylott would lose £250 per year for each daughter who married. With both daughters married, his income would drop from £750 to £250.";
+  document.getElementById('content-editable-area').textContent = 'The ventilator allowed the snake to pass from Dr. Roylott\'s room into Helen\'s bedroom. The bell-rope served as a bridge for the snake to descend onto the bed.';
+  document.getElementById('chk-ventilator').checked = true;
+  document.getElementById('chk-saucer').checked = true;
+  document.getElementById('chk-safe').checked = true;
+  document.getElementById('chk-cigar').checked = true;
+  document.getElementById('radio-snake').checked = true;
+  document.getElementById('time-3am').checked = true;
+  document.getElementById('location-select').value = 'calcutta';
+  document.getElementById('transport-select').value = 'train-cart';
+  ['observation', 'interview', 'stakeout', 'exterior'].forEach(function(v) {
+    var opt = document.querySelector('#methods-select option[value="' + v + '"]');
+    if (opt) opt.selected = true;
+  });
+});
+</script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import { defineConfig } from 'tsup'
-import { copyFileSync, mkdirSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
 
 export default defineConfig({
   entry: {
@@ -16,7 +17,9 @@ export default defineConfig({
     '../src/http-server.ts',
     '../src/page-context.ts',
     '../src/protocol.ts',
-    '../src/browser-list-tool.ts'
+    '../src/browser-list-tool.ts',
+    '../src/demo-server.ts',
+    '../src/startup-banner.ts'
   ],
   // Keep npm deps and tsx runtime external
   external: [
@@ -32,8 +35,20 @@ export default defineConfig({
     shimMissingCJS: true
   },
   // Copy package.json to dist/ so readFileSync('../package.json') resolves
+  // and copy demo/ directory for brijio demo static file serving
   async onSuccess () {
     mkdirSync('dist/bin', { recursive: true })
     copyFileSync('package.json', 'dist/package.json')
+    // Copy demo static files for brijio demo command (ADR-0039)
+    const demoDest = join('dist', 'demo')
+    mkdirSync(demoDest, { recursive: true })
+    try {
+      const demoSrc = join('demo')
+      for (const file of readdirSync(demoSrc)) {
+        copyFileSync(join(demoSrc, file), join(demoDest, file))
+      }
+    } catch {
+      // demo/ may not exist during development at server level — non-fatal
+    }
   }
 })
