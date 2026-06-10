@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import WebSocket, { type RawData } from 'ws'
 import {
+  type BrijioBatchResult,
   type BrijioClickElementResult,
   type BrijioBrowserListResult,
   type BrijioFillInputResult,
@@ -16,6 +17,7 @@ import {
   createClickElementEnvelope,
   createFillInputEnvelope,
   createNavigateToUrlEnvelope,
+  createPerformBatchEnvelope,
   createSelectOptionsEnvelope,
   createSetCheckedEnvelope,
   createSubmitFormEnvelope,
@@ -28,6 +30,7 @@ import {
   authRequiredResponse,
   invalidResponse,
   parseActionResultEnvelope,
+  parseBatchResultEnvelope,
   parseBrowserListEnvelope,
   parseNavigateToUrlEnvelope,
   parsePageContentEnvelope,
@@ -88,6 +91,13 @@ export interface SubmitFormRequestOptions extends PageContextRequestOptions {
 
 export interface NavigateToUrlRequestOptions extends PageContextRequestOptions {
   url: string
+}
+
+export interface PerformBatchRequestOptions extends PageContextRequestOptions {
+  actions: Array<Record<string, unknown>>
+  continueOnError?: boolean
+  readAfterActions?: boolean
+  pageContextId?: number
 }
 
 export async function requestPageContext (
@@ -275,6 +285,35 @@ export async function requestBrowserList (options: {
     },
     parseEnvelope: (value) => parseBrowserListEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser list response.'
+  })
+}
+
+export async function requestPerformBatch (
+  options: PerformBatchRequestOptions
+): Promise<BrijioResourceResult<BrijioBatchResult>> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createPerformBatchEnvelope(requestId, options.actions, {
+      pageContextId: options.pageContextId,
+      continueOnError: options.continueOnError,
+      readAfterActions: options.readAfterActions
+    }),
+    parseEnvelope: (value) => {
+      const result = parseBatchResultEnvelope(value, requestId)
+      // Map partial-failure ({ ok: false, data }) to success — the batch completed,
+      // individual action results (including errors) are in the data
+      if ('data' in result) {
+        return { ok: true as const, data: result.data }
+      }
+      // Error or ignored — pass through
+      return result as BrijioResourceResult<BrijioBatchResult> | { ok: false, ignored: true }
+    },
+    timeoutMessage: 'Timed out waiting for a batch action response.'
   })
 }
 
