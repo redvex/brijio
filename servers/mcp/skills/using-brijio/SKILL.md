@@ -59,15 +59,22 @@ skill://brijio/{skill_name}
 
 ### Interaction
 
-| Tool              | Purpose                                | Key Parameters                                   |
-| ----------------- | -------------------------------------- | ------------------------------------------------ |
-| `navigate_to_url` | Navigate the browser to an HTTP(S) URL | `url` (required), `browserInstanceId` (optional) |
-| `click_element`   | Click a link or button-like action     | `kind` ("link" or "action"), `id` (short-lived)  |
-| `fill_input`      | Write text into a form control         | `formId`, `controlId`, `text`                    |
-| `fill_editable`   | Write text into a contenteditable area | `id`, `text`                                     |
-| `set_checked`     | Check/uncheck a checkbox or radio      | `formId`, `controlId`, `checked` (boolean)       |
-| `select_options`  | Select option values in a `<select>`   | `formId`, `controlId`, `values` (string array)   |
-| `submit_form`     | Submit a form                          | `formId`                                         |
+| Tool              | Purpose                                 | Key Parameters                                   |
+| ----------------- | --------------------------------------- | ------------------------------------------------ |
+| `navigate_to_url` | Navigate the browser to an HTTP(S) URL  | `url` (required), `browserInstanceId` (optional) |
+| `click_element`   | Click a link or button-like action      | `kind` ("link" or "action"), `id` (short-lived)  |
+| `fill_input`      | Write text into a form control          | `formId`, `controlId`, `text`                    |
+| `fill_editable`   | Write text into a contenteditable area  | `id`, `text`                                     |
+| `set_checked`     | Check/uncheck a checkbox or radio       | `formId`, `controlId`, `checked` (boolean)       |
+| `select_options`  | Select option values in a `<select>`    | `formId`, `controlId`, `values` (string array)   |
+| `submit_form`     | Submit a form                           | `formId`                                         |
+| `perform_batch`   | Execute up to 20 explicit write actions | `actions`, `continueOnError`, `readAfterActions` |
+
+Use `perform_batch` only after reading the current page and choosing valid
+short-lived IDs from that page context. It is for compact sequences of write
+actions on the same page, such as filling several fields and setting a checkbox.
+Do not use it for hidden reads or open-ended automation: reads stay separate
+except for optional `readAfterActions: true`.
 
 ### Critical: Short-Lived IDs
 
@@ -76,6 +83,10 @@ the page changes — including after navigation, form submissions, or DOM update
 
 **Always re-read the page with `read_current_page` before interacting with
 elements if the page may have changed.**
+
+If `perform_batch` returns `data.aborted: true`, stop using IDs from the old
+page, call `read_current_page`, and decide whether to retry against the fresh
+context.
 
 ## Step 1: Check Connection
 
@@ -125,6 +136,7 @@ These thoughts mean STOP — you're about to make a mistake:
 | "The ID from the last page should still work" | IDs expire on navigation or DOM updates. Re-read the page.           |
 | "I'll submit the form for the user"           | Never auto-submit. Always ask the user to confirm.                   |
 | "I'll just click without checking"            | Radio buttons cannot be unchecked. Select carefully.                 |
+| "I'll batch across pages"                     | Navigation aborts remaining batch actions. Re-read before retrying.  |
 | "I don't need to read a skill for this"       | If there's even a 1% chance a skill applies, read it.                |
 | "I'll skip the connection check"              | No browser = no action. Always call `list_browsers` first.           |
 

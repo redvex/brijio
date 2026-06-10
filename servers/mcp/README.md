@@ -1,7 +1,7 @@
 # Brijio MCP Server
 
 The MCP server exposes Brijio resources and tools to AI agents and
-routes explicit page-reading, click, and form-fill requests to an active
+routes explicit page-reading, click, form-fill, navigation, and batch action requests to an active
 browser extension session through the WebSocket server.
 
 ## Current Scope
@@ -32,6 +32,8 @@ The implementation also exposes MCP tools:
 - `set_checked`
 - `select_options`
 - `submit_form`
+- `navigate_to_url`
+- `perform_batch`
 
 `list_browsers` returns the browser instances currently online for the
 configured pairing token. Use it when more than one browser extension instance
@@ -64,6 +66,17 @@ visible single-select or multi-select control. `submit_form` submits a visible
 form by short-lived form ID. Each tool sends one ADR 0016 `perform_action`
 message and waits for the matching `action_result`.
 
+`navigate_to_url` navigates the connected browser to an HTTP or HTTPS URL and
+waits for the page to load.
+
+`perform_batch` sends up to 20 explicit browser actions in one WebSocket
+request. It supports the same write-action shapes as the single-action tools:
+`click`, `write_text`, `set_checked`, `select_options`, and `submit_form`.
+Reads are intentionally not arbitrary batch steps; the MVP supports only an
+optional trailing read via `readAfterActions`. The result includes per-action
+entries plus top-level `aborted` so agents can detect navigation and re-read the
+page before retrying.
+
 The HTTP MCP runtime uses the official TypeScript MCP SDK Streamable HTTP
 transport for server lifecycle, protocol framing, initialization, resource
 discovery, resource reads, tool discovery, and tool calls. Brijio code
@@ -81,9 +94,10 @@ all tool and resource requests from this MCP server.
 
 Out of scope for this package version:
 
-- Navigation tools.
 - CSS selector, XPath, text-query, coordinate, hover, keyboard, drag, or
-  multi-step action support.
+  arbitrary script/DOM action support.
+- Arbitrary read operations inside `perform_batch`; use `readAfterActions` for
+  the optional trailing page read, or call `read_current_page` separately.
 - Page body text or DOM extraction inside the MCP server. The MCP server only
   relays explicit requests to the connected extension.
 - Server-side LLM summarization.
@@ -164,6 +178,7 @@ Error codes are:
 - `browser_unavailable`
 - `ambiguous_browser_target`
 - `invalid_browser_target`
+- `batch_failed`
 
 ## Tool Results
 
@@ -423,6 +438,78 @@ behavior. Successful submit calls return:
 }
 ```
 
+`perform_batch` accepts:
+
+```json
+{
+  "actions": [
+    { "type": "click", "target": { "kind": "link", "id": "bb-1" } },
+    {
+      "type": "write_text",
+      "target": { "formId": "form-1", "controlId": "control-1" },
+      "text": "hello"
+    },
+    {
+      "type": "set_checked",
+      "target": { "formId": "form-1", "controlId": "control-2" },
+      "checked": true
+    },
+    {
+      "type": "select_options",
+      "target": { "formId": "form-1", "controlId": "control-3" },
+      "values": ["alpha"]
+    },
+    { "type": "submit_form", "target": { "formId": "form-1" } }
+  ],
+  "continueOnError": false,
+  "readAfterActions": true,
+  "pageContextId": 42,
+  "browserInstanceId": "chrome-default-test"
+}
+```
+
+`actions` is required and must contain 1-20 actions. `continueOnError`
+defaults to `false`; when enabled, recoverable per-action element errors are
+reported in place and later actions continue. Page navigation still aborts the
+batch because short-lived IDs may no longer match the new page. `readAfterActions`
+defaults to `false`; when enabled, the final result entry is a fresh page
+context read after the actions that completed.
+
+Successful or partially successful batch calls return:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "ok": false,
+    "results": [
+      {
+        "ok": true,
+        "data": {
+          "action": "click",
+          "target": { "kind": "link", "id": "bb-1" }
+        }
+      },
+      {
+        "ok": false,
+        "error": {
+          "code": "target_not_found",
+          "message": "Target not found",
+          "aborted": false
+        }
+      }
+    ],
+    "aborted": false
+  }
+}
+```
+
+The outer `ok` is the MCP/transport result. The inner `data.ok` is the batch
+outcome. A batch with per-action failures still returns data so the caller can
+inspect `results` and decide whether to retry. Batch-level failures, such as an
+unexpected dispatch error, use the standard tool error shape with code
+`batch_failed`.
+
 ## Environment
 
 Expected local variables:
@@ -515,3 +602,7 @@ editable ID and text to write.
 For checkboxes, radio options, selects, and form submission, choose the target
 form/control IDs from `data.context.structure.forms[]` and call `set_checked`,
 `select_options`, or `submit_form`.
+
+For short sequences of already-known actions on the same page, call
+`perform_batch` instead of making many separate action tool calls. Re-read the
+page after any result with `data.aborted: true` before retrying.
