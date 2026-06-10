@@ -120,6 +120,13 @@ describe('repository tooling', () => {
     assert.equal(packageJson.bugs.url, 'https://github.com/redvex/brijio/issues')
   })
 
+  it('keeps the MCP CLI entry independent from the tsx runtime', async () => {
+    const cliEntry = await readFile('servers/mcp/bin/brijio.mjs', 'utf8')
+
+    assert.doesNotMatch(cliEntry, /tsx\/esm\/api/)
+    assert.doesNotMatch(cliEntry, /\btsImport\b/)
+  })
+
   it('uses Brijio descriptions for current package metadata', async () => {
     const expectedDescriptions = new Map([
       ['package.json', 'Brijio gives AI agents controlled, user-approved browser access.'],

@@ -33,14 +33,14 @@ export function getPageContextConfigFromEnv (
     oldNames: ['BROWSERBRIDGE_WEBSOCKET_URL', 'BRIJIO_WEBSOCKET_URL', 'WEBSOCKET_URL'],
     defaultValue: 'ws://127.0.0.1:8787',
     warn
-  })
+  }) ?? 'ws://127.0.0.1:8787'
   const pairingToken = resolveRenamedEnv({
     env,
     newName: 'BRIJIO_PAIRING_TOKEN',
     oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BRIJIO_TOKEN'],
     defaultValue: '',
     warn
-  })
+  }) ?? ''
   const defaultBrowserInstanceId = resolveRenamedEnv({
     env,
     newName: 'BRIJIO_BROWSER_INSTANCE_ID',
@@ -57,8 +57,10 @@ export function getPageContextConfigFromEnv (
   return {
     websocketUrl,
     pairingToken,
-    defaultBrowserInstanceId,
-    timeoutMs
+    timeoutMs,
+    ...(defaultBrowserInstanceId !== undefined
+      ? { defaultBrowserInstanceId }
+      : {})
   }
 }
 

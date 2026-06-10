@@ -523,7 +523,7 @@ void describe('SafariPageNavigationAdapter', () => {
     // mechanism is wired. We race against a short 500ms check to avoid
     // waiting the full 10s timeout, just confirming the promise stays
     // in-flight without crashing.
-    let resolveUpdate: (() => void) | undefined
+    let resolveUpdate: ((value: { id?: number, title?: string, url?: string }) => void) | undefined
     const updatePromise = new Promise<{ id?: number, title?: string, url?: string }>(
       (resolve) => { resolveUpdate = resolve }
     )
@@ -543,11 +543,14 @@ void describe('SafariPageNavigationAdapter', () => {
       // Expected: the 10s timeout hasn't elapsed yet, so we're still waiting.
       // Resolve the update to clean up.
       const completeUpdate = resolveUpdate
-      assert.notEqual(completeUpdate, undefined)
-      completeUpdate()
+      if (completeUpdate === undefined) {
+        throw new Error('tabs.update promise resolver was not captured')
+      }
+      completeUpdate({})
     } else {
       // Unexpected early result — verify it's an error, not a crash.
-      assert.equal(result.ok, false)
+      const navigationResult = result as Awaited<ReturnType<SafariPageNavigationAdapter['navigateToUrl']>>
+      assert.equal(navigationResult.ok, false)
     }
   })
 })
