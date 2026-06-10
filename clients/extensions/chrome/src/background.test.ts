@@ -434,7 +434,7 @@ void describe('navigateActiveTabToUrl', () => {
     // should reject after NAVIGATION_TIMEOUT_MS (10s). We test with a
     // 500ms race to avoid a 10s test, verifying the promise stays pending
     // (i.e. the timeout mechanism is wired correctly rather than hanging).
-    let resolveUpdate: (() => void) | undefined
+    let resolveUpdate: ((value: { id?: number, title?: string, url?: string }) => void) | undefined
     const updatePromise = new Promise<{ id?: number, title?: string, url?: string }>(
       (resolve) => { resolveUpdate = resolve }
     )
@@ -458,11 +458,14 @@ void describe('navigateActiveTabToUrl', () => {
       // Expected: the 10s timeout hasn't elapsed yet, so we're still waiting.
       // Resolve the update to clean up.
       const completeUpdate = resolveUpdate
-      assert.notEqual(completeUpdate, undefined)
-      completeUpdate()
+      if (completeUpdate === undefined) {
+        throw new Error('tabs.update promise resolver was not captured')
+      }
+      completeUpdate({})
     } else {
       // Unexpected early result — either ok or error, verify it's not a crash.
-      assert.equal(result.ok, false)
+      const navigationResult = result as Awaited<ReturnType<typeof navigateActiveTabToUrl>>
+      assert.equal(navigationResult.ok, false)
     }
   })
 })
