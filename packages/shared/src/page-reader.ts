@@ -4,6 +4,10 @@ import type {
 } from './protocol.js'
 import type { ContentRequest } from './content-handler.js'
 import type {
+  ContentBatchRequest,
+  BatchResult
+} from './batch-handler.js'
+import type {
   PageReadResult,
   PageActionResult
 } from './background-controller.js'
@@ -218,5 +222,92 @@ export async function performActiveTabAction (
     }
 
     return actionContentScriptUnavailable()
+  }
+}
+
+// --- Shared performActiveTabBatch ---
+
+const BATCH_DEFAULT_RESULT: BatchResult = {
+  ok: false,
+  results: [],
+  aborted: false
+}
+
+function isBatchResult (value: unknown): value is BatchResult {
+  if (typeof value !== 'object' || value === null) return false
+  const obj = value as Record<string, unknown>
+  return typeof obj.ok === 'boolean' && Array.isArray(obj.results)
+}
+
+export async function performActiveTabBatch (
+  message: ContentBatchRequest,
+  deps: ActiveTabDeps
+): Promise<BatchResult> {
+  const [activeTab] = await deps.tabs.query({
+    active: true,
+    currentWindow: true
+  })
+
+  if (activeTab?.id === undefined || activeTab.url === undefined) {
+    return {
+      ...BATCH_DEFAULT_RESULT,
+      results: message.actions.map(() => ({
+        ok: false,
+        error: { code: 'no_active_tab', message: 'No active tab with a URL is available.', aborted: true }
+      }))
+    }
+  }
+
+  if (!deps.isRegularPageUrl(activeTab.url)) {
+    return {
+      ...BATCH_DEFAULT_RESULT,
+      results: message.actions.map(() => ({
+        ok: false,
+        error: { code: 'unsupported_page', message: 'Brijio can perform actions only on HTTP and HTTPS tabs.', aborted: true }
+      }))
+    }
+  }
+
+  try {
+    await deps.scripting.executeScript({
+      target: { tabId: activeTab.id },
+      files: ['content.js']
+    })
+
+    const response = await deps.tabs.sendMessage(activeTab.id, message)
+
+    if (isBatchResult(response)) {
+      return response
+    }
+
+    // Content script returned an unexpected response type
+    return {
+      ...BATCH_DEFAULT_RESULT,
+      results: message.actions.map(() => ({
+        ok: false,
+        error: { code: 'content_script_unavailable', message: 'Content script returned an unexpected response.', aborted: true }
+      }))
+    }
+  } catch {
+    if (
+      deps.onCatchPermissionCheck !== undefined &&
+      !(await deps.onCatchPermissionCheck())
+    ) {
+      return {
+        ...BATCH_DEFAULT_RESULT,
+        results: message.actions.map(() => ({
+          ok: false,
+          error: { code: 'regular_page_permission_required', message: 'Permission required to access this page.', aborted: true }
+        }))
+      }
+    }
+
+    return {
+      ...BATCH_DEFAULT_RESULT,
+      results: message.actions.map(() => ({
+        ok: false,
+        error: { code: 'content_script_unavailable', message: 'Content script is not available on this page.', aborted: true }
+      }))
+    }
   }
 }

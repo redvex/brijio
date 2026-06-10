@@ -3,6 +3,8 @@ import {
   createActionResultResponse,
   createAuthEnvelope,
   createBrowserPresenceAnnounceEnvelope,
+  createBatchResultResponse,
+  createBatchResultErrorResponse,
   createNavigateToUrlErrorResponse,
   createNavigateToUrlResponse,
   createPageContentErrorResponse,
@@ -15,6 +17,7 @@ import {
   isGetPageContextEnvelope,
   isNavigateToUrlEnvelope,
   isPerformActionEnvelope,
+  isPerformBatchEnvelope,
   type ActionResultData,
   type ActionResultErrorCode,
   type ClickActionTarget,
@@ -29,8 +32,14 @@ import {
   type WebSocketEnvelope,
   type WriteTextActionResultData,
   type WriteTextEditableTarget,
-  type WriteTextActionTarget
+  type WriteTextActionTarget,
+  type BatchAction
 } from './protocol.js'
+
+import {
+  type ContentBatchRequest,
+  type BatchResult
+} from './batch-handler.js'
 
 export interface ConnectionStatus {
   state: 'disconnected' | 'connecting' | 'reconnecting' | 'connected' | 'error'
@@ -124,6 +133,10 @@ export interface PageActionAdapter {
   submitForm: (target: { formId: string, expectedLabel?: string }, pageContextId?: number) => Promise<PageActionResult>
 }
 
+export interface PageBatchAdapter {
+  performBatch: (message: ContentBatchRequest) => Promise<BatchResult>
+}
+
 export type PageNavigationResult =
   | { ok: true, data: NavigateToUrlResult }
   | {
@@ -151,6 +164,7 @@ export interface BrijioBackgroundControllerOptions {
   action: ActionAdapter
   createWebSocket: (url: string) => BrijioSocket
   pageActions: PageActionAdapter
+  pageBatch: PageBatchAdapter
   pageNavigation: PageNavigationAdapter
   pageReader: PageReaderAdapter
   setup: SetupAdapter
@@ -424,6 +438,16 @@ export class BrijioBackgroundController {
       return
     }
 
+    if (isPerformBatchEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handlePerformBatchRequest(message.id, message.payload)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
+    }
+
     if (isPerformActionRequestEnvelope(message)) {
       this.pendingRequestCount++
       try {
@@ -532,6 +556,25 @@ export class BrijioBackgroundController {
 
     this.socket?.send(
       JSON.stringify(createActionResultResponse(requestId, result.data))
+    )
+  }
+
+  private async handlePerformBatchRequest (
+    requestId: string | undefined,
+    payload: { actions: BatchAction[], continueOnError?: boolean, readAfterActions?: boolean, pageContextId?: number }
+  ): Promise<void> {
+    const batchMessage: ContentBatchRequest = {
+      type: 'perform_batch',
+      actions: payload.actions,
+      ...(payload.pageContextId !== undefined ? { pageContextId: payload.pageContextId } : {}),
+      ...(payload.continueOnError !== undefined ? { continueOnError: payload.continueOnError } : {}),
+      ...(payload.readAfterActions !== undefined ? { readAfterActions: payload.readAfterActions } : {})
+    }
+
+    const result = await this.options.pageBatch.performBatch(batchMessage)
+
+    this.socket?.send(
+      JSON.stringify(createBatchResultResponse(requestId, result.results))
     )
   }
 

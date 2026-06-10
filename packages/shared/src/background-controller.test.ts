@@ -5,6 +5,7 @@ import {
   type ActionAdapter,
   type BridgeSettings,
   type PageActionAdapter,
+  type PageBatchAdapter,
   type PageActionResult,
   type BrijioSocket,
   type PageNavigationAdapter,
@@ -15,6 +16,7 @@ import {
   type StorageAdapter
 } from './background-controller.js'
 import type {
+  ActionResultData,
   ActionResultErrorCode,
   ClickActionTarget,
   NavigateToUrlErrorCode,
@@ -28,6 +30,12 @@ import type {
   WriteTextEditableTarget,
   WriteTextActionTarget
 } from './protocol.js'
+
+import type {
+  ContentBatchRequest,
+  BatchResult
+} from './batch-handler.js'
+import type { BatchResultEntry } from './protocol.js'
 
 void describe('Brijio background controller', () => {
   void it('opens setup when action is clicked without a stored WebSocket URL', async () => {
@@ -1397,6 +1405,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const action = new FakeActionAdapter()
   const pageReader = new FakePageReaderAdapter(options)
   const pageActions = new FakePageActionAdapter(options)
+  const pageBatch = new FakePageBatchAdapter()
   const pageNavigation = new FakePageNavigationAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
@@ -1407,6 +1416,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
     storage,
     pageReader,
     pageActions,
+    pageBatch,
     pageNavigation,
     timers
   })
@@ -1529,6 +1539,21 @@ class FakePageActionAdapter implements PageActionAdapter {
         target
       }
     }
+  }
+}
+
+class FakePageBatchAdapter implements PageBatchAdapter {
+  async performBatch (_message: ContentBatchRequest): Promise<BatchResult> {
+    // Default fake implementation: return success for all actions
+    const results: BatchResultEntry[] = _message.actions.map(() => ({
+      ok: true as const,
+      data: {
+        action: 'click' as const,
+        target: { kind: 'link' as const, id: 'bb-1' },
+        changed: false
+      } as ActionResultData
+    }))
+    return { ok: true, results, aborted: false }
   }
 }
 

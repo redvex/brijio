@@ -10,12 +10,15 @@ import {
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
   type FormSubmitTarget,
+  type ContentBatchRequest,
+  type BatchResult,
   stringValue,
   requireString,
   createBrowserInstanceId,
   normalizeBridgeSettings,
   readActiveTabPage as sharedReadActiveTabPage,
   performActiveTabAction as sharedPerformActiveTabAction,
+  performActiveTabBatch as sharedPerformActiveTabBatch,
   type ActiveTabDeps
 } from '@brijio/shared'
 import { isRegularPageUrl } from './permissions.js'
@@ -174,6 +177,11 @@ const controller = new BrijioBackgroundController({
     },
     async submitForm (target, pageContextId) {
       return await performActiveTabSubmitForm(target, pageContextId)
+    }
+  },
+  pageBatch: {
+    async performBatch (message: ContentBatchRequest): Promise<BatchResult> {
+      return await sharedPerformActiveTabBatch(message, chromeDeps)
     }
   },
   pageNavigation: {
