@@ -38,18 +38,6 @@ if (usingLegacyBinary) {
   )
 }
 
-// ─── Load TypeScript daemon module ───────────────────────────────────────────
-// Daemon commands exit early, so dynamic import is fine — tsup externalises tsx.
-
-async function importModule (path) {
-  try {
-    const { tsImport } = await import('tsx/esm/api')
-    return await tsImport(path, import.meta.url)
-  } catch {
-    return await import(path)
-  }
-}
-
 const [
   daemonModule,
   printConfigModule,
@@ -57,11 +45,11 @@ const [
   startupBannerModule,
   demoServerModule
 ] = await Promise.all([
-  importModule('../src/daemon.ts'),
-  importModule('../src/print-config.ts'),
-  importModule('../src/doctor.ts'),
-  importModule('../src/startup-banner.ts'),
-  importModule('../src/demo-server.ts')
+  import('../src/daemon.ts'),
+  import('../src/print-config.ts'),
+  import('../src/doctor.ts'),
+  import('../src/startup-banner.ts'),
+  import('../src/demo-server.ts')
 ])
 
 const {
@@ -290,8 +278,8 @@ if (isDemo) {
 
 if (!demoAttachedToExistingDaemon) {
   try {
-    const { createWebSocketServer } = await importModule('@brijio/websocket/server')
-    const { getMcpHttpServerOptionsFromEnv, startBrijioMcpHttpServer } = await importModule('../src/http-server.ts')
+    const { createWebSocketServer } = await import('@brijio/websocket/server')
+    const { getMcpHttpServerOptionsFromEnv, startBrijioMcpHttpServer } = await import('../src/http-server.ts')
 
     wsServer = await createWebSocketServer({
       host: wsHost,
@@ -392,7 +380,7 @@ async function handlePrintConfig (command) {
   let mcpHost = '127.0.0.1'
   if (!isDev) {
     try {
-      const { detectNetworkPaths } = await importModule('../src/network.ts')
+      const { detectNetworkPaths } = await import('../src/network.ts')
       const networkPaths = await detectNetworkPaths()
       mcpHost = networkPaths.bestHost
     } catch {
