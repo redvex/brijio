@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brijio P1.3 — Navigation &amp; Action Test Page</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.6; color: #1a1a1a; }
+    h1 { border-bottom: 2px solid #4f46e5; padding-bottom: .5rem; }
+    h2 { margin-top: 0; color: #4f46e5; }
+    section { margin: 2rem 0; padding: 1.25rem 1.5rem; border: 1px solid #e5e7eb; border-radius: .5rem; background: #fafafa; }
+
+    /* ── Action selector showcase grid ──────────────────────────── */
+    .action-grid {
+      display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-start;
+    }
+    .action-grid > * { margin: 0; }
+
+    /* ── Shared interactive styling ─────────────────────────────── */
+    button {
+      padding: .4rem 1rem; border: 1px solid #d1d5db; border-radius: .375rem;
+      background: #fff; cursor: pointer; font-size: .9rem;
+      transition: background .15s, border-color .15s, box-shadow .15s;
+    }
+    button:hover { background: #f3f4f6; }
+    button:active { background: #e5e7eb; }
+    button:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    button.flash-active {
+      background: #dbeafe !important; border-color: #93c5fd !important;
+      box-shadow: 0 0 0 2px #93c5fd;
+    }
+
+    /* ── Role-based action styling ──────────────────────────────── */
+    [role="menuitem"] {
+      display: block; padding: .5rem 1rem; border-radius: .25rem;
+      cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
+      transition: background .15s;
+    }
+    [role="menuitem"]:hover { background: #f3f4f6; }
+    [role="menuitem"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+
+    /* ── Tabs ────────────────────────────────────────────────────── */
+    .tab-bar { display: flex; gap: 0; }
+    [role="tab"] {
+      display: inline-block; padding: .4rem 1rem; border: 1px solid #d1d5db;
+      border-bottom: none; border-radius: .375rem .375rem 0 0;
+      background: #f9fafb; cursor: pointer; font-size: .9rem;
+      transition: background .15s;
+    }
+    [role="tab"][aria-selected="true"] { background: #fff; border-bottom: 2px solid #4f46e5; font-weight: 600; }
+    [role="tab"]:hover { background: #f3f4f6; }
+    [role="tab"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    .tab-panel {
+      border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 .375rem .375rem;
+      padding: 1rem; background: #fff; min-height: 3rem;
+    }
+
+    /* ── Switch ──────────────────────────────────────────────────── */
+    [role="switch"] {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .35rem .75rem; border: 1px solid #d1d5db; border-radius: 1rem;
+      background: #f3f4f6; cursor: pointer; font-size: .9rem;
+      transition: background .15s;
+    }
+    [role="switch"][aria-checked="true"] { background: #dbeafe; border-color: #93c5fd; }
+    [role="switch"]:hover { background: #e5e7eb; }
+    [role="switch"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    .switch-indicator {
+      display: inline-block; width: .75rem; height: .75rem; border-radius: 50%;
+      background: #9ca3af; transition: background .15s;
+    }
+    [role="switch"][aria-checked="true"] .switch-indicator { background: #3b82f6; }
+
+    /* ── Tree ────────────────────────────────────────────────────── */
+    [role="tree"] { margin: 0; padding: 0; }
+    [role="treeitem"] {
+      display: block; padding: .35rem .75rem; border-radius: .25rem;
+      cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
+      transition: background .15s;
+    }
+    [role="treeitem"]:hover { background: #f3f4f6; }
+    [role="treeitem"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    .tree-group { margin-left: 1.5rem; overflow: hidden; transition: max-height .2s ease; }
+    .tree-group.collapsed { max-height: 0; }
+    .tree-group.expanded { max-height: 10rem; }
+    .tree-toggle::before { content: "▸ "; color: #9ca3af; font-size: .8rem; transition: content .15s; }
+    .tree-toggle.open::before { content: "▾ "; }
+
+    /* ── Listbox / option ─────────────────────────────────────────── */
+    [role="listbox"] {
+      border: 1px solid #d1d5db; border-radius: .375rem; padding: .25rem;
+      background: #fff; min-width: 10rem;
+    }
+    [role="option"] {
+      display: block; padding: .35rem .75rem; cursor: pointer;
+      border-radius: .25rem; transition: background .15s;
+    }
+    [role="option"]:hover { background: #dbeafe; }
+    [role="option"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    [role="option"][aria-selected="true"] { background: #dbeafe; font-weight: 600; }
+    [role="option"][aria-selected="true"]::before { content: "✓ "; color: #3b82f6; }
+
+    /* ── Menu checkbox / radio ───────────────────────────────────── */
+    [role="menuitemcheckbox"], [role="menuitemradio"] {
+      display: block; padding: .5rem 1rem; border-radius: .25rem;
+      cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
+      transition: background .15s;
+    }
+    [role="menuitemcheckbox"]:hover, [role="menuitemradio"]:hover { background: #f3f4f6; }
+    [role="menuitemcheckbox"]:focus-visible, [role="menuitemradio"]:focus-visible {
+      outline: 2px solid #4f46e5; outline-offset: 2px;
+    }
+    [role="menuitemcheckbox"]::before { content: "☐ "; color: #9ca3af; }
+    [role="menuitemcheckbox"][aria-checked="true"]::before { content: "☑ "; color: #3b82f6; }
+    [role="menuitemradio"]::before { content: "○ "; color: #9ca3af; }
+    [role="menuitemradio"][aria-checked="true"]::before { content: "● "; color: #3b82f6; }
+
+    /* ── Submit image ─────────────────────────────────────────────── */
+    input[type="image"] {
+      padding: .5rem .75rem; border: 1px solid #d1d5db; border-radius: .375rem;
+      background: #4f46e5; color: #fff; cursor: pointer; font-size: .9rem;
+      transition: background .15s;
+    }
+    input[type="image"]:hover { background: #4338ca; }
+
+    /* ── Details / disclosure ─────────────────────────────────────── */
+    details { margin: .5rem 0; border: 1px solid #e5e7eb; border-radius: .375rem; }
+    details[open] { border-color: #93c5fd; }
+    summary {
+      padding: .5rem 1rem; background: #f9fafb; cursor: pointer;
+      border-radius: .375rem; font-weight: 500; list-style: none;
+    }
+    summary::before { content: "▶ "; font-size: .7rem; display: inline-block; }
+    details[open] > summary::before { content: "▼ "; }
+    summary:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    details > p, details > div { padding: .75rem 1rem; }
+
+    /* ── Navigation buttons ─────────────────────────────────────── */
+    .nav-btn { background: #4f46e5; color: #fff; border: none; }
+    .nav-btn:hover { background: #4338ca; }
+    .nav-btn:active { background: #3730a3; }
+    .url-display {
+      display: inline-block; padding: .25rem .75rem; background: #f1f5f9;
+      border: 1px solid #e2e8f0; border-radius: .25rem; font-family: monospace;
+      font-size: .85rem; max-width: 100%; overflow-x: auto; word-break: break-all;
+    }
+    .nav-log { color: #6b7280; font-style: italic; }
+
+    /* ── Disabled / hidden ────────────────────────────────────────── */
+    [aria-disabled="true"] { opacity: .45; cursor: not-allowed; pointer-events: none; }
+    [hidden] { display: none !important; }
+
+    /* ── Action metadata ─────────────────────────────────────────── */
+    .meta-card {
+      display: inline-flex; flex-direction: column; gap: .25rem;
+      padding: .75rem 1rem; border: 1px solid #d1d5db; border-radius: .5rem;
+      background: #fff; min-width: 12rem;
+    }
+    .meta-card-label { font-weight: 600; }
+    .meta-card-detail { font-size: .85rem; color: #6b7280; }
+    .meta-card-tag { font-size: .8rem; color: #4f46e5; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Brijio P1.3 — Navigation &amp; Action Test Page</h1>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 1: Expanded action selectors                             -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <section id="expanded-selectors">
+    <h2>1. Expanded Action Selectors</h2>
+    <p>Each element below should appear as a distinct action in <code>read_current_page</code>. Interactive elements respond to clicks.</p>
+
+    <div class="action-grid">
+      <button id="native-button">🔘 Native button</button>
+
+      <div role="menuitem" tabindex="0" id="menu-item">📋 Menu item</div>
+
+      <div style="margin-top:.5rem;">
+        <div class="tab-bar" role="tablist" aria-label="Selector tabs">
+          <div role="tab" aria-selected="true" tabindex="0" id="tab-profile">👤 Profile</div>
+          <div role="tab" aria-selected="false" tabindex="0" id="tab-settings">⚙️ Settings</div>
+        </div>
+        <div class="tab-panel" id="tab-panel" role="tabpanel">
+          <p id="tab-panel-content">View and edit your profile information.</p>
+        </div>
+      </div>
+
+      <div role="switch" aria-checked="false" tabindex="0" id="dark-mode-switch">
+        <span class="switch-indicator"></span> 🌙 Dark mode
+      </div>
+
+      <div role="tree" aria-label="File tree">
+        <div role="treeitem" tabindex="0" id="tree-node" class="tree-toggle" aria-expanded="false">📁 Tree node</div>
+        <div class="tree-group collapsed" id="tree-children">
+          <div role="treeitem" tabindex="0" id="tree-child-1">📄 Child item 1</div>
+          <div role="treeitem" tabindex="0" id="tree-child-2">📄 Child item 2</div>
+        </div>
+      </div>
+
+      <div role="listbox" aria-label="Options">
+        <div role="option" tabindex="0" id="list-option" aria-selected="false">🔲 List option</div>
+      </div>
+
+      <div role="menuitemcheckbox" aria-checked="false" tabindex="0" id="toggle-check">Toggle check</div>
+      <div role="menuitemradio" aria-checked="false" tabindex="0" id="radio-choice">Radio choice</div>
+
+      <input type="image"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='32'%3E%3Crect width='120' height='32' rx='4' fill='%234f46e5'/%3E%3Ctext x='60' y='21' text-anchor='middle' fill='white' font-family='system-ui' font-size='14'%3ESubmit image%3C/text%3E%3C/svg%3E"
+        alt="Submit image button"
+        id="image-submit" />
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 2: Disclosure / details observation                       -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <section id="disclosure-observation">
+    <h2>2. Disclosure / Details Observation</h2>
+    <p>Click the summary elements. <code>observed.detailsOpen</code> should report the toggle state.</p>
+
+    <details id="info-details">
+      <summary id="info-summary">Show more information</summary>
+      <p>Here is the expanded detail content. The <code>observed.detailsOpen</code> hint should report <code>true</code> after clicking this summary.</p>
+    </details>
+
+    <details id="second-details" open>
+      <summary id="second-summary">Initially open section</summary>
+      <p>This section starts open. Clicking the summary should report <code>detailsOpen: false</code>.</p>
+    </details>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 3: SPA navigation detection                               -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <section id="spa-navigation">
+    <h2>3. SPA Navigation Detection</h2>
+    <p>Current URL: <span class="url-display" id="current-url"></span></p>
+
+    <div class="action-grid" style="margin-top:.75rem;">
+      <button class="nav-btn" id="push-state-btn" title="Navigates to /spa/page-a via history.pushState">
+        ↗️ Navigate to /spa/page-a
+      </button>
+
+      <button class="nav-btn" id="replace-state-btn" aria-label="Go to page B" title="Navigates to /spa/page-b via history.replaceState">
+        🔁 Navigate to /spa/page-b
+      </button>
+
+      <button id="back-btn">⬅️ Go back</button>
+    </div>
+
+    <p class="nav-log" id="nav-log">Navigation events will appear here.</p>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 4: Disabled / hidden filtering                             -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <section id="disabled-hidden-filtering">
+    <h2>4. Disabled / Hidden Filtering</h2>
+
+    <p>The following controls should <strong>not</strong> appear in the actions list:</p>
+    <div class="action-grid" style="margin-bottom:.75rem;">
+      <button disabled id="disabled-btn">🚫 Disabled button</button>
+      <div role="menuitem" aria-disabled="true" tabindex="0" id="aria-disabled-item">🚫 ARIA disabled item</div>
+      <button hidden id="hidden-btn">Hidden button</button>
+      <div role="tab" aria-hidden="true" tabindex="0" id="aria-hidden-tab">Invisible tab</div>
+    </div>
+
+    <p>The following controls <strong>should</strong> appear:</p>
+    <div class="action-grid">
+      <button id="enabled-btn">✅ Enabled button</button>
+      <div role="switch" aria-checked="false" tabindex="0" id="enabled-switch">
+        <span class="switch-indicator"></span> ✅ Enabled switch
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 5: Action metadata (tagName, description)                 -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <section id="action-metadata">
+    <h2>5. Action Metadata</h2>
+    <p>Each action should include <code>tagName</code> and <code>description</code> fields where applicable. Switch tabs to see different content.</p>
+
+    <div>
+      <div class="tab-bar" role="tablist" aria-label="Metadata tabs">
+        <div role="tab" aria-selected="true" tabindex="0" id="account-tab" aria-label="Account" aria-describedby="account-tab-desc">👤 Account</div>
+        <div role="tab" aria-selected="false" tabindex="0" id="notifications-tab" aria-label="Notifications" aria-describedby="notifications-tab-desc">🔔 Notifications</div>
+      </div>
+      <div class="tab-panel" id="meta-tab-panel" role="tabpanel">
+        <p id="meta-tab-panel-content">View and edit your account settings and preferences.</p>
+      </div>
+    </div>
+    <p id="account-tab-desc" style="display:none">View and edit your account settings and preferences</p>
+    <p id="notifications-tab-desc" style="display:none">Manage your notification preferences and alert settings</p>
+
+    <div style="margin-top:.75rem;">
+      <button aria-label="Save" title="Saves your current work to the server" id="save-btn">💾 Save</button>
+      <p style="margin-top:.5rem; font-size: .85rem; color: #6b7280;">
+        <code>tagName: button</code> · <code>description: "Saves your current work to the server"</code>
+      </p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Script                                                            -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
+  <script>
+    // ── SPA Navigation ────────────────────────────────────────────
+    const navLog = document.getElementById('nav-log')
+    const currentUrlEl = document.getElementById('current-url')
+
+    function logNav(msg) {
+      navLog.textContent = msg
+    }
+
+    function showCurrentUrl() {
+      currentUrlEl.textContent = location.href
+    }
+    showCurrentUrl()
+
+    document.getElementById('push-state-btn').addEventListener('click', () => {
+      const url = new URL('/spa/page-a', location.origin)
+      history.pushState({ page: 'a' }, '', url)
+      showCurrentUrl()
+      logNav('pushState → /spa/page-a')
+    })
+
+    document.getElementById('replace-state-btn').addEventListener('click', () => {
+      const url = new URL('/spa/page-b', location.origin)
+      history.replaceState({ page: 'b' }, '', url)
+      showCurrentUrl()
+      logNav('replaceState → /spa/page-b')
+    })
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      history.back()
+      setTimeout(() => {
+        showCurrentUrl()
+        logNav('history.back → ' + location.pathname)
+      }, 50)
+    })
+
+    // ── Native button click feedback ──────────────────────────────
+    document.getElementById('native-button').addEventListener('click', function () {
+      this.classList.add('flash-active')
+      setTimeout(() => this.classList.remove('flash-active'), 300)
+    })
+
+    // ── Switch toggle ────────────────────────────────────────────
+    document.querySelectorAll('[role="switch"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const checked = el.getAttribute('aria-checked') === 'true'
+        el.setAttribute('aria-checked', String(!checked))
+      })
+    })
+
+    // ── Tab switching (Section 1: selector tabs) ─────────────────
+    const tabPanelContent = {
+      'tab-profile': 'View and edit your profile information.',
+      'tab-settings': 'Adjust your application settings and preferences.'
+    }
+    document.querySelectorAll('#expanded-selectors [role="tab"]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabBar = tab.closest('[role="tablist"]') || tab.parentElement
+        tabBar.querySelectorAll('[role="tab"]').forEach(t => {
+          t.setAttribute('aria-selected', 'false')
+        })
+        tab.setAttribute('aria-selected', 'true')
+        document.getElementById('tab-panel-content').textContent = tabPanelContent[tab.id] || ''
+      })
+    })
+
+    // ── Tree node expand/collapse ─────────────────────────────────
+    const treeNode = document.getElementById('tree-node')
+    const treeChildren = document.getElementById('tree-children')
+    treeNode.addEventListener('click', () => {
+      const expanded = treeNode.getAttribute('aria-expanded') === 'true'
+      treeNode.setAttribute('aria-expanded', String(!expanded))
+      treeNode.classList.toggle('open', !expanded)
+      treeChildren.classList.toggle('collapsed', expanded)
+      treeChildren.classList.toggle('expanded', !expanded)
+    })
+
+    // ── List option toggle ────────────────────────────────────────
+    const listOption = document.getElementById('list-option')
+    listOption.addEventListener('click', () => {
+      const selected = listOption.getAttribute('aria-selected') === 'true'
+      listOption.setAttribute('aria-selected', String(!selected))
+    })
+
+    // ── Menu item checkbox/radio toggle ───────────────────────────
+    document.querySelectorAll('[role="menuitemcheckbox"], [role="menuitemradio"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const checked = el.getAttribute('aria-checked') === 'true'
+        el.setAttribute('aria-checked', String(!checked))
+      })
+    })
+
+    // ── Tab switching (Section 5: metadata tabs) ──────────────────
+    const metaTabPanelContent = {
+      'account-tab': 'View and edit your account settings and preferences.',
+      'notifications-tab': 'Manage your notification preferences and alert settings.'
+    }
+    document.querySelectorAll('#action-metadata [role="tab"]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabBar = tab.closest('[role="tablist"]') || tab.parentElement
+        tabBar.querySelectorAll('[role="tab"]').forEach(t => {
+          t.setAttribute('aria-selected', 'false')
+        })
+        tab.setAttribute('aria-selected', 'true')
+        document.getElementById('meta-tab-panel-content').textContent = metaTabPanelContent[tab.id] || ''
+      })
+    })
+  </script>
+</body>
+</html>
