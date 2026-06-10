@@ -21,14 +21,33 @@ import { chunkReadableContent } from './page-content.js'
 /** Module-scoped page context version; incremented on navigation (pageshow). */
 let pageContextVersion = 1
 
-/** Register a pageshow listener to increment pageContextVersion on navigation. */
+/**
+ * Register a pageshow listener to increment pageContextVersion on navigation.
+ * Per ADR 0043: stores the listener on globalThis so re-injection can replace
+ * the previous one instead of accumulating duplicates.
+ */
 export function registerPageNavigationListener (): void {
   if (typeof window === 'undefined') {
     return
   }
-  window.addEventListener('pageshow', () => {
+
+  const globalRef = globalThis as Record<string, unknown>
+
+  const onPageShow = (): void => {
     pageContextVersion++
-  })
+  }
+
+  // Remove the previous injection's pageshow listener if it exists
+  const previousListener = globalRef.__brijioPageShowListener as
+    | (() => void)
+    | undefined
+  if (previousListener !== undefined) {
+    window.removeEventListener('pageshow', previousListener)
+  }
+
+  window.addEventListener('pageshow', onPageShow)
+  // Store reference so the next injection can remove this one
+  globalRef.__brijioPageShowListener = onPageShow
 }
 
 /** Get the current pageContextVersion (for testing and embedding in responses). */

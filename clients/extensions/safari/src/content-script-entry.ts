@@ -30,11 +30,12 @@ interface BrowserRuntimeApi {
 
 declare const browser: BrowserRuntimeApi | undefined
 
-// Per ADR 0041, register a pageshow listener so content-handler
-// increments pageContextVersion on back/forward navigation.
-registerPageNavigationListener()
-
 if (typeof browser !== 'undefined') {
+  // Per ADR 0041, register a pageshow listener so content-handler
+  // increments pageContextVersion on back/forward navigation.
+  // Per ADR 0043, this also replaces any previous injection's listener.
+  registerPageNavigationListener()
+
   // Per ADR 0043: When scripting.executeScript re-injects this script,
   // a new module scope is created with a fresh pageContextVersion.
   // We must remove the PREVIOUS injection's listener (stored on globalThis)
