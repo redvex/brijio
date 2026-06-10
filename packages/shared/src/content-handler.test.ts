@@ -612,6 +612,130 @@ void describe('content handler request handler', () => {
     })
   })
 
+  void it('returns target_disabled for aria-disabled action targets', () => {
+    const { document } = parseHTML(
+      '<main><div role="menuitem" aria-disabled="true">Greyed out</div><div role="tab">Active tab</div></main>'
+    )
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: false,
+      error: {
+        code: 'target_disabled',
+        message: 'The requested click target is disabled.'
+      }
+    })
+  })
+
+  void it('clicks expanded action types (role="menuitem", role="tab", summary)', () => {
+    const { document } = parseHTML(`
+      <main>
+        <div role="menuitem">Menu item</div>
+        <div role="tab">Settings</div>
+        <summary>Expand</summary>
+      </main>
+    `)
+    const clicked: string[] = []
+
+    document.querySelectorAll('[role="menuitem"], [role="tab"], summary').forEach((el) => {
+      el.addEventListener('click', () => {
+        clicked.push(el.textContent ?? '')
+      })
+    })
+
+    // Click the menuitem (bb-1)
+    const response1 = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response1.ok, true)
+
+    // Click the tab (bb-2)
+    const response2 = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-2'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response2.ok, true)
+
+    // Click the summary (bb-3)
+    const response3 = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-3'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response3.ok, true)
+    assert.deepEqual(clicked, ['Menu item', 'Settings', 'Expand'])
+  })
+
+  void it('returns observed.detailsOpen when clicking a summary inside details', () => {
+    const { document } = parseHTML(`
+      <main>
+        <details>
+          <summary>More info</summary>
+          <p>Details content here</p>
+        </details>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('summary')?.addEventListener('click', () => {
+      clicked = true
+      // Simulate browser toggling the open attribute
+      const details = document.querySelector('details')
+      if (details !== null) {
+        details.setAttribute('open', '')
+      }
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    assert.equal(response.data.observed?.detailsOpen, true)
+  })
+
   void it('returns target_not_found when no matching click target exists', () => {
     const { document } = parseHTML('<main><button>Save</button></main>')
     const response = handleContentRequest(

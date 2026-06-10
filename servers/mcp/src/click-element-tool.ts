@@ -18,6 +18,10 @@ export interface ClickElementInput {
 export type ClickElementResult = BrijioToolResult<{
   action: 'click'
   target: ClickElementTarget
+  observed?: {
+    navigationStarted?: boolean
+    detailsOpen?: boolean
+  }
 }>
 
 export async function clickElement (

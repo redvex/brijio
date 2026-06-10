@@ -15,7 +15,7 @@ import {
   type WriteTextActionResultData
 } from './protocol.js'
 
-import { extractPageContent, extractPageContext } from './page-context.js'
+import { extractPageContent, extractPageContext, ACTION_SELECTORS } from './page-context.js'
 import { chunkReadableContent } from './page-content.js'
 
 /** Module-scoped page context version; incremented on navigation (pageshow). */
@@ -670,7 +670,7 @@ function performClick (
     return staleError
   }
 
-  if (target.kind === 'action' && element.hasAttribute('disabled')) {
+  if (target.kind === 'action' && isActionDisabledForClick(element)) {
     return {
       ok: false,
       error: {
@@ -680,15 +680,28 @@ function performClick (
     }
   }
 
+  // Capture pre-click state for side-effect detection
+  const urlBefore = locationHref
+  const detailsBefore = getDetailsOpenState(element)
+
   try {
     const clickable = element as HTMLElement
     clickable.click()
+
+    // Detect observable side effects
+    const observed = detectClickSideEffects(
+      element,
+      urlBefore,
+      document,
+      detailsBefore
+    )
 
     return {
       ok: true,
       data: {
         action: 'click',
-        target
+        target,
+        ...(Object.keys(observed).length > 0 ? { observed } : {})
       }
     }
   } catch {
@@ -700,6 +713,54 @@ function performClick (
       }
     }
   }
+}
+
+function isActionDisabledForClick (element: Element): boolean {
+  return (
+    element.hasAttribute('disabled') ||
+    element.getAttribute('aria-disabled') === 'true'
+  )
+}
+
+function getDetailsOpenState (element: Element): boolean | null {
+  const details =
+    element.tagName.toLowerCase() === 'summary'
+      ? element.closest('details')
+      : null
+
+  if (details !== null) {
+    return details.hasAttribute('open')
+  }
+
+  return null
+}
+
+function detectClickSideEffects (
+  element: Element,
+  urlBefore: string,
+  document: Document,
+  detailsOpenBefore: boolean | null
+): Record<string, unknown> {
+  const observed: Record<string, unknown> = {}
+
+  // Detect navigation: compare document.URL after click
+  // Note: In browser environments, document.URL reflects the current page URL.
+  // In test environments (linkedom), document.URL may not update after click,
+  // so we compare against the locationHref that was passed in.
+  const urlAfter = document.URL ?? ''
+  if (urlAfter !== '' && urlAfter !== urlBefore) {
+    observed.navigationStarted = true
+  }
+
+  // Detect details disclosure toggle
+  if (detailsOpenBefore !== null) {
+    const details = element.closest('details')
+    if (details !== null) {
+      observed.detailsOpen = details.hasAttribute('open')
+    }
+  }
+
+  return observed
 }
 
 function findWriteTextTarget (
@@ -782,7 +843,7 @@ function findClickTarget (
   const selector =
     target.kind === 'link'
       ? 'a[href]'
-      : 'button, [role="button"], input[type="button"], input[type="submit"]'
+      : ACTION_SELECTORS
   const elements = Array.from(document.querySelectorAll(selector)).filter(
     isVisible
   )

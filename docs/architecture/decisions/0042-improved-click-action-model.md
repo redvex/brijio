@@ -1,9 +1,9 @@
-# ADR 0042: Improved Click/Action Model
+# 0042 — Improved click/action model
 
-**Status:** Proposed
-**Date:** 2026-06-10
-**Supersedes:** ADR 0012 (extension click actions), ADR 0013 (MCP click element tool)
-**Prerequisite:** ADR 0041 (reliable target identity and stale-target handling)
+- **Status:** Accepted
+  **Date:** 2026-06-10
+  **Supersedes:** ADR 0012 (extension click actions), ADR 0013 (MCP click element tool)
+  **Prerequisite:** ADR 0041 (reliable target identity and stale-target handling)
 
 ## Problem Context
 
@@ -11,31 +11,31 @@ Brijio's current action discovery surface is narrow. `read_current_page` returns
 
 ```ts
 // Current selector in extractActions()
-'button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"]'
+'button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"]';
 ```
 
 This misses many common interactive elements that real web apps rely on:
 
-| Element | Example | Currently discoverable? |
-|---|---|---|
-| `<button>` | Submit, Cancel | ✅ Yes |
-| `[role="button"]` | Custom button | ✅ Yes |
-| `input[type="submit"]` | Form submit | ✅ Yes |
-| Menu items (`[role="menuitem"]`) | Dropdown menu entries | ❌ No |
-| Tabs (`[role="tab"]`) | Tab bar controls | ❌ No |
-| Disclosure/summary (`<details>/<summary>`) | Expandable sections | ❌ No |
-| Tree items (`[role="treeitem"]`) | Sidebar navigation | ❌ No |
-| Links with click handlers but no `href` | SPA navigation anchors | ❌ No (only `a[href]` in `links`) |
-| Elements with `[role]` and visible click behavior | Custom widgets | ❌ No (partial) |
+| Element                                           | Example                | Currently discoverable?           |
+| ------------------------------------------------- | ---------------------- | --------------------------------- |
+| `<button>`                                        | Submit, Cancel         | ✅ Yes                            |
+| `[role="button"]`                                 | Custom button          | ✅ Yes                            |
+| `input[type="submit"]`                            | Form submit            | ✅ Yes                            |
+| Menu items (`[role="menuitem"]`)                  | Dropdown menu entries  | ❌ No                             |
+| Tabs (`[role="tab"]`)                             | Tab bar controls       | ❌ No                             |
+| Disclosure/summary (`<details>/<summary>`)        | Expandable sections    | ❌ No                             |
+| Tree items (`[role="treeitem"]`)                  | Sidebar navigation     | ❌ No                             |
+| Links with click handlers but no `href`           | SPA navigation anchors | ❌ No (only `a[href]` in `links`) |
+| Elements with `[role]` and visible click behavior | Custom widgets         | ❌ No (partial)                   |
 
 Additionally, the `PageAction` type provides minimal metadata:
 
 ```ts
 export interface PageAction {
-  id: string
-  role: string
-  name: string
-  enabled: boolean
+  id: string;
+  role: string;
+  name: string;
+  enabled: boolean;
 }
 ```
 
@@ -56,12 +56,12 @@ Replace the current narrow selector with a comprehensive list that covers common
 ```ts
 const ACTION_SELECTORS = [
   // Native interactive elements
-  'button',
+  "button",
   'input[type="button"]',
   'input[type="submit"]',
   'input[type="reset"]',
   'input[type="image"]',
-  'summary',
+  "summary",
 
   // ARIA role-based interactive elements
   '[role="button"]',
@@ -72,8 +72,8 @@ const ACTION_SELECTORS = [
   '[role="switch"]',
   '[role="treeitem"]',
   '[role="option"]',
-  '[role="link"]' // links without href — SPA navigation triggers
-].join(',')
+  '[role="link"]', // links without href — SPA navigation triggers
+].join(",");
 ```
 
 The `summary` element is included because it is the standard disclosure trigger for `<details>` — clicking `<summary>` toggles the open/closed state natively.
@@ -86,20 +86,21 @@ Extend the `PageAction` type in `protocol.ts`:
 
 ```ts
 export interface PageAction {
-  id: string
-  role: string
-  name: string
-  enabled: boolean
+  id: string;
+  role: string;
+  name: string;
+  enabled: boolean;
   /** Element type tag, e.g. 'button', 'summary', 'input' */
-  tagName?: string
+  tagName?: string;
   /** Accessible description beyond the name, from aria-describedby or title */
-  description?: string
+  description?: string;
   /** Whether the element is currently hidden (aria-hidden="true" or hidden attribute) */
-  hidden?: boolean
+  hidden?: boolean;
 }
 ```
 
 Fields:
+
 - **`tagName`**: The HTML tag name of the element (lowercase). Agents can use this to distinguish a `<summary>` (disclosure) from a `<button>` (action) from a `[role="tab"]` (tab control).
 - **`description`**: Additional accessible description from `aria-describedby` or `title` attribute. Provides context the `name` alone doesn't convey (e.g., a button named "Delete" might have a description "Remove this item from the list").
 - **`hidden`**: Whether the element has `aria-hidden="true"` or the HTML `hidden` attribute. Separated from `enabled` because hidden elements should be excluded from the actions list entirely (see section 3), but `hidden` is still useful for agents who receive stale context.
@@ -132,7 +133,7 @@ flowchart TD
 The `findClickTarget` function in `content-handler.ts` currently resolves `kind: "action"` targets against:
 
 ```ts
-'button, [role="button"], input[type="button"], input[type="submit"]'
+'button, [role="button"], input[type="button"], input[type="submit"]';
 ```
 
 This must be updated to use the same expanded selector list as `extractActions`. If the selectors diverge, an action that appears in `structure.actions` cannot be clicked, breaking the core contract.
@@ -145,15 +146,15 @@ When a click succeeds, the action result will include observable side-effect inf
 
 ```ts
 export interface ClickActionResultData extends ActionResultData {
-  action: 'click'
-  target: ClickActionTarget
+  action: "click";
+  target: ClickActionTarget;
   /** What was detectable about the page after the click */
   observed?: {
     /** Whether a navigation appears to have started (URL changed) */
-    navigationStarted?: boolean
+    navigationStarted?: boolean;
     /** If a disclosure/summary was clicked, its new open state */
-    detailsOpen?: boolean
-  }
+    detailsOpen?: boolean;
+  };
 }
 ```
 
@@ -174,13 +175,13 @@ The P1.3 ticket says "Add double-click only if there is a clear product need; de
 
 ```ts
 export interface PageAction {
-  id: string
-  role: string
-  name: string
-  enabled: boolean
-  tagName?: string
-  description?: string
-  hidden?: boolean
+  id: string;
+  role: string;
+  name: string;
+  enabled: boolean;
+  tagName?: string;
+  description?: string;
+  hidden?: boolean;
 }
 ```
 
@@ -190,12 +191,12 @@ The existing `ActionResultData` for clicks becomes:
 
 ```ts
 export interface ActionResultData {
-  action: 'click'
-  target: ClickActionTarget
+  action: "click";
+  target: ClickActionTarget;
   observed?: {
-    navigationStarted?: boolean
-    detailsOpen?: boolean
-  }
+    navigationStarted?: boolean;
+    detailsOpen?: boolean;
+  };
 }
 ```
 

@@ -169,20 +169,107 @@ function extractFormControls (form: Element): PageFormControl[] {
     })
 }
 
+export const ACTION_SELECTORS = [
+  // Native interactive elements
+  'button',
+  'input[type="button"]',
+  'input[type="submit"]',
+  'input[type="reset"]',
+  'input[type="image"]',
+  'summary',
+
+  // ARIA role-based interactive elements
+  '[role="button"]',
+  '[role="menuitem"]',
+  '[role="menuitemcheckbox"]',
+  '[role="menuitemradio"]',
+  '[role="tab"]',
+  '[role="switch"]',
+  '[role="treeitem"]',
+  '[role="option"]',
+  '[role="link"]'
+].join(',')
+
 function extractActions (document: Document): PageAction[] {
   return Array.from(
-    document.querySelectorAll(
-      'button, [role="button"], input[type="button"], input[type="submit"], input[type="reset"]'
-    )
+    document.querySelectorAll(ACTION_SELECTORS)
   )
     .filter(isVisible)
+    .filter((element) => !isActionDisabled(element))
+    .filter((element) => !isActionHidden(element))
     .map((element, index) => ({
       id: createId(index + 1),
-      role: element.getAttribute('role') ?? 'button',
+      role: getActionRole(element),
       name: getAccessibleName(element),
-      enabled: !element.hasAttribute('disabled')
+      enabled: true,
+      tagName: element.tagName.toLowerCase(),
+      description: getActionDescription(element)
     }))
     .filter((action) => action.name !== '')
+}
+
+function isActionDisabled (element: Element): boolean {
+  return (
+    element.hasAttribute('disabled') ||
+    element.getAttribute('aria-disabled') === 'true'
+  )
+}
+
+function isActionHidden (element: Element): boolean {
+  return (
+    element.getAttribute('aria-hidden') === 'true' ||
+    element.hasAttribute('hidden')
+  )
+}
+
+function getActionRole (element: Element): string {
+  const explicitRole = element.getAttribute('role')
+  if (explicitRole !== null && explicitRole !== '') {
+    return explicitRole
+  }
+
+  const tag = element.tagName.toLowerCase()
+  if (tag === 'button') return 'button'
+  if (tag === 'summary') return 'button'
+  if (tag === 'input') {
+    const type = (element.getAttribute('type') ?? 'text').toLowerCase()
+    if (type === 'button' || type === 'submit' || type === 'reset' || type === 'image') {
+      return 'button'
+    }
+  }
+
+  return ''
+}
+
+function getActionDescription (element: Element): string | undefined {
+  // Try aria-describedby
+  const describedBy = element.getAttribute('aria-describedby')
+  if (describedBy !== null && describedBy.trim() !== '') {
+    const ids = describedBy.trim().split(/\s+/u)
+    const descriptions = ids
+      .map((id) => element.ownerDocument?.getElementById(id))
+      .filter(
+        (el): el is HTMLElement => el != null
+      )
+      .map((el) => normalizeText(el.textContent ?? ''))
+      .filter((text) => text !== '')
+      .join(' ')
+
+    if (descriptions !== '') {
+      return descriptions
+    }
+  }
+
+  // Try title (but not if it's already the accessible name source)
+  const title = element.getAttribute('title')
+  if (title !== null && title.trim() !== '') {
+    const name = getAccessibleName(element)
+    if (normalizeText(title) !== name) {
+      return normalizeText(title)
+    }
+  }
+
+  return undefined
 }
 
 function extractEditables (document: Document): PageEditable[] {
