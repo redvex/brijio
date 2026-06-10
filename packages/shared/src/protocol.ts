@@ -221,9 +221,17 @@ export interface PageAction {
   role: string
   name: string
   enabled: boolean
+  /** Element type tag, e.g. 'button', 'summary', 'input' */
+  tagName?: string
+  /** Accessible description beyond the name, from aria-describedby or title */
+  description?: string
+  /** Whether the element has aria-hidden="true" or the hidden attribute */
+  hidden?: boolean
 }
 
 export interface PageContext {
+  /** Content script version for diagnostics (identifies ACTION_SELECTORS shape) */
+  _csVersion?: number
   pageContextId?: number
   url: string
   title: string
@@ -328,9 +336,18 @@ export interface PageContentErrorResponse {
   }
 }
 
+export interface ClickObserved {
+  /** Whether a navigation appears to have started (URL changed) */
+  navigationStarted?: boolean
+  /** If a disclosure/summary was clicked, its new open state */
+  detailsOpen?: boolean
+}
+
 export interface ActionResultData {
   action: 'click'
   target: ClickActionTarget
+  /** What was detectable about the page after the click */
+  observed?: ClickObserved
 }
 
 export interface WriteTextActionResultData {

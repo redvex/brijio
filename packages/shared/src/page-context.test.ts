@@ -119,6 +119,154 @@ void describe('page context extraction', () => {
     assert.equal(nav?.name, 'On this page')
   })
 
+  void it('extracts expanded action types beyond basic buttons', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>Click me</button>
+        <div role="menuitem">Menu item</div>
+        <div role="tab">Settings</div>
+        <div role="switch">Dark mode</div>
+        <div role="treeitem">Node A</div>
+        <div role="option">Choice 1</div>
+        <summary>Show details</summary>
+        <div role="menuitemcheckbox">Toggle item</div>
+        <div role="menuitemradio">Radio item</div>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/page',
+      title: 'Actions',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    const actions = context.structure.actions
+    assert.equal(actions.length, 9)
+    assert.equal(actions[0].name, 'Click me')
+    assert.equal(actions[0].tagName, 'button')
+    assert.equal(actions[0].role, 'button')
+    assert.equal(actions[1].name, 'Menu item')
+    assert.equal(actions[1].tagName, 'div')
+    assert.equal(actions[1].role, 'menuitem')
+    assert.equal(actions[2].name, 'Settings')
+    assert.equal(actions[2].role, 'tab')
+    assert.equal(actions[3].name, 'Dark mode')
+    assert.equal(actions[3].role, 'switch')
+    assert.equal(actions[4].name, 'Node A')
+    assert.equal(actions[4].role, 'treeitem')
+    assert.equal(actions[5].name, 'Choice 1')
+    assert.equal(actions[5].role, 'option')
+    assert.equal(actions[6].name, 'Show details')
+    assert.equal(actions[6].tagName, 'summary')
+    assert.equal(actions[7].name, 'Toggle item')
+    assert.equal(actions[7].role, 'menuitemcheckbox')
+    assert.equal(actions[8].name, 'Radio item')
+    assert.equal(actions[8].role, 'menuitemradio')
+  })
+
+  void it('excludes disabled and aria-disabled actions from actions list', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>Active</button>
+        <button disabled>Disabled button</button>
+        <div role="menuitem" aria-disabled="true">Greyed out</div>
+        <div role="tab">Available tab</div>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/page',
+      title: 'Actions',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    const actions = context.structure.actions
+    assert.equal(actions.length, 2)
+    assert.equal(actions[0].name, 'Active')
+    assert.equal(actions[0].enabled, true)
+    assert.equal(actions[1].name, 'Available tab')
+  })
+
+  void it('excludes hidden and aria-hidden actions from actions list', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>Visible</button>
+        <button hidden>Hidden button</button>
+        <div role="menuitem" aria-hidden="true">Invisible item</div>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/page',
+      title: 'Actions',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    const actions = context.structure.actions
+    assert.equal(actions.length, 1)
+    assert.equal(actions[0].name, 'Visible')
+  })
+
+  void it('includes tagName and description in PageAction metadata', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button aria-label="Save" title="Saves your current work">Save</button>
+        <div role="tab" aria-describedby="tab-desc" aria-label="Profile">Profile tab</div>
+        <p id="tab-desc">View and edit your profile settings</p>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/page',
+      title: 'Actions',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    const actions = context.structure.actions
+    assert.equal(actions[0].tagName, 'button')
+    assert.equal(actions[0].description, 'Saves your current work')
+    assert.equal(actions[0].name, 'Save')
+    assert.equal(actions[1].tagName, 'div')
+    assert.equal(actions[1].description, 'View and edit your profile settings')
+  })
+
+  void it('does not duplicate title as description when title matches name', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button title="Save">Save</button>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/page',
+      title: 'Actions',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    const actions = context.structure.actions
+    assert.equal(actions[0].description, undefined)
+  })
+
   void it('extracts form action metadata for supported form control actions', () => {
     const { document } = parseHTML(`
       <main>
