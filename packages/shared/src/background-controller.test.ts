@@ -933,6 +933,159 @@ void describe('Brijio background controller', () => {
     })
   })
 
+  // --- perform_batch ---
+
+  void it('responds to perform_batch with a batch result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787'
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'batch-1',
+        payload: {
+          type: 'perform_batch',
+          actions: [
+            { type: 'click', target: { kind: 'link', id: 'bb-1' } },
+            { type: 'write_text', target: { formId: 'bb-2', controlId: 'bb-3' }, text: 'hello' }
+          ]
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'batch-1',
+      payload: {
+        type: 'batch_result',
+        ok: true,
+        results: [
+          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } },
+          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } }
+        ],
+        aborted: false
+      }
+    })
+  })
+
+  void it('responds to perform_batch with partial failure result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      batchResult: {
+        ok: false,
+        results: [
+          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } },
+          { ok: false, error: { code: 'target_not_found', message: 'Target not found', aborted: false } }
+        ],
+        aborted: false
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'batch-2',
+        payload: {
+          type: 'perform_batch',
+          actions: [
+            { type: 'click', target: { kind: 'link', id: 'bb-1' } },
+            { type: 'click', target: { kind: 'link', id: 'bb-missing' } }
+          ],
+          continueOnError: true
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'batch-2',
+      payload: {
+        type: 'batch_result',
+        ok: false,
+        results: [
+          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } },
+          { ok: false, error: { code: 'target_not_found', message: 'Target not found', aborted: false } }
+        ],
+        aborted: false
+      }
+    })
+  })
+
+  void it('responds to perform_batch with aborted result', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      batchResult: {
+        ok: false,
+        results: [
+          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } }
+        ],
+        aborted: true
+      }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'batch-3',
+        payload: {
+          type: 'perform_batch',
+          actions: [
+            { type: 'click', target: { kind: 'link', id: 'bb-1' } },
+            { type: 'click', target: { kind: 'link', id: 'bb-2' } }
+          ]
+        }
+      })
+    )
+
+    const sent = parseLastSent(harness) as { payload: { type: string, ok: boolean, results: unknown[], aborted: boolean } }
+    assert.equal(sent.payload.type, 'batch_result')
+    assert.equal(sent.payload.ok, false)
+    assert.equal(sent.payload.results.length, 1)
+    assert.equal(sent.payload.aborted, true)
+  })
+
+  void it('returns batch_error when performBatch throws', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      batchError: { code: 'batch_failed', message: 'Something went wrong' }
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'batch-4',
+        payload: {
+          type: 'perform_batch',
+          actions: [
+            { type: 'click', target: { kind: 'link', id: 'bb-1' } }
+          ]
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'batch-4',
+      payload: {
+        type: 'batch_result',
+        ok: false,
+        error: {
+          code: 'batch_failed',
+          message: 'Something went wrong'
+        }
+      }
+    })
+  })
+
   void it('transitions to reconnecting when a socket error is followed by close', async () => {
     const harness = createHarness({ websocketUrl: 'ws://127.0.0.1:8787' })
 
@@ -1384,6 +1537,8 @@ interface HarnessOptions {
     message: string
   }
   navigateThrowsError?: boolean
+  batchResult?: BatchResult
+  batchError?: { code: string, message: string }
 }
 
 interface Harness {
@@ -1405,7 +1560,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const action = new FakeActionAdapter()
   const pageReader = new FakePageReaderAdapter(options)
   const pageActions = new FakePageActionAdapter(options)
-  const pageBatch = new FakePageBatchAdapter()
+  const pageBatch = new FakePageBatchAdapter(options)
   const pageNavigation = new FakePageNavigationAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
@@ -1543,14 +1698,23 @@ class FakePageActionAdapter implements PageActionAdapter {
 }
 
 class FakePageBatchAdapter implements PageBatchAdapter {
-  async performBatch (_message: ContentBatchRequest): Promise<BatchResult> {
+  constructor (private readonly options: HarnessOptions = {}) {}
+
+  async performBatch (message: ContentBatchRequest): Promise<BatchResult> {
+    if (this.options.batchError !== undefined) {
+      throw new Error(this.options.batchError.message)
+    }
+
+    if (this.options.batchResult !== undefined) {
+      return this.options.batchResult
+    }
+
     // Default fake implementation: return success for all actions
-    const results: BatchResultEntry[] = _message.actions.map(() => ({
+    const results: BatchResultEntry[] = message.actions.map(() => ({
       ok: true as const,
       data: {
         action: 'click' as const,
-        target: { kind: 'link' as const, id: 'bb-1' },
-        changed: false
+        target: { kind: 'link' as const, id: 'bb-1' }
       } as ActionResultData
     }))
     return { ok: true, results, aborted: false }

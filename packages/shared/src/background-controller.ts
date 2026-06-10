@@ -571,10 +571,19 @@ export class BrijioBackgroundController {
       ...(payload.readAfterActions !== undefined ? { readAfterActions: payload.readAfterActions } : {})
     }
 
-    const result = await this.options.pageBatch.performBatch(batchMessage)
+    let result: BatchResult
+    try {
+      result = await this.options.pageBatch.performBatch(batchMessage)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unexpected batch error.'
+      this.socket?.send(
+        JSON.stringify(createBatchResultErrorResponse(requestId, 'batch_failed', message))
+      )
+      return
+    }
 
     this.socket?.send(
-      JSON.stringify(createBatchResultResponse(requestId, result.results))
+      JSON.stringify(createBatchResultResponse(requestId, result.results, result.aborted, result.ok))
     )
   }
 

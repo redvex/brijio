@@ -355,7 +355,8 @@ void describe('batch request protocol', () => {
           results: [
             { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } },
             { ok: true, data: { action: 'write_text', target: { formId: 'bb-1', controlId: 'bb-2' }, textLength: 5 } }
-          ]
+          ],
+          aborted: false
         }
       })
     })
