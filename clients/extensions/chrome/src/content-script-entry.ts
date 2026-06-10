@@ -23,24 +23,32 @@ interface ChromeRuntimeApi {
 
 declare const chrome: ChromeRuntimeApi | undefined
 
-// Per ADR 0041, register a pageshow listener so content-handler
-// increments pageContextVersion on back/forward navigation.
-registerPageNavigationListener()
+// Guard against duplicate injection: if this script is injected again
+// (e.g. by scripting.executeScript), skip re-registering listeners.
+// The window property is set on first injection and persists across
+// re-injections because the page context is the same.
+if ((globalThis as Record<string, unknown>).__brijioContentLoaded !== true) {
+  ;(globalThis as Record<string, unknown>).__brijioContentLoaded = true
 
-if (typeof chrome !== 'undefined') {
-  chrome.runtime.onMessage.addListener(
-    (message: ContentRequest, _sender: unknown, sendResponse: SendResponse): boolean => {
-      sendResponse(
-        handleContentRequest(message, {
-          document: globalThis.document,
-          locationHref: globalThis.location.href,
-          title: globalThis.document.title,
-          selectedText: globalThis.getSelection?.()?.toString() ?? '',
-          now: () => new Date().toISOString()
-        })
-      )
+  // Per ADR 0041, register a pageshow listener so content-handler
+  // increments pageContextVersion on back/forward navigation.
+  registerPageNavigationListener()
 
-      return false
-    }
-  )
+  if (typeof chrome !== 'undefined') {
+    chrome.runtime.onMessage.addListener(
+      (message: ContentRequest, _sender: unknown, sendResponse: SendResponse): boolean => {
+        sendResponse(
+          handleContentRequest(message, {
+            document: globalThis.document,
+            locationHref: globalThis.location.href,
+            title: globalThis.document.title,
+            selectedText: globalThis.getSelection?.()?.toString() ?? '',
+            now: () => new Date().toISOString()
+          })
+        )
+
+        return false
+      }
+    )
+  }
 }

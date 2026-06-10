@@ -107,8 +107,10 @@ export async function readActiveTabPage<T> (
     })
 
     const response = await deps.tabs.sendMessage(activeTab.id, message)
+    console.log('[brijio] readActiveTabPage sendMessage response:', JSON.stringify(response))
 
     if (!isContentResponse(response)) {
+      console.log('[brijio] readActiveTabPage response failed isContentResponse check, response type:', typeof response, 'value:', response)
       return contentScriptUnavailable<T>()
     }
 
@@ -126,7 +128,8 @@ export async function readActiveTabPage<T> (
         message: response.error.message
       }
     }
-  } catch {
+  } catch (err) {
+    console.log('[brijio] readActiveTabPage caught error:', err)
     if (
       deps.onCatchPermissionCheck !== undefined &&
       !(await deps.onCatchPermissionCheck())
@@ -177,8 +180,10 @@ export async function performActiveTabAction (
     })
 
     const response = await deps.tabs.sendMessage(activeTab.id, message)
+    console.log('[brijio] performActiveTabAction sendMessage response:', JSON.stringify(response))
 
     if (!isContentResponse(response)) {
+      console.log('[brijio] performActiveTabAction response failed isContentResponse, type:', typeof response, 'value:', response)
       return actionContentScriptUnavailable()
     }
 
@@ -201,7 +206,8 @@ export async function performActiveTabAction (
         message: response.error.message
       }
     }
-  } catch {
+  } catch (err) {
+    console.log('[brijio] performActiveTabAction caught error:', err)
     if (
       deps.onCatchPermissionCheck !== undefined &&
       !(await deps.onCatchPermissionCheck())
