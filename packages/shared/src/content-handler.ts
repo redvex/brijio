@@ -15,20 +15,42 @@ import {
   type WriteTextActionResultData
 } from './protocol.js'
 
-import { extractPageContent, extractPageContext } from './page-context.js'
+import { extractPageContent, extractPageContext, ACTION_SELECTORS } from './page-context.js'
 import { chunkReadableContent } from './page-content.js'
+
+/** Content script version — incremented when ACTION_SELECTORS or response shape changes. */
+export const CONTENT_SCRIPT_VERSION = 2
 
 /** Module-scoped page context version; incremented on navigation (pageshow). */
 let pageContextVersion = 1
 
-/** Register a pageshow listener to increment pageContextVersion on navigation. */
+/**
+ * Register a pageshow listener to increment pageContextVersion on navigation.
+ * Per ADR 0043: stores the listener on globalThis so re-injection can replace
+ * the previous one instead of accumulating duplicates.
+ */
 export function registerPageNavigationListener (): void {
   if (typeof window === 'undefined') {
     return
   }
-  window.addEventListener('pageshow', () => {
+
+  const globalRef = globalThis as Record<string, unknown>
+
+  const onPageShow = (): void => {
     pageContextVersion++
-  })
+  }
+
+  // Remove the previous injection's pageshow listener if it exists
+  const previousListener = globalRef.__brijioPageShowListener as
+    | (() => void)
+    | undefined
+  if (previousListener !== undefined) {
+    window.removeEventListener('pageshow', previousListener)
+  }
+
+  window.addEventListener('pageshow', onPageShow)
+  // Store reference so the next injection can remove this one
+  globalRef.__brijioPageShowListener = onPageShow
 }
 
 /** Get the current pageContextVersion (for testing and embedding in responses). */
@@ -130,6 +152,7 @@ export function handleContentRequest (
         ok: true,
         data: {
           ...context,
+          _csVersion: CONTENT_SCRIPT_VERSION,
           pageContextId: pageContextVersion
         }
       }
@@ -670,7 +693,7 @@ function performClick (
     return staleError
   }
 
-  if (target.kind === 'action' && element.hasAttribute('disabled')) {
+  if (target.kind === 'action' && isActionDisabledForClick(element)) {
     return {
       ok: false,
       error: {
@@ -680,15 +703,28 @@ function performClick (
     }
   }
 
+  // Capture pre-click state for side-effect detection
+  const urlBefore = locationHref
+  const detailsBefore = getDetailsOpenState(element)
+
   try {
     const clickable = element as HTMLElement
     clickable.click()
+
+    // Detect observable side effects
+    const observed = detectClickSideEffects(
+      element,
+      urlBefore,
+      document,
+      detailsBefore
+    )
 
     return {
       ok: true,
       data: {
         action: 'click',
-        target
+        target,
+        ...(Object.keys(observed).length > 0 ? { observed } : {})
       }
     }
   } catch {
@@ -700,6 +736,69 @@ function performClick (
       }
     }
   }
+}
+
+function isActionDisabledForClick (element: Element): boolean {
+  return (
+    element.hasAttribute('disabled') ||
+    element.getAttribute('aria-disabled') === 'true'
+  )
+}
+
+function getDetailsOpenState (element: Element): boolean | null {
+  const details =
+    element.tagName.toLowerCase() === 'summary'
+      ? element.closest('details')
+      : null
+
+  if (details !== null) {
+    return details.hasAttribute('open')
+  }
+
+  return null
+}
+
+function detectClickSideEffects (
+  element: Element,
+  urlBefore: string,
+  document: Document,
+  detailsOpenBefore: boolean | null
+): Record<string, unknown> {
+  const observed: Record<string, unknown> = {}
+
+  // Detect navigation: compare current URL after click.
+  // For SPA navigations (pushState/replaceState), window.location.href updates
+  // synchronously. For full-page navigations, the content script may not survive
+  // to observe the change — the extension's pageshow listener handles that.
+  // We check document.URL (DOM) first, then fall back to the window's location
+  // if available (browser environment).
+  const urlAfter = getWindowLocationHref(document) ?? document.URL ?? ''
+  if (urlAfter !== '' && urlAfter !== urlBefore) {
+    observed.navigationStarted = true
+  }
+
+  // Detect details disclosure toggle
+  if (detailsOpenBefore !== null) {
+    const details = element.closest('details')
+    if (details !== null) {
+      observed.detailsOpen = details.hasAttribute('open')
+    }
+  }
+
+  return observed
+}
+
+function getWindowLocationHref (document: Document): string | null {
+  try {
+    const href = (document.defaultView as { location?: { href?: string } } | null)?.location?.href
+    if (typeof href === 'string' && href !== '' && href !== 'about:blank') {
+      return href
+    }
+  } catch {
+    // Cross-origin access to window.location may throw; fall back to document.URL
+  }
+
+  return null
 }
 
 function findWriteTextTarget (
@@ -782,10 +881,12 @@ function findClickTarget (
   const selector =
     target.kind === 'link'
       ? 'a[href]'
-      : 'button, [role="button"], input[type="button"], input[type="submit"]'
-  const elements = Array.from(document.querySelectorAll(selector)).filter(
-    isVisible
-  )
+      : ACTION_SELECTORS
+  const elements = Array.from(document.querySelectorAll(selector))
+    .filter(isVisible)
+    .filter((element) =>
+      target.kind === 'link' || !isActionDisabledForClick(element)
+    )
 
   return elements[index - 1] ?? null
 }
@@ -803,11 +904,12 @@ function validateClickTarget (
 
   // Validate expectedText: case-insensitive substring match
   if (target.expectedText !== undefined && target.expectedText !== '') {
-    const visibleText = getElementVisibleText(element).toLowerCase()
+    const foundText = getClickTargetText(element)
+    const visibleText = foundText.toLowerCase()
     const expected = target.expectedText.toLowerCase()
 
     detail.expectedText = target.expectedText
-    detail.foundText = getElementVisibleText(element)
+    detail.foundText = foundText
 
     if (!visibleText.includes(expected)) {
       parts.push(
@@ -883,6 +985,62 @@ function getElementVisibleText (element: Element): string {
   }
 
   return (element.textContent ?? '').trim()
+}
+
+function getClickTargetText (element: Element): string {
+  const accessibleName = getElementAccessibleName(element)
+
+  if (accessibleName !== '') {
+    return accessibleName
+  }
+
+  return getElementVisibleText(element)
+}
+
+function getElementAccessibleName (element: Element): string {
+  const ariaLabel = element.getAttribute('aria-label')
+
+  if (ariaLabel !== null && ariaLabel.trim() !== '') {
+    return normalizeText(ariaLabel)
+  }
+
+  const labelledBy = element.getAttribute('aria-labelledby')
+
+  if (labelledBy !== null && labelledBy.trim() !== '') {
+    const label = labelledBy
+      .split(/\s+/u)
+      .map((id) => element.ownerDocument?.getElementById(id))
+      .filter((labelElement): labelElement is HTMLElement => labelElement != null)
+      .map(getElementVisibleText)
+      .filter((text) => text !== '')
+      .join(' ')
+
+    if (label !== '') {
+      return normalizeText(label)
+    }
+  }
+
+  if (element.tagName.toLowerCase() === 'input') {
+    const value = element.getAttribute('value')
+
+    if (value !== null && value.trim() !== '') {
+      return normalizeText(value)
+    }
+  }
+
+  const alt = element.getAttribute('alt')
+
+  if (alt !== null && alt.trim() !== '') {
+    return normalizeText(alt)
+  }
+
+  const title = element.getAttribute('title')
+
+  if (title !== null && title.trim() !== '') {
+    return normalizeText(title)
+  }
+
+  return ''
 }
 
 /** Get the visible label for a form control element. */
@@ -1068,10 +1226,11 @@ function getImplicitRole (element: Element): string {
   const tag = element.tagName.toLowerCase()
 
   if (tag === 'button') return 'button'
+  if (tag === 'summary') return 'button'
   if (tag === 'a' && element.hasAttribute('href')) return 'link'
   if (tag === 'input') {
     const type = (element.getAttribute('type') ?? 'text').toLowerCase()
-    if (type === 'button' || type === 'submit' || type === 'reset') { return 'button' }
+    if (type === 'button' || type === 'submit' || type === 'reset' || type === 'image') { return 'button' }
     if (type === 'checkbox') return 'checkbox'
     if (type === 'radio') return 'radio'
   }
@@ -1169,6 +1328,10 @@ function parseTargetId (id: string): number | null {
   const index = Number(match[1])
 
   return Number.isInteger(index) && index >= 1 ? index : null
+}
+
+function normalizeText (value: string): string {
+  return value.replace(/\s+/gu, ' ').trim()
 }
 
 function isVisible (element: Element): boolean {
