@@ -174,7 +174,7 @@ void describe('MCP batch result protocol helpers', () => {
 
       const result = parseBatchResultEnvelope(JSON.parse(raw), 'batch-5')
       assert.equal(result.ok, false)
-      if (!result.ok && !('ignored' in result)) {
+      if (!result.ok && 'error' in result) {
         assert.equal(result.error.code, 'invalid_response')
       }
     })
@@ -227,7 +227,7 @@ void describe('MCP batch result protocol helpers', () => {
     void it('returns invalid for non-envelope values', () => {
       const result = parseBatchResultEnvelope('not an envelope', 'batch-1')
       assert.equal(result.ok, false)
-      if (!result.ok && !('ignored' in result) && !('data' in result)) {
+      if (!result.ok && 'error' in result) {
         assert.equal(result.error.code, 'invalid_response')
       }
     })
