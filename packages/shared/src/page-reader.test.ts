@@ -179,6 +179,20 @@ void describe('page-reader', () => {
         assert.strictEqual(result.error.code, 'no_active_tab')
       }
     })
+
+    void it('returns content_script_unavailable when sendMessage returns undefined', async () => {
+      const deps = makeDeps({
+        tabs: {
+          query: async () => [{ id: 1, url: 'https://example.com' }],
+          sendMessage: async () => undefined
+        }
+      })
+      const result = await readActiveTabPage(extractContext, deps)
+      assert.strictEqual(result.ok, false)
+      if (!result.ok) {
+        assert.strictEqual(result.error.code, 'content_script_unavailable')
+      }
+    })
   })
 
   void describe('performActiveTabAction', () => {

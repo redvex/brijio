@@ -101,6 +101,10 @@ export async function readActiveTabPage<T> (
   }
 
   try {
+    // Per ADR 0043: call executeScript first to ensure the latest content
+    // script is loaded. The content-script-entry.ts listener replacement
+    // mechanism (globalThis.__brijioOnMessageListener) prevents duplicate
+    // listeners when re-injecting.
     await deps.scripting.executeScript({
       target: { tabId: activeTab.id },
       files: ['content.js']
@@ -126,7 +130,7 @@ export async function readActiveTabPage<T> (
         message: response.error.message
       }
     }
-  } catch {
+  } catch (err) {
     if (
       deps.onCatchPermissionCheck !== undefined &&
       !(await deps.onCatchPermissionCheck())
@@ -171,6 +175,10 @@ export async function performActiveTabAction (
   }
 
   try {
+    // Per ADR 0043: call executeScript first to ensure the latest content
+    // script is loaded. The content-script-entry.ts listener replacement
+    // mechanism (globalThis.__brijioOnMessageListener) prevents duplicate
+    // listeners when re-injecting.
     await deps.scripting.executeScript({
       target: { tabId: activeTab.id },
       files: ['content.js']
@@ -201,7 +209,7 @@ export async function performActiveTabAction (
         message: response.error.message
       }
     }
-  } catch {
+  } catch (err) {
     if (
       deps.onCatchPermissionCheck !== undefined &&
       !(await deps.onCatchPermissionCheck())
