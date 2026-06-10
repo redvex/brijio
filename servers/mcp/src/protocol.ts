@@ -175,6 +175,7 @@ export type BrijioErrorCode =
   | 'timeout'
   | 'invalid_response'
   | 'browser_error'
+  | 'batch_failed'
   | 'stale_context'
   | 'page_navigated'
   | 'invalid_resource_uri'
@@ -296,6 +297,7 @@ export type BatchResultEntry = BatchActionOutcome | BatchReadOutcome
 export interface BrijioBatchResult {
   ok: boolean
   results: BatchResultEntry[]
+  aborted: boolean
 }
 
 export type BrijioBatchResultParseResult =
@@ -570,16 +572,18 @@ export function parseBatchResultEnvelope (
     }
   }
 
+  const aborted = value.payload.aborted === true
+
   if (results.every(entry => entry.ok)) {
     return {
       ok: true,
-      data: { ok: true, results }
+      data: { ok: true, results, aborted }
     }
   }
 
   return {
     ok: false,
-    data: { ok: false, results }
+    data: { ok: false, results, aborted }
   }
 }
 
@@ -1193,6 +1197,7 @@ function isBrijioErrorCode (
     value === 'timeout' ||
     value === 'invalid_response' ||
     value === 'browser_error' ||
+    value === 'batch_failed' ||
     value === 'stale_context' ||
     value === 'page_navigated' ||
     value === 'invalid_resource_uri' ||
