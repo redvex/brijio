@@ -47,6 +47,7 @@ Capabilities are intentionally constrained to align with these principles.
 | `set_checked`     | Set the checked state for a checkbox or select a radio option                  | ✅ Implemented | ✅     | ✅     | 📋 Planned | Cannot uncheck a radio button — select a different option instead.                                                                            |
 | `select_options`  | Select option values in a visible select control from the current browser page | ✅ Implemented | ✅     | ✅     | 📋 Planned | Supports both single-select and multi-select controls.                                                                                        |
 | `submit_form`     | Submit a visible form from the current browser page                            | ✅ Implemented | ✅     | ✅     | 📋 Planned | Submits with browser validation. Targets form by short-lived `formId`.                                                                        |
+| `perform_batch`   | Execute multiple explicit browser actions in one request                       | ✅ Implemented | ✅     | ✅     | 📋 Planned | Supports click, write text, checked state, select options, and form submit actions with per-action results.                                    |
 
 ---
 
@@ -104,8 +105,25 @@ Brijio ships skill markdown files that guide agents through common workflows. Sk
 | Checkbox and radio control                                                       | ✅     | ✅     | 📋 Planned |
 | Select options (single and multi)                                                | ✅     | ✅     | 📋 Planned |
 | Form submission with browser validation                                          | ✅     | ✅     | 📋 Planned |
+| Batched actions                                                                  | ✅     | ✅     | 📋 Planned |
 
 Firefox is not yet implemented.
+
+## Batched Actions
+
+Supported:
+
+- up to 20 explicit browser actions in one request
+- per-action results, including partial failures
+- `continueOnError` for recoverable element errors
+- top-level `aborted` reporting when navigation stops remaining actions
+- optional trailing page read via `readAfterActions`
+
+Constraints:
+
+- reads are not arbitrary batch steps; `readAfterActions` is the only read in the MVP
+- batches remain explicit tool calls, not background automation
+- page navigation aborts remaining actions so agents can re-read before retrying
 
 ---
 
@@ -135,6 +153,8 @@ Firefox is not yet implemented.
 | `page_context_response` | Extension → Server | ✅ Implemented | Return structured page data.                               |
 | `perform_action`        | Server → Extension | ✅ Implemented | Request a DOM action (click, fill, check, select, submit). |
 | `action_result`         | Extension → Server | ✅ Implemented | Return the result of a performed action.                   |
+| `perform_batch`         | Server → Extension | ✅ Implemented | Request a sequential batch of explicit DOM actions.        |
+| `batch_result`          | Extension → Server | ✅ Implemented | Return per-action results for a performed batch.           |
 | `error`                 | Either             | ✅ Implemented | Structured error response with code and message.           |
 | `extension_keepalive`   | Extension → Server | ✅ Implemented | Sent every 20 seconds; contains no browser state.          |
 

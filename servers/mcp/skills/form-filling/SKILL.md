@@ -72,6 +72,44 @@ Fill fields in a logical order (top-to-bottom) using the appropriate tool:
 | Select (single)     | `select_options(formId, controlId, [value])`  | Pass one value                             |
 | Select (multiple)   | `select_options(formId, controlId, [v1, v2])` | Pass multiple values                       |
 
+For several fields on the same stable page, prefer `perform_batch` over many
+individual tool calls once you have read the page and matched all target IDs.
+Keep batches small and same-page:
+
+```json
+{
+  "actions": [
+    {
+      "type": "write_text",
+      "target": { "formId": "f1", "controlId": "c1" },
+      "text": "John"
+    },
+    {
+      "type": "write_text",
+      "target": { "formId": "f1", "controlId": "c2" },
+      "text": "Smith"
+    },
+    {
+      "type": "select_options",
+      "target": { "formId": "f1", "controlId": "c5" },
+      "values": ["us"]
+    },
+    {
+      "type": "set_checked",
+      "target": { "formId": "f1", "controlId": "c6" },
+      "checked": true
+    }
+  ],
+  "continueOnError": false,
+  "readAfterActions": true
+}
+```
+
+Use `readAfterActions: true` when you want the returned batch result to include
+a fresh page context for verification. If `data.aborted` is true, the page
+navigated during the batch; stop, call `read_current_page`, and continue with
+fresh IDs.
+
 ### 5. Verify Before Submitting
 
 After filling, call `read_current_page` again to verify:
@@ -128,6 +166,10 @@ Element IDs (`e5`, `f2`, `c3`) are **ephemeral**. They expire when:
 Always re-read the page after any action that changes the DOM before
 referencing new element IDs.
 
+Do not run one `perform_batch` across wizard steps or navigation boundaries.
+Navigation aborts remaining batch actions and invalidates IDs from the previous
+page.
+
 ### React and SPA Forms
 
 Brijio injects values via the DOM, which triggers React's synthetic
@@ -156,11 +198,14 @@ editable's `id`, not `fill_input` with a form/control pair.
 1. list_browsers → Confirm browser connected
 2. read_current_page → Get page context
 3. Identify application form (id: "f1")
-4. fill_input(formId: "f1", controlId: "c1", text: "John")  // First Name
-5. fill_input(formId: "f1", controlId: "c2", text: "Smith") // Last Name
-6. fill_input(formId: "f1", controlId: "c3", text: "john@example.com") // Email
-7. select_options(formId: "f1", controlId: "c5", values: ["us"]) // Country
-8. set_checked(formId: "f1", controlId: "c6", checked: true) // Terms checkbox
-9. read_current_page → Verify all fields filled correctly
-10. Inform user: "Form is filled. Please review and submit when ready."
+4. perform_batch(actions: [
+     write_text(f1/c1, "John"),
+     write_text(f1/c2, "Smith"),
+     write_text(f1/c3, "john@example.com"),
+     select_options(f1/c5, ["us"]),
+     set_checked(f1/c6, true)
+   ], readAfterActions: true)
+5. Inspect batch results and returned page context.
+6. If data.aborted is true, read_current_page and recover with fresh IDs.
+7. Inform user: "Form is filled. Please review and submit when ready."
 ```

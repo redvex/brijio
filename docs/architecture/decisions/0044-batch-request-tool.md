@@ -147,11 +147,15 @@ without the envelope wrapper or batch-level fields (`pageContextId`,
 
 ```ts
 type BatchAction =
-  | { type: 'click', target: ClickElementTarget }
-  | { type: 'write_text', target: FillInputTarget | EditableTarget, text: string }
-  | { type: 'set_checked', target: FillInputTarget, checked: boolean }
-  | { type: 'select_options', target: FillInputTarget, values: string[] }
-  | { type: 'submit_form', target: SubmitFormTarget }
+  | { type: "click"; target: ClickElementTarget }
+  | {
+      type: "write_text";
+      target: FillInputTarget | EditableTarget;
+      text: string;
+    }
+  | { type: "set_checked"; target: FillInputTarget; checked: boolean }
+  | { type: "select_options"; target: FillInputTarget; values: string[] }
+  | { type: "submit_form"; target: SubmitFormTarget };
 ```
 
 ### readAfterActions
@@ -169,12 +173,12 @@ only reliable read point is after all mutations settle.
 An optional boolean flag (default `false`). Controls what happens when an
 individual action fails with an element-level error:
 
-| Error type | `continueOnError: false` | `continueOnError: true` |
-|---|---|---|
-| `page_navigated` | Abort remaining | Abort remaining |
-| `stale_context` | Abort remaining | Mark failed, continue |
-| `target_not_found` | Abort remaining | Mark failed, continue |
-| `browser_error` | Abort remaining | Mark failed, continue |
+| Error type         | `continueOnError: false` | `continueOnError: true` |
+| ------------------ | ------------------------ | ----------------------- |
+| `page_navigated`   | Abort remaining          | Abort remaining         |
+| `stale_context`    | Abort remaining          | Mark failed, continue   |
+| `target_not_found` | Abort remaining          | Mark failed, continue   |
+| `browser_error`    | Abort remaining          | Mark failed, continue   |
 
 `page_navigated` **always aborts** regardless of `continueOnError`. After
 navigation, all positional IDs from the previous page are meaningless —
@@ -200,26 +204,26 @@ clear error for oversized batches.
 
 ```ts
 interface BatchActionResult {
-  type: 'batch_result'
-  ok: boolean          // true only if ALL entries succeeded
-  results: BatchActionOutcome[]
+  type: "batch_result";
+  ok: boolean; // true only if ALL entries succeeded
+  results: BatchActionOutcome[];
 }
 
 type BatchActionOutcome =
-  | { ok: true, data: ActionData }
-  | { ok: false, error: BatchActionError }
+  | { ok: true; data: ActionData }
+  | { ok: false; error: BatchActionError };
 
 interface BatchActionError {
-  code: BrijioErrorCode
-  message: string
-  detail?: StaleContextDetail
-  aborted: boolean    // true = not executed, skipped due to prior failure
+  code: BrijioErrorCode;
+  message: string;
+  detail?: StaleContextDetail;
+  aborted: boolean; // true = not executed, skipped due to prior failure
 }
 
 // When readAfterActions is true, the final entry is:
 type BatchReadOutcome =
-  | { ok: true, data: PageContext }
-  | { ok: false, error: BatchActionError }
+  | { ok: true; data: PageContext }
+  | { ok: false; error: BatchActionError };
 ```
 
 ## Message Flow
