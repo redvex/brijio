@@ -1,5 +1,5 @@
 import { performBatch, type BrijioPageActionsConfig } from './page-actions.js'
-import { type BrijioBatchResult, type BrijioResourceResult } from './protocol.js'
+import { type BrijioBatchResult } from './protocol.js'
 import { type BrijioToolResult } from './page-reading-tool.js'
 
 const VALID_ACTION_TYPES = ['click', 'write_text', 'set_checked', 'select_options', 'submit_form'] as const
@@ -64,9 +64,9 @@ export async function performBatchTool (
 
   const result = await performBatch(config, input.actions as Array<Record<string, unknown>>, {
     browserInstanceId: browserInstanceId.data,
-    continueOnError: input.continueOnError as boolean | undefined,
-    readAfterActions: input.readAfterActions as boolean | undefined,
-    pageContextId: input.pageContextId as number | undefined
+    continueOnError: input.continueOnError,
+    readAfterActions: input.readAfterActions,
+    pageContextId: input.pageContextId
   })
 
   // BrijioResourceResult<BrijioBatchResult> maps directly to BrijioToolResult<BrijioBatchResult>

@@ -87,7 +87,7 @@ if (typeof browser !== 'undefined') {
     }
 
     sendResponse(
-      handleContentRequest(message as ContentRequest, {
+      handleContentRequest(message, {
         document: globalThis.document,
         locationHref: globalThis.location.href,
         title: globalThis.document.title,
