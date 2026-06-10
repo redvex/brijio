@@ -47,7 +47,7 @@ Capabilities are intentionally constrained to align with these principles.
 | `set_checked`     | Set the checked state for a checkbox or select a radio option                  | ✅ Implemented | ✅     | ✅     | 📋 Planned | Cannot uncheck a radio button — select a different option instead.                                                                            |
 | `select_options`  | Select option values in a visible select control from the current browser page | ✅ Implemented | ✅     | ✅     | 📋 Planned | Supports both single-select and multi-select controls.                                                                                        |
 | `submit_form`     | Submit a visible form from the current browser page                            | ✅ Implemented | ✅     | ✅     | 📋 Planned | Submits with browser validation. Targets form by short-lived `formId`.                                                                        |
-| `perform_batch`   | Execute multiple explicit browser actions in one request                       | ✅ Implemented | ✅     | ✅     | 📋 Planned | Supports click, write text, checked state, select options, and form submit actions with per-action results.                                    |
+| `perform_batch`   | Execute multiple explicit browser actions in one request                       | ✅ Implemented | ✅     | ✅     | 📋 Planned | Supports click, write text, checked state, select options, and form submit actions with per-action results.                                   |
 
 ---
 

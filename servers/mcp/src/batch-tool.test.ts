@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { performBatchTool, type PerformBatchInput } from './batch-tool.js'
+import { performBatchTool } from './batch-tool.js'
 import type { BrijioPageActionsConfig } from './page-actions.js'
 import type { BrijioBatchResult, BrijioResourceResult } from './protocol.js'
 
@@ -17,8 +17,8 @@ void describe('MCP perform batch tool', () => {
     websocketUrl: 'ws://127.0.0.1:8787',
     pairingToken: 'test-token',
     timeoutMs: 5000,
-    requestPerformBatch: async () => {
-      return { ok: true, data: successResult } as BrijioResourceResult<BrijioBatchResult>
+    requestPerformBatch: async (): Promise<BrijioResourceResult<BrijioBatchResult>> => {
+      return { ok: true, data: successResult }
     }
   }
 
@@ -146,9 +146,9 @@ void describe('MCP perform batch tool', () => {
       websocketUrl: 'ws://127.0.0.1:8787',
       pairingToken: 'test-token',
       timeoutMs: 5000,
-      requestPerformBatch: async (options) => {
+      requestPerformBatch: async (options): Promise<BrijioResourceResult<BrijioBatchResult>> => {
         calledWith = options
-        return { ok: true, data: successResult } as BrijioResourceResult<BrijioBatchResult>
+        return { ok: true, data: successResult }
       }
     }
 
@@ -169,9 +169,9 @@ void describe('MCP perform batch tool', () => {
       websocketUrl: 'ws://127.0.0.1:8787',
       pairingToken: 'test-token',
       timeoutMs: 5000,
-      requestPerformBatch: async (options) => {
+      requestPerformBatch: async (options): Promise<BrijioResourceResult<BrijioBatchResult>> => {
         calledWith = options
-        return { ok: true, data: successResult } as BrijioResourceResult<BrijioBatchResult>
+        return { ok: true, data: successResult }
       }
     }
 

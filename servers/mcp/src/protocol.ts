@@ -544,7 +544,7 @@ export function parseBatchResultEnvelope (
         }
         results.push({ ok: true, data: actionResult })
       } else if (isPageContext(entry.data)) {
-        results.push({ ok: true, data: entry.data as PageContext })
+        results.push({ ok: true, data: entry.data })
       } else {
         return invalidResponse()
       }
