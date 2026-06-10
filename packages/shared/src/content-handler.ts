@@ -106,24 +106,24 @@ export type ContentRequest =
 
 export type ContentResponse =
   | {
-      ok: true
-      data:
-      | PageContext
-      | PageContent
-      | ActionResultData
-      | WriteTextActionResultData
-      | SetCheckedActionResultData
-      | SelectOptionsActionResultData
-      | SubmitFormActionResultData
-    }
+    ok: true
+    data:
+    | PageContext
+    | PageContent
+    | ActionResultData
+    | WriteTextActionResultData
+    | SetCheckedActionResultData
+    | SelectOptionsActionResultData
+    | SubmitFormActionResultData
+  }
   | {
-      ok: false
-      error: {
-        code: PageContentErrorCode | ActionResultErrorCode
-        message: string
-        detail?: StaleContextDetail
-      }
+    ok: false
+    error: {
+      code: PageContentErrorCode | ActionResultErrorCode
+      message: string
+      detail?: StaleContextDetail
     }
+  }
 
 export interface ContentEnvironment {
   document: Document

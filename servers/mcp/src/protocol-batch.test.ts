@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import {
+  type PageContext,
   createPerformBatchEnvelope,
   parseBatchResultEnvelope
 } from './protocol.js'
@@ -64,7 +65,7 @@ void describe('MCP batch result protocol helpers', () => {
 
       const result = parseBatchResultEnvelope(JSON.parse(raw), 'batch-1')
       assert.equal(result.ok, true)
-      if (result.ok === true) {
+      if (result.ok) {
         assert.equal(result.data.ok, true)
         assert.equal(result.data.results.length, 2)
         assert.equal(result.data.results[0].ok, true)
@@ -88,7 +89,7 @@ void describe('MCP batch result protocol helpers', () => {
 
       const result = parseBatchResultEnvelope(JSON.parse(raw), 'batch-2')
       assert.equal(result.ok, false)
-      if ('data' in result && result.data) {
+      if (!result.ok && 'data' in result) {
         assert.equal(result.data.ok, false)
         assert.equal(result.data.results.length, 3)
         assert.equal(result.data.results[0].ok, true)
@@ -119,7 +120,7 @@ void describe('MCP batch result protocol helpers', () => {
 
       const result = parseBatchResultEnvelope(JSON.parse(raw), 'batch-3')
       assert.equal(result.ok, true)
-      if (result.ok === true) {
+      if (result.ok) {
         assert.equal(result.data.results.length, 2)
       }
     })
@@ -193,7 +194,7 @@ void describe('MCP batch result protocol helpers', () => {
       })
 
       const result = parseBatchResultEnvelope(JSON.parse(raw), 'batch-6')
-      if ('data' in result && result.data) {
+      if (!result.ok && 'data' in result) {
         const firstResult = result.data.results[0]
         if (!firstResult.ok) {
           assert.equal(firstResult.error.code, 'stale_context')
@@ -215,7 +216,7 @@ void describe('MCP batch result protocol helpers', () => {
       })
 
       const result = parseBatchResultEnvelope(JSON.parse(raw), 'batch-7')
-      if ('data' in result && result.data) {
+      if (!result.ok && 'data' in result) {
         const firstResult = result.data.results[0]
         if (!firstResult.ok) {
           assert.notEqual(firstResult.error.detail, undefined)
@@ -234,7 +235,7 @@ void describe('MCP batch result protocol helpers', () => {
   })
 })
 
-function createPageContextFixture () {
+function createPageContextFixture (): PageContext {
   return {
     url: 'https://example.com/',
     title: 'Example Domain',
