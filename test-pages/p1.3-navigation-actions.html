@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Brijio P1.3 — Navigation &amp; Action Test Page</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 60rem; margin: 2rem auto; padding: 0 1rem; }
+    section { margin: 2rem 0; padding: 1rem; border: 1px solid #ddd; border-radius: 0.5rem; }
+    h2 { margin-top: 0; }
+    .status { font-weight: bold; }
+    .status.open { color: green; }
+    .status.closed { color: red; }
+    [aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+    [hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Brijio P1.3 — Navigation &amp; Action Test Page</h1>
+
+  <!-- ── Section 1: Expanded action selectors ────────────────────────── -->
+  <section id="expanded-selectors">
+    <h2>Expanded Action Selectors</h2>
+
+    <button id="native-button">Native button</button>
+
+    <div role="menuitem" tabindex="0" id="menu-item">Menu item</div>
+
+    <ul role="tablist">
+      <li role="tab" aria-selected="true" tabindex="0" id="tab-profile">Profile</li>
+      <li role="tab" aria-selected="false" tabindex="0" id="tab-settings">Settings</li>
+    </ul>
+
+    <div role="switch" aria-checked="false" tabindex="0" id="dark-mode-switch">Dark mode</div>
+
+    <div role="treeitem" tabindex="0" id="tree-node">Tree node</div>
+
+    <div role="option" tabindex="0" id="list-option">List option</div>
+
+    <div role="menuitemcheckbox" aria-checked="false" tabindex="0" id="toggle-check">Toggle check</div>
+
+    <div role="menuitemradio" aria-checked="false" tabindex="0" id="radio-choice">Radio choice</div>
+
+    <input type="image" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='16'>Submit image</text></svg>" alt="Submit image button" id="image-submit" />
+  </section>
+
+  <!-- ── Section 2: Disclosure / details observation ─────────────────── -->
+  <section id="disclosure-observation">
+    <h2>Disclosure / Details Observation</h2>
+
+    <details id="info-details">
+      <summary id="info-summary">Show more information</summary>
+      <p id="details-content">Here is the expanded detail content. The <code>observed.detailsOpen</code> hint should report <code>true</code> after clicking this summary.</p>
+    </details>
+
+    <details id="second-details" open>
+      <summary id="second-summary">Initially open section</summary>
+      <p>This section starts open. Clicking the summary should report <code>detailsOpen: false</code>.</p>
+    </details>
+  </section>
+
+  <!-- ── Section 3: SPA navigation detection ─────────────────────────── -->
+  <section id="spa-navigation">
+    <h2>SPA Navigation Detection</h2>
+
+    <p>Current URL: <code id="current-url"></code></p>
+
+    <button id="push-state-btn" title="Navigates to /spa/page-a via history.pushState">
+      Navigate to /spa/page-a
+    </button>
+
+    <button id="replace-state-btn" aria-label="Go to page B" title="Navigates to /spa/page-b via history.replaceState">
+      Navigate to /spa/page-b
+    </button>
+
+    <button id="back-btn">Go back</button>
+
+    <p id="nav-log">Navigation events will appear here.</p>
+  </section>
+
+  <!-- ── Section 4: Disabled / hidden filtering ─────────────────────── -->
+  <section id="disabled-hidden-filtering">
+    <h2>Disabled / Hidden Filtering</h2>
+
+    <p>The following controls should <strong>not</strong> appear in the actions list:</p>
+
+    <button disabled id="disabled-btn">Disabled button</button>
+
+    <div role="menuitem" aria-disabled="true" tabindex="0" id="aria-disabled-item">ARIA disabled item</div>
+
+    <button hidden id="hidden-btn">Hidden button</button>
+
+    <div role="tab" aria-hidden="true" tabindex="0" id="aria-hidden-tab">Invisible tab</div>
+
+    <p>The following controls <strong>should</strong> appear:</p>
+
+    <button id="enabled-btn">Enabled button</button>
+
+    <div role="switch" aria-checked="false" tabindex="0" id="enabled-switch">Enabled switch</div>
+  </section>
+
+  <!-- ── Section 5: Action metadata (tagName, description) ───────────── -->
+  <section id="action-metadata">
+    <h2>Action Metadata</h2>
+
+    <button aria-label="Save" title="Saves your current work to the server" id="save-btn">Save</button>
+
+    <div role="tab" aria-label="Account" aria-describedby="account-tab-desc" tabindex="0" id="account-tab">Account tab</div>
+    <p id="account-tab-desc" style="display:none">View and edit your account settings and preferences</p>
+  </section>
+
+  <!-- ── Script ──────────────────────────────────────────────────────── -->
+  <script>
+    // ── SPA Navigation ────────────────────────────────────────────
+    const navLog = document.getElementById('nav-log')
+    const currentUrlEl = document.getElementById('current-url')
+
+    function logNav(msg) {
+      navLog.textContent = msg
+    }
+
+    function showCurrentUrl() {
+      currentUrlEl.textContent = location.href
+    }
+    showCurrentUrl()
+
+    document.getElementById('push-state-btn').addEventListener('click', () => {
+      const url = new URL('/spa/page-a', location.origin)
+      history.pushState({ page: 'a' }, '', url)
+      showCurrentUrl()
+      logNav('pushState → /spa/page-a')
+    })
+
+    document.getElementById('replace-state-btn').addEventListener('click', () => {
+      const url = new URL('/spa/page-b', location.origin)
+      history.replaceState({ page: 'b' }, '', url)
+      showCurrentUrl()
+      logNav('replaceState → /spa/page-b')
+    })
+
+    document.getElementById('back-btn').addEventListener('click', () => {
+      history.back()
+      setTimeout(() => {
+        showCurrentUrl()
+        logNav('history.back → ' + location.pathname)
+      }, 50)
+    })
+
+    // ── Disclosure status display ─────────────────────────────────
+    function updateDetailsStatus(details, statusEl) {
+      if (!statusEl) return
+      const open = details.hasAttribute('open')
+      statusEl.textContent = open ? 'Open' : 'Closed'
+      statusEl.className = 'status ' + (open ? 'open' : 'closed')
+    }
+
+    document.querySelectorAll('details').forEach(details => {
+      const statusEl = details.querySelector('.status')
+      updateDetailsStatus(details, statusEl)
+      details.addEventListener('toggle', () => updateDetailsStatus(details, statusEl))
+    })
+  </script>
+</body>
+</html>

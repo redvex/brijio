@@ -743,11 +743,13 @@ function detectClickSideEffects (
 ): Record<string, unknown> {
   const observed: Record<string, unknown> = {}
 
-  // Detect navigation: compare document.URL after click
-  // Note: In browser environments, document.URL reflects the current page URL.
-  // In test environments (linkedom), document.URL may not update after click,
-  // so we compare against the locationHref that was passed in.
-  const urlAfter = document.URL ?? ''
+  // Detect navigation: compare current URL after click.
+  // For SPA navigations (pushState/replaceState), window.location.href updates
+  // synchronously. For full-page navigations, the content script may not survive
+  // to observe the change — the extension's pageshow listener handles that.
+  // We check document.URL (DOM) first, then fall back to the window's location
+  // if available (browser environment).
+  const urlAfter = getWindowLocationHref(document) ?? document.URL ?? ''
   if (urlAfter !== '' && urlAfter !== urlBefore) {
     observed.navigationStarted = true
   }
@@ -761,6 +763,19 @@ function detectClickSideEffects (
   }
 
   return observed
+}
+
+function getWindowLocationHref (document: Document): string | null {
+  try {
+    const href = (document.defaultView as { location?: { href?: string } } | null)?.location?.href
+    if (typeof href === 'string' && href !== '' && href !== 'about:blank') {
+      return href
+    }
+  } catch {
+    // Cross-origin access to window.location may throw; fall back to document.URL
+  }
+
+  return null
 }
 
 function findWriteTextTarget (

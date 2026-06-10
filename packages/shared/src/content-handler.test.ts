@@ -736,6 +736,133 @@ void describe('content handler request handler', () => {
     assert.equal(response.data.observed?.detailsOpen, true)
   })
 
+  void it('reports observed.navigationStarted when URL changes after click', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>Navigate</button>
+      </main>
+    `)
+    // Simulate SPA navigation: after click, the browser's location.href changes
+    // NOTE: linkedom shares location across window instances, so we must
+    // restore it after this test to avoid leaking state to subsequent tests
+    let currentHref = 'https://example.com/'
+    const defaultView = document.defaultView as Record<string, unknown> | null
+    if (defaultView !== null) {
+      defaultView.location = {
+        get href () {
+          return currentHref
+        }
+      }
+    }
+
+    document.querySelector('button')?.addEventListener('click', () => {
+      // Simulate pushState changing the URL
+      currentHref = 'https://example.com/spa/page-a'
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      {
+        document,
+        locationHref: 'https://example.com/',
+        title: 'Example',
+        selectedText: '',
+        now: () => '2026-05-25T10:03:00.000Z'
+      }
+    )
+
+    assert.equal(response.ok, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    assert.equal(response.data.observed?.navigationStarted, true)
+
+    // Restore location to avoid leaking to other tests (linkedom quirk)
+    if (defaultView !== null) {
+      defaultView.location = undefined
+    }
+  })
+
+  void it('omits observed when no side effects are detected', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>Static</button>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('button')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    // In linkedom, defaultView.location is undefined and document.URL is undefined,
+    // so no navigationStarted should be detected
+    const observed = response.data.observed as Record<string, unknown> | undefined
+    assert.equal(observed, undefined, `Expected no observed side effects but got: ${JSON.stringify(observed)}`)
+  })
+
+  void it('reports observed.detailsOpen=false when closing an open details', () => {
+    const { document } = parseHTML(`
+      <main>
+        <details open>
+          <summary>Close me</summary>
+          <p>Visible content</p>
+        </details>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('summary')?.addEventListener('click', () => {
+      clicked = true
+      // Simulate browser removing the open attribute
+      const details = document.querySelector('details')
+      if (details !== null) {
+        details.removeAttribute('open')
+      }
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    assert.equal(response.data.observed?.detailsOpen, false)
+  })
+
   void it('returns target_not_found when no matching click target exists', () => {
     const { document } = parseHTML('<main><button>Save</button></main>')
     const response = handleContentRequest(
