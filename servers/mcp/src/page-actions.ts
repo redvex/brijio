@@ -1,7 +1,9 @@
 import {
+  type BrijioBatchResult,
   type BrijioClickElementResult,
   type BrijioFillInputResult,
   type BrijioNavigateToUrlResult,
+  type BrijioResourceResult,
   type BrijioSelectOptionsResult,
   type BrijioSetCheckedResult,
   type BrijioSubmitFormResult,
@@ -17,6 +19,8 @@ import {
   type FillInputRequestOptions,
   requestNavigateToUrl as defaultRequestNavigateToUrl,
   type NavigateToUrlRequestOptions,
+  requestPerformBatch as defaultRequestPerformBatch,
+  type PerformBatchRequestOptions,
   requestSelectOptions as defaultRequestSelectOptions,
   type SelectOptionsRequestOptions,
   requestSetChecked as defaultRequestSetChecked,
@@ -53,6 +57,9 @@ export interface BrijioPageActionsConfig {
   requestNavigateToUrl?: (
     options: NavigateToUrlRequestOptions
   ) => Promise<BrijioNavigateToUrlResult>
+  requestPerformBatch?: (
+    options: PerformBatchRequestOptions
+  ) => Promise<BrijioResourceResult<BrijioBatchResult>>
 }
 
 export async function clickCurrentPageElement (
@@ -190,5 +197,29 @@ export async function navigateToCurrentPageUrl (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     url
+  })
+}
+
+export async function performBatch (
+  config: BrijioPageActionsConfig,
+  actions: Array<Record<string, unknown>>,
+  options?: {
+    browserInstanceId?: string
+    continueOnError?: boolean
+    readAfterActions?: boolean
+    pageContextId?: number
+  }
+): Promise<BrijioResourceResult<BrijioBatchResult>> {
+  const requestPerformBatch = config.requestPerformBatch ?? defaultRequestPerformBatch
+
+  return await requestPerformBatch({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: options?.browserInstanceId ?? config.defaultBrowserInstanceId,
+    actions,
+    continueOnError: options?.continueOnError,
+    readAfterActions: options?.readAfterActions,
+    pageContextId: options?.pageContextId
   })
 }
