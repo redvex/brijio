@@ -64,6 +64,7 @@ export type BrijioErrorCode =
   | 'invalid_browser_target'
   | 'timeout'
   | 'unsupported_action'
+  | 'batch_failed'
 
 export interface BrijioErrorEnvelope {
   type: 'error'
@@ -200,6 +201,7 @@ export interface BatchResultResponse {
   type: 'batch_result'
   ok: boolean
   results: BatchResultEntry[]
+  aborted: boolean
 }
 
 export interface BatchResultErrorResponse {
@@ -952,15 +954,20 @@ export function createPerformBatchEnvelope (
 
 export function createBatchResultResponse (
   id: string | undefined,
-  results: BatchResultEntry[]
+  results: BatchResultEntry[],
+  aborted: boolean = false,
+  ok?: boolean
 ): WebSocketEnvelope {
-  const allOk = results.every(entry => entry.ok)
+  const allOk = ok ?? results.every(entry => entry.ok)
 
-  return createEnvelope(id, {
+  const payload: BatchResultResponse = {
     type: 'batch_result',
     ok: allOk,
-    results
-  })
+    results,
+    aborted
+  }
+
+  return createEnvelope(id, payload)
 }
 
 export function createBatchResultErrorResponse (
