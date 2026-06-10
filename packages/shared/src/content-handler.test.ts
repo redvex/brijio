@@ -7,6 +7,7 @@ import {
   resetPageContextVersion,
   type ContentEnvironment
 } from './content-handler.js'
+import { type ActionResultData } from './protocol.js'
 
 void describe('content handler request handler', () => {
   void it('handles extract_page_context requests', () => {
@@ -587,7 +588,7 @@ void describe('content handler request handler', () => {
     })
   })
 
-  void it('returns target_disabled for disabled button-like action targets', () => {
+  void it('returns target_not_found for disabled button-like action targets omitted from discovery', () => {
     const { document } = parseHTML(
       '<main><button disabled>Save</button></main>'
     )
@@ -606,16 +607,20 @@ void describe('content handler request handler', () => {
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'target_disabled',
-        message: 'The requested click target is disabled.'
+        code: 'target_not_found',
+        message: 'No matching click target was found.'
       }
     })
   })
 
-  void it('returns target_disabled for aria-disabled action targets', () => {
+  void it('skips aria-disabled actions when resolving action IDs', () => {
     const { document } = parseHTML(
       '<main><div role="menuitem" aria-disabled="true">Greyed out</div><div role="tab">Active tab</div></main>'
     )
+    let clickedText = ''
+    document.querySelector('[role="tab"]')?.addEventListener('click', (event) => {
+      clickedText = (event.currentTarget as Element).textContent ?? ''
+    })
 
     const response = handleContentRequest(
       {
@@ -628,13 +633,41 @@ void describe('content handler request handler', () => {
       createEnvironment(document)
     )
 
-    assert.deepEqual(response, {
-      ok: false,
-      error: {
-        code: 'target_disabled',
-        message: 'The requested click target is disabled.'
-      }
+    assert.equal(response.ok, true)
+    assert.equal(clickedText, 'Active tab')
+  })
+
+  void it('resolves action IDs with the same disabled filtering used during discovery', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>First enabled</button>
+        <button disabled>Disabled button</button>
+        <div role="menuitem" aria-disabled="true">ARIA disabled item</div>
+        <button id="enabled-lower">Lower enabled</button>
+      </main>
+    `)
+    let clickedId = ''
+    document.querySelectorAll('button').forEach((button) => {
+      button.addEventListener('click', () => {
+        clickedId = button.id
+      })
     })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-2',
+          expectedText: 'Lower enabled',
+          expectedRole: 'button'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clickedId, 'enabled-lower')
   })
 
   void it('clicks expanded action types (role="menuitem", role="tab", summary)', () => {
@@ -733,7 +766,7 @@ void describe('content handler request handler', () => {
       assert.fail('Expected successful response')
       return
     }
-    assert.equal(response.data.observed?.detailsOpen, true)
+    assert.equal(requireClickActionData(response.data).observed?.detailsOpen, true)
   })
 
   void it('reports observed.navigationStarted when URL changes after click', () => {
@@ -782,7 +815,10 @@ void describe('content handler request handler', () => {
       assert.fail('Expected successful response')
       return
     }
-    assert.equal(response.data.observed?.navigationStarted, true)
+    assert.equal(
+      requireClickActionData(response.data).observed?.navigationStarted,
+      true
+    )
 
     // Restore location to avoid leaking to other tests (linkedom quirk)
     if (defaultView !== null) {
@@ -820,7 +856,9 @@ void describe('content handler request handler', () => {
     }
     // In linkedom, defaultView.location is undefined and document.URL is undefined,
     // so no navigationStarted should be detected
-    const observed = response.data.observed as Record<string, unknown> | undefined
+    const observed = requireClickActionData(response.data).observed as
+    | Record<string, unknown>
+    | undefined
     assert.equal(observed, undefined, `Expected no observed side effects but got: ${JSON.stringify(observed)}`)
   })
 
@@ -860,7 +898,7 @@ void describe('content handler request handler', () => {
       assert.fail('Expected successful response')
       return
     }
-    assert.equal(response.data.observed?.detailsOpen, false)
+    assert.equal(requireClickActionData(response.data).observed?.detailsOpen, false)
   })
 
   void it('returns target_not_found when no matching click target exists', () => {
@@ -1030,6 +1068,93 @@ void describe('content handler request handler', () => {
       {
         type: 'perform_click',
         target: { kind: 'action', id: 'bb-1', expectedRole: 'button' }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+  })
+
+  void it('clicks a summary when expectedRole matches its implicit button role', () => {
+    const { document } = parseHTML(`
+      <main>
+        <details>
+          <summary>Show more information</summary>
+          <p>Extra content</p>
+        </details>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('summary')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1',
+          expectedText: 'Show more information',
+          expectedRole: 'button'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+  })
+
+  void it('clicks an image input when expectedRole matches its implicit button role', () => {
+    const { document } = parseHTML(`
+      <main>
+        <input type="image" alt="Submit image button" id="image-submit" />
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('input')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1',
+          expectedText: 'Submit image button',
+          expectedRole: 'button'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+  })
+
+  void it('matches expectedText against the accessible name for aria-labelled actions', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button aria-label="Go to page B">Navigate to /spa/page-b</button>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('button')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1',
+          expectedText: 'Go to page B',
+          expectedRole: 'button'
+        }
       },
       createEnvironment(document)
     )
@@ -1661,4 +1786,17 @@ function createEnvironment (document: Document): ContentEnvironment {
     selectedText: '',
     now: () => '2026-05-25T10:03:00.000Z'
   }
+}
+
+function requireClickActionData (data: unknown): ActionResultData {
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'action' in data &&
+    data.action === 'click'
+  ) {
+    return data as ActionResultData
+  }
+
+  assert.fail('Expected click action result data.')
 }

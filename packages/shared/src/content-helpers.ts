@@ -26,7 +26,9 @@ export function isPageContentErrorCode (
     value === 'invalid_control_value' ||
     value === 'option_not_found' ||
     value === 'target_option_disabled' ||
-    value === 'action_failed'
+    value === 'action_failed' ||
+    value === 'stale_context' ||
+    value === 'page_navigated'
   )
 }
 

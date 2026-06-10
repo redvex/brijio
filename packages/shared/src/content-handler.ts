@@ -882,9 +882,11 @@ function findClickTarget (
     target.kind === 'link'
       ? 'a[href]'
       : ACTION_SELECTORS
-  const elements = Array.from(document.querySelectorAll(selector)).filter(
-    isVisible
-  )
+  const elements = Array.from(document.querySelectorAll(selector))
+    .filter(isVisible)
+    .filter((element) =>
+      target.kind === 'link' || !isActionDisabledForClick(element)
+    )
 
   return elements[index - 1] ?? null
 }
@@ -902,11 +904,12 @@ function validateClickTarget (
 
   // Validate expectedText: case-insensitive substring match
   if (target.expectedText !== undefined && target.expectedText !== '') {
-    const visibleText = getElementVisibleText(element).toLowerCase()
+    const foundText = getClickTargetText(element)
+    const visibleText = foundText.toLowerCase()
     const expected = target.expectedText.toLowerCase()
 
     detail.expectedText = target.expectedText
-    detail.foundText = getElementVisibleText(element)
+    detail.foundText = foundText
 
     if (!visibleText.includes(expected)) {
       parts.push(
@@ -982,6 +985,62 @@ function getElementVisibleText (element: Element): string {
   }
 
   return (element.textContent ?? '').trim()
+}
+
+function getClickTargetText (element: Element): string {
+  const accessibleName = getElementAccessibleName(element)
+
+  if (accessibleName !== '') {
+    return accessibleName
+  }
+
+  return getElementVisibleText(element)
+}
+
+function getElementAccessibleName (element: Element): string {
+  const ariaLabel = element.getAttribute('aria-label')
+
+  if (ariaLabel !== null && ariaLabel.trim() !== '') {
+    return normalizeText(ariaLabel)
+  }
+
+  const labelledBy = element.getAttribute('aria-labelledby')
+
+  if (labelledBy !== null && labelledBy.trim() !== '') {
+    const label = labelledBy
+      .split(/\s+/u)
+      .map((id) => element.ownerDocument?.getElementById(id))
+      .filter((labelElement): labelElement is HTMLElement => labelElement != null)
+      .map(getElementVisibleText)
+      .filter((text) => text !== '')
+      .join(' ')
+
+    if (label !== '') {
+      return normalizeText(label)
+    }
+  }
+
+  if (element.tagName.toLowerCase() === 'input') {
+    const value = element.getAttribute('value')
+
+    if (value !== null && value.trim() !== '') {
+      return normalizeText(value)
+    }
+  }
+
+  const alt = element.getAttribute('alt')
+
+  if (alt !== null && alt.trim() !== '') {
+    return normalizeText(alt)
+  }
+
+  const title = element.getAttribute('title')
+
+  if (title !== null && title.trim() !== '') {
+    return normalizeText(title)
+  }
+
+  return ''
 }
 
 /** Get the visible label for a form control element. */
@@ -1167,10 +1226,11 @@ function getImplicitRole (element: Element): string {
   const tag = element.tagName.toLowerCase()
 
   if (tag === 'button') return 'button'
+  if (tag === 'summary') return 'button'
   if (tag === 'a' && element.hasAttribute('href')) return 'link'
   if (tag === 'input') {
     const type = (element.getAttribute('type') ?? 'text').toLowerCase()
-    if (type === 'button' || type === 'submit' || type === 'reset') { return 'button' }
+    if (type === 'button' || type === 'submit' || type === 'reset' || type === 'image') { return 'button' }
     if (type === 'checkbox') return 'checkbox'
     if (type === 'radio') return 'radio'
   }
@@ -1268,6 +1328,10 @@ function parseTargetId (id: string): number | null {
   const index = Number(match[1])
 
   return Number.isInteger(index) && index >= 1 ? index : null
+}
+
+function normalizeText (value: string): string {
+  return value.replace(/\s+/gu, ' ').trim()
 }
 
 function isVisible (element: Element): boolean {
