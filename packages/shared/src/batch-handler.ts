@@ -11,7 +11,6 @@
 import {
   type BatchAction,
   type BatchActionError,
-  type BatchActionOutcome,
   type BatchResultEntry,
   type ActionResultData,
   type WriteTextActionResultData,
@@ -175,7 +174,7 @@ export function executeBatch (
   }
 
   // If readAfterActions is requested, append a fresh page context read
-  if (request.readAfterActions) {
+  if (request.readAfterActions === true) {
     const readResponse = handleContentRequest(
       {
         type: 'extract_page_context',

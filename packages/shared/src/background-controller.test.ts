@@ -16,7 +16,6 @@ import {
   type StorageAdapter
 } from './background-controller.js'
 import type {
-  ActionResultData,
   ActionResultErrorCode,
   ClickActionTarget,
   NavigateToUrlErrorCode,
@@ -29,13 +28,13 @@ import type {
   SubmitFormActionResultData,
   WriteTextEditableTarget,
   WriteTextActionTarget
+  , BatchResultEntry
 } from './protocol.js'
 
 import type {
   ContentBatchRequest,
   BatchResult
 } from './batch-handler.js'
-import type { BatchResultEntry } from './protocol.js'
 
 void describe('Brijio background controller', () => {
   void it('opens setup when action is clicked without a stored WebSocket URL', async () => {
@@ -1710,12 +1709,12 @@ class FakePageBatchAdapter implements PageBatchAdapter {
     }
 
     // Default fake implementation: return success for all actions
-    const results: BatchResultEntry[] = message.actions.map(() => ({
-      ok: true as const,
+    const results: BatchResultEntry[] = message.actions.map((): BatchResultEntry => ({
+      ok: true,
       data: {
-        action: 'click' as const,
-        target: { kind: 'link' as const, id: 'bb-1' }
-      } as ActionResultData
+        action: 'click',
+        target: { kind: 'link', id: 'bb-1' }
+      }
     }))
     return { ok: true, results, aborted: false }
   }
