@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Brijio",
-  "version": "0.0.0",
+  "version": "0.1.2",
   "description": "User-controlled bridge between Safari and AI agents.",
   "background": {
     "scripts": ["background.js"]

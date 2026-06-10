@@ -9,12 +9,31 @@ Server packages and browser extensions use **independent versioning** — extens
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-06-10
+
 ### Changed
 
-- Renamed the project from Brijio to Brijio for current public branding.
-- Renamed the publishable MCP runtime package from `@brijio/mcp` to `@brijio/mcp`.
-- Added the preferred `brijio` CLI binary while keeping `brijio` as a backwards-compatible alias for the transition window.
-- Added `BRIJIO_*` environment variables while preserving `BRIJIO_*` aliases.
+- Renamed the project and runtime surfaces from BrowserBridge to Brijio for
+  current public branding.
+- Renamed the publishable MCP runtime package to `@brijio/mcp`.
+- Added the preferred `brijio` CLI binary while keeping `browserbridge` as a
+  backwards-compatible alias for the transition window.
+- Added `BRIJIO_*` environment variables while preserving BrowserBridge
+  aliases.
+- Added local runtime polish, daemon lifecycle commands, and live log access.
+- Added the demo command and smoke-test page for validating browser actions.
+- Added `navigate_to_url` support across shared protocol types, MCP tooling,
+  Chrome, and Safari.
+- Improved reliable target identity with `pageContextId`, expected target
+  validation, and `page_navigated` errors.
+- Replaced Chrome and Safari extension icons.
+
+### Fixed
+
+- Made content script reinjection idempotent.
+- Improved demo validation behavior and form state handling.
+- Hardened `navigate_to_url` validation for unsupported URL schemes.
+- Improved stale-context validation for browser actions.
 
 ## [ext-chrome-v0.1.0] - 2026-06-03
 
@@ -115,3 +134,4 @@ browser extensions and AI agents via the Model Context Protocol.
   `clients/extensions/{chrome,safari}`
 
 [0.1.0]: https://github.com/brijio/mcp/releases/tag/v0.1.0
+[0.1.2]: https://github.com/redvex/brijio/releases/tag/v0.1.2

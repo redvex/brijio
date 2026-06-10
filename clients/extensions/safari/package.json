@@ -1,6 +1,6 @@
 {
   "name": "@brijio/safari-extension",
-  "version": "0.0.0",
+  "version": "0.1.2",
   "private": true,
   "description": "Brijio Safari extension.",
   "license": "AGPL-3.0-only",

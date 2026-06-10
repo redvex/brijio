@@ -1,6 +1,6 @@
 {
   "name": "@brijio/websocket",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "description": "Brijio WebSocket session router.",
   "license": "AGPL-3.0-only",

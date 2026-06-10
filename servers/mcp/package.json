@@ -1,6 +1,6 @@
 {
   "name": "@brijio/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": false,
   "description": "Brijio MCP server for AI agent browser resources and tools.",
   "license": "AGPL-3.0-only",
