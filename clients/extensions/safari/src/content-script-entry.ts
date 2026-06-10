@@ -1,25 +1,39 @@
+// Safari content script entry point.
+//
+// Per ADR 0019, this is a thin file that registers a
+// browser.runtime.onMessage listener and delegates to the shared
+// handleContentRequest / executeBatch functions from @brijio/shared.
+// It is analogous to Chrome's content-script-entry.ts but uses the
+// browser.* namespace (WebExtension API) instead of chrome.*.
+
 import {
   handleContentRequest,
+  executeBatch,
+  isContentBatchRequest,
   registerPageNavigationListener,
   type ContentRequest,
-  type ContentResponse
+  type ContentResponse,
+  type ContentBatchRequest,
+  type BatchResult
 } from '@brijio/shared'
 
-type SendResponse = (response: ContentResponse) => void
+type SendResponse = (response: ContentResponse | BatchResult) => void
+
+type IncomingMessage = ContentRequest | ContentBatchRequest
 
 interface BrowserRuntimeApi {
   runtime: {
     onMessage: {
       addListener: (
         callback: (
-          message: ContentRequest,
+          message: IncomingMessage,
           sender: unknown,
           sendResponse: SendResponse
         ) => boolean
       ) => void
       removeListener: (
         callback: (
-          message: ContentRequest,
+          message: IncomingMessage,
           sender: unknown,
           sendResponse: SendResponse
         ) => boolean
@@ -42,7 +56,7 @@ if (typeof browser !== 'undefined') {
   // before adding the new one, so only one listener is active and
   // pageContextVersion matches the current module scope.
   type OnMessageCallback = (
-    message: ContentRequest,
+    message: IncomingMessage,
     sender: unknown,
     sendResponse: SendResponse
   ) => boolean
@@ -50,12 +64,30 @@ if (typeof browser !== 'undefined') {
   const globalRef = globalThis as Record<string, unknown>
 
   const onMessage: OnMessageCallback = (
-    message: ContentRequest,
+    message: IncomingMessage,
     _sender: unknown,
     sendResponse: SendResponse
   ): boolean => {
+    if (isContentBatchRequest(message)) {
+      const result = executeBatch({
+        actions: message.actions,
+        ...(message.pageContextId !== undefined ? { pageContextId: message.pageContextId } : {}),
+        ...(message.continueOnError !== undefined ? { continueOnError: message.continueOnError } : {}),
+        ...(message.readAfterActions !== undefined ? { readAfterActions: message.readAfterActions } : {})
+      }, {
+        document: globalThis.document,
+        locationHref: globalThis.location.href,
+        title: globalThis.document.title,
+        selectedText: globalThis.getSelection?.()?.toString() ?? '',
+        now: () => new Date().toISOString()
+      })
+
+      sendResponse(result)
+      return false
+    }
+
     sendResponse(
-      handleContentRequest(message, {
+      handleContentRequest(message as ContentRequest, {
         document: globalThis.document,
         locationHref: globalThis.location.href,
         title: globalThis.document.title,

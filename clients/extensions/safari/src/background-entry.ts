@@ -20,6 +20,9 @@ import {
   requireString,
   createBrowserInstanceId,
   performActiveTabAction as sharedPerformActiveTabAction,
+  performActiveTabBatch as sharedPerformActiveTabBatch,
+  type ContentBatchRequest,
+  type BatchResult,
   type ActiveTabDeps
 } from '@brijio/shared'
 import {
@@ -92,6 +95,12 @@ const pageActions = {
   }
 }
 
+const pageBatch = {
+  async performBatch (message: ContentBatchRequest): Promise<BatchResult> {
+    return await sharedPerformActiveTabBatch(message, safariDeps)
+  }
+}
+
 const pageNavigation = new SafariPageNavigationAdapter(browser.tabs)
 
 const controller = new BrijioBackgroundController({
@@ -105,6 +114,7 @@ const controller = new BrijioBackgroundController({
   storage,
   pageReader,
   pageActions,
+  pageBatch,
   pageNavigation,
   timers: createGlobalTimers()
 })
