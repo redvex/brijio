@@ -59,6 +59,14 @@ void describe('isPageContentErrorCode', () => {
     assert.strictEqual(isPageContentErrorCode('action_failed'), true)
   })
 
+  void it('returns true for stale_context validation errors', () => {
+    assert.strictEqual(isPageContentErrorCode('stale_context'), true)
+  })
+
+  void it('returns true for page_navigated validation errors', () => {
+    assert.strictEqual(isPageContentErrorCode('page_navigated'), true)
+  })
+
   void it('returns false for unknown code', () => {
     assert.strictEqual(isPageContentErrorCode('unknown_error'), false)
   })
@@ -76,6 +84,19 @@ void describe('isContentResponse', () => {
   void it('returns true for error response with valid error', () => {
     assert.strictEqual(
       isContentResponse({ ok: false, error: { code: 'content_script_unavailable', message: 'Failed' } }),
+      true
+    )
+  })
+
+  void it('returns true for stale_context content responses', () => {
+    assert.strictEqual(
+      isContentResponse({
+        ok: false,
+        error: {
+          code: 'stale_context',
+          message: 'Element at position bb-1 does not match expected target.'
+        }
+      }),
       true
     )
   })

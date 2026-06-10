@@ -7,6 +7,7 @@ import {
   resetPageContextVersion,
   type ContentEnvironment
 } from './content-handler.js'
+import { type ActionResultData } from './protocol.js'
 
 void describe('content handler request handler', () => {
   void it('handles extract_page_context requests', () => {
@@ -587,7 +588,7 @@ void describe('content handler request handler', () => {
     })
   })
 
-  void it('returns target_disabled for disabled button-like action targets', () => {
+  void it('returns target_not_found for disabled button-like action targets omitted from discovery', () => {
     const { document } = parseHTML(
       '<main><button disabled>Save</button></main>'
     )
@@ -606,10 +607,298 @@ void describe('content handler request handler', () => {
     assert.deepEqual(response, {
       ok: false,
       error: {
-        code: 'target_disabled',
-        message: 'The requested click target is disabled.'
+        code: 'target_not_found',
+        message: 'No matching click target was found.'
       }
     })
+  })
+
+  void it('skips aria-disabled actions when resolving action IDs', () => {
+    const { document } = parseHTML(
+      '<main><div role="menuitem" aria-disabled="true">Greyed out</div><div role="tab">Active tab</div></main>'
+    )
+    let clickedText = ''
+    document.querySelector('[role="tab"]')?.addEventListener('click', (event) => {
+      clickedText = (event.currentTarget as Element).textContent ?? ''
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clickedText, 'Active tab')
+  })
+
+  void it('resolves action IDs with the same disabled filtering used during discovery', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>First enabled</button>
+        <button disabled>Disabled button</button>
+        <div role="menuitem" aria-disabled="true">ARIA disabled item</div>
+        <button id="enabled-lower">Lower enabled</button>
+      </main>
+    `)
+    let clickedId = ''
+    document.querySelectorAll('button').forEach((button) => {
+      button.addEventListener('click', () => {
+        clickedId = button.id
+      })
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-2',
+          expectedText: 'Lower enabled',
+          expectedRole: 'button'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clickedId, 'enabled-lower')
+  })
+
+  void it('clicks expanded action types (role="menuitem", role="tab", summary)', () => {
+    const { document } = parseHTML(`
+      <main>
+        <div role="menuitem">Menu item</div>
+        <div role="tab">Settings</div>
+        <summary>Expand</summary>
+      </main>
+    `)
+    const clicked: string[] = []
+
+    document.querySelectorAll('[role="menuitem"], [role="tab"], summary').forEach((el) => {
+      el.addEventListener('click', () => {
+        clicked.push(el.textContent ?? '')
+      })
+    })
+
+    // Click the menuitem (bb-1)
+    const response1 = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response1.ok, true)
+
+    // Click the tab (bb-2)
+    const response2 = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-2'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response2.ok, true)
+
+    // Click the summary (bb-3)
+    const response3 = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-3'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response3.ok, true)
+    assert.deepEqual(clicked, ['Menu item', 'Settings', 'Expand'])
+  })
+
+  void it('returns observed.detailsOpen when clicking a summary inside details', () => {
+    const { document } = parseHTML(`
+      <main>
+        <details>
+          <summary>More info</summary>
+          <p>Details content here</p>
+        </details>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('summary')?.addEventListener('click', () => {
+      clicked = true
+      // Simulate browser toggling the open attribute
+      const details = document.querySelector('details')
+      if (details !== null) {
+        details.setAttribute('open', '')
+      }
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    assert.equal(requireClickActionData(response.data).observed?.detailsOpen, true)
+  })
+
+  void it('reports observed.navigationStarted when URL changes after click', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>Navigate</button>
+      </main>
+    `)
+    // Simulate SPA navigation: after click, the browser's location.href changes
+    // NOTE: linkedom shares location across window instances, so we must
+    // restore it after this test to avoid leaking state to subsequent tests
+    let currentHref = 'https://example.com/'
+    const defaultView = document.defaultView as Record<string, unknown> | null
+    if (defaultView !== null) {
+      defaultView.location = {
+        get href () {
+          return currentHref
+        }
+      }
+    }
+
+    document.querySelector('button')?.addEventListener('click', () => {
+      // Simulate pushState changing the URL
+      currentHref = 'https://example.com/spa/page-a'
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      {
+        document,
+        locationHref: 'https://example.com/',
+        title: 'Example',
+        selectedText: '',
+        now: () => '2026-05-25T10:03:00.000Z'
+      }
+    )
+
+    assert.equal(response.ok, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    assert.equal(
+      requireClickActionData(response.data).observed?.navigationStarted,
+      true
+    )
+
+    // Restore location to avoid leaking to other tests (linkedom quirk)
+    if (defaultView !== null) {
+      defaultView.location = undefined
+    }
+  })
+
+  void it('omits observed when no side effects are detected', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button>Static</button>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('button')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    // In linkedom, defaultView.location is undefined and document.URL is undefined,
+    // so no navigationStarted should be detected
+    const observed = requireClickActionData(response.data).observed as
+    | Record<string, unknown>
+    | undefined
+    assert.equal(observed, undefined, `Expected no observed side effects but got: ${JSON.stringify(observed)}`)
+  })
+
+  void it('reports observed.detailsOpen=false when closing an open details', () => {
+    const { document } = parseHTML(`
+      <main>
+        <details open>
+          <summary>Close me</summary>
+          <p>Visible content</p>
+        </details>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('summary')?.addEventListener('click', () => {
+      clicked = true
+      // Simulate browser removing the open attribute
+      const details = document.querySelector('details')
+      if (details !== null) {
+        details.removeAttribute('open')
+      }
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+    if (!response.ok || response.data == null) {
+      assert.fail('Expected successful response')
+      return
+    }
+    assert.equal(requireClickActionData(response.data).observed?.detailsOpen, false)
   })
 
   void it('returns target_not_found when no matching click target exists', () => {
@@ -779,6 +1068,93 @@ void describe('content handler request handler', () => {
       {
         type: 'perform_click',
         target: { kind: 'action', id: 'bb-1', expectedRole: 'button' }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+  })
+
+  void it('clicks a summary when expectedRole matches its implicit button role', () => {
+    const { document } = parseHTML(`
+      <main>
+        <details>
+          <summary>Show more information</summary>
+          <p>Extra content</p>
+        </details>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('summary')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1',
+          expectedText: 'Show more information',
+          expectedRole: 'button'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+  })
+
+  void it('clicks an image input when expectedRole matches its implicit button role', () => {
+    const { document } = parseHTML(`
+      <main>
+        <input type="image" alt="Submit image button" id="image-submit" />
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('input')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1',
+          expectedText: 'Submit image button',
+          expectedRole: 'button'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    assert.equal(clicked, true)
+  })
+
+  void it('matches expectedText against the accessible name for aria-labelled actions', () => {
+    const { document } = parseHTML(`
+      <main>
+        <button aria-label="Go to page B">Navigate to /spa/page-b</button>
+      </main>
+    `)
+    let clicked = false
+    document.querySelector('button')?.addEventListener('click', () => {
+      clicked = true
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_click',
+        target: {
+          kind: 'action',
+          id: 'bb-1',
+          expectedText: 'Go to page B',
+          expectedRole: 'button'
+        }
       },
       createEnvironment(document)
     )
@@ -1410,4 +1786,17 @@ function createEnvironment (document: Document): ContentEnvironment {
     selectedText: '',
     now: () => '2026-05-25T10:03:00.000Z'
   }
+}
+
+function requireClickActionData (data: unknown): ActionResultData {
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'action' in data &&
+    data.action === 'click'
+  ) {
+    return data as ActionResultData
+  }
+
+  assert.fail('Expected click action result data.')
 }

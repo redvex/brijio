@@ -107,9 +107,18 @@ export interface ClickElementTarget {
   expectedRole?: string
 }
 
+export interface ClickObserved {
+  /** Whether a navigation appears to have started (URL changed) */
+  navigationStarted?: boolean
+  /** If a disclosure/summary was clicked, its new open state */
+  detailsOpen?: boolean
+}
+
 export interface ClickElementActionResultData {
   action: 'click'
   target: ClickElementTarget
+  /** What was detectable about the page after the click */
+  observed?: ClickObserved
 }
 
 export interface FillInputTarget {
