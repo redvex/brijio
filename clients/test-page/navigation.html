@@ -5,52 +5,208 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Brijio P1.3 — Navigation &amp; Action Test Page</title>
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 60rem; margin: 2rem auto; padding: 0 1rem; }
-    section { margin: 2rem 0; padding: 1rem; border: 1px solid #ddd; border-radius: 0.5rem; }
-    h2 { margin-top: 0; }
-    .status { font-weight: bold; }
-    .status.open { color: green; }
-    .status.closed { color: red; }
-    [aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
-    [hidden] { display: none; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1.5rem; line-height: 1.6; color: #1a1a1a; }
+    h1 { border-bottom: 2px solid #4f46e5; padding-bottom: .5rem; }
+    h2 { margin-top: 0; color: #4f46e5; }
+    section { margin: 2rem 0; padding: 1.25rem 1.5rem; border: 1px solid #e5e7eb; border-radius: .5rem; background: #fafafa; }
+
+    /* ── Action selector showcase grid ──────────────────────────── */
+    .action-grid {
+      display: flex; flex-wrap: wrap; gap: .75rem; align-items: center;
+    }
+    .action-grid > * { margin: 0; }
+
+    /* ── Shared interactive styling ─────────────────────────────── */
+    button {
+      padding: .4rem 1rem; border: 1px solid #d1d5db; border-radius: .375rem;
+      background: #fff; cursor: pointer; font-size: .9rem;
+      transition: background .15s, border-color .15s;
+    }
+    button:hover { background: #f3f4f6; }
+    button:active { background: #e5e7eb; }
+    button:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+
+    /* ── Role-based action styling ──────────────────────────────── */
+    [role="menuitem"] {
+      display: block; padding: .5rem 1rem; border-radius: .25rem;
+      cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
+      transition: background .15s;
+    }
+    [role="menuitem"]:hover { background: #f3f4f6; }
+    [role="menuitem"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+
+    [role="tab"] {
+      display: inline-block; padding: .4rem 1rem; border: 1px solid #d1d5db;
+      border-bottom: none; border-radius: .375rem .375rem 0 0;
+      background: #f9fafb; cursor: pointer; font-size: .9rem;
+      transition: background .15s;
+    }
+    [role="tab"][aria-selected="true"] { background: #fff; border-bottom: 2px solid #4f46e5; font-weight: 600; }
+    [role="tab"]:hover { background: #f3f4f6; }
+    [role="tab"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+
+    .tab-panel {
+      border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 .375rem .375rem;
+      padding: 1rem; background: #fff;
+    }
+
+    [role="switch"] {
+      display: inline-flex; align-items: center; gap: .5rem;
+      padding: .35rem .75rem; border: 1px solid #d1d5db; border-radius: 1rem;
+      background: #f3f4f6; cursor: pointer; font-size: .9rem;
+      transition: background .15s;
+    }
+    [role="switch"][aria-checked="true"] { background: #dbeafe; border-color: #93c5fd; }
+    [role="switch"]:hover { background: #e5e7eb; }
+    [role="switch"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    .switch-indicator {
+      display: inline-block; width: .75rem; height: .75rem; border-radius: 50%;
+      background: #9ca3af; transition: background .15s;
+    }
+    [role="switch"][aria-checked="true"] .switch-indicator { background: #3b82f6; }
+
+    [role="treeitem"] {
+      display: block; padding: .35rem .75rem; border-radius: .25rem;
+      cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
+      transition: background .15s; margin-left: 1rem;
+    }
+    [role="treeitem"]:hover { background: #f3f4f6; }
+    [role="treeitem"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    .tree-connector::before { content: "└─ "; color: #9ca3af; }
+
+    [role="option"] {
+      display: block; padding: .35rem .75rem; cursor: pointer;
+      border-radius: .25rem; transition: background .15s;
+    }
+    [role="option"]:hover { background: #dbeafe; }
+    [role="option"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    [role="listbox"] {
+      border: 1px solid #d1d5db; border-radius: .375rem; padding: .25rem;
+      background: #fff; min-width: 10rem;
+    }
+
+    [role="menuitemcheckbox"], [role="menuitemradio"] {
+      display: block; padding: .5rem 1rem; border-radius: .25rem;
+      cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
+      transition: background .15s;
+    }
+    [role="menuitemcheckbox"]:hover, [role="menuitemradio"]:hover { background: #f3f4f6; }
+    [role="menuitemcheckbox"]:focus-visible, [role="menuitemradio"]:focus-visible {
+      outline: 2px solid #4f46e5; outline-offset: 2px;
+    }
+    [role="menuitemcheckbox"]::before { content: "☐ "; color: #9ca3af; }
+    [role="menuitemcheckbox"][aria-checked="true"]::before { content: "☑ "; color: #3b82f6; }
+    [role="menuitemradio"]::before { content: "○ "; color: #9ca3af; }
+    [role="menuitemradio"][aria-checked="true"]::before { content: "● "; color: #3b82f6; }
+
+    input[type="image"] {
+      padding: .5rem .75rem; border: 1px solid #d1d5db; border-radius: .375rem;
+      background: #4f46e5; color: #fff; cursor: pointer; font-size: .9rem;
+      transition: background .15s;
+    }
+    input[type="image"]:hover { background: #4338ca; }
+
+    /* ── Details / disclosure ───────────────────────────────────── */
+    details { margin: .5rem 0; border: 1px solid #e5e7eb; border-radius: .375rem; }
+    details[open] { border-color: #93c5fd; }
+    summary {
+      padding: .5rem 1rem; background: #f9fafb; cursor: pointer;
+      border-radius: .375rem; font-weight: 500; list-style: none;
+    }
+    summary::before { content: "▶ "; font-size: .7rem; transition: transform .15s; display: inline-block; }
+    details[open] > summary::before { content: "▼ "; }
+    summary:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    details > p, details > div { padding: .75rem 1rem; }
+
+    /* ── Navigation buttons ─────────────────────────────────────── */
+    .nav-btn { background: #4f46e5; color: #fff; border: none; }
+    .nav-btn:hover { background: #4338ca; }
+    .nav-btn:active { background: #3730a3; }
+    .url-display {
+      display: inline-block; padding: .25rem .75rem; background: #f1f5f9;
+      border: 1px solid #e2e8f0; border-radius: .25rem; font-family: monospace;
+      font-size: .85rem; max-width: 100%; overflow-x: auto; word-break: break-all;
+    }
+    .nav-log { color: #6b7280; font-style: italic; }
+
+    /* ── Disabled / hidden ────────────────────────────────────────── */
+    .filter-section p { margin: .5rem 0; }
+    [aria-disabled="true"] { opacity: .45; cursor: not-allowed; pointer-events: none; }
+    [hidden] { display: none !important; }
+
+    .tag {
+      display: inline-block; font-size: .75rem; padding: .1rem .4rem;
+      border-radius: .25rem; font-family: monospace; vertical-align: middle;
+      margin-left: .25rem;
+    }
+    .tag-excluded { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .tag-included { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+
+    /* ── Action metadata ─────────────────────────────────────────── */
+    .meta-card {
+      display: inline-flex; flex-direction: column; gap: .25rem;
+      padding: .75rem 1rem; border: 1px solid #d1d5db; border-radius: .5rem;
+      background: #fff; min-width: 12rem;
+    }
+    .meta-card-label { font-weight: 600; }
+    .meta-card-detail { font-size: .85rem; color: #6b7280; }
+    .meta-card-tag { font-size: .8rem; color: #4f46e5; font-family: monospace; }
   </style>
 </head>
 <body>
   <h1>Brijio P1.3 — Navigation &amp; Action Test Page</h1>
 
-  <!-- ── Section 1: Expanded action selectors ────────────────────────── -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 1: Expanded action selectors                             -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
   <section id="expanded-selectors">
-    <h2>Expanded Action Selectors</h2>
+    <h2>1. Expanded Action Selectors</h2>
+    <p>Each element below should appear as a distinct action in <code>read_current_page</code>.</p>
 
-    <button id="native-button">Native button</button>
+    <div class="action-grid">
+      <button id="native-button">🔘 Native button</button>
 
-    <div role="menuitem" tabindex="0" id="menu-item">Menu item</div>
+      <div role="menuitem" tabindex="0" id="menu-item">📋 Menu item</div>
 
-    <ul role="tablist">
-      <li role="tab" aria-selected="true" tabindex="0" id="tab-profile">Profile</li>
-      <li role="tab" aria-selected="false" tabindex="0" id="tab-settings">Settings</li>
-    </ul>
+      <div role="tablist" style="margin-top:.5rem;">
+        <div role="tab" aria-selected="true" tabindex="0" id="tab-profile">👤 Profile</div>
+        <div role="tab" aria-selected="false" tabindex="0" id="tab-settings">⚙️ Settings</div>
+      </div>
+      <div class="tab-panel" id="tab-panel">
+        <em>Tab content appears here.</em>
+      </div>
 
-    <div role="switch" aria-checked="false" tabindex="0" id="dark-mode-switch">Dark mode</div>
+      <div role="switch" aria-checked="false" tabindex="0" id="dark-mode-switch">
+        <span class="switch-indicator"></span> 🌙 Dark mode
+      </div>
 
-    <div role="treeitem" tabindex="0" id="tree-node">Tree node</div>
+      <div role="treeitem" tabindex="0" id="tree-node" class="tree-connector">📁 Tree node</div>
 
-    <div role="option" tabindex="0" id="list-option">List option</div>
+      <div role="listbox" aria-label="Options">
+        <div role="option" tabindex="0" id="list-option">🔲 List option</div>
+      </div>
 
-    <div role="menuitemcheckbox" aria-checked="false" tabindex="0" id="toggle-check">Toggle check</div>
+      <div role="menuitemcheckbox" aria-checked="false" tabindex="0" id="toggle-check">Toggle check</div>
+      <div role="menuitemradio" aria-checked="false" tabindex="0" id="radio-choice">Radio choice</div>
 
-    <div role="menuitemradio" aria-checked="false" tabindex="0" id="radio-choice">Radio choice</div>
-
-    <input type="image" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'><text y='16'>Submit image</text></svg>" alt="Submit image button" id="image-submit" />
+      <input type="image"
+        src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='32'%3E%3Crect width='120' height='32' rx='4' fill='%234f46e5'/%3E%3Ctext x='60' y='21' text-anchor='middle' fill='white' font-family='system-ui' font-size='14'%3ESubmit image%3C/text%3E%3C/svg%3E"
+        alt="Submit image button"
+        id="image-submit" />
+    </div>
   </section>
 
-  <!-- ── Section 2: Disclosure / details observation ─────────────────── -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 2: Disclosure / details observation                       -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
   <section id="disclosure-observation">
-    <h2>Disclosure / Details Observation</h2>
+    <h2>2. Disclosure / Details Observation</h2>
+    <p>Click the summary elements. <code>observed.detailsOpen</code> should report the toggle state.</p>
 
     <details id="info-details">
       <summary id="info-summary">Show more information</summary>
-      <p id="details-content">Here is the expanded detail content. The <code>observed.detailsOpen</code> hint should report <code>true</code> after clicking this summary.</p>
+      <p>Here is the expanded detail content. The <code>observed.detailsOpen</code> hint should report <code>true</code> after clicking this summary.</p>
     </details>
 
     <details id="second-details" open>
@@ -59,57 +215,77 @@
     </details>
   </section>
 
-  <!-- ── Section 3: SPA navigation detection ─────────────────────────── -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 3: SPA navigation detection                               -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
   <section id="spa-navigation">
-    <h2>SPA Navigation Detection</h2>
+    <h2>3. SPA Navigation Detection</h2>
+    <p>Current URL: <span class="url-display" id="current-url"></span></p>
 
-    <p>Current URL: <code id="current-url"></code></p>
+    <div class="action-grid" style="margin-top:.75rem;">
+      <button class="nav-btn" id="push-state-btn" title="Navigates to /spa/page-a via history.pushState">
+        ↗️ Navigate to /spa/page-a
+      </button>
 
-    <button id="push-state-btn" title="Navigates to /spa/page-a via history.pushState">
-      Navigate to /spa/page-a
-    </button>
+      <button class="nav-btn" id="replace-state-btn" aria-label="Go to page B" title="Navigates to /spa/page-b via history.replaceState">
+        🔁 Navigate to /spa/page-b
+      </button>
 
-    <button id="replace-state-btn" aria-label="Go to page B" title="Navigates to /spa/page-b via history.replaceState">
-      Navigate to /spa/page-b
-    </button>
+      <button id="back-btn">⬅️ Go back</button>
+    </div>
 
-    <button id="back-btn">Go back</button>
-
-    <p id="nav-log">Navigation events will appear here.</p>
+    <p class="nav-log" id="nav-log">Navigation events will appear here.</p>
   </section>
 
-  <!-- ── Section 4: Disabled / hidden filtering ─────────────────────── -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 4: Disabled / hidden filtering                             -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
   <section id="disabled-hidden-filtering">
-    <h2>Disabled / Hidden Filtering</h2>
+    <h2>4. Disabled / Hidden Filtering</h2>
 
     <p>The following controls should <strong>not</strong> appear in the actions list:</p>
-
-    <button disabled id="disabled-btn">Disabled button</button>
-
-    <div role="menuitem" aria-disabled="true" tabindex="0" id="aria-disabled-item">ARIA disabled item</div>
-
-    <button hidden id="hidden-btn">Hidden button</button>
-
-    <div role="tab" aria-hidden="true" tabindex="0" id="aria-hidden-tab">Invisible tab</div>
+    <div class="action-grid" style="margin-bottom:.75rem;">
+      <button disabled id="disabled-btn">🚫 Disabled button</button>
+      <div role="menuitem" aria-disabled="true" tabindex="0" id="aria-disabled-item">🚫 ARIA disabled item</div>
+      <button hidden id="hidden-btn">Hidden button</button>
+      <div role="tab" aria-hidden="true" tabindex="0" id="aria-hidden-tab">Invisible tab</div>
+    </div>
 
     <p>The following controls <strong>should</strong> appear:</p>
-
-    <button id="enabled-btn">Enabled button</button>
-
-    <div role="switch" aria-checked="false" tabindex="0" id="enabled-switch">Enabled switch</div>
+    <div class="action-grid">
+      <button id="enabled-btn">✅ Enabled button</button>
+      <div role="switch" aria-checked="false" tabindex="0" id="enabled-switch">
+        <span class="switch-indicator"></span> ✅ Enabled switch
+      </div>
+    </div>
   </section>
 
-  <!-- ── Section 5: Action metadata (tagName, description) ───────────── -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Section 5: Action metadata (tagName, description)                 -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
   <section id="action-metadata">
-    <h2>Action Metadata</h2>
+    <h2>5. Action Metadata</h2>
+    <p>Each action should include <code>tagName</code> and <code>description</code> fields where applicable.</p>
 
-    <button aria-label="Save" title="Saves your current work to the server" id="save-btn">Save</button>
+    <div class="action-grid">
+      <div class="meta-card">
+        <button aria-label="Save" title="Saves your current work to the server" id="save-btn">💾 Save</button>
+        <span class="meta-card-detail">title: "Saves your current work to the server"</span>
+        <span class="meta-card-tag">tagName: button · description: "Saves your current work to the server"</span>
+      </div>
 
-    <div role="tab" aria-label="Account" aria-describedby="account-tab-desc" tabindex="0" id="account-tab">Account tab</div>
-    <p id="account-tab-desc" style="display:none">View and edit your account settings and preferences</p>
+      <div class="meta-card">
+        <div role="tab" aria-label="Account" aria-describedby="account-tab-desc" tabindex="0" id="account-tab">👤 Account tab</div>
+        <span class="meta-card-detail">aria-describedby: "View and edit your account settings and preferences"</span>
+        <span class="meta-card-tag">tagName: div · description: "View and edit your account settings and preferences"</span>
+      </div>
+      <p id="account-tab-desc" style="display:none">View and edit your account settings and preferences</p>
+    </div>
   </section>
 
-  <!-- ── Script ──────────────────────────────────────────────────────── -->
+  <!-- ════════════════════════════════════════════════════════════════ -->
+  <!-- Script                                                            -->
+  <!-- ══════════════════════════════════════════════════════════════════ -->
   <script>
     // ── SPA Navigation ────────────────────────────────────────────
     const navLog = document.getElementById('nav-log')
@@ -146,18 +322,30 @@
       }, 50)
     })
 
-    // ── Disclosure status display ─────────────────────────────────
-    function updateDetailsStatus(details, statusEl) {
-      if (!statusEl) return
-      const open = details.hasAttribute('open')
-      statusEl.textContent = open ? 'Open' : 'Closed'
-      statusEl.className = 'status ' + (open ? 'open' : 'closed')
-    }
+    // ── Switch toggle ────────────────────────────────────────────
+    document.querySelectorAll('[role="switch"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const checked = el.getAttribute('aria-checked') === 'true'
+        el.setAttribute('aria-checked', String(!checked))
+      })
+    })
 
-    document.querySelectorAll('details').forEach(details => {
-      const statusEl = details.querySelector('.status')
-      updateDetailsStatus(details, statusEl)
-      details.addEventListener('toggle', () => updateDetailsStatus(details, statusEl))
+    // ── Tab switching ──────────────────────────────────────────────
+    document.querySelectorAll('[role="tab"]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('[role="tab"]').forEach(t => {
+          t.setAttribute('aria-selected', 'false')
+        })
+        tab.setAttribute('aria-selected', 'true')
+      })
+    })
+
+    // ── Menu item checkbox/radio toggle ───────────────────────────
+    document.querySelectorAll('[role="menuitemcheckbox"], [role="menuitemradio"]').forEach(el => {
+      el.addEventListener('click', () => {
+        const checked = el.getAttribute('aria-checked') === 'true'
+        el.setAttribute('aria-checked', String(!checked))
+      })
     })
   </script>
 </body>
