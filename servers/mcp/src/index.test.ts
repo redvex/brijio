@@ -272,6 +272,12 @@ void describe('Brijio MCP HTTP server', () => {
             title: 'Navigate to URL',
             description:
               'Navigate the browser to an HTTP or HTTPS URL and wait for the page to load.'
+          },
+          {
+            name: 'perform_batch',
+            title: 'Perform Batch Actions',
+            description:
+              'Execute multiple browser actions (click, write_text, set_checked, select_options, submit_form) in a single request. Actions are executed sequentially. If continueOnError is false (default), execution stops on the first error. If continueOnError is true, execution continues and errors are reported per-action. Optionally reads page context after all actions by setting readAfterActions to true.'
           }
         ]
       )

@@ -21,6 +21,7 @@ import {
   submitForm
 } from './form-action-tools.js'
 import { readCurrentPage } from './page-reading-tool.js'
+import { performBatchTool } from './batch-tool.js'
 import {
   buildContextMessage,
   loadSkills,
@@ -431,6 +432,80 @@ export async function createBrijioMcpServer (
     async (input) => {
       logToolCall('navigate_to_url', input as Record<string, unknown>)
       const result = await navigateToUrl(pageContextConfig, input)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
+    'perform_batch',
+    {
+      title: 'Perform Batch Actions',
+      description:
+        'Execute multiple browser actions (click, write_text, set_checked, select_options, submit_form) in a single request. ' +
+        'Actions are executed sequentially. If continueOnError is false (default), execution stops on the first error. ' +
+        'If continueOnError is true, execution continues and errors are reported per-action. ' +
+        'Optionally reads page context after all actions by setting readAfterActions to true.',
+      inputSchema: {
+        actions: z
+          .array(
+            z.object({
+              type: z
+                .enum(['click', 'write_text', 'set_checked', 'select_options', 'submit_form'])
+                .describe('The action type.'),
+              target: z
+                .record(z.unknown())
+                .describe('The Brijio target ID object (e.g. { kind: "link", id: "bb-1" } or { formId: "bb-2", controlId: "bb-3" }).'),
+              text: z
+                .string()
+                .optional()
+                .describe('Text to write (required for write_text actions).'),
+              checked: z
+                .boolean()
+                .optional()
+                .describe('Checked state (required for set_checked actions).'),
+              values: z
+                .array(z.string())
+                .optional()
+                .describe('Option values (required for select_options actions).')
+            })
+          )
+          .min(1)
+          .max(20)
+          .describe('Array of actions to execute (1–20).'),
+        continueOnError: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe('If true, continue executing actions after an error. Default: false.'),
+        readAfterActions: z
+          .boolean()
+          .optional()
+          .default(false)
+          .describe('If true, read page context after all actions complete. Default: false.'),
+        pageContextId: z
+          .number()
+          .optional()
+          .describe('Page context ID for stale-context detection.'),
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input) => {
+      logToolCall('perform_batch', input as Record<string, unknown>)
+      const result = await performBatchTool(pageContextConfig, {
+        actions: input.actions,
+        continueOnError: input.continueOnError,
+        readAfterActions: input.readAfterActions,
+        pageContextId: input.pageContextId,
+        browserInstanceId: input.browserInstanceId
+      })
 
       return {
         content: [
