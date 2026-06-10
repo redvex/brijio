@@ -596,6 +596,11 @@ void describe('BrijioBackgroundController with Safari adapters', () => {
         async selectOptions () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } },
         async submitForm () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } }
       },
+      pageBatch: {
+        async performBatch () {
+          return { ok: false, results: [], aborted: false }
+        }
+      },
       pageNavigation,
       timers
     })

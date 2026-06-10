@@ -24,6 +24,7 @@ import { handleContentRequest, type ContentEnvironment, type ContentRequest } fr
 
 export interface BatchRequest {
   actions: BatchAction[]
+  pageContextId?: number
   continueOnError?: boolean
   readAfterActions?: boolean
 }
@@ -31,6 +32,28 @@ export interface BatchRequest {
 export interface BatchResult {
   ok: boolean
   results: BatchResultEntry[]
+  aborted: boolean
+}
+
+/**
+ * Message type for batch requests sent to the content script.
+ * The content script dispatches this to executeBatch() and returns a BatchResult.
+ */
+export interface ContentBatchRequest {
+  type: 'perform_batch'
+  actions: BatchAction[]
+  pageContextId?: number
+  continueOnError?: boolean
+  readAfterActions?: boolean
+}
+
+/**
+ * Type guard to check if a message is a batch request.
+ */
+export function isContentBatchRequest (message: unknown): message is ContentBatchRequest {
+  if (typeof message !== 'object' || message === null) return false
+  const m = message as Record<string, unknown>
+  return m.type === 'perform_batch' && Array.isArray(m.actions)
 }
 
 type ActionData = ActionResultData | WriteTextActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData
@@ -38,18 +61,44 @@ type ActionData = ActionResultData | WriteTextActionResultData | SetCheckedActio
 /**
  * Convert a BatchAction (from protocol) to a ContentRequest (for content-handler).
  */
-export function batchActionToContentRequest (action: BatchAction): ContentRequest {
+export function batchActionToContentRequest (
+  action: BatchAction,
+  pageContextId?: number
+): ContentRequest {
   switch (action.type) {
     case 'click':
-      return { type: 'perform_click', target: action.target }
+      return {
+        type: 'perform_click',
+        target: action.target,
+        ...(pageContextId !== undefined ? { pageContextId } : {})
+      }
     case 'write_text':
-      return { type: 'perform_write_text', target: action.target, text: action.text }
+      return {
+        type: 'perform_write_text',
+        target: action.target,
+        text: action.text,
+        ...(pageContextId !== undefined ? { pageContextId } : {})
+      }
     case 'set_checked':
-      return { type: 'perform_set_checked', target: action.target, checked: action.checked }
+      return {
+        type: 'perform_set_checked',
+        target: action.target,
+        checked: action.checked,
+        ...(pageContextId !== undefined ? { pageContextId } : {})
+      }
     case 'select_options':
-      return { type: 'perform_select_options', target: action.target, values: action.values }
+      return {
+        type: 'perform_select_options',
+        target: action.target,
+        values: action.values,
+        ...(pageContextId !== undefined ? { pageContextId } : {})
+      }
     case 'submit_form':
-      return { type: 'perform_submit_form', target: { formId: action.target.formId } }
+      return {
+        type: 'perform_submit_form',
+        target: action.target,
+        ...(pageContextId !== undefined ? { pageContextId } : {})
+      }
   }
 }
 
@@ -88,7 +137,7 @@ export function executeBatch (
     }
 
     const action = request.actions[i]
-    const contentRequest = batchActionToContentRequest(action)
+    const contentRequest = batchActionToContentRequest(action, request.pageContextId)
     const response = handleContentRequest(contentRequest, environment)
 
     if (response.ok) {
@@ -155,6 +204,7 @@ export function executeBatch (
 
   return {
     ok: allOk,
-    results
+    results,
+    aborted
   }
 }
