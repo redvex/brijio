@@ -87,6 +87,41 @@ Run these steps manually after starting `brijio demo`.
 - [ ] `fill_input` on `disabled-text` returns an error or no-op (field is disabled)
 - [ ] `click_element` on `disabled-button` returns an error or no-op
 
+## Navigation Test Page — `/navigation.html`
+
+- [ ] `http://localhost:8789/navigation.html` loads without errors
+- [ ] Page title shows "Brijio P1.3 — Navigation & Action Test Page"
+
+### Expanded Action Selectors
+
+- [ ] `read_current_page` returns actions for: `role="menuitem"`, `role="tab"`, `role="switch"`, `role="treeitem"`, `role="option"`, `role="menuitemcheckbox"`, `role="menuitemradio"`, `summary`, `input[type="image"]`
+- [ ] Each action includes `tagName` (e.g. `"div"`, `"button"`, `"summary"`)
+- [ ] Actions with `title` or `aria-describedby` include a `description` field
+- [ ] Actions with `aria-label` different from `title` show `title` as description
+
+### Disclosure / Details Observation
+
+- [ ] Click `info-summary` ("Show more information") — `observed.detailsOpen` is `true`
+- [ ] Click `info-summary` again — `observed.detailsOpen` is `false`
+- [ ] Click `second-summary` ("Initially open section") — `observed.detailsOpen` is `false`
+
+### SPA Navigation Detection
+
+- [ ] Click "Navigate to /spa/page-a" button — `observed.navigationStarted` is `true`
+- [ ] Click "Go back" button to return to original URL
+- [ ] Click "Navigate to /spa/page-b" button — `observed.navigationStarted` is `true`
+
+### Disabled / Hidden Filtering
+
+- [ ] `read_current_page` actions list does NOT include: `disabled-btn`, `aria-disabled-item`, `hidden-btn`, `aria-hidden-tab`
+- [ ] `read_current_page` actions list DOES include: `enabled-btn`, `enabled-switch`
+- [ ] `click_element` on `aria-disabled-item` returns `target_disabled` error
+
+### Action Metadata
+
+- [ ] `save-btn` action has `tagName: "button"`, `description: "Saves your current work to the server"`
+- [ ] `account-tab` action has `tagName: "div"`, `description` from `aria-describedby` element
+
 ## Graceful Shutdown
 
 - [ ] Ctrl+C stops the demo server
