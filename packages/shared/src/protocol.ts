@@ -23,6 +23,7 @@ export type BrowserCapability =
   | 'select_options'
   | 'submit_form'
   | 'navigate'
+  | 'batch'
 
 export interface BrowserPresence {
   browserInstanceId: string
@@ -157,6 +158,57 @@ export interface PerformActionRequest {
   | PerformSetCheckedAction
   | PerformSelectOptionsAction
   | PerformSubmitFormAction
+}
+
+// --- Batch request types (ADR 0044) ---
+
+export const BATCH_MAX_ACTIONS = 20
+
+export type BatchAction =
+  | PerformClickAction
+  | PerformWriteTextAction
+  | PerformSetCheckedAction
+  | PerformSelectOptionsAction
+  | PerformSubmitFormAction
+
+export interface PerformBatchRequest {
+  type: 'perform_batch'
+  pageContextId?: number
+  actions: BatchAction[]
+  continueOnError?: boolean
+  readAfterActions?: boolean
+}
+
+export interface BatchActionError {
+  code: ActionResultErrorCode | 'page_navigated'
+  message: string
+  detail?: StaleContextDetail
+  aborted: boolean
+}
+
+export type BatchActionOutcome =
+  | { ok: true, data: ActionResultData | WriteTextActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData }
+  | { ok: false, error: BatchActionError }
+
+export type BatchReadOutcome =
+  | { ok: true, data: PageContext }
+  | { ok: false, error: BatchActionError }
+
+export type BatchResultEntry = BatchActionOutcome | BatchReadOutcome
+
+export interface BatchResultResponse {
+  type: 'batch_result'
+  ok: boolean
+  results: BatchResultEntry[]
+}
+
+export interface BatchResultErrorResponse {
+  type: 'batch_result'
+  ok: false
+  error: {
+    code: BrijioErrorCode
+    message: string
+  }
 }
 
 export interface PageHeading {
@@ -461,6 +513,8 @@ export type ExtensionResponse =
   | ActionResultErrorResponse
   | NavigateToUrlResponse
   | NavigateToUrlErrorResponse
+  | BatchResultResponse
+  | BatchResultErrorResponse
 
 export function createAuthEnvelope (input: {
   requestId?: string
@@ -869,6 +923,140 @@ export function createActionResultErrorResponse (
   })
 }
 
+export function createPerformBatchEnvelope (
+  requestId: string | undefined,
+  actions: BatchAction[],
+  options?: { pageContextId?: number, continueOnError?: boolean, readAfterActions?: boolean }
+): WebSocketEnvelope {
+  const payload: PerformBatchRequest = {
+    type: 'perform_batch',
+    actions,
+    ...(options?.pageContextId !== undefined ? { pageContextId: options.pageContextId } : {}),
+    ...(options?.continueOnError !== undefined ? { continueOnError: options.continueOnError } : {}),
+    ...(options?.readAfterActions !== undefined ? { readAfterActions: options.readAfterActions } : {})
+  }
+
+  if (requestId === undefined) {
+    return {
+      type: 'message',
+      payload
+    }
+  }
+
+  return {
+    type: 'message',
+    id: requestId,
+    payload
+  }
+}
+
+export function createBatchResultResponse (
+  id: string | undefined,
+  results: BatchResultEntry[]
+): WebSocketEnvelope {
+  const allOk = results.every(entry => entry.ok)
+
+  return createEnvelope(id, {
+    type: 'batch_result',
+    ok: allOk,
+    results
+  })
+}
+
+export function createBatchResultErrorResponse (
+  id: string | undefined,
+  code: BrijioErrorCode,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'batch_result',
+    ok: false,
+    error: { code, message }
+  })
+}
+
+export function isPerformBatchEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: PerformBatchRequest } {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type !== 'message') {
+    return false
+  }
+
+  if (Object.hasOwn(value, 'id') && typeof value.id !== 'string') {
+    return false
+  }
+
+  if (!isRecord(value.payload)) {
+    return false
+  }
+
+  if (value.payload.type !== 'perform_batch') {
+    return false
+  }
+
+  // pageContextId: if present, must be a number
+  if (Object.hasOwn(value.payload, 'pageContextId') && typeof value.payload.pageContextId !== 'number') {
+    return false
+  }
+
+  // actions: required array, 1–20 items, each must be a valid BatchAction
+  if (!Array.isArray(value.payload.actions)) {
+    return false
+  }
+
+  if (value.payload.actions.length < 1 || value.payload.actions.length > BATCH_MAX_ACTIONS) {
+    return false
+  }
+
+  if (!value.payload.actions.every(isBatchAction)) {
+    return false
+  }
+
+  // continueOnError: if present, must be boolean
+  if (Object.hasOwn(value.payload, 'continueOnError') && typeof value.payload.continueOnError !== 'boolean') {
+    return false
+  }
+
+  // readAfterActions: if present, must be boolean
+  if (Object.hasOwn(value.payload, 'readAfterActions') && typeof value.payload.readAfterActions !== 'boolean') {
+    return false
+  }
+
+  return true
+}
+
+function isBatchAction (value: unknown): value is BatchAction {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type === 'click') {
+    return isClickAction(value)
+  }
+
+  if (value.type === 'write_text') {
+    return isWriteTextAction(value)
+  }
+
+  if (value.type === 'set_checked') {
+    return isSetCheckedAction(value)
+  }
+
+  if (value.type === 'select_options') {
+    return isSelectOptionsAction(value)
+  }
+
+  if (value.type === 'submit_form') {
+    return isSubmitFormAction(value)
+  }
+
+  return false
+}
+
 function createEnvelope (
   id: string | undefined,
   payload: ExtensionResponse
@@ -986,7 +1174,8 @@ function isBrowserCapability (value: unknown): value is BrowserCapability {
     value === 'set_checked' ||
     value === 'select_options' ||
     value === 'submit_form' ||
-    value === 'navigate'
+    value === 'navigate' ||
+    value === 'batch'
   )
 }
 
