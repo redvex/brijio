@@ -230,6 +230,8 @@ export interface PageAction {
 }
 
 export interface PageContext {
+  /** Content script version for diagnostics (identifies ACTION_SELECTORS shape) */
+  _csVersion?: number
   pageContextId?: number
   url: string
   title: string

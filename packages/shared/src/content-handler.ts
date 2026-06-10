@@ -18,6 +18,9 @@ import {
 import { extractPageContent, extractPageContext, ACTION_SELECTORS } from './page-context.js'
 import { chunkReadableContent } from './page-content.js'
 
+/** Content script version — incremented when ACTION_SELECTORS or response shape changes. */
+export const CONTENT_SCRIPT_VERSION = 2
+
 /** Module-scoped page context version; incremented on navigation (pageshow). */
 let pageContextVersion = 1
 
@@ -149,6 +152,7 @@ export function handleContentRequest (
         ok: true,
         data: {
           ...context,
+          _csVersion: CONTENT_SCRIPT_VERSION,
           pageContextId: pageContextVersion
         }
       }

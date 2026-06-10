@@ -84,6 +84,10 @@ listener's `pageContextVersion` matches the current module scope.
   lifecycle for the active listener, so stale-context detection continues to
   work correctly.
 
+- **Positive**: `_csVersion` field in `PageContext` responses enables
+  diagnostics — if the LLM sees `_csVersion: 2` the content script is
+  P1.3+; if missing, it's pre-P1.3.
+
 - **Neutral**: `executeScript` is called before every action, adding a small
   overhead. This is acceptable because `executeScript` with an already-loaded
   content script is a fast no-op in most browser implementations.
