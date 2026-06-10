@@ -9,7 +9,8 @@ void describe('MCP perform batch tool', () => {
     ok: true,
     results: [
       { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } }
-    ]
+    ],
+    aborted: false
   }
 
   const defaultConfig: BrijioPageActionsConfig = {
