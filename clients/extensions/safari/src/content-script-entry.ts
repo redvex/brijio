@@ -1,15 +1,3 @@
-// Safari content script entry point.
-//
-// Per ADR 0019, this is a thin file that registers a
-// browser.runtime.onMessage listener and delegates to the shared
-// handleContentRequest function from @brijio/shared.
-// It is analogous to Chrome's content-script-entry.ts but uses the
-// browser.* namespace (WebExtension API) instead of chrome.*.
-//
-// Per ADR 0042, a module-scoped sentinel prevents duplicate listener
-// registration when scripting.executeScript re-injects this script
-// into the same page.
-
 import {
   handleContentRequest,
   registerPageNavigationListener,
@@ -29,38 +17,62 @@ interface BrowserRuntimeApi {
           sendResponse: SendResponse
         ) => boolean
       ) => void
+      removeListener: (
+        callback: (
+          message: ContentRequest,
+          sender: unknown,
+          sendResponse: SendResponse
+        ) => boolean
+      ) => void
     }
   }
 }
 
 declare const browser: BrowserRuntimeApi | undefined
 
-// Guard against duplicate injection: if this script is injected again
-// (e.g. by scripting.executeScript), skip re-registering listeners.
-// The window property is set on first injection and persists across
-// re-injections because the page context is the same.
-if ((globalThis as Record<string, unknown>).__brijioContentLoaded !== true) {
-  ;(globalThis as Record<string, unknown>).__brijioContentLoaded = true
+// Per ADR 0041, register a pageshow listener so content-handler
+// increments pageContextVersion on back/forward navigation.
+registerPageNavigationListener()
 
-  // Per ADR 0041, register a pageshow listener so content-handler
-  // increments pageContextVersion on back/forward navigation.
-  registerPageNavigationListener()
+if (typeof browser !== 'undefined') {
+  // Per ADR 0043: When scripting.executeScript re-injects this script,
+  // a new module scope is created with a fresh pageContextVersion.
+  // We must remove the PREVIOUS injection's listener (stored on globalThis)
+  // before adding the new one, so only one listener is active and
+  // pageContextVersion matches the current module scope.
+  type OnMessageCallback = (
+    message: ContentRequest,
+    sender: unknown,
+    sendResponse: SendResponse
+  ) => boolean
 
-  if (typeof browser !== 'undefined') {
-    browser.runtime.onMessage.addListener(
-      (message: ContentRequest, _sender: unknown, sendResponse: SendResponse): boolean => {
-        sendResponse(
-          handleContentRequest(message, {
-            document: globalThis.document,
-            locationHref: globalThis.location.href,
-            title: globalThis.document.title,
-            selectedText: globalThis.getSelection?.()?.toString() ?? '',
-            now: () => new Date().toISOString()
-          })
-        )
+  const globalRef = globalThis as Record<string, unknown>
 
-        return false
-      }
+  const onMessage: OnMessageCallback = (
+    message: ContentRequest,
+    _sender: unknown,
+    sendResponse: SendResponse
+  ): boolean => {
+    sendResponse(
+      handleContentRequest(message, {
+        document: globalThis.document,
+        locationHref: globalThis.location.href,
+        title: globalThis.document.title,
+        selectedText: globalThis.getSelection?.()?.toString() ?? '',
+        now: () => new Date().toISOString()
+      })
     )
+
+    return false
   }
+
+  // Remove the previous injection's listener if it exists
+  const previousListener = globalRef.__brijioOnMessageListener as OnMessageCallback | undefined
+  if (previousListener !== undefined) {
+    browser.runtime.onMessage.removeListener(previousListener)
+  }
+
+  browser.runtime.onMessage.addListener(onMessage)
+  // Store reference so the next injection can remove this one
+  globalRef.__brijioOnMessageListener = onMessage
 }
