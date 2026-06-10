@@ -98,6 +98,13 @@ Run these steps manually after starting `brijio demo`.
 - [ ] Each action includes `tagName` (e.g. `"div"`, `"button"`, `"summary"`)
 - [ ] Actions with `title` or `aria-describedby` include a `description` field
 - [ ] Actions with `aria-label` different from `title` show `title` as description
+- [ ] Click "Native button" — button briefly flashes blue (click feedback)
+- [ ] Click "Profile" tab then "Settings" tab — tab panel content updates accordingly
+- [ ] Click "Tree node" — children expand/collapse; `aria-expanded` toggles
+- [ ] Click "List option" — `aria-selected` toggles between true/false
+- [ ] Click "Dark mode" switch — `aria-checked` toggles; indicator dot changes color
+- [ ] Click "Toggle check" — checkbox toggles between ☐ and ☑
+- [ ] Click "Radio choice" — radio toggles between ○ and ●
 
 ### Disclosure / Details Observation
 
@@ -119,8 +126,10 @@ Run these steps manually after starting `brijio demo`.
 
 ### Action Metadata
 
+- [ ] Switch between Account and Notifications tabs — panel content updates
 - [ ] `save-btn` action has `tagName: "button"`, `description: "Saves your current work to the server"`
 - [ ] `account-tab` action has `tagName: "div"`, `description` from `aria-describedby` element
+- [ ] `notifications-tab` action has `tagName: "div"`, `description` from `aria-describedby` element
 
 ## Graceful Shutdown
 

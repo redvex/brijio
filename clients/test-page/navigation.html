@@ -13,7 +13,7 @@
 
     /* ── Action selector showcase grid ──────────────────────────── */
     .action-grid {
-      display: flex; flex-wrap: wrap; gap: .75rem; align-items: center;
+      display: flex; flex-wrap: wrap; gap: .75rem; align-items: flex-start;
     }
     .action-grid > * { margin: 0; }
 
@@ -21,11 +21,15 @@
     button {
       padding: .4rem 1rem; border: 1px solid #d1d5db; border-radius: .375rem;
       background: #fff; cursor: pointer; font-size: .9rem;
-      transition: background .15s, border-color .15s;
+      transition: background .15s, border-color .15s, box-shadow .15s;
     }
     button:hover { background: #f3f4f6; }
     button:active { background: #e5e7eb; }
     button:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
+    button.flash-active {
+      background: #dbeafe !important; border-color: #93c5fd !important;
+      box-shadow: 0 0 0 2px #93c5fd;
+    }
 
     /* ── Role-based action styling ──────────────────────────────── */
     [role="menuitem"] {
@@ -36,6 +40,8 @@
     [role="menuitem"]:hover { background: #f3f4f6; }
     [role="menuitem"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
 
+    /* ── Tabs ────────────────────────────────────────────────────── */
+    .tab-bar { display: flex; gap: 0; }
     [role="tab"] {
       display: inline-block; padding: .4rem 1rem; border: 1px solid #d1d5db;
       border-bottom: none; border-radius: .375rem .375rem 0 0;
@@ -45,12 +51,12 @@
     [role="tab"][aria-selected="true"] { background: #fff; border-bottom: 2px solid #4f46e5; font-weight: 600; }
     [role="tab"]:hover { background: #f3f4f6; }
     [role="tab"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
-
     .tab-panel {
       border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 .375rem .375rem;
-      padding: 1rem; background: #fff;
+      padding: 1rem; background: #fff; min-height: 3rem;
     }
 
+    /* ── Switch ──────────────────────────────────────────────────── */
     [role="switch"] {
       display: inline-flex; align-items: center; gap: .5rem;
       padding: .35rem .75rem; border: 1px solid #d1d5db; border-radius: 1rem;
@@ -66,26 +72,36 @@
     }
     [role="switch"][aria-checked="true"] .switch-indicator { background: #3b82f6; }
 
+    /* ── Tree ────────────────────────────────────────────────────── */
+    [role="tree"] { margin: 0; padding: 0; }
     [role="treeitem"] {
       display: block; padding: .35rem .75rem; border-radius: .25rem;
       cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
-      transition: background .15s; margin-left: 1rem;
+      transition: background .15s;
     }
     [role="treeitem"]:hover { background: #f3f4f6; }
     [role="treeitem"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
-    .tree-connector::before { content: "└─ "; color: #9ca3af; }
+    .tree-group { margin-left: 1.5rem; overflow: hidden; transition: max-height .2s ease; }
+    .tree-group.collapsed { max-height: 0; }
+    .tree-group.expanded { max-height: 10rem; }
+    .tree-toggle::before { content: "▸ "; color: #9ca3af; font-size: .8rem; transition: content .15s; }
+    .tree-toggle.open::before { content: "▾ "; }
 
+    /* ── Listbox / option ─────────────────────────────────────────── */
+    [role="listbox"] {
+      border: 1px solid #d1d5db; border-radius: .375rem; padding: .25rem;
+      background: #fff; min-width: 10rem;
+    }
     [role="option"] {
       display: block; padding: .35rem .75rem; cursor: pointer;
       border-radius: .25rem; transition: background .15s;
     }
     [role="option"]:hover { background: #dbeafe; }
     [role="option"]:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
-    [role="listbox"] {
-      border: 1px solid #d1d5db; border-radius: .375rem; padding: .25rem;
-      background: #fff; min-width: 10rem;
-    }
+    [role="option"][aria-selected="true"] { background: #dbeafe; font-weight: 600; }
+    [role="option"][aria-selected="true"]::before { content: "✓ "; color: #3b82f6; }
 
+    /* ── Menu checkbox / radio ───────────────────────────────────── */
     [role="menuitemcheckbox"], [role="menuitemradio"] {
       display: block; padding: .5rem 1rem; border-radius: .25rem;
       cursor: pointer; background: #fff; border: 1px solid #e5e7eb;
@@ -100,6 +116,7 @@
     [role="menuitemradio"]::before { content: "○ "; color: #9ca3af; }
     [role="menuitemradio"][aria-checked="true"]::before { content: "● "; color: #3b82f6; }
 
+    /* ── Submit image ─────────────────────────────────────────────── */
     input[type="image"] {
       padding: .5rem .75rem; border: 1px solid #d1d5db; border-radius: .375rem;
       background: #4f46e5; color: #fff; cursor: pointer; font-size: .9rem;
@@ -107,14 +124,14 @@
     }
     input[type="image"]:hover { background: #4338ca; }
 
-    /* ── Details / disclosure ───────────────────────────────────── */
+    /* ── Details / disclosure ─────────────────────────────────────── */
     details { margin: .5rem 0; border: 1px solid #e5e7eb; border-radius: .375rem; }
     details[open] { border-color: #93c5fd; }
     summary {
       padding: .5rem 1rem; background: #f9fafb; cursor: pointer;
       border-radius: .375rem; font-weight: 500; list-style: none;
     }
-    summary::before { content: "▶ "; font-size: .7rem; transition: transform .15s; display: inline-block; }
+    summary::before { content: "▶ "; font-size: .7rem; display: inline-block; }
     details[open] > summary::before { content: "▼ "; }
     summary:focus-visible { outline: 2px solid #4f46e5; outline-offset: 2px; }
     details > p, details > div { padding: .75rem 1rem; }
@@ -131,17 +148,8 @@
     .nav-log { color: #6b7280; font-style: italic; }
 
     /* ── Disabled / hidden ────────────────────────────────────────── */
-    .filter-section p { margin: .5rem 0; }
     [aria-disabled="true"] { opacity: .45; cursor: not-allowed; pointer-events: none; }
     [hidden] { display: none !important; }
-
-    .tag {
-      display: inline-block; font-size: .75rem; padding: .1rem .4rem;
-      border-radius: .25rem; font-family: monospace; vertical-align: middle;
-      margin-left: .25rem;
-    }
-    .tag-excluded { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-    .tag-included { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
 
     /* ── Action metadata ─────────────────────────────────────────── */
     .meta-card {
@@ -162,29 +170,37 @@
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <section id="expanded-selectors">
     <h2>1. Expanded Action Selectors</h2>
-    <p>Each element below should appear as a distinct action in <code>read_current_page</code>.</p>
+    <p>Each element below should appear as a distinct action in <code>read_current_page</code>. Interactive elements respond to clicks.</p>
 
     <div class="action-grid">
       <button id="native-button">🔘 Native button</button>
 
       <div role="menuitem" tabindex="0" id="menu-item">📋 Menu item</div>
 
-      <div role="tablist" style="margin-top:.5rem;">
-        <div role="tab" aria-selected="true" tabindex="0" id="tab-profile">👤 Profile</div>
-        <div role="tab" aria-selected="false" tabindex="0" id="tab-settings">⚙️ Settings</div>
-      </div>
-      <div class="tab-panel" id="tab-panel">
-        <em>Tab content appears here.</em>
+      <div style="margin-top:.5rem;">
+        <div class="tab-bar" role="tablist" aria-label="Selector tabs">
+          <div role="tab" aria-selected="true" tabindex="0" id="tab-profile">👤 Profile</div>
+          <div role="tab" aria-selected="false" tabindex="0" id="tab-settings">⚙️ Settings</div>
+        </div>
+        <div class="tab-panel" id="tab-panel" role="tabpanel">
+          <p id="tab-panel-content">View and edit your profile information.</p>
+        </div>
       </div>
 
       <div role="switch" aria-checked="false" tabindex="0" id="dark-mode-switch">
         <span class="switch-indicator"></span> 🌙 Dark mode
       </div>
 
-      <div role="treeitem" tabindex="0" id="tree-node" class="tree-connector">📁 Tree node</div>
+      <div role="tree" aria-label="File tree">
+        <div role="treeitem" tabindex="0" id="tree-node" class="tree-toggle" aria-expanded="false">📁 Tree node</div>
+        <div class="tree-group collapsed" id="tree-children">
+          <div role="treeitem" tabindex="0" id="tree-child-1">📄 Child item 1</div>
+          <div role="treeitem" tabindex="0" id="tree-child-2">📄 Child item 2</div>
+        </div>
+      </div>
 
       <div role="listbox" aria-label="Options">
-        <div role="option" tabindex="0" id="list-option">🔲 List option</div>
+        <div role="option" tabindex="0" id="list-option" aria-selected="false">🔲 List option</div>
       </div>
 
       <div role="menuitemcheckbox" aria-checked="false" tabindex="0" id="toggle-check">Toggle check</div>
@@ -265,21 +281,25 @@
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <section id="action-metadata">
     <h2>5. Action Metadata</h2>
-    <p>Each action should include <code>tagName</code> and <code>description</code> fields where applicable.</p>
+    <p>Each action should include <code>tagName</code> and <code>description</code> fields where applicable. Switch tabs to see different content.</p>
 
-    <div class="action-grid">
-      <div class="meta-card">
-        <button aria-label="Save" title="Saves your current work to the server" id="save-btn">💾 Save</button>
-        <span class="meta-card-detail">title: "Saves your current work to the server"</span>
-        <span class="meta-card-tag">tagName: button · description: "Saves your current work to the server"</span>
+    <div>
+      <div class="tab-bar" role="tablist" aria-label="Metadata tabs">
+        <div role="tab" aria-selected="true" tabindex="0" id="account-tab" aria-label="Account" aria-describedby="account-tab-desc">👤 Account</div>
+        <div role="tab" aria-selected="false" tabindex="0" id="notifications-tab" aria-label="Notifications" aria-describedby="notifications-tab-desc">🔔 Notifications</div>
       </div>
+      <div class="tab-panel" id="meta-tab-panel" role="tabpanel">
+        <p id="meta-tab-panel-content">View and edit your account settings and preferences.</p>
+      </div>
+    </div>
+    <p id="account-tab-desc" style="display:none">View and edit your account settings and preferences</p>
+    <p id="notifications-tab-desc" style="display:none">Manage your notification preferences and alert settings</p>
 
-      <div class="meta-card">
-        <div role="tab" aria-label="Account" aria-describedby="account-tab-desc" tabindex="0" id="account-tab">👤 Account tab</div>
-        <span class="meta-card-detail">aria-describedby: "View and edit your account settings and preferences"</span>
-        <span class="meta-card-tag">tagName: div · description: "View and edit your account settings and preferences"</span>
-      </div>
-      <p id="account-tab-desc" style="display:none">View and edit your account settings and preferences</p>
+    <div style="margin-top:.75rem;">
+      <button aria-label="Save" title="Saves your current work to the server" id="save-btn">💾 Save</button>
+      <p style="margin-top:.5rem; font-size: .85rem; color: #6b7280;">
+        <code>tagName: button</code> · <code>description: "Saves your current work to the server"</code>
+      </p>
     </div>
   </section>
 
@@ -322,6 +342,12 @@
       }, 50)
     })
 
+    // ── Native button click feedback ──────────────────────────────
+    document.getElementById('native-button').addEventListener('click', function () {
+      this.classList.add('flash-active')
+      setTimeout(() => this.classList.remove('flash-active'), 300)
+    })
+
     // ── Switch toggle ────────────────────────────────────────────
     document.querySelectorAll('[role="switch"]').forEach(el => {
       el.addEventListener('click', () => {
@@ -330,14 +356,38 @@
       })
     })
 
-    // ── Tab switching ──────────────────────────────────────────────
-    document.querySelectorAll('[role="tab"]').forEach(tab => {
+    // ── Tab switching (Section 1: selector tabs) ─────────────────
+    const tabPanelContent = {
+      'tab-profile': 'View and edit your profile information.',
+      'tab-settings': 'Adjust your application settings and preferences.'
+    }
+    document.querySelectorAll('#expanded-selectors [role="tab"]').forEach(tab => {
       tab.addEventListener('click', () => {
-        document.querySelectorAll('[role="tab"]').forEach(t => {
+        const tabBar = tab.closest('[role="tablist"]') || tab.parentElement
+        tabBar.querySelectorAll('[role="tab"]').forEach(t => {
           t.setAttribute('aria-selected', 'false')
         })
         tab.setAttribute('aria-selected', 'true')
+        document.getElementById('tab-panel-content').textContent = tabPanelContent[tab.id] || ''
       })
+    })
+
+    // ── Tree node expand/collapse ─────────────────────────────────
+    const treeNode = document.getElementById('tree-node')
+    const treeChildren = document.getElementById('tree-children')
+    treeNode.addEventListener('click', () => {
+      const expanded = treeNode.getAttribute('aria-expanded') === 'true'
+      treeNode.setAttribute('aria-expanded', String(!expanded))
+      treeNode.classList.toggle('open', !expanded)
+      treeChildren.classList.toggle('collapsed', expanded)
+      treeChildren.classList.toggle('expanded', !expanded)
+    })
+
+    // ── List option toggle ────────────────────────────────────────
+    const listOption = document.getElementById('list-option')
+    listOption.addEventListener('click', () => {
+      const selected = listOption.getAttribute('aria-selected') === 'true'
+      listOption.setAttribute('aria-selected', String(!selected))
     })
 
     // ── Menu item checkbox/radio toggle ───────────────────────────
@@ -345,6 +395,22 @@
       el.addEventListener('click', () => {
         const checked = el.getAttribute('aria-checked') === 'true'
         el.setAttribute('aria-checked', String(!checked))
+      })
+    })
+
+    // ── Tab switching (Section 5: metadata tabs) ──────────────────
+    const metaTabPanelContent = {
+      'account-tab': 'View and edit your account settings and preferences.',
+      'notifications-tab': 'Manage your notification preferences and alert settings.'
+    }
+    document.querySelectorAll('#action-metadata [role="tab"]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabBar = tab.closest('[role="tablist"]') || tab.parentElement
+        tabBar.querySelectorAll('[role="tab"]').forEach(t => {
+          t.setAttribute('aria-selected', 'false')
+        })
+        tab.setAttribute('aria-selected', 'true')
+        document.getElementById('meta-tab-panel-content').textContent = metaTabPanelContent[tab.id] || ''
       })
     })
   </script>
