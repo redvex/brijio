@@ -274,6 +274,36 @@ export type NavigateToUrlParseResult =
   | BrijioNavigateToUrlResult
   | { ok: false, ignored: true }
 
+// --- Batch result types (ADR 0044) ---
+
+export interface BatchActionError {
+  code: string
+  message: string
+  detail?: StaleContextDetail
+  aborted: boolean
+}
+
+export type BatchActionOutcome =
+  | { ok: true, data: ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData }
+  | { ok: false, error: BatchActionError }
+
+export type BatchReadOutcome =
+  | { ok: true, data: PageContext }
+  | { ok: false, error: BatchActionError }
+
+export type BatchResultEntry = BatchActionOutcome | BatchReadOutcome
+
+export interface BrijioBatchResult {
+  ok: boolean
+  results: BatchResultEntry[]
+}
+
+export type BrijioBatchResultParseResult =
+  | { ok: true, data: BrijioBatchResult }
+  | { ok: false, data: BrijioBatchResult }
+  | { ok: false, error: { code: BrijioErrorCode, message: string, detail?: StaleContextDetail, browsers?: BrowserPresence[] } }
+  | { ok: false, ignored: true }
+
 export function createNavigateToUrlEnvelope (
   requestId: string,
   url: string
@@ -434,6 +464,156 @@ export function createSubmitFormEnvelope (
       }
     }
   }
+}
+
+export function createPerformBatchEnvelope (
+  requestId: string,
+  actions: Array<Record<string, unknown>>,
+  options?: { pageContextId?: number, continueOnError?: boolean, readAfterActions?: boolean }
+): WebSocketEnvelope {
+  const payload: Record<string, unknown> = {
+    type: 'perform_batch',
+    actions,
+    ...(options?.pageContextId !== undefined ? { pageContextId: options.pageContextId } : {}),
+    ...(options?.continueOnError !== undefined ? { continueOnError: options.continueOnError } : {}),
+    ...(options?.readAfterActions !== undefined ? { readAfterActions: options.readAfterActions } : {})
+  }
+
+  return {
+    type: 'message',
+    id: requestId,
+    payload
+  }
+}
+
+export function parseBatchResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrijioBatchResultParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  if (value.payload.type !== 'batch_result') {
+    return invalidResponse()
+  }
+
+  // Batch-level error (no browser, timeout, etc.)
+  if (value.payload.ok === false && !Object.hasOwn(value.payload, 'results')) {
+    if (!isRecord(value.payload.error) || typeof value.payload.error.message !== 'string') {
+      return invalidResponse()
+    }
+
+    return {
+      ok: false,
+      error: {
+        code: mapBatchErrorCode(value.payload.error.code),
+        message: value.payload.error.message
+      }
+    }
+  }
+
+  // Success or partial-failure response with results array
+  if (!Array.isArray(value.payload.results)) {
+    return invalidResponse()
+  }
+
+  const results: BatchResultEntry[] = []
+
+  for (const entry of value.payload.results) {
+    if (!isRecord(entry)) {
+      return invalidResponse()
+    }
+
+    if (entry.ok === true) {
+      // Could be an action result or a page context read result
+      if (isRecord(entry.data) && Object.hasOwn(entry.data, 'action')) {
+        const actionResult = parseActionResultData(entry.data)
+        if (actionResult === null) {
+          return invalidResponse()
+        }
+        results.push({ ok: true, data: actionResult })
+      } else if (isPageContext(entry.data)) {
+        results.push({ ok: true, data: entry.data as PageContext })
+      } else {
+        return invalidResponse()
+      }
+    } else if (entry.ok === false) {
+      if (!isRecord(entry.error) || typeof entry.error.message !== 'string') {
+        return invalidResponse()
+      }
+
+      const aborted = entry.error.aborted === true
+      const detail = isStaleContextDetail(entry.error.detail)
+        ? entry.error.detail
+        : undefined
+
+      results.push({
+        ok: false,
+        error: {
+          code: mapBatchErrorCode(entry.error.code),
+          message: entry.error.message,
+          ...(detail !== undefined ? { detail } : {}),
+          aborted
+        }
+      })
+    } else {
+      return invalidResponse()
+    }
+  }
+
+  if (results.every(entry => entry.ok)) {
+    return {
+      ok: true,
+      data: { ok: true, results }
+    }
+  }
+
+  return {
+    ok: false,
+    data: { ok: false, results }
+  }
+}
+
+function parseActionResultData (
+  data: Record<PropertyKey, unknown>
+): ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | null {
+  if (isClickElementActionResultData(data)) {
+    return data
+  }
+  if (isFillInputActionResultData(data)) {
+    return data
+  }
+  if (isSetCheckedActionResultData(data)) {
+    return data
+  }
+  if (isSelectOptionsActionResultData(data)) {
+    return data
+  }
+  if (isSubmitFormActionResultData(data)) {
+    return data
+  }
+  return null
+}
+
+function mapBatchErrorCode (code: unknown): BrijioErrorCode {
+  if (typeof code === 'string') {
+    if (code === 'page_navigated') {
+      return 'stale_context'
+    }
+    if (isBrijioErrorCode(code)) {
+      return code
+    }
+  }
+  return 'browser_error'
 }
 
 export function parsePageContextEnvelope (
