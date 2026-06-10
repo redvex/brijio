@@ -2,7 +2,7 @@ import type {
   PageContentErrorCode,
   ActionResultErrorCode
 } from './protocol.js'
-import type { ContentRequest, ContentResponse } from './content-handler.js'
+import type { ContentRequest } from './content-handler.js'
 import type {
   PageReadResult,
   PageActionResult
@@ -68,47 +68,6 @@ export function actionRegularPagePermissionRequired (): PageActionResult {
   }
 }
 
-/**
- * Send a message to the content script in the active tab.
- *
- * Per ADR 0043, we try sendMessage first without re-injecting the content
- * script. If the content script is already loaded (e.g. via manifest
- * content_scripts on Safari), this avoids the duplicate-listener and
- * pageContextVersion-reset problems caused by scripting.executeScript.
- *
- * If sendMessage returns undefined (no listener), we fall back to
- * executeScript + sendMessage to inject the content script on demand
- * (e.g. for Chrome which uses programmatic injection).
- */
-async function sendMessageToContentScript<T> (
-  tabId: number,
-  message: ContentRequest,
-  deps: ActiveTabDeps
-): Promise<T | null> {
-  // Try sending the message directly first — if the content script is
-  // already loaded, this succeeds without side effects.
-  let response = await deps.tabs.sendMessage(tabId, message)
-
-  if (isContentResponse(response)) {
-    return response as T
-  }
-
-  // No listener responded (undefined) or an unexpected response was
-  // received. Inject the content script and try again.
-  await deps.scripting.executeScript({
-    target: { tabId },
-    files: ['content.js']
-  })
-
-  response = await deps.tabs.sendMessage(tabId, message)
-
-  if (isContentResponse(response)) {
-    return response as T
-  }
-
-  return null
-}
-
 // --- Shared readActiveTabPage ---
 
 export async function readActiveTabPage<T> (
@@ -142,9 +101,18 @@ export async function readActiveTabPage<T> (
   }
 
   try {
-    const response = await sendMessageToContentScript<ContentResponse>(activeTab.id, message, deps)
+    // Per ADR 0043: call executeScript first to ensure the latest content
+    // script is loaded. The content-script-entry.ts listener replacement
+    // mechanism (globalThis.__brijioOnMessageListener) prevents duplicate
+    // listeners when re-injecting.
+    await deps.scripting.executeScript({
+      target: { tabId: activeTab.id },
+      files: ['content.js']
+    })
 
-    if (response === null) {
+    const response = await deps.tabs.sendMessage(activeTab.id, message)
+
+    if (!isContentResponse(response)) {
       return contentScriptUnavailable<T>()
     }
 
@@ -163,7 +131,6 @@ export async function readActiveTabPage<T> (
       }
     }
   } catch (err) {
-    console.log('[brijio] readActiveTabPage caught error:', err)
     if (
       deps.onCatchPermissionCheck !== undefined &&
       !(await deps.onCatchPermissionCheck())
@@ -208,9 +175,18 @@ export async function performActiveTabAction (
   }
 
   try {
-    const response = await sendMessageToContentScript<ContentResponse>(activeTab.id, message, deps)
+    // Per ADR 0043: call executeScript first to ensure the latest content
+    // script is loaded. The content-script-entry.ts listener replacement
+    // mechanism (globalThis.__brijioOnMessageListener) prevents duplicate
+    // listeners when re-injecting.
+    await deps.scripting.executeScript({
+      target: { tabId: activeTab.id },
+      files: ['content.js']
+    })
 
-    if (response === null) {
+    const response = await deps.tabs.sendMessage(activeTab.id, message)
+
+    if (!isContentResponse(response)) {
       return actionContentScriptUnavailable()
     }
 
@@ -234,7 +210,6 @@ export async function performActiveTabAction (
       }
     }
   } catch (err) {
-    console.log('[brijio] performActiveTabAction caught error:', err)
     if (
       deps.onCatchPermissionCheck !== undefined &&
       !(await deps.onCatchPermissionCheck())

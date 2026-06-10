@@ -79,8 +79,6 @@ void describe('page-reader', () => {
     })
 
     void it('returns content_script_unavailable when response is not ContentResponse', async () => {
-      // Both sendMessage calls return invalid responses, and executeScript
-      // succeeds but doesn't help (still no valid response)
       const deps = makeDeps({
         tabs: {
           query: async () => [{ id: 1, url: 'https://example.com' }],
@@ -94,36 +92,32 @@ void describe('page-reader', () => {
       }
     })
 
-    void it('returns content_script_unavailable when sendMessage returns undefined and executeScript throws', async () => {
-      // Per ADR 0043: sendMessage is tried first. If it returns undefined
-      // (no listener), executeScript + sendMessage is tried as fallback.
-      // If executeScript throws, we get content_script_unavailable.
+    void it('returns error from failed content response', async () => {
       const deps = makeDeps({
         tabs: {
           query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => undefined
-        },
-        scripting: {
-          executeScript: async () => {
-            throw new Error('inject failed')
-          }
+          sendMessage: async () => ({
+            ok: false,
+            error: { code: 'extraction_failed', message: 'Boom' }
+          })
         }
       })
-      const result = await readActiveTabPage(extractContext, deps)
+      const message: ContentRequest = {
+        type: 'extract_page_content',
+        index: 0,
+        maxContentBytes: 50000,
+        maxPayloadBytes: 100000
+      }
+      const result = await readActiveTabPage(message, deps)
       assert.strictEqual(result.ok, false)
       if (!result.ok) {
-        assert.strictEqual(result.error.code, 'content_script_unavailable')
+        assert.strictEqual(result.error.code, 'extraction_failed')
+        assert.strictEqual(result.error.message, 'Boom')
       }
     })
 
     void it('returns content_script_unavailable on catch without permission check', async () => {
-      // sendMessage returns undefined (no listener), executeScript + sendMessage
-      // also throw. No permission check configured.
       const deps = makeDeps({
-        tabs: {
-          query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => undefined
-        },
         scripting: {
           executeScript: async () => {
             throw new Error('inject failed')
@@ -139,10 +133,6 @@ void describe('page-reader', () => {
 
     void it('returns regular_page_permission_required on catch when permission check returns false', async () => {
       const deps = makeDeps({
-        tabs: {
-          query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => undefined
-        },
         scripting: {
           executeScript: async () => {
             throw new Error('inject failed')
@@ -162,10 +152,6 @@ void describe('page-reader', () => {
 
     void it('returns content_script_unavailable on catch when permission check returns true', async () => {
       const deps = makeDeps({
-        tabs: {
-          query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => undefined
-        },
         scripting: {
           executeScript: async () => {
             throw new Error('inject failed')
@@ -194,28 +180,18 @@ void describe('page-reader', () => {
       }
     })
 
-    void it('falls back to executeScript when sendMessage returns undefined', async () => {
-      // First sendMessage returns undefined (no listener), so executeScript
-      // is called. Second sendMessage (after injection) returns valid response.
-      let sendMessageCallCount = 0
+    void it('returns content_script_unavailable when sendMessage returns undefined', async () => {
       const deps = makeDeps({
         tabs: {
           query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => {
-            sendMessageCallCount++
-            if (sendMessageCallCount === 1) {
-              return undefined
-            }
-            return { ok: true, data: { title: 'Injected' } }
-          }
-        },
-        scripting: {
-          executeScript: async () => {}
+          sendMessage: async () => undefined
         }
       })
-      const result = await readActiveTabPage<{ title: string }>(extractContext, deps)
-      assert.deepStrictEqual(result, { ok: true, data: { title: 'Injected' } })
-      assert.strictEqual(sendMessageCallCount, 2)
+      const result = await readActiveTabPage(extractContext, deps)
+      assert.strictEqual(result.ok, false)
+      if (!result.ok) {
+        assert.strictEqual(result.error.code, 'content_script_unavailable')
+      }
     })
   })
 
@@ -233,10 +209,6 @@ void describe('page-reader', () => {
 
     void it('returns action_content_script_unavailable on catch without permission check', async () => {
       const deps = makeDeps({
-        tabs: {
-          query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => undefined
-        },
         scripting: {
           executeScript: async () => {
             throw new Error('inject failed')
@@ -252,10 +224,6 @@ void describe('page-reader', () => {
 
     void it('returns action regular_page_permission_required on catch when permission check returns false', async () => {
       const deps = makeDeps({
-        tabs: {
-          query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => undefined
-        },
         scripting: {
           executeScript: async () => {
             throw new Error('inject failed')

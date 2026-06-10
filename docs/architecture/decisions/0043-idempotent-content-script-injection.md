@@ -1,4 +1,4 @@
-# ADR 0043: Idempotent Content Script Communication
+# ADR 0043: Idempotent Content Script Injection
 
 ## Status
 
@@ -14,9 +14,8 @@ happens via two mechanisms:
 2. **Programmatic `scripting.executeScript`** (Chrome) — called by the background
    script to inject the content script on demand
 
-Previously, the background script called `scripting.executeScript` before
-**every** `tabs.sendMessage` call, even on Safari where the manifest already
-injects the content script. This caused three problems:
+The background script previously called `scripting.executeScript` before
+**every** `tabs.sendMessage` call. This caused three problems:
 
 1. **Duplicate `onMessage` listeners** — each re-injection created a new module
    scope with a new `onMessage` listener, while the old listener remained
@@ -40,52 +39,54 @@ that caused `sendMessage` responses to be lost or overwritten.
 
 ## Decision
 
-Two changes address these problems:
+Use **listener replacement** in the content-script-entry files to make
+re-injection safe. The background script continues to call `executeScript`
+before every `sendMessage` (ensuring the latest content script code is always
+loaded), but the content script now replaces its previous listener instead of
+accumulating duplicates.
 
-### 1. Try-first messaging pattern (page-reader.ts)
+### Listener replacement (content-script-entry.ts)
 
-Instead of calling `executeScript` before every `sendMessage`, the background
-script now **tries `sendMessage` first**. If the content script is already
-loaded (e.g. via manifest `content_scripts` on Safari), this succeeds without
-any side effects. Only if `sendMessage` returns `undefined` (no listener
-responded) does the background script fall back to `executeScript` +
-`sendMessage` to inject the content script on demand (e.g. for Chrome which
-uses programmatic injection).
-
-This eliminates unnecessary re-injections on Safari and prevents the
-duplicate-listener and version-reset problems for the common case.
-
-### 2. Listener replacement in content-script-entry.ts
-
-For the case where `executeScript` does re-inject the content script (Chrome's
-first injection, or Safari fallback), each content-script entry now stores its
-`onMessage` listener reference on `globalThis.__brijioOnMessageListener`. On
-re-injection, the new module removes the previous injection's listener via
-`removeListener(globalThis.__brijioOnMessageListener)` before adding its own.
+Each content-script entry stores its `onMessage` listener reference on
+`globalThis.__brijioOnMessageListener`. On re-injection, the new module removes
+the previous injection's listener via `browser.runtime.onMessage.removeListener()`
+before adding its own.
 
 This ensures at most one `onMessage` listener is active per page, and that
 listener's `pageContextVersion` matches the current module scope.
 
+### Rejected alternatives
+
+- **Try-first messaging**: Send `sendMessage` first, only call `executeScript`
+  if no listener responds. This avoids re-injection when the manifest already
+  loaded the content script (Safari). **Rejected** because the manifest-injected
+  content script may be stale (e.g. after an extension update where Safari
+  hasn't reloaded the extension bundle). By always calling `executeScript`, we
+  ensure the latest content script code is loaded, while listener replacement
+  prevents the duplicate-listener problem.
+
+- **GlobalThis sentinel guard**: Set `globalThis.__brijioContentLoaded = true` on
+  first injection and skip re-registration on subsequent injections. **Rejected**
+  because when `executeScript` creates a new module scope, the guard prevents
+  the new module from registering its listener, but the old module scope's
+  listener may have been destroyed by the re-injection, leaving no active
+  listener at all.
+
 ## Consequences
 
-- **Positive**: Content script re-injection is now safe. Click actions that
-  previously failed due to duplicate listeners or stale context versions now
-  work correctly.
+- **Positive**: Content script re-injection is now safe. The duplicate-listener
+  and version-reset bugs are eliminated.
 
-- **Positive**: The try-first pattern avoids unnecessary `executeScript` calls
-  on Safari, improving performance and reducing side effects.
+- **Positive**: `executeScript` before every `sendMessage` ensures the latest
+  content script code is always loaded, even after extension updates.
 
 - **Positive**: The `pageContextVersion` remains consistent across the page
   lifecycle for the active listener, so stale-context detection continues to
   work correctly.
 
-- **Positive**: Chrome's programmatic injection still works — when `sendMessage`
-  returns `undefined` (no content script loaded), `executeScript` + `sendMessage`
-  provides the fallback.
-
-- **Neutral**: If the page navigates to a new origin or is completely reloaded,
-  `globalThis` is reset (new page context), and the content script registers
-  fresh listeners as expected.
+- **Neutral**: `executeScript` is called before every action, adding a small
+  overhead. This is acceptable because `executeScript` with an already-loaded
+  content script is a fast no-op in most browser implementations.
 
 - **Risk**: If the content script crashes during initialization (before setting
   `globalThis.__brijioOnMessageListener`), re-injection will register a new
