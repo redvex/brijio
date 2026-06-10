@@ -281,11 +281,21 @@ function extractEditables (document: Document): PageEditable[] {
     .filter(isVisible)
     .map((element, index) => ({
       id: createId(index + 1),
-      label: getAccessibleName(element),
+      label: getEditableLabel(element),
       role: element.getAttribute('role') ?? 'textbox',
       multiline: true
     }))
     .filter((editable) => editable.label !== '')
+}
+
+function getEditableLabel (element: Element): string {
+  const explicitLabel = getControlLabel(element)
+
+  if (explicitLabel !== '') {
+    return explicitLabel
+  }
+
+  return getAccessibleName(element)
 }
 
 function visitReadableNode (node: Node, blocks: string[]): void {

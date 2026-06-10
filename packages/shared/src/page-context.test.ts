@@ -334,4 +334,30 @@ void describe('page context extraction', () => {
       multiline: true
     })
   })
+
+  void it('extracts empty contenteditable targets labelled by for/id labels', () => {
+    const { document } = parseHTML(`
+      <main>
+        <label for="content-editable-area">Write a brief description of the ventilator's role in the mystery.</label>
+        <div id="content-editable-area" contenteditable="true"></div>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/demo',
+      title: 'Demo',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    assert.deepEqual(context.structure.editables[0], {
+      id: 'bb-1',
+      label: "Write a brief description of the ventilator's role in the mystery.",
+      role: 'textbox',
+      multiline: true
+    })
+  })
 })
