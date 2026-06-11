@@ -290,7 +290,39 @@ void describe('page-reader', () => {
       assert.equal(result.results.length, 1)
     })
 
-    void it('returns content_script_unavailable entries when Chrome sendMessage never resolves', async () => {
+    void it('falls back to single-action messages when Chrome batch sendMessage hangs', async () => {
+      const sentMessages: unknown[] = []
+      const deps = makeDeps({
+        contentScriptMessageTimeoutMs: 5,
+        tabs: {
+          query: async () => [{ id: 1, url: 'https://example.com' }],
+          sendMessage: async (_tabId, message) => {
+            sentMessages.push(message)
+            if ((message as { type?: string }).type === 'perform_batch') {
+              return await new Promise(() => {})
+            }
+            return {
+              ok: true,
+              data: {
+                action: 'write_text',
+                target: { formId: 'bb-1', controlId: 'bb-2' },
+                textLength: 12
+              }
+            }
+          }
+        }
+      })
+
+      const result = await performActiveTabBatch(batchMessage, deps)
+      assert.equal(result.ok, true)
+      assert.equal(result.results.length, 1)
+      assert.deepEqual(
+        sentMessages.map(message => (message as { type?: string }).type),
+        ['perform_batch', 'perform_write_text']
+      )
+    })
+
+    void it('returns content_script_unavailable entries when Chrome batch and fallback both hang', async () => {
       const deps = makeDeps({
         contentScriptMessageTimeoutMs: 5,
         tabs: {

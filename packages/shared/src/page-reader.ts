@@ -1,12 +1,19 @@
 import type {
   PageContentErrorCode,
-  ActionResultErrorCode
+  ActionResultErrorCode,
+  ActionResultData,
+  WriteTextActionResultData,
+  SetCheckedActionResultData,
+  SelectOptionsActionResultData,
+  SubmitFormActionResultData,
+  PageContext
 } from './protocol.js'
 import type { ContentRequest } from './content-handler.js'
 import type {
   ContentBatchRequest,
   BatchResult
 } from './batch-handler.js'
+import { batchActionToContentRequest } from './batch-handler.js'
 import type {
   PageReadResult,
   PageActionResult
@@ -274,6 +281,173 @@ function isBatchResult (value: unknown): value is BatchResult {
   return typeof obj.ok === 'boolean' && Array.isArray(obj.results)
 }
 
+type BatchActionSuccessData =
+  | ActionResultData
+  | WriteTextActionResultData
+  | SetCheckedActionResultData
+  | SelectOptionsActionResultData
+  | SubmitFormActionResultData
+
+function batchUnavailableResult (
+  message: ContentBatchRequest,
+  errorMessage: string
+): BatchResult {
+  return {
+    ...BATCH_DEFAULT_RESULT,
+    results: message.actions.map(() => ({
+      ok: false,
+      error: {
+        code: 'content_script_unavailable',
+        message: errorMessage,
+        aborted: true
+      }
+    }))
+  }
+}
+
+async function performActiveTabBatchViaSingleActions (
+  message: ContentBatchRequest,
+  deps: ActiveTabDeps,
+  tabId: number
+): Promise<BatchResult> {
+  const results: BatchResult['results'] = []
+  const continueOnError = message.continueOnError === true
+  let aborted = false
+
+  for (const action of message.actions) {
+    if (aborted) {
+      results.push({
+        ok: false,
+        error: {
+          code: 'page_navigated',
+          message: 'Action skipped: a previous action caused a page navigation or abort.',
+          aborted: true
+        }
+      })
+      continue
+    }
+
+    try {
+      const contentRequest: ContentRequest = batchActionToContentRequest(
+        action,
+        message.pageContextId
+      )
+      const response = await sendMessageWithTimeout(deps, tabId, contentRequest)
+
+      if (!isContentResponse(response)) {
+        results.push({
+          ok: false,
+          error: {
+            code: 'content_script_unavailable',
+            message: 'Content script returned an unexpected response.',
+            aborted: true
+          }
+        })
+        aborted = true
+        continue
+      }
+
+      if (response.ok) {
+        const entry: {
+          ok: true
+          data: BatchActionSuccessData
+        } = {
+          ok: true,
+          data: response.data as BatchActionSuccessData
+        }
+        results.push(entry)
+        continue
+      }
+
+      const errorCode = response.error.code as ActionResultErrorCode
+
+      results.push({
+        ok: false,
+        error: {
+          code: errorCode,
+          message: response.error.message,
+          ...(response.error.detail !== undefined
+            ? { detail: response.error.detail }
+            : {}),
+          aborted: false
+        }
+      })
+
+      if (String(response.error.code) === 'page_navigated' || !continueOnError) {
+        aborted = true
+      }
+    } catch {
+      results.push({
+        ok: false,
+        error: {
+          code: 'content_script_unavailable',
+          message: 'Content script is not available on this page.',
+          aborted: true
+        }
+      })
+      aborted = true
+    }
+  }
+
+  if (message.readAfterActions === true) {
+    try {
+      const response = await sendMessageWithTimeout(deps, tabId, {
+        type: 'extract_page_context',
+        previewMaxBytes: 4096,
+        defaultMaxPayloadBytes: 131072
+      })
+      const contentResponse = isContentResponse(response) ? response : undefined
+
+      if (contentResponse === undefined) {
+        results.push({
+          ok: false,
+          error: {
+            code: 'content_script_unavailable',
+            message: 'Content script returned an unexpected response.',
+            aborted: false
+          }
+        })
+      } else if (contentResponse.ok) {
+        const entry: {
+          ok: true
+          data: PageContext
+        } = {
+          ok: true,
+          data: contentResponse.data as PageContext
+        }
+        results.push(entry)
+      } else {
+        results.push({
+          ok: false,
+          error: {
+            code: contentResponse.error.code as ActionResultErrorCode,
+            message: contentResponse.error.message,
+            ...(contentResponse.error.detail !== undefined
+              ? { detail: contentResponse.error.detail }
+              : {}),
+            aborted: false
+          }
+        })
+      }
+    } catch {
+      results.push({
+        ok: false,
+        error: {
+          code: 'content_script_unavailable',
+          message: 'Content script is not available on this page.',
+          aborted: false
+        }
+      })
+    }
+  }
+
+  return {
+    ok: results.every(entry => entry.ok),
+    results,
+    aborted
+  }
+}
+
 export async function performActiveTabBatch (
   message: ContentBatchRequest,
   deps: ActiveTabDeps
@@ -315,14 +489,14 @@ export async function performActiveTabBatch (
       return response
     }
 
-    // Content script returned an unexpected response type
-    return {
-      ...BATCH_DEFAULT_RESULT,
-      results: message.actions.map(() => ({
-        ok: false,
-        error: { code: 'content_script_unavailable', message: 'Content script returned an unexpected response.', aborted: true }
-      }))
-    }
+    // Content script returned an unexpected response type. Fall back to the
+    // already-supported single-action path so older Chrome content scripts can
+    // still execute the batch semantics instead of failing the whole request.
+    return await performActiveTabBatchViaSingleActions(
+      message,
+      deps,
+      activeTab.id
+    )
   } catch {
     if (
       deps.onCatchPermissionCheck !== undefined &&
@@ -337,12 +511,19 @@ export async function performActiveTabBatch (
       }
     }
 
-    return {
-      ...BATCH_DEFAULT_RESULT,
-      results: message.actions.map(() => ({
-        ok: false,
-        error: { code: 'content_script_unavailable', message: 'Content script is not available on this page.', aborted: true }
-      }))
+    const fallbackResult = await performActiveTabBatchViaSingleActions(
+      message,
+      deps,
+      activeTab.id
+    )
+
+    if (fallbackResult.results.some(entry => entry.ok)) {
+      return fallbackResult
     }
+
+    return batchUnavailableResult(
+      message,
+      'Content script is not available on this page.'
+    )
   }
 }
