@@ -46,6 +46,41 @@ export interface ActiveTabDeps {
   scripting: ScriptingApi
   isRegularPageUrl: (url: string) => boolean
   onCatchPermissionCheck?: PermissionCheck
+  contentScriptMessageTimeoutMs?: number
+}
+
+const DEFAULT_CONTENT_SCRIPT_MESSAGE_TIMEOUT_MS = 4000
+
+class ContentScriptMessageTimeoutError extends Error {
+  constructor () {
+    super('Content script message timed out.')
+    this.name = 'ContentScriptMessageTimeoutError'
+  }
+}
+
+async function sendMessageWithTimeout (
+  deps: ActiveTabDeps,
+  tabId: number,
+  message: unknown
+): Promise<unknown> {
+  const timeoutMs = deps.contentScriptMessageTimeoutMs ?? DEFAULT_CONTENT_SCRIPT_MESSAGE_TIMEOUT_MS
+
+  return await new Promise<unknown>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new ContentScriptMessageTimeoutError())
+    }, timeoutMs)
+
+    deps.tabs.sendMessage(tabId, message).then(
+      (response) => {
+        clearTimeout(timer)
+        resolve(response)
+      },
+      (reason) => {
+        clearTimeout(timer)
+        reject(reason)
+      }
+    )
+  })
 }
 
 // --- Error factories ---
@@ -274,7 +309,7 @@ export async function performActiveTabBatch (
       files: ['content.js']
     })
 
-    const response = await deps.tabs.sendMessage(activeTab.id, message)
+    const response = await sendMessageWithTimeout(deps, activeTab.id, message)
 
     if (isBatchResult(response)) {
       return response

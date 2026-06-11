@@ -3,10 +3,12 @@ import { describe, it } from 'node:test'
 import {
   readActiveTabPage,
   performActiveTabAction,
+  performActiveTabBatch,
   regularPagePermissionRequired,
   actionRegularPagePermissionRequired,
   type ActiveTabDeps,
   type ContentRequest,
+  type ContentBatchRequest,
   type PageReadResult,
   type PageActionResult
 } from './index.js'
@@ -255,6 +257,56 @@ void describe('page-reader', () => {
       assert.strictEqual(result.ok, false)
       if (!result.ok) {
         assert.strictEqual(result.error.code, 'target_not_found')
+      }
+    })
+  })
+
+  void describe('performActiveTabBatch', () => {
+    const batchMessage: ContentBatchRequest = {
+      type: 'perform_batch',
+      actions: [
+        {
+          type: 'write_text',
+          target: { formId: 'bb-1', controlId: 'bb-2' },
+          text: 'Baker Street'
+        }
+      ]
+    }
+
+    void it('returns batch result when response is a BatchResult', async () => {
+      const deps = makeDeps({
+        tabs: {
+          query: async () => [{ id: 1, url: 'https://example.com' }],
+          sendMessage: async () => ({
+            ok: true,
+            aborted: false,
+            results: [{ ok: true, data: { action: 'write_text', target: { formId: 'bb-1', controlId: 'bb-2' }, textLength: 12 } }]
+          })
+        }
+      })
+
+      const result = await performActiveTabBatch(batchMessage, deps)
+      assert.equal(result.ok, true)
+      assert.equal(result.results.length, 1)
+    })
+
+    void it('returns content_script_unavailable entries when Chrome sendMessage never resolves', async () => {
+      const deps = makeDeps({
+        contentScriptMessageTimeoutMs: 5,
+        tabs: {
+          query: async () => [{ id: 1, url: 'https://example.com' }],
+          sendMessage: async () => await new Promise(() => {})
+        }
+      })
+
+      const result = await performActiveTabBatch(batchMessage, deps)
+      assert.equal(result.ok, false)
+      assert.equal(result.results.length, 1)
+      const [entry] = result.results
+      assert.equal(entry.ok, false)
+      if (!entry.ok) {
+        assert.equal(entry.error.code, 'content_script_unavailable')
+        assert.equal(entry.error.aborted, true)
       }
     })
   })
