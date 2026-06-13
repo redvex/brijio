@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 import { parseHTML } from 'linkedom'
-import { extractPageContent, extractPageContext } from './page-context.js'
+import {
+  computeVisibleContextId,
+  extractPageContent,
+  extractPageContext
+} from './page-context.js'
 
 void describe('page context extraction', () => {
   void it('extracts structure, selected text, and preview', () => {
@@ -333,6 +337,106 @@ void describe('page context extraction', () => {
       role: 'textbox',
       multiline: true
     })
+  })
+
+  void it('extracts visible-only safe form state without raw text values', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form aria-label="Profile">
+          <label>Name <input type="text" value="Ada" data-brijio-fill-owner="brijio" /></label>
+          <label>Email <input type="email" required /></label>
+          <label>Nickname <input type="text" aria-required="true" value="Countess" /></label>
+          <label>Password <input type="password" value="secret" /></label>
+          <input type="hidden" value="hidden-secret" />
+          <label hidden>Hidden field <input type="text" value="not-visible" /></label>
+          <label style="display: none">Invisible <input type="text" /></label>
+        </form>
+      </main>
+    `)
+
+    const context = extractPageContext({
+      document,
+      locationHref: 'https://example.com/profile',
+      title: 'Profile',
+      selectedText: null,
+      now: () => '2026-05-25T10:00:00.000Z',
+      previewMaxBytes: 4096,
+      defaultMaxPayloadBytes: 131072
+    })
+
+    assert.equal(typeof context.visibleContextId, 'string')
+    assert.equal(context.structure.forms[0].controls.length, 4)
+    assert.deepEqual(
+      context.structure.forms[0].controls.map((control) => ({
+        label: control.label,
+        type: control.type,
+        required: control.required,
+        requiredSource: control.requiredSource,
+        sensitive: control.sensitive,
+        valueState: control.valueState,
+        filledBy: control.filledBy
+      })),
+      [
+        {
+          label: 'Name',
+          type: 'text',
+          required: false,
+          requiredSource: undefined,
+          sensitive: false,
+          valueState: 'filled',
+          filledBy: 'brijio'
+        },
+        {
+          label: 'Email',
+          type: 'email',
+          required: true,
+          requiredSource: 'html',
+          sensitive: true,
+          valueState: 'empty',
+          filledBy: undefined
+        },
+        {
+          label: 'Nickname',
+          type: 'text',
+          required: true,
+          requiredSource: 'aria',
+          sensitive: false,
+          valueState: 'filled',
+          filledBy: 'user_or_page'
+        },
+        {
+          label: 'Password',
+          type: 'password',
+          required: false,
+          requiredSource: undefined,
+          sensitive: true,
+          valueState: 'filled',
+          filledBy: 'user_or_page'
+        }
+      ]
+    )
+  })
+
+  void it('changes visibleContextId when safe visible form state changes asynchronously', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Name <input type="text" /></label>
+        </form>
+      </main>
+    `)
+
+    const before = computeVisibleContextId(document)
+    const form = document.querySelector('form')
+    const label = document.createElement('label')
+    label.textContent = 'Postcode '
+    const input = document.createElement('input')
+    input.type = 'text'
+    label.append(input)
+    form?.append(label)
+    const after = computeVisibleContextId(document)
+
+    assert.notEqual(after, before)
   })
 
   void it('extracts empty contenteditable targets labelled by for/id labels', () => {
