@@ -13,6 +13,7 @@ export interface ClickElementInput {
   expectedHref?: unknown
   expectedRole?: unknown
   pageContextId?: unknown
+  visibleContextId?: unknown
 }
 
 export type ClickElementResult = BrijioToolResult<{
@@ -38,7 +39,8 @@ export async function clickElement (
     config,
     normalizedInput.data.target,
     normalizedInput.data.browserInstanceId,
-    normalizedInput.data.pageContextId
+    normalizedInput.data.pageContextId,
+    normalizedInput.data.visibleContextId
   )
 }
 
@@ -46,6 +48,7 @@ function normalizeInput (input: ClickElementInput): BrijioToolResult<{
   target: ClickElementTarget
   browserInstanceId?: string
   pageContextId?: number
+  visibleContextId?: string
 }> {
   if (input.kind !== 'link' && input.kind !== 'action') {
     return invalidToolInputResponse('kind must be either "link" or "action".')
@@ -112,6 +115,15 @@ function normalizeInput (input: ClickElementInput): BrijioToolResult<{
     )
   }
 
+  if (
+    input.visibleContextId !== undefined &&
+    typeof input.visibleContextId !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'visibleContextId must be a string when provided.'
+    )
+  }
+
   return {
     ok: true,
     data: {
@@ -121,6 +133,9 @@ function normalizeInput (input: ClickElementInput): BrijioToolResult<{
         : {}),
       ...(input.pageContextId !== undefined
         ? { pageContextId: input.pageContextId }
+        : {}),
+      ...(input.visibleContextId !== undefined
+        ? { visibleContextId: input.visibleContextId }
         : {})
     }
   }

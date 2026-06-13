@@ -23,6 +23,7 @@ export interface SetCheckedInput {
   expectedLabel?: unknown
   browserInstanceId?: unknown
   pageContextId?: unknown
+  visibleContextId?: unknown
 }
 
 export interface SelectOptionsInput {
@@ -32,6 +33,7 @@ export interface SelectOptionsInput {
   expectedLabel?: unknown
   browserInstanceId?: unknown
   pageContextId?: unknown
+  visibleContextId?: unknown
 }
 
 export interface SubmitFormInput {
@@ -39,6 +41,7 @@ export interface SubmitFormInput {
   expectedLabel?: unknown
   browserInstanceId?: unknown
   pageContextId?: unknown
+  visibleContextId?: unknown
 }
 
 export interface FillEditableInput {
@@ -47,6 +50,7 @@ export interface FillEditableInput {
   expectedText?: unknown
   browserInstanceId?: unknown
   pageContextId?: unknown
+  visibleContextId?: unknown
 }
 
 export type SetCheckedResult =
@@ -80,7 +84,8 @@ export async function setChecked (
     targetResult.data.target,
     input.checked,
     targetResult.data.browserInstanceId,
-    targetResult.data.pageContextId
+    targetResult.data.pageContextId,
+    targetResult.data.visibleContextId
   )
 }
 
@@ -106,7 +111,8 @@ export async function selectOptions (
     targetResult.data.target,
     input.values,
     targetResult.data.browserInstanceId,
-    targetResult.data.pageContextId
+    targetResult.data.pageContextId,
+    targetResult.data.visibleContextId
   )
 }
 
@@ -144,6 +150,15 @@ export async function submitForm (
     )
   }
 
+  if (
+    input.visibleContextId !== undefined &&
+    typeof input.visibleContextId !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'visibleContextId must be a string when provided.'
+    )
+  }
+
   const target: SubmitFormTarget = {
     formId: input.formId,
     ...(input.expectedLabel !== undefined
@@ -155,7 +170,8 @@ export async function submitForm (
     config,
     target,
     browserInstanceId.data,
-    input.pageContextId !== undefined ? input.pageContextId : undefined
+    input.pageContextId !== undefined ? input.pageContextId : undefined,
+    typeof input.visibleContextId === 'string' ? input.visibleContextId : undefined
   )
 }
 
@@ -178,7 +194,8 @@ export async function fillEditable (
     targetResult.data.target,
     input.text,
     targetResult.data.browserInstanceId,
-    targetResult.data.pageContextId
+    targetResult.data.pageContextId,
+    targetResult.data.visibleContextId
   )
 }
 
@@ -188,6 +205,7 @@ function normalizeFormControlTarget (
     target: FillInputTarget
     browserInstanceId?: string
     pageContextId?: number
+    visibleContextId?: string
   }> {
   if (typeof input.formId !== 'string' || input.formId.length === 0) {
     return invalidToolInputResponse('formId must be a non-empty string.')
@@ -226,6 +244,15 @@ function normalizeFormControlTarget (
     )
   }
 
+  if (
+    input.visibleContextId !== undefined &&
+    typeof input.visibleContextId !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'visibleContextId must be a string when provided.'
+    )
+  }
+
   return {
     ok: true,
     data: {
@@ -241,6 +268,9 @@ function normalizeFormControlTarget (
         : {}),
       ...(input.pageContextId !== undefined
         ? { pageContextId: input.pageContextId }
+        : {}),
+      ...(input.visibleContextId !== undefined
+        ? { visibleContextId: input.visibleContextId }
         : {})
     }
   }
@@ -252,6 +282,7 @@ function normalizeEditableTarget (
     target: EditableTarget
     browserInstanceId?: string
     pageContextId?: number
+    visibleContextId?: string
   }> {
   if (typeof input.id !== 'string' || input.id.length === 0) {
     return invalidToolInputResponse('id must be a non-empty string.')
@@ -283,6 +314,15 @@ function normalizeEditableTarget (
     )
   }
 
+  if (
+    input.visibleContextId !== undefined &&
+    typeof input.visibleContextId !== 'string'
+  ) {
+    return invalidToolInputResponse(
+      'visibleContextId must be a string when provided.'
+    )
+  }
+
   return {
     ok: true,
     data: {
@@ -298,6 +338,9 @@ function normalizeEditableTarget (
         : {}),
       ...(input.pageContextId !== undefined
         ? { pageContextId: input.pageContextId }
+        : {}),
+      ...(input.visibleContextId !== undefined
+        ? { visibleContextId: input.visibleContextId }
         : {})
     }
   }

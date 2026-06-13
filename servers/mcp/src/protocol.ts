@@ -41,13 +41,47 @@ export interface PageImage {
   src: string
 }
 
+export type PageFormControlValueState = 'empty' | 'filled' | 'unknown'
+export type PageFormControlFilledBy = 'brijio' | 'user_or_page'
+export type PageFormControlValidityReason =
+  | 'value_missing'
+  | 'type_mismatch'
+  | 'pattern_mismatch'
+  | 'too_short'
+  | 'too_long'
+  | 'range_underflow'
+  | 'range_overflow'
+  | 'step_mismatch'
+  | 'bad_input'
+  | 'custom_error'
+  | 'unknown'
+
+export interface PageFormControlValidity {
+  valid: boolean
+  reason?: PageFormControlValidityReason
+}
+
+export interface PageFormControlOption {
+  label: string
+  value: string
+  selected: boolean
+}
+
 export interface PageFormControl {
   id: string
   label: string
   type: string
   required: boolean
+  requiredSource?: 'html' | 'aria'
   disabled: boolean
+  readonly?: boolean
   sensitive: boolean
+  valueState: PageFormControlValueState
+  filledBy?: PageFormControlFilledBy
+  checked?: boolean
+  multiple?: boolean
+  options?: PageFormControlOption[]
+  validity?: PageFormControlValidity
 }
 
 export interface PageForm {
@@ -64,6 +98,8 @@ export interface PageAction {
 }
 
 export interface PageContext {
+  pageContextId?: number
+  visibleContextId?: string
   url: string
   title: string
   timestamp: string
@@ -139,6 +175,8 @@ export interface FillInputActionResultData {
   action: 'write_text'
   target: WriteTextTarget
   textLength: number
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
 }
 
 export interface SetCheckedActionResultData {
@@ -146,12 +184,24 @@ export interface SetCheckedActionResultData {
   target: FillInputTarget
   checked: boolean
   changed: boolean
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
 }
 
 export interface SelectOptionsActionResultData {
   action: 'select_options'
   target: FillInputTarget
   values: string[]
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
+}
+
+export interface SubmitFormValidationError {
+  formId: string
+  controlId: string
+  label: string
+  type: string
+  reason: PageFormControlValidityReason
 }
 
 export interface SubmitFormTarget {
@@ -162,6 +212,10 @@ export interface SubmitFormTarget {
 export interface SubmitFormActionResultData {
   action: 'submit_form'
   target: SubmitFormTarget
+  submitted: boolean
+  validationErrors?: SubmitFormValidationError[]
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
 }
 
 export type BrijioErrorCode =
@@ -198,6 +252,8 @@ export interface StaleContextDetail {
   controlId?: string
   previousContextId?: number
   currentContextId?: number
+  previousVisibleContextId?: string
+  currentVisibleContextId?: string
 }
 
 export type BrijioResourceResult<T> =
@@ -349,7 +405,8 @@ export function createGetPageContentEnvelope (
 export function createClickElementEnvelope (
   requestId: string,
   target: ClickElementTarget,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): WebSocketEnvelope {
   return {
     type: 'message',
@@ -357,6 +414,7 @@ export function createClickElementEnvelope (
     payload: {
       type: 'perform_action',
       ...(pageContextId !== undefined ? { pageContextId } : {}),
+      ...(visibleContextId !== undefined ? { visibleContextId } : {}),
       action: {
         type: 'click',
         target
@@ -369,7 +427,8 @@ export function createFillInputEnvelope (
   requestId: string,
   target: FillInputTarget,
   text: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): WebSocketEnvelope {
   return {
     type: 'message',
@@ -377,6 +436,7 @@ export function createFillInputEnvelope (
     payload: {
       type: 'perform_action',
       ...(pageContextId !== undefined ? { pageContextId } : {}),
+      ...(visibleContextId !== undefined ? { visibleContextId } : {}),
       action: {
         type: 'write_text',
         target,
@@ -390,7 +450,8 @@ export function createWriteEditableEnvelope (
   requestId: string,
   target: EditableTarget,
   text: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): WebSocketEnvelope {
   return {
     type: 'message',
@@ -398,6 +459,7 @@ export function createWriteEditableEnvelope (
     payload: {
       type: 'perform_action',
       ...(pageContextId !== undefined ? { pageContextId } : {}),
+      ...(visibleContextId !== undefined ? { visibleContextId } : {}),
       action: {
         type: 'write_text',
         target,
@@ -411,7 +473,8 @@ export function createSetCheckedEnvelope (
   requestId: string,
   target: FillInputTarget,
   checked: boolean,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): WebSocketEnvelope {
   return {
     type: 'message',
@@ -419,6 +482,7 @@ export function createSetCheckedEnvelope (
     payload: {
       type: 'perform_action',
       ...(pageContextId !== undefined ? { pageContextId } : {}),
+      ...(visibleContextId !== undefined ? { visibleContextId } : {}),
       action: {
         type: 'set_checked',
         target,
@@ -432,7 +496,8 @@ export function createSelectOptionsEnvelope (
   requestId: string,
   target: FillInputTarget,
   values: string[],
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): WebSocketEnvelope {
   return {
     type: 'message',
@@ -440,6 +505,7 @@ export function createSelectOptionsEnvelope (
     payload: {
       type: 'perform_action',
       ...(pageContextId !== undefined ? { pageContextId } : {}),
+      ...(visibleContextId !== undefined ? { visibleContextId } : {}),
       action: {
         type: 'select_options',
         target,
@@ -452,7 +518,8 @@ export function createSelectOptionsEnvelope (
 export function createSubmitFormEnvelope (
   requestId: string,
   target: SubmitFormTarget,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): WebSocketEnvelope {
   return {
     type: 'message',
@@ -460,6 +527,7 @@ export function createSubmitFormEnvelope (
     payload: {
       type: 'perform_action',
       ...(pageContextId !== undefined ? { pageContextId } : {}),
+      ...(visibleContextId !== undefined ? { visibleContextId } : {}),
       action: {
         type: 'submit_form',
         target
@@ -471,12 +539,13 @@ export function createSubmitFormEnvelope (
 export function createPerformBatchEnvelope (
   requestId: string,
   actions: Array<Record<string, unknown>>,
-  options?: { pageContextId?: number, continueOnError?: boolean, readAfterActions?: boolean }
+  options?: { pageContextId?: number, visibleContextId?: string, continueOnError?: boolean, readAfterActions?: boolean }
 ): WebSocketEnvelope {
   const payload: Record<string, unknown> = {
     type: 'perform_batch',
     actions,
     ...(options?.pageContextId !== undefined ? { pageContextId: options.pageContextId } : {}),
+    ...(options?.visibleContextId !== undefined ? { visibleContextId: options.visibleContextId } : {}),
     ...(options?.continueOnError !== undefined ? { continueOnError: options.continueOnError } : {}),
     ...(options?.readAfterActions !== undefined ? { readAfterActions: options.readAfterActions } : {})
   }
@@ -1055,6 +1124,20 @@ function isPageContext (value: unknown): value is PageContext {
     return false
   }
 
+  if (
+    value.pageContextId !== undefined &&
+    typeof value.pageContextId !== 'number'
+  ) {
+    return false
+  }
+
+  if (
+    value.visibleContextId !== undefined &&
+    typeof value.visibleContextId !== 'string'
+  ) {
+    return false
+  }
+
   if (!isPagePreview(value.preview)) {
     return false
   }
@@ -1227,7 +1310,9 @@ function isStaleContextDetail (value: unknown): value is StaleContextDetail {
     'expectedType',
     'foundType',
     'formId',
-    'controlId'
+    'controlId',
+    'previousVisibleContextId',
+    'currentVisibleContextId'
   ]
 
   for (const key of optionalStrings) {

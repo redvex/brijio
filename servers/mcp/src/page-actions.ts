@@ -66,7 +66,8 @@ export async function clickCurrentPageElement (
   config: BrijioPageActionsConfig,
   target: ClickElementTarget,
   browserInstanceId?: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): Promise<BrijioClickElementResult> {
   const requestClickElement =
     config.requestClickElement ?? defaultRequestClickElement
@@ -77,7 +78,8 @@ export async function clickCurrentPageElement (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
-    pageContextId
+    pageContextId,
+    visibleContextId
   })
 }
 
@@ -86,7 +88,8 @@ export async function fillCurrentPageInput (
   target: FillInputTarget,
   text: string,
   browserInstanceId?: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): Promise<BrijioFillInputResult> {
   const requestFillInput = config.requestFillInput ?? defaultRequestFillInput
 
@@ -97,7 +100,8 @@ export async function fillCurrentPageInput (
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     text,
-    pageContextId
+    pageContextId,
+    visibleContextId
   })
 }
 
@@ -106,7 +110,8 @@ export async function fillCurrentPageEditable (
   target: EditableTarget,
   text: string,
   browserInstanceId?: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): Promise<BrijioFillInputResult> {
   const requestWriteEditable =
     config.requestWriteEditable ?? defaultRequestWriteEditable
@@ -118,7 +123,8 @@ export async function fillCurrentPageEditable (
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     text,
-    pageContextId
+    pageContextId,
+    visibleContextId
   })
 }
 
@@ -127,7 +133,8 @@ export async function setCurrentPageChecked (
   target: FillInputTarget,
   checked: boolean,
   browserInstanceId?: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): Promise<BrijioSetCheckedResult> {
   const requestSetChecked =
     config.requestSetChecked ?? defaultRequestSetChecked
@@ -139,7 +146,8 @@ export async function setCurrentPageChecked (
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     checked,
-    pageContextId
+    pageContextId,
+    visibleContextId
   })
 }
 
@@ -148,7 +156,8 @@ export async function selectCurrentPageOptions (
   target: FillInputTarget,
   values: string[],
   browserInstanceId?: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): Promise<BrijioSelectOptionsResult> {
   const requestSelectOptions =
     config.requestSelectOptions ?? defaultRequestSelectOptions
@@ -160,7 +169,8 @@ export async function selectCurrentPageOptions (
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     values,
-    pageContextId
+    pageContextId,
+    visibleContextId
   })
 }
 
@@ -168,7 +178,8 @@ export async function submitCurrentPageForm (
   config: BrijioPageActionsConfig,
   target: SubmitFormTarget,
   browserInstanceId?: string,
-  pageContextId?: number
+  pageContextId?: number,
+  visibleContextId?: string
 ): Promise<BrijioSubmitFormResult> {
   const requestSubmitForm =
     config.requestSubmitForm ?? defaultRequestSubmitForm
@@ -179,7 +190,8 @@ export async function submitCurrentPageForm (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
-    pageContextId
+    pageContextId,
+    visibleContextId
   })
 }
 
@@ -208,6 +220,7 @@ export async function performBatch (
     continueOnError?: boolean
     readAfterActions?: boolean
     pageContextId?: number
+    visibleContextId?: string
   }
 ): Promise<BrijioResourceResult<BrijioBatchResult>> {
   const requestPerformBatch = config.requestPerformBatch ?? defaultRequestPerformBatch
@@ -220,6 +233,7 @@ export async function performBatch (
     actions,
     continueOnError: options?.continueOnError,
     readAfterActions: options?.readAfterActions,
-    pageContextId: options?.pageContextId
+    pageContextId: options?.pageContextId,
+    visibleContextId: options?.visibleContextId
   })
 }
