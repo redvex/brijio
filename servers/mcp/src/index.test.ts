@@ -350,6 +350,11 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'number',
             description:
               'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          },
+          visibleContextId: {
+            type: 'string',
+            description:
+              'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           }
         },
         required: ['kind', 'id'],
@@ -384,6 +389,11 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           },
+          visibleContextId: {
+            type: 'string',
+            description:
+              'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
+          },
           text: {
             type: 'string',
             description: 'Text to write into the targeted form control.'
@@ -415,6 +425,11 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'number',
             description:
               'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          },
+          visibleContextId: {
+            type: 'string',
+            description:
+              'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           },
           text: {
             type: 'string',
@@ -457,6 +472,11 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'number',
             description:
               'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          },
+          visibleContextId: {
+            type: 'string',
+            description:
+              'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           }
         },
         required: ['formId', 'controlId', 'checked'],
@@ -490,6 +510,11 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'number',
             description:
               'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          },
+          visibleContextId: {
+            type: 'string',
+            description:
+              'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           },
           values: {
             type: 'array',
@@ -526,6 +551,11 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'number',
             description:
               'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          },
+          visibleContextId: {
+            type: 'string',
+            description:
+              'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           }
         },
         required: ['formId'],

@@ -20,10 +20,12 @@ import {
   type PageContext
 } from './protocol.js'
 import { handleContentRequest, type ContentEnvironment, type ContentRequest } from './content-handler.js'
+import { computeVisibleContextId } from './page-context.js'
 
 export interface BatchRequest {
   actions: BatchAction[]
   pageContextId?: number
+  visibleContextId?: string
   continueOnError?: boolean
   readAfterActions?: boolean
 }
@@ -42,6 +44,7 @@ export interface ContentBatchRequest {
   type: 'perform_batch'
   actions: BatchAction[]
   pageContextId?: number
+  visibleContextId?: string
   continueOnError?: boolean
   readAfterActions?: boolean
 }
@@ -120,6 +123,34 @@ export function executeBatch (
   const continueOnError = request.continueOnError === true
   const urlBeforeBatch = environment.locationHref
   let aborted = false
+
+  if (request.visibleContextId !== undefined) {
+    const currentVisibleContextId = computeVisibleContextId(environment.document)
+
+    if (request.visibleContextId !== currentVisibleContextId) {
+      return {
+        ok: false,
+        results: [
+          {
+            ok: false,
+            error: {
+              code: 'stale_context',
+              message: 'Visible form controls changed since the page was read. Call read_current_page before continuing.',
+              detail: {
+                id: '',
+                kind: 'visible_context',
+                previousVisibleContextId: request.visibleContextId,
+                currentVisibleContextId,
+                reason: 'visible_controls_changed'
+              },
+              aborted: false
+            }
+          }
+        ],
+        aborted: true
+      }
+    }
+  }
 
   for (let i = 0; i < request.actions.length; i++) {
     // If a previous action caused abort (page_navigated or non-continue error), skip
