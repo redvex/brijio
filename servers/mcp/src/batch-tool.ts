@@ -10,6 +10,7 @@ export interface PerformBatchInput {
   continueOnError?: unknown
   readAfterActions?: unknown
   pageContextId?: unknown
+  visibleContextId?: unknown
   browserInstanceId?: unknown
 }
 
@@ -62,11 +63,16 @@ export async function performBatchTool (
     return invalidToolInputResponse('pageContextId must be a number when provided.')
   }
 
+  if (input.visibleContextId !== undefined && typeof input.visibleContextId !== 'string') {
+    return invalidToolInputResponse('visibleContextId must be a string when provided.')
+  }
+
   const result = await performBatch(config, input.actions as Array<Record<string, unknown>>, {
     browserInstanceId: browserInstanceId.data,
     continueOnError: input.continueOnError,
     readAfterActions: input.readAfterActions,
-    pageContextId: input.pageContextId
+    pageContextId: input.pageContextId,
+    visibleContextId: input.visibleContextId
   })
 
   // BrijioResourceResult<BrijioBatchResult> maps directly to BrijioToolResult<BrijioBatchResult>

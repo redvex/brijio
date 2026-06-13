@@ -58,35 +58,41 @@ export interface PageContentRequestOptions extends PageContextRequestOptions {
 export interface ClickElementRequestOptions extends PageContextRequestOptions {
   target: ClickElementTarget
   pageContextId?: number
+  visibleContextId?: string
 }
 
 export interface FillInputRequestOptions extends PageContextRequestOptions {
   target: FillInputTarget
   text: string
   pageContextId?: number
+  visibleContextId?: string
 }
 
 export interface WriteEditableRequestOptions extends PageContextRequestOptions {
   target: EditableTarget
   text: string
   pageContextId?: number
+  visibleContextId?: string
 }
 
 export interface SetCheckedRequestOptions extends PageContextRequestOptions {
   target: FillInputTarget
   checked: boolean
   pageContextId?: number
+  visibleContextId?: string
 }
 
 export interface SelectOptionsRequestOptions extends PageContextRequestOptions {
   target: FillInputTarget
   values: string[]
   pageContextId?: number
+  visibleContextId?: string
 }
 
 export interface SubmitFormRequestOptions extends PageContextRequestOptions {
   target: SubmitFormTarget
   pageContextId?: number
+  visibleContextId?: string
 }
 
 export interface NavigateToUrlRequestOptions extends PageContextRequestOptions {
@@ -98,6 +104,7 @@ export interface PerformBatchRequestOptions extends PageContextRequestOptions {
   continueOnError?: boolean
   readAfterActions?: boolean
   pageContextId?: number
+  visibleContextId?: string
 }
 
 export async function requestPageContext (
@@ -142,7 +149,7 @@ export async function requestClickElement (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createClickElementEnvelope(requestId, options.target, options.pageContextId),
+    requestEnvelope: createClickElementEnvelope(requestId, options.target, options.pageContextId, options.visibleContextId),
     parseEnvelope: (value) => parseClickActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
@@ -162,7 +169,7 @@ export async function requestFillInput (
       requestId,
       options.target,
       options.text,
-      options.pageContextId
+      options.pageContextId, options.visibleContextId
     ),
     parseEnvelope: (value) => parseFillActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -183,7 +190,7 @@ export async function requestWriteEditable (
       requestId,
       options.target,
       options.text,
-      options.pageContextId
+      options.pageContextId, options.visibleContextId
     ),
     parseEnvelope: (value) => parseWriteTextActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -204,7 +211,7 @@ export async function requestSetChecked (
       requestId,
       options.target,
       options.checked,
-      options.pageContextId
+      options.pageContextId, options.visibleContextId
     ),
     parseEnvelope: (value) => parseSetCheckedActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -225,7 +232,7 @@ export async function requestSelectOptions (
       requestId,
       options.target,
       options.values,
-      options.pageContextId
+      options.pageContextId, options.visibleContextId
     ),
     parseEnvelope: (value) => parseSelectOptionsActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -242,7 +249,7 @@ export async function requestSubmitForm (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createSubmitFormEnvelope(requestId, options.target, options.pageContextId),
+    requestEnvelope: createSubmitFormEnvelope(requestId, options.target, options.pageContextId, options.visibleContextId),
     parseEnvelope: (value) => parseSubmitFormActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
@@ -300,6 +307,7 @@ export async function requestPerformBatch (
     browserInstanceId: options.browserInstanceId,
     requestEnvelope: createPerformBatchEnvelope(requestId, options.actions, {
       pageContextId: options.pageContextId,
+      visibleContextId: options.visibleContextId,
       continueOnError: options.continueOnError,
       readAfterActions: options.readAfterActions
     }),
