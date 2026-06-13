@@ -46,7 +46,7 @@ The guiding principle for this ADR is:
 ## Decision
 
 Enhance the existing page context and form action protocol with a user-visible
-form state model. The model stays inside `read_current_page`; P1.5 does not add a
+form state model. The model stays inside `read_current_page`; add a
 separate `inspect_form` tool.
 
 ### Visible-only form controls
