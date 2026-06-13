@@ -153,6 +153,7 @@ export interface PerformSubmitFormAction {
 export interface PerformActionRequest {
   type: 'perform_action'
   pageContextId?: number
+  visibleContextId?: string
   action:
   | PerformClickAction
   | PerformWriteTextAction
@@ -175,6 +176,7 @@ export type BatchAction =
 export interface PerformBatchRequest {
   type: 'perform_batch'
   pageContextId?: number
+  visibleContextId?: string
   actions: BatchAction[]
   continueOnError?: boolean
   readAfterActions?: boolean
@@ -242,12 +244,33 @@ export interface PageFormControl {
   label: string
   type: string
   required: boolean
+  requiredSource?: 'html' | 'aria'
   disabled: boolean
   readonly?: boolean
   sensitive: boolean
+  valueState?: 'empty' | 'filled' | 'unknown'
+  filledBy?: 'brijio' | 'user_or_page'
   checked?: boolean
   multiple?: boolean
   options?: PageFormControlOption[]
+  validity?: PageFormControlValidity
+}
+
+export type PageFormControlValidityReason =
+  | 'value_missing'
+  | 'type_mismatch'
+  | 'pattern_mismatch'
+  | 'too_short'
+  | 'too_long'
+  | 'range_underflow'
+  | 'range_overflow'
+  | 'step_mismatch'
+  | 'bad_input'
+  | 'custom_error'
+
+export interface PageFormControlValidity {
+  valid: boolean
+  reason?: PageFormControlValidityReason
 }
 
 export interface PageFormControlOption {
@@ -287,6 +310,7 @@ export interface PageContext {
   /** Content script version for diagnostics (identifies ACTION_SELECTORS shape) */
   _csVersion?: number
   pageContextId?: number
+  visibleContextId?: string
   url: string
   title: string
   timestamp: string
@@ -408,6 +432,9 @@ export interface WriteTextActionResultData {
   action: 'write_text'
   target: WriteTextActionTarget | WriteTextEditableTarget
   textLength: number
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
+  currentVisibleContextId?: string
 }
 
 export interface SetCheckedActionResultData {
@@ -415,12 +442,25 @@ export interface SetCheckedActionResultData {
   target: WriteTextActionTarget
   checked: boolean
   changed: boolean
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
+  currentVisibleContextId?: string
 }
 
 export interface SelectOptionsActionResultData {
   action: 'select_options'
   target: WriteTextActionTarget
   values: string[]
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
+  currentVisibleContextId?: string
+}
+
+export interface FormValidationError {
+  formId: string
+  controlId: string
+  label: string
+  reason: PageFormControlValidityReason
 }
 
 export interface SubmitFormActionResultData {
@@ -428,6 +468,11 @@ export interface SubmitFormActionResultData {
   target: {
     formId: string
   }
+  submitted?: boolean
+  validationErrors?: FormValidationError[]
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
+  currentVisibleContextId?: string
 }
 
 export interface ActionResultResponse {
@@ -458,6 +503,9 @@ export interface StaleContextDetail {
   controlId?: string
   previousContextId?: number
   currentContextId?: number
+  previousVisibleContextId?: string
+  currentVisibleContextId?: string
+  reason?: 'visible_controls_changed'
 }
 
 export interface ActionResultErrorResponse {
@@ -928,12 +976,13 @@ export function createActionResultErrorResponse (
 export function createPerformBatchEnvelope (
   requestId: string | undefined,
   actions: BatchAction[],
-  options?: { pageContextId?: number, continueOnError?: boolean, readAfterActions?: boolean }
+  options?: { pageContextId?: number, visibleContextId?: string, continueOnError?: boolean, readAfterActions?: boolean }
 ): WebSocketEnvelope {
   const payload: PerformBatchRequest = {
     type: 'perform_batch',
     actions,
     ...(options?.pageContextId !== undefined ? { pageContextId: options.pageContextId } : {}),
+    ...(options?.visibleContextId !== undefined ? { visibleContextId: options.visibleContextId } : {}),
     ...(options?.continueOnError !== undefined ? { continueOnError: options.continueOnError } : {}),
     ...(options?.readAfterActions !== undefined ? { readAfterActions: options.readAfterActions } : {})
   }
@@ -1007,6 +1056,10 @@ export function isPerformBatchEnvelope (
 
   // pageContextId: if present, must be a number
   if (Object.hasOwn(value.payload, 'pageContextId') && typeof value.payload.pageContextId !== 'number') {
+    return false
+  }
+
+  if (Object.hasOwn(value.payload, 'visibleContextId') && typeof value.payload.visibleContextId !== 'string') {
     return false
   }
 

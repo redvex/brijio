@@ -12,6 +12,7 @@ import {
   type PageForm,
   type PageFormControl,
   type PageFormControlOption,
+  type PageFormControlValidityReason,
   type PageHeading,
   type PageImage,
   type PageLandmark,
@@ -44,6 +45,7 @@ export function extractPageContext (
     title: options.title,
     timestamp: options.now(),
     selectedText: selectedText === '' ? null : selectedText,
+    visibleContextId: computeVisibleContextId(options.document),
     preview: {
       content: preview.content,
       truncated: preview.truncated,
@@ -153,20 +155,72 @@ function extractFormControls (form: Element): PageFormControl[] {
     .filter(isVisible)
     .map((control, index) => {
       const type = getControlType(control)
+      const requiredSource = getRequiredSource(control)
+      const valueState = getValueState(control)
+      const filledBy = getFilledBy(control, valueState)
 
       return {
         id: createId(index + 1),
         label: getControlLabel(control),
         type,
-        required: control.hasAttribute('required'),
+        required: requiredSource !== undefined,
+        requiredSource,
         disabled: control.hasAttribute('disabled'),
         readonly: control.hasAttribute('readonly') || undefined,
         sensitive: isSensitiveType(type),
+        valueState,
+        filledBy,
         checked: getCheckedState(control),
         multiple: getMultipleState(control),
-        options: getSelectOptions(control)
+        options: getSelectOptions(control),
+        validity: getControlValidity(control)
       }
     })
+}
+
+export function computeVisibleContextId (document: Document): string {
+  const signature = extractForms(document).map((form) => ({
+    label: form.label,
+    controls: form.controls.map((control) => ({
+      label: control.label,
+      type: control.type,
+      required: control.required,
+      requiredSource: control.requiredSource,
+      disabled: control.disabled,
+      readonly: control.readonly === true,
+      sensitive: control.sensitive,
+      valueState: control.valueState,
+      filledBy: control.filledBy,
+      checked: control.checked,
+      multiple: control.multiple,
+      options: control.options?.map((option) => ({
+        selected: option.selected,
+        disabled: option.disabled
+      })),
+      validityReason: control.validity?.reason
+    }))
+  }))
+
+  return `ctx_${hashString(JSON.stringify(signature))}`
+}
+
+export function computeVisibleFormStructureId (document: Document): string {
+  const signature = extractForms(document).map((form) => ({
+    label: form.label,
+    controls: form.controls.map((control) => ({
+      label: control.label,
+      type: control.type,
+      required: control.required,
+      requiredSource: control.requiredSource,
+      disabled: control.disabled,
+      readonly: control.readonly === true,
+      sensitive: control.sensitive,
+      multiple: control.multiple,
+      optionCount: control.options?.length
+    }))
+  }))
+
+  return `vfs_${hashString(JSON.stringify(signature))}`
 }
 
 export const ACTION_SELECTORS = [
@@ -484,6 +538,107 @@ function getMultipleState (control: Element): boolean | undefined {
   )
 }
 
+function getRequiredSource (control: Element): 'html' | 'aria' | undefined {
+  if (control.hasAttribute('required')) {
+    return 'html'
+  }
+
+  if (control.getAttribute('aria-required') === 'true') {
+    return 'aria'
+  }
+
+  return undefined
+}
+
+function getValueState (control: Element): 'empty' | 'filled' | 'unknown' {
+  const tagName = control.tagName.toLowerCase()
+  const type = getControlType(control)
+
+  if (type === 'checkbox' || type === 'radio') {
+    return getCheckedState(control) === true ? 'filled' : 'empty'
+  }
+
+  if (tagName === 'select') {
+    const selectedOptions = Array.from((control as HTMLSelectElement).options)
+      .filter((option) => option.selected || option.hasAttribute('selected'))
+      .filter((option) => option.value !== '')
+
+    return selectedOptions.length > 0 ? 'filled' : 'empty'
+  }
+
+  if (tagName === 'button') {
+    return 'unknown'
+  }
+
+  const value = (control as HTMLInputElement | HTMLTextAreaElement).value ??
+    control.getAttribute('value') ??
+    control.textContent ??
+    ''
+
+  return normalizeText(value) === '' ? 'empty' : 'filled'
+}
+
+function getFilledBy (
+  control: Element,
+  valueState: 'empty' | 'filled' | 'unknown'
+): 'brijio' | 'user_or_page' | undefined {
+  if (valueState !== 'filled') {
+    return undefined
+  }
+
+  return control.getAttribute('data-brijio-fill-owner') === 'brijio'
+    ? 'brijio'
+    : 'user_or_page'
+}
+
+function getControlValidity (control: Element): PageFormControl['validity'] {
+  if (getValueState(control) === 'empty' && getRequiredSource(control) !== undefined) {
+    return {
+      valid: false,
+      reason: 'value_missing'
+    }
+  }
+
+  const input = control as HTMLInputElement
+  const validity = input.validity
+
+  if (validity !== undefined && !validity.valid) {
+    return {
+      valid: false,
+      reason: getValidityReason(validity)
+    }
+  }
+
+  return { valid: true }
+}
+
+function getValidityReason (
+  validity: ValidityState
+): PageFormControlValidityReason {
+  if (validity.valueMissing) return 'value_missing'
+  if (validity.typeMismatch) return 'type_mismatch'
+  if (validity.patternMismatch) return 'pattern_mismatch'
+  if (validity.tooShort) return 'too_short'
+  if (validity.tooLong) return 'too_long'
+  if (validity.rangeUnderflow) return 'range_underflow'
+  if (validity.rangeOverflow) return 'range_overflow'
+  if (validity.stepMismatch) return 'step_mismatch'
+  if (validity.badInput) return 'bad_input'
+  if (validity.customError) return 'custom_error'
+  return 'custom_error'
+}
+
+function hashString (value: string): string {
+  let hash = 0x811c9dc5
+
+  for (let index = 0; index < value.length; index++) {
+    hash ^= value.charCodeAt(index)
+    hash = Math.imul(hash, 0x01000193)
+  }
+
+  return (hash >>> 0).toString(16).padStart(8, '0')
+}
+
 function getSelectOptions (
   control: Element
 ): PageFormControlOption[] | undefined {
@@ -586,16 +741,29 @@ function getExplicitAccessibleName (element: Element): string {
 }
 
 function isVisible (element: Element): boolean {
-  return !isSkippedElement(element)
+  let current: Element | null = element
+
+  while (current !== null) {
+    if (isSkippedElement(current)) {
+      return false
+    }
+
+    current = current.parentElement
+  }
+
+  return true
 }
 
 function isSkippedElement (element: Element): boolean {
   const tagName = element.tagName.toLowerCase()
+  const style = element.getAttribute('style')?.toLowerCase() ?? ''
 
   return (
     ['script', 'style', 'template', 'noscript'].includes(tagName) ||
     element.hasAttribute('hidden') ||
     element.getAttribute('aria-hidden') === 'true' ||
+    style.includes('display: none') ||
+    style.includes('visibility: hidden') ||
     (tagName === 'input' && element.getAttribute('type') === 'hidden')
   )
 }
