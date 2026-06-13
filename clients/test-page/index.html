@@ -1012,55 +1012,55 @@ a:hover { text-decoration: underline; }
 <h2>Response Form</h2>
 <p>Answer each question based on the story passage above. Submit the form to see which answers match.</p>
 
-<form id="brijio-test-form" method="GET" action="#results">
+<form id="brijio-test-form" method="POST" action="#results">
 
 <fieldset>
 <legend>Short Text Answers</legend>
 
 <label for="surname">What was Helen's surname before marriage?</label>
-<input id="surname" name="surname" type="text" placeholder="e.g. Watson">
+<input id="surname" name="surname" type="text" placeholder="e.g. Watson" required>
 
 <label for="detective-street">On which street does Sherlock Holmes live?</label>
-<input id="detective-street" name="detective_street" type="text" placeholder="e.g. Baker Street">
+<input id="detective-street" name="detective_street" type="text" placeholder="e.g. Baker Street" required>
 
 <label for="county">In which English county is Stoke Moran located?</label>
-<input id="county" name="county" type="text" placeholder="e.g. Surrey">
+<input id="county" name="county" type="text" placeholder="e.g. Surrey" required>
 
 <label for="animal-1">Name one of Dr. Roylott's exotic animals (other than the snake).</label>
-<input id="animal-1" name="animal_one" type="text" placeholder="e.g. cheetah">
+<input id="animal-1" name="animal_one" type="text" placeholder="e.g. cheetah" required>
 
 <label for="death-year">In what year did Julia Stoner die?</label>
-<input id="death-year" name="death_year" type="text" placeholder="e.g. 1881">
+<input id="death-year" name="death_year" type="text" placeholder="e.g. 1881" required>
 
 <label for="doctor-rank">What was Dr. Roylott's rank in the Indian Army?</label>
-<input id="doctor-rank" name="doctor_rank" type="text" placeholder="e.g. surgeon">
+<input id="doctor-rank" name="doctor_rank" type="text" placeholder="e.g. surgeon" required>
 </fieldset>
 
 <fieldset>
 <legend>Contact &amp; Numeric Fields</legend>
 
 <label for="email-contact">Dr. Watson's fictional email (use watson@bakerstreet.uk)</label>
-<input id="email-contact" name="email_contact" type="email" placeholder="name@example.com">
+<input id="email-contact" name="email_contact" type="email" placeholder="name@example.com" required>
 
 <label for="secret-passphrase">Enter the public demo passphrase: <em>speckled band</em></label>
-<input id="secret-passphrase" name="secret_passphrase" type="text" placeholder="Enter demo passphrase" autocomplete="off">
+<input id="secret-passphrase" name="secret_passphrase" type="text" placeholder="Enter demo passphrase" autocomplete="off" required>
 <p class="note">This is intentionally a normal text field. Brijio does not fill real password controls.</p>
 
 <label for="story-search">Search for a detail in the story</label>
-<input id="story-search" name="story_search" type="search" placeholder="e.g. ventilator">
+<input id="story-search" name="story_search" type="search" placeholder="e.g. ventilator" required>
 
 <label for="income-amount">Dr. Roylott's annual income in pounds (number only)</label>
-<input id="income-amount" name="income_amount" type="number" min="0" max="10000" placeholder="750">
+<input id="income-amount" name="income_amount" type="number" min="0" max="10000" placeholder="750" required>
 
 <label for="event-date">The approximate date Holmes visited Stoke Moran (April 1883)</label>
-<input id="event-date" name="event_date" type="date" value="1883-04-06">
+<input id="event-date" name="event_date" type="date" value="1883-04-06" required>
 </fieldset>
 
 <fieldset>
 <legend>Free-Text Response</legend>
 
 <label for="motive-explanation">In your own words, explain Dr. Roylott's motive for sending the snake.</label>
-<textarea id="motive-explanation" name="motive_explanation" rows="4" placeholder="Write 2-3 sentences explaining the financial motive..."></textarea>
+<textarea id="motive-explanation" name="motive_explanation" rows="4" placeholder="Write 2-3 sentences explaining the financial motive..." required></textarea>
 
 <label for="content-editable-area">Write a brief description of the ventilator's role in the mystery.</label>
 <div id="content-editable-area" contenteditable="true" style="min-height:80px; border:1px solid color-mix(in srgb, CanvasText 28%, transparent); border-radius:6px; padding:8px 10px; max-width:600px; background:Canvas; color:CanvasText;"></div>
@@ -1087,7 +1087,7 @@ a:hover { text-decoration: underline; }
 <span class="inline-flex demo-mui-outer">
 <span class="demo-mui-root" aria-disabled="false">
 <span class="demo-mui-label">
-<input class="demo-mui-input" id="understand" name="understand" type="checkbox" value="yes">
+<input class="demo-mui-input" id="understand" name="understand" type="checkbox" value="yes" required>
 <span class="demo-mui-box" aria-hidden="true"></span>
 </span>
 </span>
@@ -1101,13 +1101,13 @@ a:hover { text-decoration: underline; }
 <p class="note">What was the "speckled band" that Julia described?</p>
 
 <label><input id="radio-gypsy" name="speckled_band" type="radio" value="gypsy"> A gypsy band that camped on the grounds</label>
-<label><input id="radio-snake" name="speckled_band" type="radio" value="snake"> A swamp adder (snake)</label>
+<label><input id="radio-snake" name="speckled_band" type="radio" value="snake" required> A swamp adder (snake)</label>
 <label><input id="radio-rope" name="speckled_band" type="radio" value="rope"> A rope used to lower something from the ventilator</label>
 <label><input id="radio-scarf" name="speckled_band" type="radio" value="scarf"> A spotted scarf worn by Dr. Roylott</label>
 
 <p class="note" style="margin-top:16px">What time did Holmes and Watson hear the whistle?</p>
 
-<label><input id="time-1am" name="whistle_time" type="radio" value="1am"> 1:00 AM</label>
+<label><input id="time-1am" name="whistle_time" type="radio" value="1am" required> 1:00 AM</label>
 <label><input id="time-2am" name="whistle_time" type="radio" value="2am"> 2:00 AM</label>
 <label><input id="time-3am" name="whistle_time" type="radio" value="3am"> 3:00 AM</label>
 <label><input id="time-4am" name="whistle_time" type="radio" value="4am"> 4:00 AM</label>
@@ -1117,7 +1117,7 @@ a:hover { text-decoration: underline; }
 <legend>Dropdown Select</legend>
 
 <label for="location-select">Where did Dr. Roylott previously practise medicine?</label>
-<select id="location-select" name="location_select">
+<select id="location-select" name="location_select" required>
 <option value="">— Select a location —</option>
 <option value="london">London, England</option>
 <option value="calcutta">Calcutta, India</option>
@@ -1127,7 +1127,7 @@ a:hover { text-decoration: underline; }
 </select>
 
 <label for="transport-select">How did Holmes and Watson travel to Stoke Moran?</label>
-<select id="transport-select" name="transport_select">
+<select id="transport-select" name="transport_select" required>
 <option value="">— Select transport —</option>
 <option value="train-cart">Train then dog-cart</option>
 <option value="carriage">Horse-drawn carriage from Baker Street</option>
@@ -1140,7 +1140,7 @@ a:hover { text-decoration: underline; }
 <legend>Multi-Select Dropdown</legend>
 
 <label for="methods-select">Which investigative methods did Holmes use? (Hold Ctrl/Cmd to select multiple)</label>
-<select id="methods-select" name="investigative_methods" multiple style="min-height:100px;">
+<select id="methods-select" name="investigative_methods" multiple required style="min-height:100px;">
 <option value="observation">Careful observation of the room</option>
 <option value="interview">Interview with Helen Stoner</option>
 <option value="stakeout">Staying overnight (stakeout) in Helen's room</option>
@@ -1379,6 +1379,15 @@ function markRadioGroupValidation(name, expectedValue, selectedValue) {
 (function() {
   var form = document.getElementById('brijio-test-form');
   form.addEventListener('submit', function(event) {
+    // Validate contenteditable manually — HTML required doesn't apply to divs
+    var editable = document.getElementById('content-editable-area');
+    if (!editable.textContent.trim()) {
+      editable.style.borderColor = 'var(--error)';
+      editable.style.boxShadow = '0 0 0 2px color-mix(in srgb, var(--error) 16%, transparent)';
+      editable.focus();
+      alert('The ventilator description field is required.');
+      return;
+    }
     event.preventDefault();
     var params = formParams();
     var query = params.toString();
