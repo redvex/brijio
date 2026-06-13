@@ -72,6 +72,7 @@ if (typeof browser !== 'undefined') {
       const result = executeBatch({
         actions: message.actions,
         ...(message.pageContextId !== undefined ? { pageContextId: message.pageContextId } : {}),
+        ...(message.visibleContextId !== undefined ? { visibleContextId: message.visibleContextId } : {}),
         ...(message.continueOnError !== undefined ? { continueOnError: message.continueOnError } : {}),
         ...(message.readAfterActions !== undefined ? { readAfterActions: message.readAfterActions } : {})
       }, {

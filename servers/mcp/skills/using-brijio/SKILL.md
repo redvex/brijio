@@ -17,12 +17,7 @@ irrelevant, move on — but check first.
 
 ```mermaid
 flowchart TD
-    A[["User asks for browser action"]] --> B["Check connected browsers"]
-    B --> C{"Might a skill apply?"}
-    C -->|"yes, even 1%"| D["Read skill via read_resource"]
-    C -->|"definitely not"| F[["Take browser action"]]
-    D --> E["Follow skill instructions"]
-    E --> F
+    A[[\"User asks for browser action\"]] --> B[\"Check connected browsers\"]\n    B --> C{\"Might a skill apply?\"}\n    C -->|\"yes, even 1%\"| D[\"Read skill via read_resource\"]\n    C -->|\"definitely not\"| F[[\"Take browser action\"]]\n    D --> E[\"Follow skill instructions\"]\n    E --> F
 ```
 
 ## Available Skills
@@ -59,16 +54,16 @@ skill://brijio/{skill_name}
 
 ### Interaction
 
-| Tool              | Purpose                                 | Key Parameters                                   |
-| ----------------- | --------------------------------------- | ------------------------------------------------ |
-| `navigate_to_url` | Navigate the browser to an HTTP(S) URL  | `url` (required), `browserInstanceId` (optional) |
-| `click_element`   | Click a link or button-like action      | `kind` ("link" or "action"), `id` (short-lived)  |
-| `fill_input`      | Write text into a form control          | `formId`, `controlId`, `text`                    |
-| `fill_editable`   | Write text into a contenteditable area  | `id`, `text`                                     |
-| `set_checked`     | Check/uncheck a checkbox or radio       | `formId`, `controlId`, `checked` (boolean)       |
-| `select_options`  | Select option values in a `<select>`    | `formId`, `controlId`, `values` (string array)   |
-| `submit_form`     | Submit a form                           | `formId`                                         |
-| `perform_batch`   | Execute up to 20 explicit write actions | `actions`, `continueOnError`, `readAfterActions` |
+| Tool              | Purpose                                 | Key Parameters                                      |
+| ----------------- | --------------------------------------- | --------------------------------------------------- |
+| `navigate_to_url` | Navigate the browser to an HTTP(S) URL  | `url` (required), `browserInstanceId` (optional)    |
+| `click_element`   | Click a link or button-like action      | `kind` (\"link\" or \"action\"), `id` (short-lived) |
+| `fill_input`      | Write text into a form control          | `formId`, `controlId`, `text`                       |
+| `fill_editable`   | Write text into a contenteditable area  | `id`, `text`                                        |
+| `set_checked`     | Check/uncheck a checkbox or radio       | `formId`, `controlId`, `checked` (boolean)          |
+| `select_options`  | Select option values in a `<select>`    | `formId`, `controlId`, `values` (string array)      |
+| `submit_form`     | Submit a form                           | `formId`                                            |
+| `perform_batch`   | Execute up to 20 explicit write actions | `actions`, `continueOnError`, `readAfterActions`    |
 
 Use `perform_batch` only after reading the current page and choosing valid
 short-lived IDs from that page context. It is for compact sequences of write
@@ -76,13 +71,20 @@ actions on the same page, such as filling several fields and setting a checkbox.
 Do not use it for hidden reads or open-ended automation: reads stay separate
 except for optional `readAfterActions: true`.
 
-### Critical: Short-Lived IDs
+### Critical: Short-Lived IDs and Staleness Protection
 
 Element IDs (`e5`, `f2`, `a1`, form IDs) are **ephemeral**. They expire when
 the page changes — including after navigation, form submissions, or DOM updates.
 
 **Always re-read the page with `read_current_page` before interacting with
 elements if the page may have changed.**
+
+Additionally, Brijio now tracks visible form state to prevent stale actions:
+
+- If the visible form structure changes between reading and acting, actions
+  will fail with a `stale_context` error
+- This protects against acting on outdated page information
+- When you receive a `stale_context` error, re-read the page and retry
 
 If `perform_batch` returns `data.aborted: true`, stop using IDs from the old
 page, call `read_current_page`, and decide whether to retry against the fresh
@@ -94,7 +96,7 @@ Every Brijio session starts with a connection check:
 
 ```
 → list_browsers
-← { browsers: [{ browserInstanceId: "chrome-abc123", name: "Chrome" }] }
+← { browsers: [{ browserInstanceId: \"chrome-abc123\", name: \"Chrome\" }] }
 ```
 
 If no browsers are connected, tell the user and stop. If multiple browsers are
@@ -112,39 +114,40 @@ subsequent tool calls.
 
 ## Step 3: Choose the Right Skill
 
-| User intent                                              | Skill to read                                        |
-| -------------------------------------------------------- | ---------------------------------------------------- |
-| "Fill in this form" / "Apply" / "Sign up"                | `skill://brijio/form-filling`                        |
-| "Get this data" / "Extract the table" / "Scrape"         | `skill://brijio/data-extraction`                     |
-| "Test this page" / "Check if X works" / "Find bugs"      | `skill://brijio/web-qa`                              |
-| "Go to Settings → Privacy" / "Navigate to admin"         | `skill://brijio/navigation`                          |
-| "Open https://example.com" / "Go to this URL"            | `skill://brijio/navigation`                          |
-| "Compare staging vs prod" / "Check mobile vs desktop"    | `skill://brijio/comparison`                          |
-| "Check accessibility" / "Audit a11y" / "WCAG check"      | `skill://brijio/accessibility`                       |
-| "Buy this" / "Checkout" / "Apply coupon"                 | `skill://brijio/ecommerce`                           |
-| "Sign up for X" / "Create account" / "Onboard"           | `skill://brijio/onboarding`                          |
-| "Monitor this page" / "Alert on changes" / "Price watch" | `skill://brijio/monitoring`                          |
-| Any other browser task                                   | Default to reading the page and using tools directly |
+| User intent                                                    | Skill to read                                        |
+| -------------------------------------------------------------- | ---------------------------------------------------- |
+| \"Fill in this form\" / \"Apply\" / \"Sign up\"                | `skill://brijio/form-filling`                        |
+| \"Get this data\" / \"Extract the table\" / \"Scrape\"         | `skill://brijio/data-extraction`                     |
+| \"Test this page\" / \"Check if X works\" / \"Find bugs\"      | `skill://brijio/web-qa`                              |
+| \"Go to Settings → Privacy\" / \"Navigate to admin\"           | `skill://brijio/navigation`                          |
+| \"Open https://example.com\" / \"Go to this URL\"              | `skill://brijio/navigation`                          |
+| \"Compare staging vs prod\" / \"Check mobile vs desktop\"      | `skill://brijio/comparison`                          |
+| \"Check accessibility\" / \"Audit a11y\" / \"WCAG check\"      | `skill://brijio/accessibility`                       |
+| \"Buy this\" / \"Checkout\" / \"Apply coupon\"                 | `skill://brijio/ecommerce`                           |
+| \"Sign up for X\" / \"Create account\" / \"Onboard\"           | `skill://brijio/onboarding`                          |
+| \"Monitor this page\" / \"Alert on changes\" / \"Price watch\" | `skill://brijio/monitoring`                          |
+| Any other browser task                                         | Default to reading the page and using tools directly |
 
 ## Red Flags
 
 These thoughts mean STOP — you're about to make a mistake:
 
-| Thought                                       | Reality                                                              |
-| --------------------------------------------- | -------------------------------------------------------------------- |
-| "I'll just fill in the password field"        | `fill_input` returns `browser_error` for password fields. Skip them. |
-| "The ID from the last page should still work" | IDs expire on navigation or DOM updates. Re-read the page.           |
-| "I'll submit the form for the user"           | Never auto-submit. Always ask the user to confirm.                   |
-| "I'll just click without checking"            | Radio buttons cannot be unchecked. Select carefully.                 |
-| "I'll batch across pages"                     | Navigation aborts remaining batch actions. Re-read before retrying.  |
-| "I don't need to read a skill for this"       | If there's even a 1% chance a skill applies, read it.                |
-| "I'll skip the connection check"              | No browser = no action. Always call `list_browsers` first.           |
+| Thought                                         | Reality                                                              |
+| ----------------------------------------------- | -------------------------------------------------------------------- |
+| \"I'll just fill in the password field\"        | `fill_input` returns `browser_error` for password fields. Skip them. |
+| \"The ID from the last page should still work\" | IDs expire on navigation or DOM updates. Re-read the page.           |
+| \"I'll submit the form for the user\"           | Never auto-submit. Always ask the user to confirm.                   |
+| \"I'll just click without checking\"            | Radio buttons cannot be unchecked. Select carefully.                 |
+| \"I'll batch across pages\"                     | Navigation aborts remaining batch actions. Re-read before retrying.  |
+| \"I don't need to read a skill for this\"       | If there's even a 1% chance a skill applies, read it.                |
+| \"I'll skip the connection check\"              | No browser = no action. Always call `list_browsers` first.           |
+| \"I'll ignore stale action warnings\"           | Actions may fail if the page changed; re-read and retry.             |
 
 ## User Instructions Always Win
 
 Brijio skills override default system behavior, but **user instructions
-always take precedence**. If the user explicitly says "skip the skill" or
-"just click the button," follow the user's request.
+always take precedence**. If the user explicitly says \"skip the skill\" or
+\"just click the button,\" follow the user's request.
 
 ## Multiple Browsers
 
