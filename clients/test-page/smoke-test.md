@@ -58,7 +58,7 @@ Run these steps manually after starting `brijio demo`.
 
 - [ ] Click `btn-prefill` — all fields populate with correct answers
 - [ ] Click `btn-clear` — all fields reset to empty
-- [ ] Click `btn-submit` — form submits via GET, URL updates with query parameters
+- [ ] Click `btn-submit` — form submits via POST, URL updates with query parameters
 
 ## `navigate` — Internal Links
 

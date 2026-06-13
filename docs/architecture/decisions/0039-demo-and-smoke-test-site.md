@@ -73,13 +73,13 @@ The full text is included inline in `index.html` (not loaded from an external UR
 
 ### 3. Submission and verification
 
-The `<form>` uses `method="GET"` and submits to a `/results` hash-route on the same page. A small inline script reads `window.location.search`, parses the query string, and renders a results summary showing:
+The `<form>` uses `method="POST"` and submits to a `/results` hash-route on the same page. A small inline script reads the form's `FormData`, parses the values, and renders a results summary showing:
 
 - Each question label
 - The submitted value
 - Whether it matches the expected answer (✅ / ❌)
 
-This gives agents a deterministic, self-contained round-trip: read → fill → submit → verify, with no server-side logic or external dependencies.
+Since the form uses POST, the browser does not expose form data via `URLSearchParams` natively for the hash-route. The submission handler serialises the `FormData` into query string parameters, updates the URL via `history.replaceState`, and then calls `renderResults` inline. This gives agents a deterministic, self-contained round-trip: read → fill → submit → verify, with no server-side logic or external dependencies.
 
 ### 4. Smoke-test script
 
@@ -157,7 +157,7 @@ Delete the root `test.html` file. It is superseded entirely by `clients/test-pag
 - **Additional process responsibility** — `brijio demo` adds a static HTTP server to the daemon's responsibilities (mitigated: single-port, no dynamic logic, only started for the `demo` subcommand).
 - **Maintenance surface** — demo page must be kept in sync with tool changes (mitigated: page is simple static HTML with no build step).
 - **Page size** — the inline story makes `index.html` large (~20+ KB of prose). This is intentional to exercise pagination, but it makes editing less convenient (mitigated: story text is in a clearly marked `<section>`, easily swapped for another public-domain work).
-- **No dynamic backend** — form submission uses GET params and client-side JS only; no server-side validation. This limits testing of POST flows and file uploads (deferred to P1.6 file upload support and P6.1 E2E fixture tests).
+- **No dynamic backend** — form submission uses POST and client-side JS serialisation; no server-side validation. This covers POST flows but still limits file upload testing (deferred to P1.6 file upload support and P6.1 E2E fixture tests).
 
 ### Neutral
 
