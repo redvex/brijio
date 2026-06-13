@@ -556,7 +556,8 @@ void describe('content handler request handler', () => {
         action: 'submit_form',
         target: {
           formId: 'bb-1'
-        }
+        },
+        submitted: true
       }
     })
     assert.equal(submitted, true)
@@ -1642,6 +1643,148 @@ void describe('content handler request handler', () => {
     )
 
     assert.equal(response.ok, true)
+  })
+
+  // ── visibleContextId and visible form state tests ────────────────
+
+  void it('returns stale_context when visibleContextId no longer matches visible form state', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Name <input type="text" /></label>
+        </form>
+      </main>
+    `)
+
+    const contextResponse = handleContentRequest(
+      {
+        type: 'extract_page_context',
+        previewMaxBytes: 4096,
+        defaultMaxPayloadBytes: 131072
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(contextResponse.ok, true)
+    if (!contextResponse.ok || !('visibleContextId' in contextResponse.data)) {
+      assert.fail('Expected page context response with visibleContextId')
+    }
+
+    const form = document.querySelector('form')
+    const label = document.createElement('label')
+    label.textContent = 'Postcode '
+    const input = document.createElement('input')
+    input.type = 'text'
+    label.append(input)
+    form?.append(label)
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        visibleContextId: contextResponse.data.visibleContextId,
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'Ada Lovelace'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, false)
+    if (response.ok) {
+      assert.fail('Expected stale_context error')
+      return
+    }
+
+    assert.equal(response.error.code, 'stale_context')
+    assert.equal(response.error.detail?.kind, 'visible_context')
+    assert.equal(response.error.detail?.reason, 'visible_controls_changed')
+  })
+
+  void it('marks context stale when a form action reveals a new visible control', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form>
+          <label>Country <input type="text" /></label>
+        </form>
+      </main>
+    `)
+
+    const input = document.querySelector('input') as HTMLInputElement
+    input.addEventListener('change', () => {
+      const form = document.querySelector('form')
+      const label = document.createElement('label')
+      label.textContent = 'State '
+      const stateInput = document.createElement('input')
+      stateInput.type = 'text'
+      label.append(stateInput)
+      form?.append(label)
+    })
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_write_text',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        text: 'United States'
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    if (!response.ok || !('action' in response.data) || response.data.action !== 'write_text') {
+      assert.fail('Expected write_text response')
+    }
+
+    assert.equal(response.data.contextStale, true)
+    assert.equal(response.data.contextStaleReason, 'visible_controls_changed')
+    assert.equal(typeof response.data.currentVisibleContextId, 'string')
+  })
+
+  void it('returns validation errors instead of submitting invalid visible required fields', () => {
+    const { document } = parseHTML(`
+      <main>
+        <form aria-label="Contact">
+          <label>Email <input type="email" required /></label>
+        </form>
+      </main>
+    `)
+    const form = document.querySelector('form') as HTMLFormElement & {
+      requestSubmit: () => void
+    }
+    let submitted = false
+    form.requestSubmit = () => {
+      submitted = true
+    }
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_submit_form',
+        target: {
+          formId: 'bb-1'
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.equal(response.ok, true)
+    if (!response.ok || !('action' in response.data) || response.data.action !== 'submit_form') {
+      assert.fail('Expected submit_form response')
+    }
+
+    assert.equal(response.data.submitted, false)
+    assert.deepEqual(response.data.validationErrors, [
+      {
+        formId: 'bb-1',
+        controlId: 'bb-1',
+        label: 'Email',
+        reason: 'value_missing'
+      }
+    ])
+    assert.equal(submitted, false)
   })
 
   // ── validateFormSubmitTarget tests ────────────────────────────────
