@@ -164,6 +164,12 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           ),
+        visibleContextId: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -214,6 +220,12 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           ),
+        visibleContextId: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -258,6 +270,12 @@ export async function createBrijioMcpServer (
           .optional()
           .describe(
             'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
+        visibleContextId: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
         browserInstanceId: browserInstanceIdInput
       }
@@ -306,6 +324,12 @@ export async function createBrijioMcpServer (
           .optional()
           .describe(
             'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
+        visibleContextId: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
         browserInstanceId: browserInstanceIdInput
       }
@@ -357,6 +381,12 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
           ),
+        visibleContextId: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
+          ),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -397,6 +427,12 @@ export async function createBrijioMcpServer (
           .optional()
           .describe(
             'Optional: page context version from the last read. If the page has navigated since, the action will fail with page_navigated.'
+          ),
+        visibleContextId: z
+          .string()
+          .optional()
+          .describe(
+            'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
         browserInstanceId: browserInstanceIdInput
       }
@@ -494,6 +530,10 @@ export async function createBrijioMcpServer (
           .number()
           .optional()
           .describe('Page context ID for stale-context detection.'),
+        visibleContextId: z
+          .string()
+          .optional()
+          .describe('Visible form-state ID for stale-context detection.'),
         browserInstanceId: browserInstanceIdInput
       }
     },
@@ -504,6 +544,7 @@ export async function createBrijioMcpServer (
         continueOnError: input.continueOnError,
         readAfterActions: input.readAfterActions,
         pageContextId: input.pageContextId,
+        visibleContextId: input.visibleContextId,
         browserInstanceId: input.browserInstanceId
       })
 
