@@ -3,6 +3,7 @@ import {
   type ActionResultErrorCode,
   type ClickActionTarget,
   type FormControlTarget,
+  type FormValidationError,
   type EditableActionTarget,
   type FormSubmitTarget,
   type PageContent,
@@ -15,7 +16,13 @@ import {
   type WriteTextActionResultData
 } from './protocol.js'
 
-import { extractPageContent, extractPageContext, ACTION_SELECTORS } from './page-context.js'
+import {
+  extractPageContent,
+  extractPageContext,
+  ACTION_SELECTORS,
+  computeVisibleContextId,
+  computeVisibleFormStructureId
+} from './page-context.js'
 import { chunkReadableContent } from './page-content.js'
 
 /** Content script version — incremented when ACTION_SELECTORS or response shape changes. */
@@ -79,29 +86,34 @@ export type ContentRequest =
     type: 'perform_click'
     target: ClickActionTarget
     pageContextId?: number
+    visibleContextId?: string
   }
   | {
     type: 'perform_write_text'
     target: FormControlTarget | EditableActionTarget
     text: string
     pageContextId?: number
+    visibleContextId?: string
   }
   | {
     type: 'perform_set_checked'
     target: FormControlTarget
     checked: boolean
     pageContextId?: number
+    visibleContextId?: string
   }
   | {
     type: 'perform_select_options'
     target: FormControlTarget
     values: string[]
     pageContextId?: number
+    visibleContextId?: string
   }
   | {
     type: 'perform_submit_form'
     target: FormSubmitTarget
     pageContextId?: number
+    visibleContextId?: string
   }
 
 export type ContentResponse =
@@ -174,6 +186,17 @@ export function handleContentRequest (
             }
           }
         }
+      }
+    }
+
+    if ('visibleContextId' in request && request.visibleContextId !== undefined) {
+      const currentVisibleContextId = computeVisibleContextId(environment.document)
+
+      if (request.visibleContextId !== currentVisibleContextId) {
+        return createVisibleContextStaleError(
+          request.visibleContextId,
+          currentVisibleContextId
+        )
       }
     }
 
@@ -251,6 +274,207 @@ export function handleContentRequest (
       }
     }
   }
+}
+
+function createVisibleContextStaleError (
+  previousVisibleContextId: string,
+  currentVisibleContextId: string
+): ContentResponse {
+  return {
+    ok: false,
+    error: {
+      code: 'stale_context',
+      message: 'Visible form controls changed since the page was read. Call read_current_page before continuing.',
+      detail: {
+        id: '',
+        kind: 'visible_context',
+        previousVisibleContextId,
+        currentVisibleContextId,
+        reason: 'visible_controls_changed'
+      }
+    }
+  }
+}
+
+type FormActionData =
+  | WriteTextActionResultData
+  | SetCheckedActionResultData
+  | SelectOptionsActionResultData
+  | SubmitFormActionResultData
+
+function addVisibleContextStaleness <T extends FormActionData> (
+  data: T,
+  previousVisibleFormStructureId: string,
+  document: Document
+): T {
+  const currentVisibleFormStructureId = computeVisibleFormStructureId(document)
+
+  if (currentVisibleFormStructureId === previousVisibleFormStructureId) {
+    return data
+  }
+
+  return {
+    ...data,
+    contextStale: true,
+    contextStaleReason: 'visible_controls_changed',
+    currentVisibleContextId: computeVisibleContextId(document)
+  }
+}
+
+function markBrijioOwned (control: Element): void {
+  control.setAttribute('data-brijio-fill-owner', 'brijio')
+
+  const globalControl = control as Element & {
+    __brijioOwnerClearListener?: EventListener
+  }
+
+  if (globalControl.__brijioOwnerClearListener !== undefined) {
+    return
+  }
+
+  const clearOwner = (): void => {
+    control.removeAttribute('data-brijio-fill-owner')
+  }
+
+  control.addEventListener('input', clearOwner)
+  control.addEventListener('change', clearOwner)
+  globalControl.__brijioOwnerClearListener = clearOwner
+}
+
+function getFormValidationErrors (
+  form: HTMLFormElement,
+  formId: string
+): FormValidationError[] {
+  return Array.from(form.querySelectorAll('input, textarea, select'))
+    .filter(isVisibleFormControl)
+    .map((control, index) => ({
+      control,
+      controlId: `bb-${index + 1}`
+    }))
+    .map(({ control, controlId }) => {
+      const reason = getInvalidReason(control)
+
+      if (reason === null) {
+        return null
+      }
+
+      return {
+        formId,
+        controlId,
+        label: getFormControlLabel(control),
+        reason
+      }
+    })
+    .filter((error): error is FormValidationError => error !== null)
+}
+
+function getInvalidReason (
+  control: Element
+): FormValidationError['reason'] | null {
+  if (isEmptyFormControl(control) && isRequiredFormControl(control)) {
+    return 'value_missing'
+  }
+
+  const validity = (control as HTMLInputElement).validity
+
+  if (validity === undefined || validity.valid) {
+    return null
+  }
+
+  if (validity.valueMissing) return 'value_missing'
+  if (validity.typeMismatch) return 'type_mismatch'
+  if (validity.patternMismatch) return 'pattern_mismatch'
+  if (validity.tooShort) return 'too_short'
+  if (validity.tooLong) return 'too_long'
+  if (validity.rangeUnderflow) return 'range_underflow'
+  if (validity.rangeOverflow) return 'range_overflow'
+  if (validity.stepMismatch) return 'step_mismatch'
+  if (validity.badInput) return 'bad_input'
+  if (validity.customError) return 'custom_error'
+  return 'custom_error'
+}
+
+function isRequiredFormControl (control: Element): boolean {
+  return control.hasAttribute('required') || control.getAttribute('aria-required') === 'true'
+}
+
+function isEmptyFormControl (control: Element): boolean {
+  const tagName = control.tagName.toLowerCase()
+  const type = getInputType(control)
+
+  if (type === 'checkbox' || type === 'radio') {
+    return !(control as HTMLInputElement).checked && !control.hasAttribute('checked')
+  }
+
+  if (tagName === 'select') {
+    return Array.from((control as HTMLSelectElement).options)
+      .filter((option) => option.selected || option.hasAttribute('selected'))
+      .filter((option) => option.value !== '')
+      .length === 0
+  }
+
+  const value = (control as HTMLInputElement | HTMLTextAreaElement).value ??
+    control.getAttribute('value') ??
+    control.textContent ??
+    ''
+
+  return value.trim() === ''
+}
+
+function isVisibleFormControl (element: Element): boolean {
+  let current: Element | null = element
+
+  while (current !== null) {
+    const tagName = current.tagName.toLowerCase()
+    const style = current.getAttribute('style')?.toLowerCase() ?? ''
+
+    if (
+      ['script', 'style', 'template', 'noscript'].includes(tagName) ||
+      current.hasAttribute('hidden') ||
+      current.getAttribute('aria-hidden') === 'true' ||
+      style.includes('display: none') ||
+      style.includes('visibility: hidden') ||
+      (tagName === 'input' && current.getAttribute('type') === 'hidden')
+    ) {
+      return false
+    }
+
+    current = current.parentElement
+  }
+
+  return true
+}
+
+function getFormControlLabel (control: Element): string {
+  const ariaLabel = control.getAttribute('aria-label')
+
+  if (ariaLabel !== null && ariaLabel.trim() !== '') {
+    return normalizeWhitespace(ariaLabel)
+  }
+
+  const wrappingLabel = control.closest('label')
+
+  if (wrappingLabel !== null) {
+    return normalizeWhitespace(wrappingLabel.textContent ?? '')
+  }
+
+  const id = control.getAttribute('id')
+
+  if (id !== null && control.ownerDocument !== null) {
+    const explicitLabel = control.ownerDocument.querySelector(
+      `label[for="${id.replaceAll('\\', '\\\\').replaceAll('"', '\\"')}"]`
+    )
+
+    if (explicitLabel !== null) {
+      return normalizeWhitespace(explicitLabel.textContent ?? '')
+    }
+  }
+
+  return ''
+}
+
+function normalizeWhitespace (value: string): string {
+  return value.replace(/\s+/gu, ' ').trim()
 }
 
 function performWriteText (
@@ -339,6 +563,8 @@ function performWriteText (
     }
   }
 
+  const visibleFormStructureBefore = computeVisibleFormStructureId(document)
+
   try {
     const control = element as HTMLInputElement | HTMLTextAreaElement
     control.focus?.()
@@ -354,14 +580,19 @@ function performWriteText (
     }
     dispatchElementEvent(control, 'input')
     dispatchElementEvent(control, 'change')
+    markBrijioOwned(control)
 
     return {
       ok: true,
-      data: {
-        action: 'write_text',
-        target,
-        textLength: text.length
-      }
+      data: addVisibleContextStaleness(
+        {
+          action: 'write_text',
+          target,
+          textLength: text.length
+        },
+        visibleFormStructureBefore,
+        document
+      )
     }
   } catch {
     return {
@@ -430,6 +661,7 @@ function performSetChecked (
   }
 
   const initialChecked = control.checked
+  const visibleFormStructureBefore = computeVisibleFormStructureId(document)
 
   if (initialChecked !== checked) {
     if (type === 'radio' && checked) {
@@ -451,14 +683,20 @@ function performSetChecked (
     }
   }
 
+  markBrijioOwned(control)
+
   return {
     ok: true,
-    data: {
-      action: 'set_checked',
-      target,
-      checked: control.checked,
-      changed
-    }
+    data: addVisibleContextStaleness(
+      {
+        action: 'set_checked',
+        target,
+        checked: control.checked,
+        changed
+      },
+      visibleFormStructureBefore,
+      document
+    )
   }
 }
 
@@ -570,6 +808,8 @@ function performSelectOptions (
     }
   }
 
+  const visibleFormStructureBefore = computeVisibleFormStructureId(document)
+
   for (const option of options) {
     const selected = values.includes(option.value)
     setOptionSelected(option, selected)
@@ -589,14 +829,19 @@ function performSelectOptions (
 
   dispatchElementEvent(select, 'input')
   dispatchElementEvent(select, 'change')
+  markBrijioOwned(select)
 
   return {
     ok: true,
-    data: {
-      action: 'select_options',
-      target,
-      values
-    }
+    data: addVisibleContextStaleness(
+      {
+        action: 'select_options',
+        target,
+        values
+      },
+      visibleFormStructureBefore,
+      document
+    )
   }
 }
 
@@ -639,6 +884,25 @@ function performSubmitForm (
     return staleError
   }
 
+  const visibleFormStructureBefore = computeVisibleFormStructureId(document)
+  const validationErrors = getFormValidationErrors(form, target.formId)
+
+  if (validationErrors.length > 0) {
+    return {
+      ok: true,
+      data: addVisibleContextStaleness(
+        {
+          action: 'submit_form',
+          target,
+          submitted: false,
+          validationErrors
+        },
+        visibleFormStructureBefore,
+        document
+      )
+    }
+  }
+
   if (typeof form.requestSubmit !== 'function') {
     return {
       ok: false,
@@ -654,10 +918,15 @@ function performSubmitForm (
 
     return {
       ok: true,
-      data: {
-        action: 'submit_form',
-        target
-      }
+      data: addVisibleContextStaleness(
+        {
+          action: 'submit_form',
+          target,
+          submitted: true
+        },
+        visibleFormStructureBefore,
+        document
+      )
     }
   } catch {
     return {
