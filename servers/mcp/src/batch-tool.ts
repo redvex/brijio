@@ -1,8 +1,9 @@
 import { performBatch, type BrijioPageActionsConfig } from './page-actions.js'
 import { type BrijioBatchResult } from './protocol.js'
 import { type BrijioToolResult } from './page-reading-tool.js'
+import { stageUploadFilePayload } from './form-action-tools.js'
 
-const VALID_ACTION_TYPES = ['click', 'write_text', 'set_checked', 'select_options', 'submit_form'] as const
+const VALID_ACTION_TYPES = ['click', 'write_text', 'set_checked', 'select_options', 'submit_form', 'upload_file'] as const
 const MAX_BATCH_ACTIONS = 20
 
 export interface PerformBatchInput {
@@ -32,6 +33,8 @@ export async function performBatchTool (
     return invalidToolInputResponse(`actions must contain at most ${MAX_BATCH_ACTIONS} actions, got ${input.actions.length}.`)
   }
 
+  const actions: Array<Record<string, unknown>> = []
+
   for (let i = 0; i < input.actions.length; i++) {
     const action = input.actions[i]
     if (typeof action !== 'object' || action === null || Array.isArray(action)) {
@@ -43,6 +46,25 @@ export async function performBatchTool (
       return invalidToolInputResponse(
         `actions[${i}].type must be one of: ${VALID_ACTION_TYPES.join(', ')}. Got: ${String(record.type)}`
       )
+    }
+
+    if (record.type === 'upload_file') {
+      const fileResult = await stageUploadFilePayload({
+        filePath: record.filePath,
+        fileName: record.fileName,
+        mimeType: record.mimeType
+      })
+      if (!fileResult.ok) {
+        return invalidToolInputResponse(`actions[${i}]: ${fileResult.error.message}`)
+      }
+
+      const { filePath: _filePath, fileName: _fileName, mimeType: _mimeType, ...stagedAction } = record
+      actions.push({
+        ...stagedAction,
+        file: fileResult.data
+      })
+    } else {
+      actions.push(record)
     }
   }
 
@@ -67,7 +89,7 @@ export async function performBatchTool (
     return invalidToolInputResponse('visibleContextId must be a string when provided.')
   }
 
-  const result = await performBatch(config, input.actions as Array<Record<string, unknown>>, {
+  const result = await performBatch(config, actions, {
     browserInstanceId: browserInstanceId.data,
     continueOnError: input.continueOnError,
     readAfterActions: input.readAfterActions,

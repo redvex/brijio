@@ -597,7 +597,8 @@ void describe('BrijioBackgroundController with Safari adapters', () => {
         async writeText () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } },
         async setChecked () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } },
         async selectOptions () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } },
-        async submitForm () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } }
+        async submitForm () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } },
+        async uploadFile () { return { ok: false, error: { code: 'target_not_found' as const, message: 'test' } } }
       },
       pageBatch: {
         async performBatch () {

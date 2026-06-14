@@ -26,6 +26,8 @@ import {
   type SelectOptionsActionResultData,
   type SetCheckedActionResultData,
   type SubmitFormActionResultData,
+  type UploadFileActionResultData,
+  type FileUploadPayload,
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
@@ -99,6 +101,7 @@ export type PageActionResult =
     | SetCheckedActionResultData
     | SelectOptionsActionResultData
     | SubmitFormActionResultData
+    | UploadFileActionResultData
   }
   | {
     ok: false
@@ -114,23 +117,27 @@ export interface PageReaderAdapter {
 }
 
 export interface PageActionAdapter {
-  click: (target: ClickActionTarget, pageContextId?: number) => Promise<PageActionResult>
+  click: (target: ClickActionTarget, pageContextId?: number, visibleContextId?: string) => Promise<PageActionResult>
   writeText: (
     target: WriteTextActionTarget | WriteTextEditableTarget,
     text: string,
     pageContextId?: number,
+    visibleContextId?: string,
   ) => Promise<PageActionResult>
   setChecked: (
     target: WriteTextActionTarget,
     checked: boolean,
     pageContextId?: number,
+    visibleContextId?: string,
   ) => Promise<PageActionResult>
   selectOptions: (
     target: WriteTextActionTarget,
     values: string[],
     pageContextId?: number,
+    visibleContextId?: string,
   ) => Promise<PageActionResult>
-  submitForm: (target: { formId: string, expectedLabel?: string }, pageContextId?: number) => Promise<PageActionResult>
+  submitForm: (target: { formId: string, expectedLabel?: string }, pageContextId?: number, visibleContextId?: string) => Promise<PageActionResult>
+  uploadFile: (target: WriteTextActionTarget, file: FileUploadPayload, pageContextId?: number, visibleContextId?: string) => Promise<PageActionResult>
 }
 
 export interface PageBatchAdapter {
@@ -420,7 +427,8 @@ export class BrijioBackgroundController {
         await this.handlePerformActionRequest(
           message.id,
           message.payload.action,
-          message.payload.pageContextId
+          message.payload.pageContextId,
+          message.payload.visibleContextId
         )
       } finally {
         this.pendingRequestCount--
@@ -536,10 +544,16 @@ export class BrijioBackgroundController {
         formId: string
         expectedLabel?: string
       }
+    }
+    | {
+      type: 'upload_file'
+      target: WriteTextActionTarget
+      file: FileUploadPayload
     },
-    pageContextId?: number
+    pageContextId?: number,
+    visibleContextId?: string
   ): Promise<void> {
-    const result = await this.performPageAction(action, pageContextId)
+    const result = await this.performPageAction(action, pageContextId, visibleContextId)
 
     if (!result.ok) {
       this.socket?.send(
@@ -561,12 +575,13 @@ export class BrijioBackgroundController {
 
   private async handlePerformBatchRequest (
     requestId: string | undefined,
-    payload: { actions: BatchAction[], continueOnError?: boolean, readAfterActions?: boolean, pageContextId?: number }
+    payload: { actions: BatchAction[], continueOnError?: boolean, readAfterActions?: boolean, pageContextId?: number, visibleContextId?: string }
   ): Promise<void> {
     const batchMessage: ContentBatchRequest = {
       type: 'perform_batch',
       actions: payload.actions,
       ...(payload.pageContextId !== undefined ? { pageContextId: payload.pageContextId } : {}),
+      ...(payload.visibleContextId !== undefined ? { visibleContextId: payload.visibleContextId } : {}),
       ...(payload.continueOnError !== undefined ? { continueOnError: payload.continueOnError } : {}),
       ...(payload.readAfterActions !== undefined ? { readAfterActions: payload.readAfterActions } : {})
     }
@@ -654,18 +669,25 @@ export class BrijioBackgroundController {
         formId: string
         expectedLabel?: string
       }
+    }
+    | {
+      type: 'upload_file'
+      target: WriteTextActionTarget
+      file: FileUploadPayload
     },
-    pageContextId?: number
+    pageContextId?: number,
+    visibleContextId?: string
   ): Promise<PageActionResult> {
     if (action.type === 'click') {
-      return await this.options.pageActions.click(action.target, pageContextId)
+      return await this.options.pageActions.click(action.target, pageContextId, visibleContextId)
     }
 
     if (action.type === 'write_text') {
       return await this.options.pageActions.writeText(
         action.target,
         action.text,
-        pageContextId
+        pageContextId,
+        visibleContextId
       )
     }
 
@@ -673,7 +695,8 @@ export class BrijioBackgroundController {
       return await this.options.pageActions.setChecked(
         action.target,
         action.checked,
-        pageContextId
+        pageContextId,
+        visibleContextId
       )
     }
 
@@ -681,11 +704,21 @@ export class BrijioBackgroundController {
       return await this.options.pageActions.selectOptions(
         action.target,
         action.values,
-        pageContextId
+        pageContextId,
+        visibleContextId
       )
     }
 
-    return await this.options.pageActions.submitForm(action.target, pageContextId)
+    if (action.type === 'upload_file') {
+      return await this.options.pageActions.uploadFile(
+        action.target,
+        action.file,
+        pageContextId,
+        visibleContextId
+      )
+    }
+
+    return await this.options.pageActions.submitForm(action.target, pageContextId, visibleContextId)
   }
 
   private async handleInvalidPerformActionRequest (
@@ -718,11 +751,16 @@ export class BrijioBackgroundController {
                     code: 'invalid_action_target' as const,
                     message: 'Submit targets must identify a form by ID.'
                   }
-                : {
-                    code: 'unsupported_action' as const,
-                    message:
-                      'Only click, write_text, set_checked, select_options, and submit_form actions are supported.'
-                  }
+                : isRecord(action) && action.type === 'upload_file'
+                  ? {
+                      code: 'invalid_action_target' as const,
+                      message: 'Upload targets must identify a file input by ID.'
+                    }
+                  : {
+                      code: 'unsupported_action' as const,
+                      message:
+                        'Only click, write_text, set_checked, select_options, submit_form, and upload_file actions are supported.'
+                    }
 
     this.socket?.send(
       JSON.stringify(

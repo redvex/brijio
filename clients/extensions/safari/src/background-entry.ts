@@ -14,6 +14,7 @@ import {
   type ClickActionTarget,
   type WriteTextActionTarget,
   type WriteTextEditableTarget,
+  type FileUploadPayload,
   type FormSubmitTarget,
   type PageActionResult,
   stringValue,
@@ -90,6 +91,12 @@ const pageActions = {
   async submitForm (target: FormSubmitTarget, pageContextId?: number): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
       { type: 'perform_submit_form', target, ...(pageContextId !== undefined ? { pageContextId } : {}) },
+      safariDeps
+    )
+  },
+  async uploadFile (target: WriteTextActionTarget, file: FileUploadPayload, pageContextId?: number): Promise<PageActionResult> {
+    return await sharedPerformActiveTabAction(
+      { type: 'perform_upload_file', target, file, ...(pageContextId !== undefined ? { pageContextId } : {}) },
       safariDeps
     )
   }

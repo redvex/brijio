@@ -209,10 +209,29 @@ export interface SubmitFormTarget {
   expectedLabel?: string
 }
 
+export interface FileUploadPayload {
+  fileName: string
+  mimeType: string
+  contentBase64: string
+  sizeBytes: number
+  lastModified?: number
+}
+
+export interface UploadFileActionResultData {
+  action: 'upload_file'
+  target: FillInputTarget
+  fileName: string
+  mimeType: string
+  sizeBytes: number
+  fileCount: number
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
+}
+
 export interface SubmitFormActionResultData {
   action: 'submit_form'
   target: SubmitFormTarget
-  submitted: boolean
+  submitted?: boolean
   validationErrors?: SubmitFormValidationError[]
   contextStale?: boolean
   contextStaleReason?: 'visible_controls_changed'
@@ -292,6 +311,9 @@ export type BrijioSelectOptionsResult =
 export type BrijioSubmitFormResult =
   BrijioResourceResult<SubmitFormActionResultData>
 
+export type BrijioUploadFileResult =
+  BrijioResourceResult<UploadFileActionResultData>
+
 export type BrijioBrowserListResult = BrijioResourceResult<{
   browsers: BrowserPresence[]
 }>
@@ -310,6 +332,7 @@ export type ActionResultParseResult =
   | BrijioSetCheckedResult
   | BrijioSelectOptionsResult
   | BrijioSubmitFormResult
+  | BrijioUploadFileResult
   | { ok: false, ignored: true }
 
 export type BrowserListParseResult =
@@ -341,7 +364,7 @@ export interface BatchActionError {
 }
 
 export type BatchActionOutcome =
-  | { ok: true, data: ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData }
+  | { ok: true, data: ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | UploadFileActionResultData }
   | { ok: false, error: BatchActionError }
 
 export type BatchReadOutcome =
@@ -515,6 +538,29 @@ export function createSelectOptionsEnvelope (
   }
 }
 
+export function createUploadFileEnvelope (
+  requestId: string,
+  target: FillInputTarget,
+  file: FileUploadPayload,
+  pageContextId?: number,
+  visibleContextId?: string
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'perform_action',
+      ...(pageContextId !== undefined ? { pageContextId } : {}),
+      ...(visibleContextId !== undefined ? { visibleContextId } : {}),
+      action: {
+        type: 'upload_file',
+        target,
+        file
+      }
+    }
+  }
+}
+
 export function createSubmitFormEnvelope (
   requestId: string,
   target: SubmitFormTarget,
@@ -658,7 +704,7 @@ export function parseBatchResultEnvelope (
 
 function parseActionResultData (
   data: Record<PropertyKey, unknown>
-): ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | null {
+): ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | UploadFileActionResultData | null {
   if (isClickElementActionResultData(data)) {
     return data
   }
@@ -672,6 +718,9 @@ function parseActionResultData (
     return data
   }
   if (isSubmitFormActionResultData(data)) {
+    return data
+  }
+  if (isUploadFileActionResultData(data)) {
     return data
   }
   return null
@@ -905,7 +954,8 @@ function parseActionResultSuccessPayload (
   | BrijioFillInputResult
   | BrijioSetCheckedResult
   | BrijioSelectOptionsResult
-  | BrijioSubmitFormResult {
+  | BrijioSubmitFormResult
+  | BrijioUploadFileResult {
   const data = payload.data
 
   if (isClickElementActionResultData(data)) {
@@ -937,6 +987,13 @@ function parseActionResultSuccessPayload (
   }
 
   if (isSubmitFormActionResultData(data)) {
+    return {
+      ok: true,
+      data
+    }
+  }
+
+  if (isUploadFileActionResultData(data)) {
     return {
       ok: true,
       data
@@ -1399,6 +1456,25 @@ function isSubmitFormActionResultData (
   }
 
   return value.action === 'submit_form' && isSubmitFormTarget(value.target)
+}
+
+function isUploadFileActionResultData (
+  value: unknown
+): value is UploadFileActionResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    value.action === 'upload_file' &&
+    isFillInputTarget(value.target) &&
+    typeof value.fileName === 'string' &&
+    typeof value.mimeType === 'string' &&
+    Number.isInteger(value.sizeBytes) &&
+    Number(value.sizeBytes) >= 0 &&
+    Number.isInteger(value.fileCount) &&
+    Number(value.fileCount) >= 0
+  )
 }
 
 function isClickElementTarget (value: unknown): value is ClickElementTarget {

@@ -1,17 +1,22 @@
+import { readFile, stat } from 'node:fs/promises'
+import { basename } from 'node:path'
 import {
   fillCurrentPageEditable,
   selectCurrentPageOptions,
   setCurrentPageChecked,
   submitCurrentPageForm,
+  uploadCurrentPageFile,
   type BrijioPageActionsConfig
 } from './page-actions.js'
 import {
   type EditableTarget,
+  type FileUploadPayload,
   type FillInputActionResultData,
   type FillInputTarget,
   type SelectOptionsActionResultData,
   type SetCheckedActionResultData,
   type SubmitFormActionResultData,
+  type UploadFileActionResultData,
   type SubmitFormTarget
 } from './protocol.js'
 import { type BrijioToolResult } from './page-reading-tool.js'
@@ -44,6 +49,18 @@ export interface SubmitFormInput {
   visibleContextId?: unknown
 }
 
+export interface UploadFileInput {
+  formId?: unknown
+  controlId?: unknown
+  filePath?: unknown
+  fileName?: unknown
+  mimeType?: unknown
+  expectedLabel?: unknown
+  browserInstanceId?: unknown
+  pageContextId?: unknown
+  visibleContextId?: unknown
+}
+
 export interface FillEditableInput {
   id?: unknown
   text?: unknown
@@ -64,6 +81,9 @@ export type SubmitFormResult =
 
 export type FillEditableResult =
   BrijioToolResult<FillInputActionResultData>
+
+export type UploadFileResult =
+  BrijioToolResult<UploadFileActionResultData>
 
 export async function setChecked (
   config: BrijioPageActionsConfig,
@@ -173,6 +193,95 @@ export async function submitForm (
     input.pageContextId !== undefined ? input.pageContextId : undefined,
     typeof input.visibleContextId === 'string' ? input.visibleContextId : undefined
   )
+}
+
+export async function uploadFile (
+  config: BrijioPageActionsConfig,
+  input: UploadFileInput
+): Promise<UploadFileResult> {
+  const targetResult = normalizeFormControlTarget(input)
+
+  if (!targetResult.ok) {
+    return targetResult
+  }
+
+  if (typeof input.filePath !== 'string' || input.filePath.length === 0) {
+    return invalidToolInputResponse('filePath must be a non-empty string.')
+  }
+
+  if (input.fileName !== undefined && (typeof input.fileName !== 'string' || input.fileName.length === 0)) {
+    return invalidToolInputResponse('fileName must be a non-empty string when provided.')
+  }
+
+  if (input.mimeType !== undefined && typeof input.mimeType !== 'string') {
+    return invalidToolInputResponse('mimeType must be a string when provided.')
+  }
+
+  const fileResult = await stageUploadFilePayload(input)
+  if (!fileResult.ok) {
+    return fileResult
+  }
+
+  return await uploadCurrentPageFile(
+    config,
+    targetResult.data.target,
+    fileResult.data,
+    targetResult.data.browserInstanceId,
+    targetResult.data.pageContextId,
+    targetResult.data.visibleContextId
+  )
+}
+
+export async function stageUploadFilePayload (
+  input: Pick<UploadFileInput, 'filePath' | 'fileName' | 'mimeType'>
+): Promise<BrijioToolResult<FileUploadPayload>> {
+  if (typeof input.filePath !== 'string' || input.filePath.length === 0) {
+    return invalidToolInputResponse('filePath must be a non-empty string.')
+  }
+
+  if (input.fileName !== undefined && (typeof input.fileName !== 'string' || input.fileName.length === 0)) {
+    return invalidToolInputResponse('fileName must be a non-empty string when provided.')
+  }
+
+  if (input.mimeType !== undefined && typeof input.mimeType !== 'string') {
+    return invalidToolInputResponse('mimeType must be a string when provided.')
+  }
+
+  const maxBytes = getUploadMaxBytes()
+  let fileStats: Awaited<ReturnType<typeof stat>>
+  let fileBytes: Buffer
+  try {
+    fileStats = await stat(input.filePath)
+    if (!fileStats.isFile()) {
+      return invalidToolInputResponse('filePath must reference a readable file.')
+    }
+    if (fileStats.size > maxBytes) {
+      return invalidToolInputResponse(`filePath exceeds maximum upload size of ${maxBytes} bytes.`)
+    }
+    fileBytes = await readFile(input.filePath)
+  } catch {
+    return invalidToolInputResponse('filePath must reference a readable file.')
+  }
+
+  return {
+    ok: true,
+    data: {
+      fileName: input.fileName ?? basename(input.filePath),
+      mimeType: input.mimeType ?? 'application/octet-stream',
+      contentBase64: fileBytes.toString('base64'),
+      sizeBytes: fileStats.size,
+      lastModified: fileStats.mtimeMs
+    }
+  }
+}
+
+function getUploadMaxBytes (): number {
+  const raw = process.env.BRIJIO_UPLOAD_MAX_BYTES
+  if (raw === undefined || raw.trim() === '') {
+    return 10 * 1024 * 1024
+  }
+  const parsed = Number.parseInt(raw, 10)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 10 * 1024 * 1024
 }
 
 export async function fillEditable (

@@ -24,6 +24,7 @@ export type BrowserCapability =
   | 'submit_form'
   | 'navigate'
   | 'batch'
+  | 'upload_file'
 
 export interface BrowserPresence {
   browserInstanceId: string
@@ -150,6 +151,20 @@ export interface PerformSubmitFormAction {
   target: FormSubmitTarget
 }
 
+export interface FileUploadPayload {
+  fileName: string
+  mimeType: string
+  contentBase64: string
+  sizeBytes: number
+  lastModified?: number
+}
+
+export interface PerformUploadFileAction {
+  type: 'upload_file'
+  target: FormControlTarget
+  file: FileUploadPayload
+}
+
 export interface PerformActionRequest {
   type: 'perform_action'
   pageContextId?: number
@@ -160,6 +175,7 @@ export interface PerformActionRequest {
   | PerformSetCheckedAction
   | PerformSelectOptionsAction
   | PerformSubmitFormAction
+  | PerformUploadFileAction
 }
 
 // --- Batch request types (ADR 0044) ---
@@ -172,6 +188,7 @@ export type BatchAction =
   | PerformSetCheckedAction
   | PerformSelectOptionsAction
   | PerformSubmitFormAction
+  | PerformUploadFileAction
 
 export interface PerformBatchRequest {
   type: 'perform_batch'
@@ -190,7 +207,7 @@ export interface BatchActionError {
 }
 
 export type BatchActionOutcome =
-  | { ok: true, data: ActionResultData | WriteTextActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData }
+  | { ok: true, data: ActionResultData | WriteTextActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | UploadFileActionResultData }
   | { ok: false, error: BatchActionError }
 
 export type BatchReadOutcome =
@@ -463,6 +480,18 @@ export interface FormValidationError {
   reason: PageFormControlValidityReason
 }
 
+export interface UploadFileActionResultData {
+  action: 'upload_file'
+  target: FormControlTarget
+  fileName: string
+  mimeType: string
+  sizeBytes: number
+  fileCount: number
+  contextStale?: boolean
+  contextStaleReason?: 'visible_controls_changed'
+  currentVisibleContextId?: string
+}
+
 export interface SubmitFormActionResultData {
   action: 'submit_form'
   target: {
@@ -484,6 +513,7 @@ export interface ActionResultResponse {
   | SetCheckedActionResultData
   | SelectOptionsActionResultData
   | SubmitFormActionResultData
+  | UploadFileActionResultData
 }
 
 export interface StaleContextDetail {
@@ -835,6 +865,10 @@ export function isPerformActionEnvelope (
     return isSubmitFormAction(value.payload.action)
   }
 
+  if (value.payload.action.type === 'upload_file') {
+    return isUploadFileAction(value.payload.action)
+  }
+
   return false
 }
 
@@ -950,6 +984,7 @@ export function createActionResultResponse (
   | SetCheckedActionResultData
   | SelectOptionsActionResultData
   | SubmitFormActionResultData
+  | UploadFileActionResultData
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'action_result',
@@ -1114,6 +1149,10 @@ function isBatchAction (value: unknown): value is BatchAction {
     return isSubmitFormAction(value)
   }
 
+  if (value.type === 'upload_file') {
+    return isUploadFileAction(value)
+  }
+
   return false
 }
 
@@ -1183,6 +1222,21 @@ function isSelectOptionsAction (value: Record<PropertyKey, unknown>): boolean {
   )
 }
 
+function isUploadFileAction (value: Record<PropertyKey, unknown>): boolean {
+  if (!isRecord(value.file)) {
+    return false
+  }
+
+  return (
+    isFormControlTarget(value.target) &&
+    typeof value.file.fileName === 'string' && value.file.fileName.trim() !== '' &&
+    typeof value.file.mimeType === 'string' &&
+    typeof value.file.contentBase64 === 'string' &&
+    Number.isInteger(value.file.sizeBytes) && Number(value.file.sizeBytes) >= 0 &&
+    (!Object.hasOwn(value.file, 'lastModified') || typeof value.file.lastModified === 'number')
+  )
+}
+
 function isSubmitFormAction (value: Record<PropertyKey, unknown>): boolean {
   if (!isRecord(value.target)) {
     return false
@@ -1235,7 +1289,8 @@ function isBrowserCapability (value: unknown): value is BrowserCapability {
     value === 'select_options' ||
     value === 'submit_form' ||
     value === 'navigate' ||
-    value === 'batch'
+    value === 'batch' ||
+    value === 'upload_file'
   )
 }
 
