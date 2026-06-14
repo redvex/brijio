@@ -263,6 +263,12 @@ void describe('Brijio MCP HTTP server', () => {
               'Select option values in a visible select control from the current browser page.'
           },
           {
+            name: 'upload_file',
+            title: 'Upload File',
+            description:
+              'Upload a local MCP-side file into a visible file input on the current browser page.'
+          },
+          {
             name: 'submit_form',
             title: 'Submit Form',
             description: 'Submit a visible form from the current browser page.'
@@ -277,7 +283,7 @@ void describe('Brijio MCP HTTP server', () => {
             name: 'perform_batch',
             title: 'Perform Batch Actions',
             description:
-              'Execute multiple browser actions (click, write_text, set_checked, select_options, submit_form) in a single request. Actions are executed sequentially. If continueOnError is false (default), execution stops on the first error. If continueOnError is true, execution continues and errors are reported per-action. Optionally reads page context after all actions by setting readAfterActions to true.'
+              'Execute multiple browser actions (click, write_text, set_checked, select_options, upload_file, submit_form) in a single request. Actions are executed sequentially. If continueOnError is false (default), execution stops on the first error. If continueOnError is true, execution continues and errors are reported per-action. Optionally reads page context after all actions by setting readAfterActions to true.'
           }
         ]
       )
@@ -537,6 +543,57 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional Brijio browser instance ID to target.'
           },
+          controlId: {
+            type: 'string',
+            description:
+              'Short-lived Brijio file input control ID from the latest page context.'
+          },
+          expectedLabel: {
+            type: 'string',
+            description:
+              'Optional: validate the form control label contains this substring before uploading.'
+          },
+          fileName: {
+            type: 'string',
+            description:
+              'Optional browser-visible filename. Defaults to the source basename.'
+          },
+          filePath: {
+            type: 'string',
+            description:
+              'Absolute or working-directory-relative file path readable by the MCP server.'
+          },
+          formId: {
+            type: 'string',
+            description:
+              'Short-lived Brijio form ID from the latest page context.'
+          },
+          mimeType: {
+            type: 'string',
+            description:
+              'Optional MIME type. Defaults to application/octet-stream.'
+          },
+          pageContextId: {
+            type: 'number',
+            description: 'Optional page context version from the last read.'
+          },
+          visibleContextId: {
+            type: 'string',
+            description: 'Optional visible form-state ID from the last read.'
+          }
+        },
+        required: ['formId', 'controlId', 'filePath'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[8].inputSchema, {
+        type: 'object',
+        properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional Brijio browser instance ID to target.'
+          },
           expectedLabel: {
             type: 'string',
             description:
@@ -562,7 +619,7 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[8].inputSchema, {
+      assert.deepEqual(tools.tools[9].inputSchema, {
         type: 'object',
         properties: {
           url: {

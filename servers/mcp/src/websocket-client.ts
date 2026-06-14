@@ -12,6 +12,7 @@ import {
   type BrijioSelectOptionsResult,
   type BrijioSetCheckedResult,
   type BrijioSubmitFormResult,
+  type BrijioUploadFileResult,
   type ClickElementTarget,
   createAuthEnvelope,
   createClickElementEnvelope,
@@ -21,11 +22,13 @@ import {
   createSelectOptionsEnvelope,
   createSetCheckedEnvelope,
   createSubmitFormEnvelope,
+  createUploadFileEnvelope,
   createWriteEditableEnvelope,
   connectionFailedResponse,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
   type EditableTarget,
+  type FileUploadPayload,
   type FillInputTarget,
   authRequiredResponse,
   invalidResponse,
@@ -91,6 +94,13 @@ export interface SelectOptionsRequestOptions extends PageContextRequestOptions {
 
 export interface SubmitFormRequestOptions extends PageContextRequestOptions {
   target: SubmitFormTarget
+  pageContextId?: number
+  visibleContextId?: string
+}
+
+export interface UploadFileRequestOptions extends PageContextRequestOptions {
+  target: FillInputTarget
+  file: FileUploadPayload
   pageContextId?: number
   visibleContextId?: string
 }
@@ -255,6 +265,27 @@ export async function requestSubmitForm (
   })
 }
 
+export async function requestUploadFile (
+  options: UploadFileRequestOptions
+): Promise<BrijioUploadFileResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createUploadFileEnvelope(
+      requestId,
+      options.target,
+      options.file,
+      options.pageContextId, options.visibleContextId
+    ),
+    parseEnvelope: (value) => parseUploadFileActionResultEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a browser action result.'
+  })
+}
+
 export async function requestNavigateToUrl (
   options: NavigateToUrlRequestOptions
 ): Promise<BrijioNavigateToUrlResult> {
@@ -403,6 +434,26 @@ function parseSelectOptionsActionResultEnvelope (
   }
 
   if (result.data.action === 'select_options') {
+    return {
+      ok: true,
+      data: result.data
+    }
+  }
+
+  return invalidResponse()
+}
+
+function parseUploadFileActionResultEnvelope (
+  value: unknown,
+  requestId: string
+): BrijioUploadFileResult | { ok: false, ignored: true } {
+  const result = parseActionResultEnvelope(value, requestId)
+
+  if ('ignored' in result || !result.ok) {
+    return result
+  }
+
+  if (result.data.action === 'upload_file') {
     return {
       ok: true,
       data: result.data

@@ -251,6 +251,32 @@ void describe('Chrome extension protocol helpers', () => {
     )
   })
 
+  void it('recognizes perform_action upload_file message envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-upload-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'upload_file',
+            target: {
+              formId: 'bb-1',
+              controlId: 'bb-2'
+            },
+            file: {
+              fileName: 'resume.pdf',
+              mimeType: 'application/pdf',
+              contentBase64: 'SGVsbG8=',
+              sizeBytes: 5
+            }
+          }
+        }
+      }),
+      true
+    )
+  })
+
   void it('rejects perform_action envelopes with invalid click targets', () => {
     assert.equal(
       isPerformActionEnvelope({

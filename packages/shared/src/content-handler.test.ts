@@ -563,6 +563,71 @@ void describe('content handler request handler', () => {
     assert.equal(submitted, true)
   })
 
+  void it('uploads a file to a visible file input target and dispatches events', () => {
+    const { document, window } = parseHTML(`
+      <main>
+        <form>
+          <label>Resume <input type="file" /></label>
+        </form>
+      </main>
+    `)
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    const dispatchedEvents: string[] = []
+
+    class TestDataTransfer {
+      private readonly filesList: File[] = []
+      readonly items = {
+        add: (file: File) => {
+          this.filesList.push(file)
+        }
+      }
+
+      get files (): FileList {
+        return this.filesList as unknown as FileList
+      }
+    }
+
+    Object.defineProperty(window, 'DataTransfer', { value: TestDataTransfer })
+    Object.defineProperty(input, 'files', { writable: true, value: [] })
+    input.addEventListener('input', () => dispatchedEvents.push('input'))
+    input.addEventListener('change', () => dispatchedEvents.push('change'))
+
+    const response = handleContentRequest(
+      {
+        type: 'perform_upload_file',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        file: {
+          fileName: 'resume.txt',
+          mimeType: 'text/plain',
+          contentBase64: 'SGVsbG8=',
+          sizeBytes: 5
+        }
+      },
+      createEnvironment(document)
+    )
+
+    assert.deepEqual(response, {
+      ok: true,
+      data: {
+        action: 'upload_file',
+        target: {
+          formId: 'bb-1',
+          controlId: 'bb-1'
+        },
+        fileName: 'resume.txt',
+        mimeType: 'text/plain',
+        sizeBytes: 5,
+        fileCount: 1
+      }
+    })
+    assert.equal(input.files?.length, 1)
+    assert.equal(input.files?.[0]?.name, 'resume.txt')
+    assert.deepEqual(dispatchedEvents, ['input', 'change'])
+  })
+
   void it('returns target_not_found when no matching text target exists', () => {
     const { document } = parseHTML(
       '<main><form><input type="text" /></form></main>'

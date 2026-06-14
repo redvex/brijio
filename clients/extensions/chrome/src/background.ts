@@ -9,6 +9,7 @@ import {
   type PageNavigationResult,
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
+  type FileUploadPayload,
   type FormSubmitTarget,
   type ContentBatchRequest,
   type BatchResult,
@@ -177,6 +178,9 @@ const controller = new BrijioBackgroundController({
     },
     async submitForm (target, pageContextId) {
       return await performActiveTabSubmitForm(target, pageContextId)
+    },
+    async uploadFile (target, file, pageContextId) {
+      return await performActiveTabUploadFile(target, file, pageContextId)
     }
   },
   pageBatch: {
@@ -248,6 +252,22 @@ async function performActiveTabSelectOptions (
       type: 'perform_select_options',
       target,
       values,
+      ...(pageContextId !== undefined ? { pageContextId } : {})
+    },
+    chromeDeps
+  )
+}
+
+async function performActiveTabUploadFile (
+  target: WriteTextActionTarget,
+  file: FileUploadPayload,
+  pageContextId?: number
+): Promise<PageActionResult> {
+  return await sharedPerformActiveTabAction(
+    {
+      type: 'perform_upload_file',
+      target,
+      file,
       ...(pageContextId !== undefined ? { pageContextId } : {})
     },
     chromeDeps

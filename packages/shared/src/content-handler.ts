@@ -13,6 +13,8 @@ import {
   type SetCheckedActionResultData,
   type StaleContextDetail,
   type SubmitFormActionResultData,
+  type UploadFileActionResultData,
+  type FileUploadPayload,
   type WriteTextActionResultData
 } from './protocol.js'
 
@@ -115,6 +117,13 @@ export type ContentRequest =
     pageContextId?: number
     visibleContextId?: string
   }
+  | {
+    type: 'perform_upload_file'
+    target: FormControlTarget
+    file: FileUploadPayload
+    pageContextId?: number
+    visibleContextId?: string
+  }
 
 export type ContentResponse =
   | {
@@ -127,6 +136,7 @@ export type ContentResponse =
     | SetCheckedActionResultData
     | SelectOptionsActionResultData
     | SubmitFormActionResultData
+    | UploadFileActionResultData
   }
   | {
     ok: false
@@ -236,6 +246,10 @@ export function handleContentRequest (
       return performSubmitForm(request.target, environment.document)
     }
 
+    if (request.type === 'perform_upload_file') {
+      return performUploadFile(request.target, request.file, environment.document)
+    }
+
     const content = extractPageContent(environment.document)
     const chunk = chunkReadableContent(
       content,
@@ -301,6 +315,7 @@ type FormActionData =
   | SetCheckedActionResultData
   | SelectOptionsActionResultData
   | SubmitFormActionResultData
+  | UploadFileActionResultData
 
 function addVisibleContextStaleness <T extends FormActionData> (
   data: T,
@@ -603,6 +618,118 @@ function performWriteText (
       }
     }
   }
+}
+
+function performUploadFile (
+  target: FormControlTarget,
+  file: FileUploadPayload,
+  document: Document
+): ContentResponse {
+  const element = findFormControlTarget(target, document)
+
+  if (element === null) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_not_found',
+        message: 'No matching file input target was found.'
+      }
+    }
+  }
+
+  const staleError = validateFormControlTarget(target, element, document)
+  if (staleError !== null) {
+    return staleError
+  }
+
+  if (element.hasAttribute('disabled')) {
+    return {
+      ok: false,
+      error: {
+        code: 'target_disabled',
+        message: 'The requested file target is disabled.'
+      }
+    }
+  }
+
+  if (element.tagName.toLowerCase() !== 'input' || getInputType(element) !== 'file') {
+    return {
+      ok: false,
+      error: {
+        code: 'unsupported_control',
+        message: 'The requested form control does not support file uploads.'
+      }
+    }
+  }
+
+  const control = element as HTMLInputElement
+  const visibleFormStructureBefore = computeVisibleFormStructureId(document)
+
+  try {
+    const uploadFile = createBrowserFile(file, document)
+    const dataTransfer = createDataTransfer(document)
+    dataTransfer.items.add(uploadFile)
+    control.files = dataTransfer.files
+    control.focus?.()
+    dispatchElementEvent(control, 'input')
+    dispatchElementEvent(control, 'change')
+    markBrijioOwned(control)
+
+    return {
+      ok: true,
+      data: addVisibleContextStaleness(
+        {
+          action: 'upload_file',
+          target,
+          fileName: file.fileName,
+          mimeType: file.mimeType,
+          sizeBytes: file.sizeBytes,
+          fileCount: control.files?.length ?? 1
+        },
+        visibleFormStructureBefore,
+        document
+      )
+    }
+  } catch {
+    return {
+      ok: false,
+      error: {
+        code: 'action_failed',
+        message: 'Unable to perform the requested file upload action.'
+      }
+    }
+  }
+}
+
+function createBrowserFile (file: FileUploadPayload, document: Document): File {
+  const bytes = decodeBase64Bytes(file.contentBase64)
+  const view = document.defaultView
+  const FileCtor = view?.File ?? globalThis.File
+  const blobPart = new ArrayBuffer(bytes.byteLength)
+  new Uint8Array(blobPart).set(bytes)
+  return new FileCtor([blobPart], file.fileName, {
+    type: file.mimeType,
+    ...(file.lastModified !== undefined ? { lastModified: file.lastModified } : {})
+  })
+}
+
+function decodeBase64Bytes (contentBase64: string): Uint8Array {
+  if (typeof atob === 'function') {
+    return Uint8Array.from(atob(contentBase64), (char) => char.charCodeAt(0))
+  }
+
+  const BufferCtor = (globalThis as { Buffer?: { from: (value: string, encoding: string) => Uint8Array } }).Buffer
+  if (BufferCtor !== undefined) {
+    return Uint8Array.from(BufferCtor.from(contentBase64, 'base64'))
+  }
+
+  throw new Error('base64 decoding unavailable')
+}
+
+function createDataTransfer (document: Document): DataTransfer {
+  const view = document.defaultView
+  const DataTransferCtor = view?.DataTransfer ?? globalThis.DataTransfer
+  return new DataTransferCtor()
 }
 
 function performSetChecked (
