@@ -26,6 +26,7 @@ import type {
   SelectOptionsActionResultData,
   SetCheckedActionResultData,
   SubmitFormActionResultData,
+  FileUploadPayload,
   WriteTextEditableTarget,
   WriteTextActionTarget
   , BatchResultEntry
@@ -669,7 +670,7 @@ void describe('Brijio background controller', () => {
         error: {
           code: 'unsupported_action',
           message:
-            'Only click, write_text, set_checked, select_options, and submit_form actions are supported.'
+            'Only click, write_text, set_checked, select_options, submit_form, and upload_file actions are supported.'
         }
       }
     })
@@ -1674,6 +1675,27 @@ class FakePageActionAdapter implements PageActionAdapter {
         action: 'select_options',
         target,
         values
+      }
+    }
+  }
+
+  async uploadFile (target: WriteTextActionTarget, file: FileUploadPayload): Promise<PageActionResult> {
+    if (this.options.pageActionError !== undefined) {
+      return {
+        ok: false,
+        error: this.options.pageActionError
+      }
+    }
+
+    return {
+      ok: true,
+      data: {
+        action: 'upload_file',
+        target,
+        fileName: file.fileName,
+        mimeType: file.mimeType,
+        sizeBytes: file.sizeBytes,
+        fileCount: 1
       }
     }
   }

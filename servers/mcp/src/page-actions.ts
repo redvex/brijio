@@ -7,8 +7,10 @@ import {
   type BrijioSelectOptionsResult,
   type BrijioSetCheckedResult,
   type BrijioSubmitFormResult,
+  type BrijioUploadFileResult,
   type ClickElementTarget,
   type EditableTarget,
+  type FileUploadPayload,
   type FillInputTarget,
   type SubmitFormTarget
 } from './protocol.js'
@@ -27,6 +29,8 @@ import {
   type SetCheckedRequestOptions,
   requestSubmitForm as defaultRequestSubmitForm,
   type SubmitFormRequestOptions,
+  requestUploadFile as defaultRequestUploadFile,
+  type UploadFileRequestOptions,
   requestWriteEditable as defaultRequestWriteEditable,
   type WriteEditableRequestOptions
 } from './websocket-client.js'
@@ -54,6 +58,9 @@ export interface BrijioPageActionsConfig {
   requestSubmitForm?: (
     options: SubmitFormRequestOptions
   ) => Promise<BrijioSubmitFormResult>
+  requestUploadFile?: (
+    options: UploadFileRequestOptions
+  ) => Promise<BrijioUploadFileResult>
   requestNavigateToUrl?: (
     options: NavigateToUrlRequestOptions
   ) => Promise<BrijioNavigateToUrlResult>
@@ -190,6 +197,28 @@ export async function submitCurrentPageForm (
     timeoutMs: config.timeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
+    pageContextId,
+    visibleContextId
+  })
+}
+
+export async function uploadCurrentPageFile (
+  config: BrijioPageActionsConfig,
+  target: FillInputTarget,
+  file: FileUploadPayload,
+  browserInstanceId?: string,
+  pageContextId?: number,
+  visibleContextId?: string
+): Promise<BrijioUploadFileResult> {
+  const requestUploadFile = config.requestUploadFile ?? defaultRequestUploadFile
+
+  return await requestUploadFile({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    target,
+    file,
     pageContextId,
     visibleContextId
   })
