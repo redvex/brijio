@@ -17,6 +17,7 @@ import {
   type SetCheckedActionResultData,
   type SelectOptionsActionResultData,
   type SubmitFormActionResultData,
+  type UploadFileActionResultData,
   type PageContext
 } from './protocol.js'
 import { handleContentRequest, type ContentEnvironment, type ContentRequest } from './content-handler.js'
@@ -58,7 +59,7 @@ export function isContentBatchRequest (message: unknown): message is ContentBatc
   return m.type === 'perform_batch' && Array.isArray(m.actions)
 }
 
-type ActionData = ActionResultData | WriteTextActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData
+type ActionData = ActionResultData | WriteTextActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | UploadFileActionResultData
 
 /**
  * Convert a BatchAction (from protocol) to a ContentRequest (for content-handler).
@@ -99,6 +100,13 @@ export function batchActionToContentRequest (
       return {
         type: 'perform_submit_form',
         target: action.target,
+        ...(pageContextId !== undefined ? { pageContextId } : {})
+      }
+    case 'upload_file':
+      return {
+        type: 'perform_upload_file',
+        target: action.target,
+        file: action.file,
         ...(pageContextId !== undefined ? { pageContextId } : {})
       }
   }

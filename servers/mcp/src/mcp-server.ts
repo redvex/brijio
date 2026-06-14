@@ -18,7 +18,8 @@ import {
   fillEditable,
   selectOptions,
   setChecked,
-  submitForm
+  submitForm,
+  uploadFile
 } from './form-action-tools.js'
 import { readCurrentPage } from './page-reading-tool.js'
 import { performBatchTool } from './batch-tool.js'
@@ -406,6 +407,39 @@ export async function createBrijioMcpServer (
   )
 
   server.registerTool(
+    'upload_file',
+    {
+      title: 'Upload File',
+      description:
+        'Upload a local MCP-side file into a visible file input on the current browser page.',
+      inputSchema: {
+        formId: z.string().describe('Short-lived Brijio form ID from the latest page context.'),
+        controlId: z.string().describe('Short-lived Brijio file input control ID from the latest page context.'),
+        filePath: z.string().describe('Absolute or working-directory-relative file path readable by the MCP server.'),
+        fileName: z.string().optional().describe('Optional browser-visible filename. Defaults to the source basename.'),
+        mimeType: z.string().optional().describe('Optional MIME type. Defaults to application/octet-stream.'),
+        expectedLabel: z.string().optional().describe('Optional: validate the form control label contains this substring before uploading.'),
+        pageContextId: z.number().optional().describe('Optional page context version from the last read.'),
+        visibleContextId: z.string().optional().describe('Optional visible form-state ID from the last read.'),
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input) => {
+      logToolCall('upload_file', input as Record<string, unknown>)
+      const result = await uploadFile(pageContextConfig, input)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
     'submit_form',
     {
       title: 'Submit Form',
@@ -485,7 +519,7 @@ export async function createBrijioMcpServer (
     {
       title: 'Perform Batch Actions',
       description:
-        'Execute multiple browser actions (click, write_text, set_checked, select_options, submit_form) in a single request. ' +
+        'Execute multiple browser actions (click, write_text, set_checked, select_options, upload_file, submit_form) in a single request. ' +
         'Actions are executed sequentially. If continueOnError is false (default), execution stops on the first error. ' +
         'If continueOnError is true, execution continues and errors are reported per-action. ' +
         'Optionally reads page context after all actions by setting readAfterActions to true.',
@@ -494,7 +528,7 @@ export async function createBrijioMcpServer (
           .array(
             z.object({
               type: z
-                .enum(['click', 'write_text', 'set_checked', 'select_options', 'submit_form'])
+                .enum(['click', 'write_text', 'set_checked', 'select_options', 'upload_file', 'submit_form'])
                 .describe('The action type.'),
               target: z
                 .record(z.unknown())
@@ -510,7 +544,19 @@ export async function createBrijioMcpServer (
               values: z
                 .array(z.string())
                 .optional()
-                .describe('Option values (required for select_options actions).')
+                .describe('Option values (required for select_options actions).'),
+              filePath: z
+                .string()
+                .optional()
+                .describe('Local MCP-side file path (required for upload_file actions).'),
+              fileName: z
+                .string()
+                .optional()
+                .describe('Optional uploaded filename override for upload_file actions.'),
+              mimeType: z
+                .string()
+                .optional()
+                .describe('Optional uploaded MIME type override for upload_file actions.')
             })
           )
           .min(1)
