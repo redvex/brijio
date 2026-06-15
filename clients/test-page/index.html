@@ -1176,11 +1176,17 @@ a:hover { text-decoration: underline; }
 <button type="button" id="btn-clear" style="font:inherit; padding:6px 12px; border-radius:4px; border:1px solid color-mix(in srgb, CanvasText 20%, transparent); cursor:pointer;">Clear All Fields</button>
 <button type="button" id="btn-prefill" style="font:inherit; padding:6px 12px; border-radius:4px; border:1px solid color-mix(in srgb, CanvasText 20%, transparent); cursor:pointer;">Prefill Correct Answers</button>
 </div>
-</fieldset>
+<button type="button" id="btn-clear" style="font:inherit; padding:6px 12px; border-radius:4px; border:1px solid color-mix(in srgb, CanvasText 20%, transparent); cursor:pointer;">Clear All Fields</button><button type="button" id="btn-prefill" style="font:inherit; padding:6px 12px; border-radius:4px; border:1px solid color-mix(in srgb, CanvasText 20%, transparent); cursor:pointer;">Prefill Correct Answers</button>
 
-<fieldset>
-<legend>Submit</legend>
-<button type="submit" id="btn-submit">Submit Answers</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>File Upload</legend>
+        <label for="story-summary-file">Upload the story summary as a text file</label>
+        <input id="story-summary-file" name="story_summary_file" type="file" accept=".txt,.text,text/plain">
+      </fieldset>
+
+      <button type="submit" id="btn-submit">Submit Answers</button>
 <button type="reset">Reset Form</button>
 </fieldset>
 </form>
