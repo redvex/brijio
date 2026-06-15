@@ -1,5 +1,3 @@
-import { readFile, stat } from 'node:fs/promises'
-import { basename } from 'node:path'
 import {
   fillCurrentPageEditable,
   selectCurrentPageOptions,
@@ -52,7 +50,7 @@ export interface SubmitFormInput {
 export interface UploadFileInput {
   formId?: unknown
   controlId?: unknown
-  filePath?: unknown
+  dataBase64?: unknown
   fileName?: unknown
   mimeType?: unknown
   expectedLabel?: unknown
@@ -205,8 +203,8 @@ export async function uploadFile (
     return targetResult
   }
 
-  if (typeof input.filePath !== 'string' || input.filePath.length === 0) {
-    return invalidToolInputResponse('filePath must be a non-empty string.')
+  if (typeof input.dataBase64 !== 'string' || input.dataBase64.length === 0) {
+    return invalidToolInputResponse('dataBase64 must be a non-empty base64-encoded string.')
   }
 
   if (input.fileName !== undefined && (typeof input.fileName !== 'string' || input.fileName.length === 0)) {
@@ -217,7 +215,7 @@ export async function uploadFile (
     return invalidToolInputResponse('mimeType must be a string when provided.')
   }
 
-  const fileResult = await stageUploadFilePayload(input)
+  const fileResult = stageUploadFilePayload(input)
   if (!fileResult.ok) {
     return fileResult
   }
@@ -232,11 +230,24 @@ export async function uploadFile (
   )
 }
 
-export async function stageUploadFilePayload (
-  input: Pick<UploadFileInput, 'filePath' | 'fileName' | 'mimeType'>
-): Promise<BrijioToolResult<FileUploadPayload>> {
-  if (typeof input.filePath !== 'string' || input.filePath.length === 0) {
-    return invalidToolInputResponse('filePath must be a non-empty string.')
+export function stageUploadFilePayload (
+  input: Pick<UploadFileInput, 'dataBase64' | 'fileName' | 'mimeType'>
+): BrijioToolResult<FileUploadPayload> {
+  if (typeof input.dataBase64 !== 'string' || input.dataBase64.length === 0) {
+    return invalidToolInputResponse('dataBase64 must be a non-empty base64-encoded string.')
+  }
+
+  // Validate that dataBase64 is valid base64
+  let decodedSize: number
+  try {
+    decodedSize = Buffer.byteLength(input.dataBase64, 'base64')
+  } catch {
+    return invalidToolInputResponse('dataBase64 must be valid base64 encoding.')
+  }
+
+  const maxBytes = getUploadMaxBytes()
+  if (decodedSize > maxBytes) {
+    return invalidToolInputResponse(`File exceeds maximum upload size of ${maxBytes} bytes.`)
   }
 
   if (input.fileName !== undefined && (typeof input.fileName !== 'string' || input.fileName.length === 0)) {
@@ -247,30 +258,14 @@ export async function stageUploadFilePayload (
     return invalidToolInputResponse('mimeType must be a string when provided.')
   }
 
-  const maxBytes = getUploadMaxBytes()
-  let fileStats: Awaited<ReturnType<typeof stat>>
-  let fileBytes: Buffer
-  try {
-    fileStats = await stat(input.filePath)
-    if (!fileStats.isFile()) {
-      return invalidToolInputResponse('filePath must reference a readable file.')
-    }
-    if (fileStats.size > maxBytes) {
-      return invalidToolInputResponse(`filePath exceeds maximum upload size of ${maxBytes} bytes.`)
-    }
-    fileBytes = await readFile(input.filePath)
-  } catch {
-    return invalidToolInputResponse('filePath must reference a readable file.')
-  }
-
   return {
     ok: true,
     data: {
-      fileName: input.fileName ?? basename(input.filePath),
-      mimeType: input.mimeType ?? 'application/octet-stream',
-      contentBase64: fileBytes.toString('base64'),
-      sizeBytes: fileStats.size,
-      lastModified: fileStats.mtimeMs
+      fileName: (input.fileName as string) ?? 'upload',
+      mimeType: (input.mimeType as string) ?? 'application/octet-stream',
+      contentBase64: input.dataBase64,
+      sizeBytes: decodedSize,
+      lastModified: Date.now()
     }
   }
 }
