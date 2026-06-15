@@ -54,6 +54,86 @@ export interface BrowserPresenceAnnouncePayload extends BrowserPresence {
   type: 'browser_presence_announce'
 }
 
+export interface StageFileUploadStartPayload {
+  type: 'stage_file_upload_start'
+  uploadId: string
+  file: {
+    name: string
+    size: number
+    type?: string
+    sha256?: string
+  }
+  chunkSize: number
+  totalChunks: number
+}
+
+export interface StageFileUploadStartEnvelope {
+  type: 'message'
+  id?: string
+  target: { browserInstanceId?: string }
+  payload: StageFileUploadStartPayload
+}
+
+export interface StageFileUploadChunkPayload {
+  type: 'stage_file_upload_chunk'
+  uploadId: string
+  index: number
+  dataBase64: string
+}
+
+export interface StageFileUploadChunkEnvelope {
+  type: 'message'
+  id?: string
+  target: { browserInstanceId?: string }
+  payload: StageFileUploadChunkPayload
+}
+
+export interface StageFileUploadCompletePayload {
+  type: 'stage_file_upload_complete'
+  uploadId: string
+  sha256?: string
+}
+
+export interface StageFileUploadCompleteEnvelope {
+  type: 'message'
+  id?: string
+  target: { browserInstanceId?: string }
+  payload: StageFileUploadCompletePayload
+}
+
+export interface StageFileUploadStagedPayload {
+  type: 'stage_file_upload_staged'
+  uploadId: string
+}
+
+export interface StageFileUploadAckPayload {
+  type: 'stage_file_upload_ack'
+  uploadId: string
+}
+
+export interface StageFileUploadAckEnvelope {
+  type: 'message'
+  id?: string
+  target?: { browserInstanceId?: string }
+  payload: StageFileUploadAckPayload
+}
+
+export interface StageFileUploadErrorPayload {
+  type: 'stage_file_upload_error'
+  uploadId: string
+  error: {
+    code: 'invalid_file_payload' | 'checksum_mismatch' | 'file_too_large' | 'invalid_file_name' | 'invalid_file_type' | 'upload_expired'
+    message: string
+  }
+}
+
+export interface StageFileUploadErrorEnvelope {
+  type: 'message'
+  id?: string
+  target?: { browserInstanceId?: string }
+  payload: StageFileUploadErrorPayload
+}
+
 export type BrijioErrorCode =
   | 'invalid_json'
   | 'invalid_message'
@@ -66,6 +146,15 @@ export type BrijioErrorCode =
   | 'timeout'
   | 'unsupported_action'
   | 'batch_failed'
+  | 'invalid_file_payload'
+  | 'checksum_mismatch'
+  | 'file_too_large'
+  | 'invalid_file_name'
+  | 'invalid_file_type'
+  | 'upload_staging_failed'
+  | 'upload_not_staged'
+  | 'target_not_file_input'
+  | 'upload_expired'
 
 export interface BrijioErrorEnvelope {
   type: 'error'
@@ -163,6 +252,7 @@ export interface PerformUploadFileAction {
   type: 'upload_file'
   target: FormControlTarget
   file: FileUploadPayload
+  expectedLabel?: string
 }
 
 export interface PerformActionRequest {
@@ -200,7 +290,7 @@ export interface PerformBatchRequest {
 }
 
 export interface BatchActionError {
-  code: ActionResultErrorCode | 'page_navigated'
+  code: ActionResultErrorCode | 'page_navigated' | 'upload_staging_failed' | 'upload_not_staged'
   message: string
   detail?: StaleContextDetail
   aborted: boolean
@@ -400,6 +490,7 @@ export type ActionResultErrorCode =
   | 'action_failed'
   | 'stale_context'
   | 'page_navigated'
+  | 'upload_not_staged'
 
 export interface PageContextResponse {
   type: 'page_context_response'

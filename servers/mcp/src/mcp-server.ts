@@ -411,12 +411,12 @@ export async function createBrijioMcpServer (
     {
       title: 'Upload File',
       description:
-        'Upload a local MCP-side file into a visible file input on the current browser page.',
+        'Write text into a visible file input from the current browser page.',
       inputSchema: {
         formId: z.string().describe('Short-lived Brijio form ID from the latest page context.'),
         controlId: z.string().describe('Short-lived Brijio file input control ID from the latest page context.'),
-        filePath: z.string().describe('Absolute or working-directory-relative file path readable by the MCP server.'),
-        fileName: z.string().optional().describe('Optional browser-visible filename. Defaults to the source basename.'),
+        dataBase64: z.string().describe('Base64-encoded file content to upload.'),
+        fileName: z.string().optional().describe('Optional browser-visible filename. Defaults to "upload".'),
         mimeType: z.string().optional().describe('Optional MIME type. Defaults to application/octet-stream.'),
         expectedLabel: z.string().optional().describe('Optional: validate the form control label contains this substring before uploading.'),
         pageContextId: z.number().optional().describe('Optional page context version from the last read.'),
@@ -545,10 +545,10 @@ export async function createBrijioMcpServer (
                 .array(z.string())
                 .optional()
                 .describe('Option values (required for select_options actions).'),
-              filePath: z
+              dataBase64: z
                 .string()
                 .optional()
-                .describe('Local MCP-side file path (required for upload_file actions).'),
+                .describe('Base64-encoded file content (required for upload_file actions).'),
               fileName: z
                 .string()
                 .optional()

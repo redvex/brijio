@@ -266,7 +266,7 @@ void describe('Brijio MCP HTTP server', () => {
             name: 'upload_file',
             title: 'Upload File',
             description:
-              'Upload a local MCP-side file into a visible file input on the current browser page.'
+              'Write text into a visible file input from the current browser page.'
           },
           {
             name: 'submit_form',
@@ -556,12 +556,12 @@ void describe('Brijio MCP HTTP server', () => {
           fileName: {
             type: 'string',
             description:
-              'Optional browser-visible filename. Defaults to the source basename.'
+              'Optional browser-visible filename. Defaults to "upload".'
           },
-          filePath: {
+          dataBase64: {
             type: 'string',
             description:
-              'Absolute or working-directory-relative file path readable by the MCP server.'
+              'Base64-encoded file content to upload.'
           },
           formId: {
             type: 'string',
@@ -582,7 +582,7 @@ void describe('Brijio MCP HTTP server', () => {
             description: 'Optional visible form-state ID from the last read.'
           }
         },
-        required: ['formId', 'controlId', 'filePath'],
+        required: ['formId', 'controlId', 'dataBase64'],
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
