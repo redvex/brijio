@@ -1324,6 +1324,24 @@ function renderResults(params) {
   var methodsPass = expectedMethods.every(function(value) { return methods.indexOf(value) !== -1; }) && unexpectedMethods.every(function(value) { return methods.indexOf(value) === -1; });
   markControlValidation('methods-select', methodsPass);
 
+  // File upload validation
+  var fileName = params.get('story_summary_file_name') || '';
+  var fileSize = params.get('story_summary_file_size') || '';
+  var filePreview = params.get('story_summary_file_preview') || '';
+  var hasFile = fileName !== '';
+  html += '<tr><td>Story summary file</td><td>';
+  if (hasFile) {
+    html += '<strong>' + escapeHtml(fileName) + '</strong> (' + escapeHtml(fileSize) + ' bytes)';
+    if (filePreview) {
+      html += '<pre style="margin:4px 0 0;padding:6px;background:Canvas;white-space:pre-wrap;max-height:160px;overflow:auto;font-size:0.85em;">' + escapeHtml(filePreview) + '</pre>';
+    }
+  } else {
+    html += '(no file uploaded)';
+  }
+  html += '</td>';
+  html += '<td class="' + (hasFile ? 'pass' : 'fail') + '">' + (hasFile ? '✅ Pass' : '❌ Fail') + '</td></tr>';
+  markControlValidation('story-summary-file', hasFile);
+
   html += '</tbody></table>';
   resultsEl.innerHTML = html;
   document.getElementById('results').style.display = 'block';
@@ -1396,9 +1414,27 @@ function markRadioGroupValidation(name, expectedValue, selectedValue) {
     }
     event.preventDefault();
     var params = formParams();
-    var query = params.toString();
-    window.history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + '#results');
-    renderResults(params);
+    var fileInput = document.getElementById('story-summary-file');
+    var file = fileInput && fileInput.files && fileInput.files[0];
+    if (file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var text = e.target.result;
+        var lines = text.split('\n').slice(0, 10);
+        var preview = lines.join('\n');
+        params.set('story_summary_file_name', file.name);
+        params.set('story_summary_file_size', file.size);
+        params.set('story_summary_file_preview', preview);
+        var query = params.toString();
+        window.history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + '#results');
+        renderResults(params);
+      };
+      reader.readAsText(file);
+    } else {
+      var query = params.toString();
+      window.history.replaceState(null, '', window.location.pathname + (query ? '?' + query : '') + '#results');
+      renderResults(params);
+    }
   });
 
   if (window.location.hash === '#results' || window.location.hash === '#results/') {
