@@ -1,7 +1,4 @@
 import assert from 'node:assert/strict'
-import { mkdtemp, writeFile } from 'node:fs/promises'
-import { join } from 'node:path'
-import { tmpdir } from 'node:os'
 import { describe, it } from 'node:test'
 import { performBatchTool } from './batch-tool.js'
 import type { BrijioPageActionsConfig } from './page-actions.js'
@@ -168,9 +165,7 @@ void describe('MCP perform batch tool', () => {
 
   void it('calls requestPerformBatch with all action types', async () => {
     let calledWith: unknown = null
-    const uploadDir = await mkdtemp(join(tmpdir(), 'brijio-batch-upload-'))
-    const uploadPath = join(uploadDir, 'upload.txt')
-    await writeFile(uploadPath, 'hello upload')
+    const testBase64 = Buffer.from('hello upload').toString('base64')
     const config: BrijioPageActionsConfig = {
       websocketUrl: 'ws://127.0.0.1:8787',
       pairingToken: 'test-token',
@@ -187,7 +182,7 @@ void describe('MCP perform batch tool', () => {
         { type: 'write_text', target: { formId: 'bb-2', controlId: 'bb-3' }, text: 'hello' },
         { type: 'set_checked', target: { formId: 'bb-4', controlId: 'bb-5' }, checked: true },
         { type: 'select_options', target: { formId: 'bb-6', controlId: 'bb-7' }, values: ['opt1'] },
-        { type: 'upload_file', target: { formId: 'bb-8', controlId: 'bb-9' }, filePath: uploadPath, fileName: 'resume.txt', mimeType: 'text/plain' },
+        { type: 'upload_file', target: { formId: 'bb-8', controlId: 'bb-9' }, dataBase64: testBase64, fileName: 'resume.txt', mimeType: 'text/plain' },
         { type: 'submit_form', target: { formId: 'bb-10' } }
       ],
       continueOnError: true,
@@ -205,7 +200,7 @@ void describe('MCP perform batch tool', () => {
     const actions = opts.actions as Array<Record<string, unknown>>
     const uploadAction = actions[4]
     assert.equal(uploadAction.type, 'upload_file')
-    assert.equal(uploadAction.filePath, undefined)
+    assert.equal(uploadAction.dataBase64, undefined)
     assert.deepEqual(uploadAction.file, {
       fileName: 'resume.txt',
       mimeType: 'text/plain',
@@ -239,9 +234,7 @@ void describe('MCP perform batch tool', () => {
   })
 
   void it('accepts valid action with all valid action types', async () => {
-    const uploadDir = await mkdtemp(join(tmpdir(), 'brijio-batch-upload-'))
-    const uploadPath = join(uploadDir, 'upload.txt')
-    await writeFile(uploadPath, 'hello upload')
+    const testBase64 = Buffer.from('hello upload').toString('base64')
     const validTypes = ['click', 'write_text', 'set_checked', 'select_options', 'upload_file', 'submit_form']
     for (const type of validTypes) {
       const action: Record<string, unknown> = { type, target: { kind: 'link', id: 'bb-1' } }
@@ -250,7 +243,7 @@ void describe('MCP perform batch tool', () => {
       if (type === 'select_options') action.values = ['opt1']
       if (type === 'upload_file') {
         action.target = { formId: 'bb-1', controlId: 'bb-2' }
-        action.filePath = uploadPath
+        action.dataBase64 = testBase64
       }
       if (type === 'submit_form') action.target = { formId: 'bb-1' }
 

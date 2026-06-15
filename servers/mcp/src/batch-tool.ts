@@ -49,8 +49,8 @@ export async function performBatchTool (
     }
 
     if (record.type === 'upload_file') {
-      const fileResult = await stageUploadFilePayload({
-        filePath: record.filePath,
+      const fileResult = stageUploadFilePayload({
+        dataBase64: record.dataBase64,
         fileName: record.fileName,
         mimeType: record.mimeType
       })
@@ -58,7 +58,7 @@ export async function performBatchTool (
         return invalidToolInputResponse(`actions[${i}]: ${fileResult.error.message}`)
       }
 
-      const { filePath: _filePath, fileName: _fileName, mimeType: _mimeType, ...stagedAction } = record
+      const { dataBase64: _dataBase64, fileName: _fileName, mimeType: _mimeType, ...stagedAction } = record
       actions.push({
         ...stagedAction,
         file: fileResult.data
