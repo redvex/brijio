@@ -32,6 +32,7 @@ import {
   SafariSetupAdapter,
   SafariPageReaderAdapter,
   SafariWebSocketConnection,
+  SafariDownloadAdapter,
   SafariPageNavigationAdapter,
   type BrowserApi
 } from './background.js'
@@ -109,6 +110,7 @@ const pageBatch = {
 }
 
 const pageNavigation = new SafariPageNavigationAdapter(browser.tabs)
+const download = new SafariDownloadAdapter(browser.tabs)
 
 const controller = new BrijioBackgroundController({
   action,
@@ -119,6 +121,7 @@ const controller = new BrijioBackgroundController({
   },
   setup,
   storage,
+  download,
   pageReader,
   pageActions,
   pageBatch,
