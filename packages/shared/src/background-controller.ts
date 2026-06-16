@@ -5,6 +5,12 @@ import {
   createBrowserPresenceAnnounceEnvelope,
   createBatchResultResponse,
   createBatchResultErrorResponse,
+  createDownloadFileErrorResponse,
+  createDownloadFileResponse,
+  createDownloadStatusErrorResponse,
+  createDownloadStatusResponse,
+  createFetchResourceCompleteResponse,
+  createFetchResourceErrorResponse,
   createNavigateToUrlErrorResponse,
   createNavigateToUrlResponse,
   createPageContentErrorResponse,
@@ -13,6 +19,9 @@ import {
   createPageContextResponse,
   isAuthSuccessEnvelope,
   isBrowserPresenceRequestEnvelope,
+  isDownloadFileEnvelope,
+  isDownloadStatusEnvelope,
+  isFetchResourceEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
   isNavigateToUrlEnvelope,
@@ -35,7 +44,9 @@ import {
   type WriteTextActionResultData,
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
-  type BatchAction
+  type BatchAction,
+  type DownloadInfo,
+  type FetchResourceInfo
 } from './protocol.js'
 
 import {
@@ -158,6 +169,24 @@ export interface PageNavigationAdapter {
   navigateToUrl: (url: string) => Promise<PageNavigationResult>
 }
 
+export type DownloadStatusResult =
+  | { ok: true, data: { capability: 'full' | 'not_supported', items: Array<DownloadInfo | FetchResourceInfo> } }
+  | { ok: false, error: { code: string, message: string } }
+
+export type DownloadFileResult =
+  | { ok: true, data: { downloadId: number | null, status: 'initiated' | 'initiated_fire_and_forget' } }
+  | { ok: false, error: { code: string, message: string } }
+
+export type FetchResourceResult =
+  | { ok: true, data: { fetchId: string, contentType: string | null, totalBytes: number | null, dataBase64: string, sha256: string } }
+  | { ok: false, error: { code: string, message: string } }
+
+export interface DownloadAdapter {
+  downloadStatus: (ids?: Array<number | string>) => Promise<DownloadStatusResult>
+  downloadFile: (url: string, filename?: string, conflictAction?: 'uniquify' | 'overwrite') => Promise<DownloadFileResult>
+  fetchResource: (url: string, maxSizeBytes?: number, timeout?: number) => Promise<FetchResourceResult>
+}
+
 export interface BrijioSocket {
   onopen: (() => void) | undefined
   onmessage: ((event: { data: string }) => void | Promise<void>) | undefined
@@ -170,6 +199,7 @@ export interface BrijioSocket {
 export interface BrijioBackgroundControllerOptions {
   action: ActionAdapter
   createWebSocket: (url: string) => BrijioSocket
+  download?: DownloadAdapter
   pageActions: PageActionAdapter
   pageBatch: PageBatchAdapter
   pageNavigation: PageNavigationAdapter
@@ -456,6 +486,36 @@ export class BrijioBackgroundController {
       return
     }
 
+    if (isDownloadStatusEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handleDownloadStatusRequest(message.id, message.payload.ids)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
+    }
+
+    if (isDownloadFileEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handleDownloadFileRequest(message.id, message.payload.url, message.payload.filename, message.payload.conflictAction)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
+    }
+
+    if (isFetchResourceEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handleFetchResourceRequest(message.id, message.payload.url, message.payload.maxSizeBytes, message.payload.timeout)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
+    }
+
     if (isPerformActionRequestEnvelope(message)) {
       this.pendingRequestCount++
       try {
@@ -640,6 +700,72 @@ export class BrijioBackgroundController {
     this.socket?.send(
       JSON.stringify(createNavigateToUrlResponse(requestId, result.data))
     )
+  }
+
+  private async handleDownloadStatusRequest (
+    requestId: string | undefined,
+    ids?: Array<number | string>
+  ): Promise<void> {
+    if (this.options.download === undefined) {
+      this.socket?.send(JSON.stringify(createDownloadStatusErrorResponse(requestId, 'not_supported', 'Download status is not supported by this browser.')))
+      return
+    }
+
+    const result = await this.options.download.downloadStatus(ids)
+    if (!result.ok) {
+      this.socket?.send(JSON.stringify(createDownloadStatusErrorResponse(requestId, result.error.code, result.error.message)))
+      return
+    }
+
+    this.socket?.send(JSON.stringify(createDownloadStatusResponse(requestId, result.data.capability, result.data.items)))
+  }
+
+  private async handleDownloadFileRequest (
+    requestId: string | undefined,
+    url: string,
+    filename?: string,
+    conflictAction?: 'uniquify' | 'overwrite'
+  ): Promise<void> {
+    if (this.options.download === undefined) {
+      this.socket?.send(JSON.stringify(createDownloadFileErrorResponse(requestId, 'not_supported', 'File download is not supported by this browser.')))
+      return
+    }
+
+    const result = await this.options.download.downloadFile(url, filename, conflictAction)
+    if (!result.ok) {
+      this.socket?.send(JSON.stringify(createDownloadFileErrorResponse(requestId, result.error.code, result.error.message)))
+      return
+    }
+
+    this.socket?.send(JSON.stringify(createDownloadFileResponse(requestId, result.data.downloadId, result.data.status)))
+  }
+
+  private async handleFetchResourceRequest (
+    requestId: string | undefined,
+    url: string,
+    maxSizeBytes?: number,
+    timeout?: number
+  ): Promise<void> {
+    if (this.options.download === undefined) {
+      this.socket?.send(JSON.stringify(createFetchResourceErrorResponse(requestId, 'not_supported', 'Fetch resource is not supported by this browser.')))
+      return
+    }
+
+    const result = await this.options.download.fetchResource(url, maxSizeBytes, timeout)
+    if (!result.ok) {
+      this.socket?.send(JSON.stringify(createFetchResourceErrorResponse(requestId, result.error.code, result.error.message)))
+      return
+    }
+
+    // Single-message fast path; start/chunk streaming can be added later.
+    this.socket?.send(JSON.stringify(createFetchResourceCompleteResponse(
+      requestId,
+      result.data.fetchId,
+      result.data.sha256,
+      result.data.totalBytes ?? 0,
+      result.data.dataBase64,
+      result.data.contentType
+    )))
   }
 
   private async performPageAction (
@@ -859,7 +985,8 @@ export class BrijioBackgroundController {
             'set_checked',
             'select_options',
             'submit_form',
-            'navigate'
+            'navigate',
+            ...(this.options.download !== undefined ? ['download_status', 'download_file', 'fetch_resource'] as const : [])
           ]
         })
       )
