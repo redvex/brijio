@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brijio Demo — Download Awareness</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📥</text></svg>">
+<style>
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  --accent: #3366ff;
+  --accent-soft: #3366ff20;
+  --success: #16a34a;
+  --warning: #d97706;
+  --error: #dc2626;
+  --left-width: 62%;
+  --right-width: 38%;
+}
+body { margin: 0; background: Canvas; color: CanvasText; }
+.layout { display: flex; gap: 24px; align-items: flex-start; padding: 16px 20px; max-width: 1600px; margin: 0 auto; }
+.left-col { width: var(--left-width); min-width: 0; }
+.right-col { width: var(--right-width); min-width: 0; position: sticky; top: 16px; align-self: flex-start; max-height: 100vh; overflow-y: auto; }
+.sticky-page-header { position: sticky; top: 0; z-index: 10; background: Canvas; padding: 12px 0 8px; margin: 0 0 16px; border-bottom: 2px solid var(--accent); }
+.sticky-page-header h1 { margin: 0 0 10px; }
+.sticky-page-header .nav-links { padding-bottom: 4px; }
+h1, h2, h3 { line-height: 1.2; }
+.intro { max-width: 720px; }
+form { display: grid; gap: 24px; }
+fieldset { display: grid; gap: 16px; border: 1px solid color-mix(in srgb, CanvasText 22%, transparent); border-radius: 8px; padding: 18px; }
+legend { padding: 0 8px; font-weight: 700; }
+label, .control { display: grid; gap: 6px; }
+input, textarea, select { max-width: 100%; font: inherit; border: 1px solid color-mix(in srgb, CanvasText 28%, transparent); border-radius: 6px; padding: 8px 10px; background: Canvas; color: CanvasText; }
+input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+button { font: inherit; padding: 10px 20px; border-radius: 6px; border: 1px solid transparent; cursor: pointer; }
+button.primary { background: var(--accent); color: white; }
+button.secondary { background: transparent; border-color: color-mix(in srgb, CanvasText 30%, transparent); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+th, td { border: 1px solid color-mix(in srgb, CanvasText 25%, transparent); padding: 8px 12px; text-align: left; }
+th { background: color-mix(in srgb, var(--accent) 15%, transparent); }
+a { color: var(--accent); }
+a:hover { text-decoration: underline; }
+.nav-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.nav-links a { padding: 4px 10px; border: 1px solid color-mix(in srgb, CanvasText 20%, transparent); border-radius: 4px; text-decoration: none; font-size: 0.85em; }
+.nav-links a:hover { background: var(--accent-soft); }
+.nav-links a.current { background: var(--accent); color: white; border-color: var(--accent); }
+.status-log { background: color-mix(in srgb, var(--accent) 8%, Canvas); border-radius: 8px; padding: 16px; }
+.status-log h3 { margin-top: 0; }
+.status-entry { padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, CanvasText 12%, transparent); font-size: 0.9em; font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace; }
+.status-entry:last-child { border-bottom: none; }
+.status-entry .timestamp { color: color-mix(in srgb, CanvasText 60%, transparent); font-size: 0.85em; }
+.status-entry .tool-name { font-weight: 700; color: var(--accent); }
+.status-entry .status-ok { color: var(--success); font-weight: 600; }
+.status-entry .status-err { color: var(--error); font-weight: 600; }
+.status-entry .status-warn { color: var(--warning); font-weight: 600; }
+.card { border: 1px solid color-mix(in srgb, CanvasText 22%, transparent); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+.card h3 { margin-top: 0; }
+.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.badge-safe { background: color-mix(in srgb, var(--success) 18%, Canvas); color: var(--success); }
+.badge-risk { background: color-mix(in srgb, var(--warning) 18%, Canvas); color: var(--warning); }
+.badge-high-risk { background: color-mix(in srgb, var(--error) 18%, Canvas); color: var(--error); }
+.url-display { font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace; font-size: 0.85em; word-break: break-all; padding: 8px 10px; background: color-mix(in srgb, CanvasText 5%, Canvas); border-radius: 4px; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
+.fetch-content { max-height: 200px; overflow: auto; padding: 12px; background: color-mix(in srgb, CanvasText 5%, Canvas); border-radius: 4px; border: 1px solid color-mix(in srgb, CanvasText 15%, transparent); font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace; font-size: 0.85em; white-space: pre-wrap; }
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  .left-col, .right-col { width: 100%; }
+  .right-col { position: static; max-height: none; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<div class="left-col">
+<header class="sticky-page-header">
+  <h1>📥 Download Awareness Demo</h1>
+  <nav class="nav-links" aria-label="Page sections">
+    <a href="index.html">🧪 Forms</a>
+    <a href="navigation.html">🧭 Navigation</a>
+    <a href="download.html" class="current">📥 Downloads</a>
+  </nav>
+</header>
+
+<p class="intro">
+  This page exercises the three <strong>P1.7 Download Awareness</strong> tools:
+  <code>download_file</code>, <code>download_status</code>, and <code>fetch_resource</code>.
+  Each section provides URLs and scenarios an AI agent can use to invoke these tools via the Brijio MCP server.
+</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: download_file                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<h2 id="download-file">📁 download_file</h2>
+<p>
+  Trigger browser downloads via the <code>download_file</code> tool.
+  Each card below provides a URL, suggested filename, and conflict action.
+</p>
+
+<div class="card">
+  <h3>Small PDF (public)</h3>
+  <span class="badge badge-safe">safe</span>
+  <div class="url-display">https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf</div>
+  <p><strong>Suggested filename:</strong> <code>wai-dummy.pdf</code></p>
+  <p>A small (~13 KB) public-domain PDF from W3C/WAI. Good for verifying basic download flow.</p>
+</div>
+
+<div class="card">
+  <h3>Small PNG image (public)</h3>
+  <span class="badge badge-safe">safe</span>
+  <div class="url-display">https://via.placeholder.com/150x100.png?text=Brijio+Test</div>
+  <p><strong>Suggested filename:</strong> <code>placeholder-150x100.png</code></p>
+  <p>A 150×100 placeholder image. Tests binary file download.</p>
+</div>
+
+<div class="card">
+  <h3>Plain text file (public)</h3>
+  <span class="badge badge-safe">safe</span>
+  <div class="url-display">https://raw.githubusercontent.com/nousresearch/hermes/main/README.md</div>
+  <p><strong>Suggested filename:</strong> <code>hermes-readme.md</code></p>
+  <p>A Markdown README from GitHub. Tests text-based file download.</p>
+</div>
+
+<div class="card">
+  <h3>Large file — NASA imagery (public, ~2 MB)</h3>
+  <span class="badge badge-safe">safe</span>
+  <div class="url-display">https://www.nasa.gov/wp-content/uploads/2023/10/iss070e001540orig.jpg</div>
+  <p><strong>Suggested filename:</strong> <code>nasa-iss070e.jpg</code></p>
+  <p>A larger file to test progress tracking with <code>download_status</code>.</p>
+</div>
+
+<div class="card">
+  <h3>404 — Not Found</h3>
+  <span class="badge badge-risk">risk</span>
+  <div class="url-display">https://example.com/this-file-does-not-exist.pdf</div>
+  <p><strong>Suggested filename:</strong> <code>not-found.pdf</code></p>
+  <p>Intentionally broken URL. Tests error handling — should return a download that ends in <code>failed</code> or similar error state.</p>
+</div>
+
+<div class="card">
+  <h3>Conflict Action Scenarios</h3>
+  <p>Download the same file twice with different <code>conflictAction</code> values to observe behaviour:</p>
+  <table>
+    <thead>
+      <tr><th>conflictAction</th><th>Expected Behaviour</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>uniquify</code></td><td>Browser appends <code>(1)</code>, <code>(2)</code>, etc. to the filename</td></tr>
+      <tr><td><code>overwrite</code></td><td>Replaces the existing file silently</td></tr>
+    </tbody>
+  </table>
+  <p>Try downloading <code>wai-dummy.pdf</code> with each conflict action to see the difference.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: download_status                                      -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<h2 id="download-status">📊 download_status</h2>
+<p>
+  Poll the status of in-progress or completed downloads.
+  Use <code>download_status</code> with the IDs returned by <code>download_file</code>.
+</p>
+
+<div class="card">
+  <h3>Typical Status Values</h3>
+  <table>
+    <thead>
+      <tr><th>Status</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>in_progress</code></td><td>Download is actively transferring data</td></tr>
+      <tr><td><code>complete</code></td><td>Download finished successfully</td></tr>
+      <tr><td><code>interrupted</code></td><td>Download was interrupted (network error, etc.)</td></tr>
+      <tr><td><code>cancelled</code></td><td>User or agent cancelled the download</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Testing Workflow</h3>
+  <ol>
+    <li>Call <code>download_file</code> with a large file URL (e.g., the NASA image above)</li>
+    <li>Immediately call <code>download_status</code> with the returned ID — expect <code>in_progress</code></li>
+    <li>Wait a few seconds, then call <code>download_status</code> again — expect <code>complete</code></li>
+    <li>Call <code>download_status</code> with multiple IDs at once to batch-check statuses</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h3>Edge Cases</h3>
+  <ul>
+    <li><strong>Unknown ID:</strong> Call <code>download_status</code> with a non-existent ID — should return an error</li>
+    <li><strong>Empty array:</strong> Call <code>download_status</code> with <code>ids: []</code> — should return empty results</li>
+    <li><strong>Batch:</strong> Trigger 3 downloads, then check all 3 statuses in a single <code>download_status</code> call</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: fetch_resource                                        -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<h2 id="fetch-resource">🌐 fetch_resource</h2>
+<p>
+  Fetch a URL's content and return it to the agent. This tool is classified
+  <span class="badge badge-high-risk">high-risk</span> because it returns
+  page content directly, so the future approval system will gate it.
+</p>
+
+<div class="card">
+  <h3>Same-Origin — HTML (this page)</h3>
+  <span class="badge badge-safe">safe</span>
+  <p>The URL of this page itself. <code>fetch_resource</code> should return its full HTML content.</p>
+  <div class="url-display" id="self-url">(loaded dynamically — see script below)</div>
+</div>
+
+<div class="card">
+  <h3>Same-Origin — Embedded JSON</h3>
+  <span class="badge badge-safe">safe</span>
+  <p>A <code>&lt;script type="application/json"&gt;</code> block embedded in this page. <code>fetch_resource</code> should return the page HTML containing this data.</p>
+  <div class="url-display" id="json-embed-url">(loaded dynamically)</div>
+  <div class="fetch-content" id="json-embed-preview"></div>
+</div>
+
+<div class="card">
+  <h3>Cross-Origin — Public API (CORS allowed)</h3>
+  <span class="badge badge-risk">risk</span>
+  <div class="url-display">https://httpbin.org/json</div>
+  <p>httpbin.org sends permissive CORS headers. <code>fetch_resource</code> should succeed and return JSON data.</p>
+</div>
+
+<div class="card">
+  <h3>Cross-Origin — CORS Blocked</h3>
+  <span class="badge badge-high-risk">high-risk</span>
+  <div class="url-display">https://example.com</div>
+  <p>example.com does <strong>not</strong> send CORS headers. In Chrome, <code>fetch_resource</code> should still succeed (extension has host permissions). In <strong>Safari</strong>, it should return <code>cors_blocked</code> status honestly.</p>
+</div>
+
+<div class="card">
+  <h3>Cross-Origin — 404 Not Found</h3>
+  <span class="badge badge-risk">risk</span>
+  <div class="url-display">https://httpbin.org/status/404</div>
+  <p>Returns HTTP 404. <code>fetch_resource</code> should report this as an error, not silently fail.</p>
+</div>
+
+<div class="card">
+  <h3>Large Content — Truncation</h3>
+  <span class="badge badge-risk">risk</span>
+  <div class="url-display">https://httpbin.org/html</div>
+  <p>A moderately-sized HTML page. Test with a small <code>maxSizeBytes</code> (e.g., 500) to verify truncation works correctly and the agent receives a partial result with a truncation indicator.</p>
+</div>
+
+<div class="card">
+  <h3>Fetch Timeout</h3>
+  <span class="badge badge-risk">risk</span>
+  <div class="url-display">https://httpbin.org/delay/10</div>
+  <p>This endpoint delays 10 seconds before responding. Set <code>fetchTimeout</code> to 3 seconds (3000 ms) to test that the tool correctly times out and returns a timeout error rather than hanging.</p>
+</div>
+
+<div class="card">
+  <h3>Various Content Types</h3>
+  <table>
+    <thead>
+      <tr><th>Type</th><th>URL</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>JSON</td><td><code>https://httpbin.org/json</code></td><td>Structured data</td></tr>
+      <tr><td>HTML</td><td><code>https://httpbin.org/html</code></td><td>Rich text content</td></tr>
+      <tr><td>XML</td><td><code>https://httpbin.org/xml</code></td><td>XML payload</td></tr>
+      <tr><td>Plain text</td><td><code>https://httpbin.org/robots.txt</code></td><td>Simple text</td></tr>
+      <tr><td>Image</td><td><code>https://httpbin.org/image/png</code></td><td>Binary — should fail or return base64 depending on implementation</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Embedded test data                                              -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<script type="application/json" id="embedded-test-data">
+{
+  "testName": "Brijio P1.7 Download Awareness",
+  "version": "1.0.0",
+  "scenarios": {
+    "download": [
+      { "id": "small-pdf", "url": "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", "filename": "wai-dummy.pdf", "conflictAction": "uniquify" },
+      { "id": "png-image", "url": "https://via.placeholder.com/150x100.png?text=Brijio+Test", "filename": "placeholder-150x100.png", "conflictAction": "uniquify" },
+      { "id": "text-file", "url": "https://raw.githubusercontent.com/nousresearch/hermes/main/README.md", "filename": "hermes-readme.md", "conflictAction": "uniquify" }
+    ],
+    "fetch": [
+      { "id": "same-origin", "description": "This page itself", "expectCors": true },
+      { "id": "public-api", "url": "https://httpbin.org/json", "description": "CORS-allowed JSON endpoint", "expectCors": true },
+      { "id": "cors-blocked", "url": "https://example.com", "description": "No CORS headers — Safari should report cors_blocked", "expectCors": false },
+      { "id": "not-found", "url": "https://httpbin.org/status/404", "description": "HTTP 404 error", "expectCors": true }
+    ]
+  }
+}
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- Status log (right column) — populated by script                 -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+</div><!-- .left-col -->
+
+<div class="right-col">
+  <div class="status-log" id="status-log">
+    <h3>📋 Activity Log</h3>
+    <p style="color: color-mix(in srgb, CanvasText 55%, transparent); font-size: 0.9em;">
+      Events from this page will appear here. The AI agent should also check results via <code>download_status</code> and <code>fetch_resource</code> directly.
+    </p>
+    <div id="log-entries"></div>
+  </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <h3>🔍 Tool Reference</h3>
+    <table>
+      <thead>
+        <tr><th>Tool</th><th>Key Params</th><th>Risk</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>download_file</code></td><td>url, filename, conflictAction, browserInstanceId</td><td><span class="badge badge-safe">safe</span></td></tr>
+        <tr><td><code>download_status</code></td><td>ids, browserInstanceId</td><td><span class="badge badge-safe">safe</span></td></tr>
+        <tr><td><code>fetch_resource</code></td><td>url, maxSizeBytes, fetchTimeout, browserInstanceId</td><td><span class="badge badge-high-risk">high-risk</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <h3>ℹ️ About P1.7</h3>
+    <p style="font-size: 0.9em;">
+      P1.7 introduces <strong>download awareness</strong> for AI agents via Brijio.
+      Agents can now trigger browser downloads, poll their progress, and fetch
+      web resource content — all through the MCP protocol.
+    </p>
+    <p style="font-size: 0.9em;">
+      <code>fetch_resource</code> is classified <span class="badge badge-high-risk">high-risk</span>
+      because it returns page content directly to the agent. In Safari, CORS-blocked
+      fetches will be reported honestly as <code>cors_blocked</code> rather than
+      silently failing or working around the restriction.
+    </p>
+  </div>
+</div>
+</div><!-- .layout -->
+
+<script>
+// Populate dynamic URL displays
+(function() {
+  var selfUrl = window.location.href;
+  var selfEl = document.getElementById('self-url');
+  if (selfEl) selfEl.textContent = selfUrl;
+
+  var jsonUrl = selfUrl; // same page — the JSON is embedded in a <script> tag
+  var jsonEl = document.getElementById('json-embed-url');
+  if (jsonEl) jsonEl.textContent = jsonUrl;
+
+  // Show preview of embedded JSON
+  var jsonBlock = document.getElementById('embedded-test-data');
+  var previewEl = document.getElementById('json-embed-preview');
+  if (jsonBlock && previewEl) {
+    try {
+      var data = JSON.parse(jsonBlock.textContent);
+      previewEl.textContent = JSON.stringify(data, null, 2).slice(0, 500) + '\n…';
+    } catch(e) {
+      previewEl.textContent = '(error parsing embedded JSON)';
+    }
+  }
+
+  // Log download link clicks
+  document.querySelectorAll('a[download]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      addLogEntry('download_file', 'Click: ' + a.href, 'ok');
+    });
+  });
+
+  function addLogEntry(tool, message, status) {
+    var container = document.getElementById('log-entries');
+    if (!container) return;
+    var entry = document.createElement('div');
+    entry.className = 'status-entry';
+    var now = new Date();
+    var ts = now.toLocaleTimeString();
+    var statusClass = status === 'ok' ? 'status-ok' : status === 'err' ? 'status-err' : 'status-warn';
+    // Safe: all values are internally generated (not user input), no XSS risk
+    entry.innerHTML = '<span class="timestamp">' + ts + '</span> ' +
+      '<span class="tool-name">' + tool + '</span> ' +
+      '<span class="' + statusClass + '">' + status + '</span> ' +
+      message;
+    container.prepend(entry);
+  }
+})();
+</script>
+</body>
+</html>
