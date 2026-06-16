@@ -13,6 +13,7 @@ import {
   type FormSubmitTarget,
   type ContentBatchRequest,
   type BatchResult,
+  type DownloadAdapter,
   stringValue,
   requireString,
   createBrowserInstanceId,
@@ -68,6 +69,25 @@ export interface ChromeApi {
       files: string[]
     }) => Promise<unknown>
   }
+  downloads?: {
+    search: (query: { id?: number }) => Promise<Array<{
+      id: number
+      filename: string
+      url: string
+      mime?: string
+      fileSize?: number
+      totalBytes?: number
+      state: 'in_progress' | 'complete' | 'interrupted'
+      error?: string
+      danger?: string
+    }>>
+    download: (options: {
+      url: string
+      filename?: string
+      conflictAction: 'uniquify' | 'overwrite'
+      saveAs: boolean
+    }) => Promise<number>
+  }
   tabs: {
     create: (properties: { url: string }) => Promise<unknown>
     query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<
@@ -107,6 +127,159 @@ const bridgeSettingsKeys = [
 const previewMaxBytes = 4096
 const maxContentBytes = 120000
 
+const downloadAdapter: DownloadAdapter = {
+  async downloadStatus (ids?: Array<number | string>) {
+    try {
+      if (chrome.downloads?.search === undefined) {
+        return { ok: true, data: { capability: 'not_supported' as const, items: [] } }
+      }
+
+      const searchIds = ids
+        ?.map(id => typeof id === 'number' ? id : Number.parseInt(id, 10))
+        .filter(id => !Number.isNaN(id)) ?? []
+
+      if (ids !== undefined && searchIds.length === 0) {
+        return { ok: true, data: { capability: 'full' as const, items: [] } }
+      }
+
+      const query = searchIds.length === 1 ? { id: searchIds[0] } : {}
+      const items = await chrome.downloads.search(query)
+
+      return {
+        ok: true,
+        data: {
+          capability: 'full' as const,
+          items: items
+            .filter(item => searchIds.length === 0 || searchIds.includes(item.id))
+            .map(item => ({
+              id: item.id,
+              kind: 'download' as const,
+              filename: item.filename,
+              url: item.url,
+              mime: item.mime ?? null,
+              size: item.fileSize ?? item.totalBytes ?? null,
+              state: item.state,
+              ...(item.error !== undefined ? { error: item.error } : {}),
+              ...(item.danger !== undefined ? { danger: item.danger } : {})
+            }))
+        }
+      }
+    } catch (error: unknown) {
+      return {
+        ok: false,
+        error: {
+          code: 'browser_error',
+          message: error instanceof Error ? error.message : 'Download status query failed.'
+        }
+      }
+    }
+  },
+
+  async downloadFile (url: string, filename?: string, conflictAction?: 'uniquify' | 'overwrite') {
+    try {
+      if (chrome.downloads?.download === undefined) {
+        return { ok: false, error: { code: 'not_supported', message: 'chrome.downloads API not available.' } }
+      }
+
+      const downloadId = await chrome.downloads.download({
+        url,
+        ...(filename !== undefined ? { filename } : {}),
+        conflictAction: conflictAction ?? 'uniquify',
+        saveAs: false
+      })
+
+      return { ok: true, data: { downloadId, status: 'initiated' as const } }
+    } catch (error: unknown) {
+      return {
+        ok: false,
+        error: {
+          code: 'browser_error',
+          message: error instanceof Error ? error.message : 'Download failed.'
+        }
+      }
+    }
+  },
+
+  async fetchResource (url: string, maxSizeBytes?: number, timeout?: number) {
+    const controller = new AbortController()
+    const timeoutId = timeout !== undefined
+      ? setTimeout(() => { controller.abort() }, timeout)
+      : undefined
+
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        credentials: 'include'
+      })
+
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId)
+      }
+
+      if (!response.ok) {
+        return { ok: false, error: { code: 'http_error', message: `HTTP ${response.status}: ${response.statusText}` } }
+      }
+
+      const contentType = response.headers.get('content-type')
+      const contentLength = response.headers.get('content-length')
+      const declaredBytes = contentLength !== null ? Number.parseInt(contentLength, 10) : null
+      const totalBytes = declaredBytes !== null && !Number.isNaN(declaredBytes) ? declaredBytes : null
+
+      if (maxSizeBytes !== undefined && totalBytes !== null && totalBytes > maxSizeBytes) {
+        return { ok: false, error: { code: 'size_exceeded', message: `Resource exceeds maxSizeBytes (${totalBytes} > ${maxSizeBytes})` } }
+      }
+
+      const arrayBuffer = await response.arrayBuffer()
+      const bytes = new Uint8Array(arrayBuffer)
+
+      if (maxSizeBytes !== undefined && bytes.length > maxSizeBytes) {
+        return { ok: false, error: { code: 'size_exceeded', message: `Resource exceeds maxSizeBytes (${bytes.length} > ${maxSizeBytes})` } }
+      }
+
+      let binary = ''
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i])
+      }
+      const dataBase64 = btoa(binary)
+
+      const hashBuffer = await crypto.subtle.digest('SHA-256', bytes)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      const sha256 = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('')
+
+      return {
+        ok: true,
+        data: {
+          fetchId: crypto.randomUUID(),
+          contentType,
+          totalBytes: bytes.length,
+          dataBase64,
+          sha256
+        }
+      }
+    } catch (error: unknown) {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId)
+      }
+
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return { ok: false, error: { code: 'timeout', message: 'Fetch timed out.' } }
+      }
+
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        return { ok: false, error: { code: 'cors_blocked', message: 'CORS blocked the request.' } }
+      }
+
+      return {
+        ok: false,
+        error: {
+          code: 'network_error',
+          message: error instanceof Error ? error.message : 'Fetch failed.'
+        }
+      }
+    }
+  }
+}
+
 const controller = new BrijioBackgroundController({
   action: {
     async setBadgeText (text) {
@@ -125,6 +298,7 @@ const controller = new BrijioBackgroundController({
   createWebSocket (url) {
     return new DomWebSocketAdapter(new WebSocket(url))
   },
+  download: downloadAdapter,
   setup: {
     async openSetupPage () {
       await chrome.tabs.create({ url: chrome.runtime.getURL('popup.html') })
