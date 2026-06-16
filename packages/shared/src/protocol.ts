@@ -25,6 +25,9 @@ export type BrowserCapability =
   | 'navigate'
   | 'batch'
   | 'upload_file'
+  | 'download_status'
+  | 'download_file'
+  | 'fetch_resource'
 
 export interface BrowserPresence {
   browserInstanceId: string
@@ -134,6 +137,128 @@ export interface StageFileUploadErrorEnvelope {
   payload: StageFileUploadErrorPayload
 }
 
+// --- Download & Fetch types (ADR 0047) ---
+
+export type DownloadState = 'in_progress' | 'complete' | 'interrupted'
+
+export interface DownloadInfo {
+  id: number
+  kind: 'download'
+  filename: string
+  url: string
+  mime: string | null
+  size: number | null
+  state: DownloadState
+  error?: string
+  danger?: string
+}
+
+export interface FetchResourceInfo {
+  id: string
+  kind: 'fetch'
+  url: string
+  contentType: string | null
+  bytesReceived: number
+  totalBytes: number | null
+  state: DownloadState | 'streaming'
+  error?: string
+}
+
+// Download status request/response
+export interface DownloadStatusRequest {
+  type: 'download_status'
+  ids?: Array<number | string>
+  browserInstanceId?: string
+}
+
+export interface DownloadStatusResponse {
+  type: 'download_status_response'
+  ok: true
+  capability: 'full' | 'not_supported'
+  items: Array<DownloadInfo | FetchResourceInfo>
+}
+
+export interface DownloadStatusErrorResponse {
+  type: 'download_status_response'
+  ok: false
+  error: {
+    code: string
+    message: string
+  }
+}
+
+// Download file request/response
+export interface DownloadFileRequest {
+  type: 'download_file'
+  url: string
+  filename?: string
+  conflictAction?: 'uniquify' | 'overwrite'
+  browserInstanceId?: string
+}
+
+export interface DownloadFileResponse {
+  type: 'download_file_response'
+  ok: true
+  downloadId: number | null
+  status: 'initiated' | 'initiated_fire_and_forget'
+}
+
+export interface DownloadFileErrorResponse {
+  type: 'download_file_response'
+  ok: false
+  error: {
+    code: string
+    message: string
+  }
+}
+
+// Fetch resource request/response
+export interface FetchResourceRequest {
+  type: 'fetch_resource'
+  url: string
+  maxSizeBytes?: number
+  timeout?: number
+  browserInstanceId?: string
+}
+
+export interface FetchResourceStartResponse {
+  type: 'fetch_resource_start'
+  fetchId: string
+  url: string
+  contentType: string | null
+  totalBytes: number | null
+}
+
+export interface FetchResourceChunkResponse {
+  type: 'fetch_resource_chunk'
+  fetchId: string
+  index: number
+  dataBase64: string
+}
+
+export interface FetchResourceCompleteResponse {
+  type: 'fetch_resource_complete'
+  fetchId: string
+  contentType?: string | null
+  sha256: string
+  totalBytes: number
+  dataBase64?: string
+}
+
+export interface FetchResourceErrorResponse {
+  type: 'fetch_resource_error'
+  fetchId?: string
+  error: string
+  httpStatus?: number
+  message: string
+}
+
+export type FetchResourceStreamMessage =
+  | FetchResourceStartResponse
+  | FetchResourceChunkResponse
+  | FetchResourceCompleteResponse
+  | FetchResourceErrorResponse
+
 export type BrijioErrorCode =
   | 'invalid_json'
   | 'invalid_message'
@@ -155,6 +280,8 @@ export type BrijioErrorCode =
   | 'upload_not_staged'
   | 'target_not_file_input'
   | 'upload_expired'
+  | 'download_not_found'
+  | 'fetch_resource_failed'
 
 export interface BrijioErrorEnvelope {
   type: 'error'
@@ -686,6 +813,11 @@ export type ExtensionResponse =
   | NavigateToUrlErrorResponse
   | BatchResultResponse
   | BatchResultErrorResponse
+  | DownloadStatusResponse
+  | DownloadStatusErrorResponse
+  | DownloadFileResponse
+  | DownloadFileErrorResponse
+  | FetchResourceStreamMessage
 
 export function createAuthEnvelope (input: {
   requestId?: string
@@ -1157,6 +1289,224 @@ export function createBatchResultErrorResponse (
   })
 }
 
+export function createDownloadStatusResponse (
+  id: string | undefined,
+  capability: 'full' | 'not_supported',
+  items: Array<DownloadInfo | FetchResourceInfo>
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'download_status_response',
+    ok: true,
+    capability,
+    items
+  })
+}
+
+export function createDownloadStatusErrorResponse (
+  id: string | undefined,
+  code: string,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'download_status_response',
+    ok: false,
+    error: { code, message }
+  })
+}
+
+export function createDownloadFileResponse (
+  id: string | undefined,
+  downloadId: number | null,
+  status: 'initiated' | 'initiated_fire_and_forget'
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'download_file_response',
+    ok: true,
+    downloadId,
+    status
+  })
+}
+
+export function createDownloadFileErrorResponse (
+  id: string | undefined,
+  code: string,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'download_file_response',
+    ok: false,
+    error: { code, message }
+  })
+}
+
+export function createFetchResourceStartResponse (
+  id: string | undefined,
+  fetchId: string,
+  url: string,
+  contentType: string | null,
+  totalBytes: number | null
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'fetch_resource_start',
+    fetchId,
+    url,
+    contentType,
+    totalBytes
+  })
+}
+
+export function createFetchResourceChunkResponse (
+  id: string | undefined,
+  fetchId: string,
+  index: number,
+  dataBase64: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'fetch_resource_chunk',
+    fetchId,
+    index,
+    dataBase64
+  })
+}
+
+export function createFetchResourceCompleteResponse (
+  id: string | undefined,
+  fetchId: string,
+  sha256: string,
+  totalBytes: number,
+  dataBase64?: string,
+  contentType?: string | null
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'fetch_resource_complete',
+    fetchId,
+    sha256,
+    totalBytes,
+    ...(dataBase64 !== undefined ? { dataBase64 } : {}),
+    ...(contentType !== undefined ? { contentType } : {})
+  })
+}
+
+export function createFetchResourceErrorResponse (
+  id: string | undefined,
+  errorCode: string,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'fetch_resource_error',
+    error: errorCode,
+    message
+  })
+}
+
+export function createDownloadStatusEnvelope (
+  requestId: string | undefined,
+  ids?: Array<number | string>,
+  browserInstanceId?: string
+): WebSocketEnvelope {
+  const payload: DownloadStatusRequest = {
+    type: 'download_status',
+    ...(ids !== undefined ? { ids } : {})
+  }
+
+  return {
+    type: 'message',
+    ...(requestId !== undefined ? { id: requestId } : {}),
+    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    payload
+  }
+}
+
+export function createDownloadFileEnvelope (
+  requestId: string | undefined,
+  url: string,
+  filename?: string,
+  conflictAction?: 'uniquify' | 'overwrite',
+  browserInstanceId?: string
+): WebSocketEnvelope {
+  const payload: DownloadFileRequest = {
+    type: 'download_file',
+    url,
+    ...(filename !== undefined ? { filename } : {}),
+    ...(conflictAction !== undefined ? { conflictAction } : {})
+  }
+
+  return {
+    type: 'message',
+    ...(requestId !== undefined ? { id: requestId } : {}),
+    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    payload
+  }
+}
+
+export function createFetchResourceEnvelope (
+  requestId: string | undefined,
+  url: string,
+  maxSizeBytes?: number,
+  timeout?: number,
+  browserInstanceId?: string
+): WebSocketEnvelope {
+  const payload: FetchResourceRequest = {
+    type: 'fetch_resource',
+    url,
+    ...(maxSizeBytes !== undefined ? { maxSizeBytes } : {}),
+    ...(timeout !== undefined ? { timeout } : {})
+  }
+
+  return {
+    type: 'message',
+    ...(requestId !== undefined ? { id: requestId } : {}),
+    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    payload
+  }
+}
+
+export function isDownloadStatusEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: DownloadStatusRequest } {
+  if (!isRecord(value) || value.type !== 'message') {
+    return false
+  }
+
+  if (!isRecord(value.payload) || value.payload.type !== 'download_status') {
+    return false
+  }
+
+  if (Object.hasOwn(value.payload, 'ids') && !Array.isArray(value.payload.ids)) {
+    return false
+  }
+
+  return true
+}
+
+export function isDownloadFileEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: DownloadFileRequest } {
+  if (!isRecord(value) || value.type !== 'message') {
+    return false
+  }
+
+  if (!isRecord(value.payload) || value.payload.type !== 'download_file') {
+    return false
+  }
+
+  return typeof value.payload.url === 'string'
+}
+
+export function isFetchResourceEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: FetchResourceRequest } {
+  if (!isRecord(value) || value.type !== 'message') {
+    return false
+  }
+
+  if (!isRecord(value.payload) || value.payload.type !== 'fetch_resource') {
+    return false
+  }
+
+  return typeof value.payload.url === 'string'
+}
+
 export function isPerformBatchEnvelope (
   value: unknown
 ): value is WebSocketEnvelope & { payload: PerformBatchRequest } {
@@ -1381,7 +1731,10 @@ function isBrowserCapability (value: unknown): value is BrowserCapability {
     value === 'submit_form' ||
     value === 'navigate' ||
     value === 'batch' ||
-    value === 'upload_file'
+    value === 'upload_file' ||
+    value === 'download_status' ||
+    value === 'download_file' ||
+    value === 'fetch_resource'
   )
 }
 
