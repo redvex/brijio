@@ -13,6 +13,9 @@ import {
   type BrijioSetCheckedResult,
   type BrijioSubmitFormResult,
   type BrijioUploadFileResult,
+  type BrijioDownloadStatusResult,
+  type BrijioDownloadFileResult,
+  type BrijioFetchResourceResult,
   type ClickElementTarget,
   createAuthEnvelope,
   createClickElementEnvelope,
@@ -24,6 +27,9 @@ import {
   createSubmitFormEnvelope,
   createUploadFileEnvelope,
   createWriteEditableEnvelope,
+  createDownloadStatusEnvelope,
+  createDownloadFileEnvelope,
+  createFetchResourceEnvelope,
   connectionFailedResponse,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
@@ -35,6 +41,9 @@ import {
   parseActionResultEnvelope,
   parseBatchResultEnvelope,
   parseBrowserListEnvelope,
+  parseDownloadStatusEnvelope,
+  parseDownloadFileEnvelope,
+  parseFetchResourceEnvelope,
   parseNavigateToUrlEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
@@ -353,6 +362,85 @@ export async function requestPerformBatch (
       return result as BrijioResourceResult<BrijioBatchResult> | { ok: false, ignored: true }
     },
     timeoutMessage: 'Timed out waiting for a batch action response.'
+  })
+}
+
+export interface DownloadStatusRequestOptions {
+  websocketUrl: string
+  pairingToken: string
+  timeoutMs: number
+  browserInstanceId?: string
+  createRequestId?: () => string
+  ids?: Array<number | string>
+}
+
+export async function requestDownloadStatus (
+  options: DownloadStatusRequestOptions
+): Promise<BrijioDownloadStatusResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createDownloadStatusEnvelope(requestId, options.ids, options.browserInstanceId),
+    parseEnvelope: (value) => parseDownloadStatusEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a download status response.'
+  })
+}
+
+export interface DownloadFileRequestOptions {
+  websocketUrl: string
+  pairingToken: string
+  timeoutMs: number
+  browserInstanceId?: string
+  createRequestId?: () => string
+  url: string
+  filename?: string
+  conflictAction?: 'uniquify' | 'overwrite'
+}
+
+export async function requestDownloadFile (
+  options: DownloadFileRequestOptions
+): Promise<BrijioDownloadFileResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createDownloadFileEnvelope(requestId, options.url, options.filename, options.conflictAction, options.browserInstanceId),
+    parseEnvelope: (value) => parseDownloadFileEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a download file response.'
+  })
+}
+
+export interface FetchResourceRequestOptions {
+  websocketUrl: string
+  pairingToken: string
+  timeoutMs: number
+  browserInstanceId?: string
+  createRequestId?: () => string
+  url: string
+  maxSizeBytes?: number
+  fetchTimeout?: number
+}
+
+export async function requestFetchResource (
+  options: FetchResourceRequestOptions
+): Promise<BrijioFetchResourceResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createFetchResourceEnvelope(requestId, options.url, options.maxSizeBytes, options.fetchTimeout, options.browserInstanceId),
+    parseEnvelope: (value) => parseFetchResourceEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a fetch resource response.'
   })
 }
 
