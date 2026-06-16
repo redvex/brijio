@@ -284,6 +284,24 @@ void describe('Brijio MCP HTTP server', () => {
             title: 'Perform Batch Actions',
             description:
               'Execute multiple browser actions (click, write_text, set_checked, select_options, upload_file, submit_form) in a single request. Actions are executed sequentially. If continueOnError is false (default), execution stops on the first error. If continueOnError is true, execution continues and errors are reported per-action. Optionally reads page context after all actions by setting readAfterActions to true.'
+          },
+          {
+            name: 'download_status',
+            title: 'Download Status',
+            description:
+              'Get the status of browser downloads by optional IDs or all session downloads. Returns a capability field ("full" or "not_supported") and a list of download items. On Safari, returns capability "not_supported" with an empty items list.'
+          },
+          {
+            name: 'download_file',
+            title: 'Download File',
+            description:
+              'Initiate a file download in the browser. On Chrome/Firefox, uses the chrome.downloads API and returns a download ID. On Safari, triggers a content-script download (fire-and-forget) and returns status "initiated_fire_and_forget" with a null download ID.'
+          },
+          {
+            name: 'fetch_resource',
+            title: 'Fetch Resource',
+            description:
+              "Fetch a resource URL using the browser's session (cookies, auth). The browser performs a fetch with credentials included and streams the response back. On Safari or when CORS blocks the request, returns error \"cors_blocked\". This is a high-risk tool that exposes session-protected content to the agent."
           }
         ]
       )
@@ -839,6 +857,62 @@ void describe('Brijio MCP HTTP server', () => {
             }
           })
         )
+
+        if (request.payload.type === 'download_status') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'download_status_response',
+                ok: true,
+                data: {
+                  capability: 'not_supported',
+                  items: []
+                }
+              }
+            })
+          )
+          return
+        }
+
+        if (request.payload.type === 'download_file') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'download_file_response',
+                ok: true,
+                data: {
+                  downloadId: 1,
+                  status: 'initiated'
+                }
+              }
+            })
+          )
+          return
+        }
+
+        if (request.payload.type === 'fetch_resource') {
+          socket.send(
+            JSON.stringify({
+              type: 'message',
+              id: request.id,
+              payload: {
+                type: 'fetch_resource_response',
+                ok: true,
+                data: {
+                  fetchId: 'fetch-1',
+                  contentType: 'text/plain',
+                  totalBytes: 13,
+                  sha256: 'abc123',
+                  dataBase64: 'SGVsbG8gV29ybGQ='
+                }
+              }
+            })
+          )
+        }
       })
     })
     const runtime = await startTestMcpRuntime({
