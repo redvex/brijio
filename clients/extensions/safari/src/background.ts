@@ -4,6 +4,7 @@ import {
   type BrijioSocket,
   type PageContent,
   type PageContext,
+  type DownloadAdapter,
   type PageNavigationResult,
   type PageReadResult,
   normalizeBridgeSettings,
@@ -188,6 +189,108 @@ export class SafariPageReaderAdapter {
       },
       this.deps
     )
+  }
+}
+
+export class SafariDownloadAdapter implements DownloadAdapter {
+  constructor (private readonly tabs: BrowserApi['tabs']) {}
+
+  async downloadStatus (): Promise<Awaited<ReturnType<DownloadAdapter['downloadStatus']>>> {
+    return { ok: true, data: { capability: 'not_supported' as const, items: [] } }
+  }
+
+  async downloadFile (url: string): Promise<Awaited<ReturnType<DownloadAdapter['downloadFile']>>> {
+    try {
+      await this.tabs.create({ url })
+      return { ok: true, data: { downloadId: null, status: 'initiated_fire_and_forget' as const } }
+    } catch (error: unknown) {
+      return {
+        ok: false,
+        error: {
+          code: 'browser_error',
+          message: error instanceof Error ? error.message : 'Safari fire-and-forget download failed.'
+        }
+      }
+    }
+  }
+
+  async fetchResource (url: string, maxSizeBytes?: number, timeout?: number): Promise<Awaited<ReturnType<DownloadAdapter['fetchResource']>>> {
+    const controller = new AbortController()
+    const timeoutId = timeout !== undefined
+      ? setTimeout(() => { controller.abort() }, timeout)
+      : undefined
+
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        credentials: 'include'
+      })
+
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId)
+      }
+
+      if (!response.ok) {
+        return { ok: false, error: { code: 'http_error', message: `HTTP ${response.status}: ${response.statusText}` } }
+      }
+
+      const contentType = response.headers.get('content-type')
+      const contentLength = response.headers.get('content-length')
+      const declaredBytes = contentLength !== null ? Number.parseInt(contentLength, 10) : null
+      const totalBytes = declaredBytes !== null && !Number.isNaN(declaredBytes) ? declaredBytes : null
+
+      if (maxSizeBytes !== undefined && totalBytes !== null && totalBytes > maxSizeBytes) {
+        return { ok: false, error: { code: 'size_exceeded', message: `Resource exceeds maxSizeBytes (${totalBytes} > ${maxSizeBytes})` } }
+      }
+
+      const arrayBuffer = await response.arrayBuffer()
+      const bytes = new Uint8Array(arrayBuffer)
+
+      if (maxSizeBytes !== undefined && bytes.length > maxSizeBytes) {
+        return { ok: false, error: { code: 'size_exceeded', message: `Resource exceeds maxSizeBytes (${bytes.length} > ${maxSizeBytes})` } }
+      }
+
+      let binary = ''
+      for (let i = 0; i < bytes.length; i++) {
+        binary += String.fromCharCode(bytes[i])
+      }
+      const dataBase64 = btoa(binary)
+
+      const hashBuffer = await crypto.subtle.digest('SHA-256', bytes)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      const sha256 = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('')
+
+      return {
+        ok: true,
+        data: {
+          fetchId: crypto.randomUUID(),
+          contentType,
+          totalBytes: bytes.length,
+          dataBase64,
+          sha256
+        }
+      }
+    } catch (error: unknown) {
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId)
+      }
+
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        return { ok: false, error: { code: 'timeout', message: 'Fetch timed out.' } }
+      }
+
+      if (error instanceof TypeError) {
+        return { ok: false, error: { code: 'cors_blocked', message: 'CORS blocked the request.' } }
+      }
+
+      return {
+        ok: false,
+        error: {
+          code: 'network_error',
+          message: error instanceof Error ? error.message : 'Fetch failed.'
+        }
+      }
+    }
   }
 }
 
