@@ -23,6 +23,9 @@ import {
 } from './form-action-tools.js'
 import { readCurrentPage } from './page-reading-tool.js'
 import { performBatchTool } from './batch-tool.js'
+import { downloadStatus } from './download-status-tool.js'
+import { downloadFile } from './download-file-tool.js'
+import { fetchResource } from './fetch-resource-tool.js'
 import {
   buildContextMessage,
   loadSkills,
@@ -604,6 +607,115 @@ export async function createBrijioMcpServer (
       }
     }
   )
+
+  server.registerTool(
+    'download_status',
+    {
+      title: 'Download Status',
+      description:
+        'Get the status of browser downloads by optional IDs or all session downloads. ' +
+        'Returns a capability field ("full" or "not_supported") and a list of download items. ' +
+        'On Safari, returns capability "not_supported" with an empty items list.',
+      inputSchema: {
+        ids: z
+          .array(z.union([z.number(), z.string()]))
+          .optional()
+          .describe('Optional: filter by specific download IDs.'),
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input) => {
+      logToolCall('download_status', input as Record<string, unknown>)
+      const result = await downloadStatus(pageContextConfig, input)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
+    'download_file',
+    {
+      title: 'Download File',
+      description:
+        'Initiate a file download in the browser. On Chrome/Firefox, uses the chrome.downloads API and returns a download ID. ' +
+        'On Safari, triggers a content-script download (fire-and-forget) and returns status "initiated_fire_and_forget" with a null download ID.',
+      inputSchema: {
+        url: z
+          .string()
+          .describe('The URL of the file to download.'),
+        filename: z
+          .string()
+          .optional()
+          .describe('Optional: suggested filename for the download.'),
+        conflictAction: z
+          .enum(['uniquify', 'overwrite'])
+          .optional()
+          .describe('Optional: how to handle filename conflicts. "uniquify" adds a suffix, "overwrite" replaces.'),
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input) => {
+      logToolCall('download_file', input as Record<string, unknown>)
+      const result = await downloadFile(pageContextConfig, input)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
+    'fetch_resource',
+    {
+      title: 'Fetch Resource',
+      description:
+        'Fetch a resource URL using the browser\'s session (cookies, auth). ' +
+        'The browser performs a fetch with credentials included and streams the response back. ' +
+        'On Safari or when CORS blocks the request, returns error "cors_blocked". ' +
+        'This is a high-risk tool that exposes session-protected content to the agent.',
+      inputSchema: {
+        url: z
+          .string()
+          .describe('The URL to fetch with browser credentials.'),
+        maxSizeBytes: z
+          .number()
+          .optional()
+          .describe('Optional: maximum response size in bytes. Defaults to server limit.'),
+        fetchTimeout: z
+          .number()
+          .optional()
+          .describe('Optional: timeout in milliseconds for the fetch operation.'),
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input) => {
+      logToolCall('fetch_resource', input as Record<string, unknown>)
+      const result = await fetchResource(pageContextConfig, input)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  // ── Resources ────────────────────────────────────────────────────────────
 
   server.registerResource(
     'current-page-context',
