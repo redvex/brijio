@@ -8,6 +8,9 @@ import {
   type BrijioSetCheckedResult,
   type BrijioSubmitFormResult,
   type BrijioUploadFileResult,
+  type BrijioDownloadStatusResult,
+  type BrijioDownloadFileResult,
+  type BrijioFetchResourceResult,
   type ClickElementTarget,
   type EditableTarget,
   type FileUploadPayload,
@@ -31,8 +34,14 @@ import {
   type SubmitFormRequestOptions,
   requestUploadFile as defaultRequestUploadFile,
   type UploadFileRequestOptions,
+  type WriteEditableRequestOptions,
   requestWriteEditable as defaultRequestWriteEditable,
-  type WriteEditableRequestOptions
+  type DownloadStatusRequestOptions,
+  type DownloadFileRequestOptions,
+  type FetchResourceRequestOptions,
+  requestDownloadStatus as defaultRequestDownloadStatus,
+  requestDownloadFile as defaultRequestDownloadFile,
+  requestFetchResource as defaultRequestFetchResource
 } from './websocket-client.js'
 
 export interface BrijioPageActionsConfig {
@@ -67,6 +76,15 @@ export interface BrijioPageActionsConfig {
   requestPerformBatch?: (
     options: PerformBatchRequestOptions
   ) => Promise<BrijioResourceResult<BrijioBatchResult>>
+  requestDownloadStatus?: (
+    options: DownloadStatusRequestOptions
+  ) => Promise<BrijioDownloadStatusResult>
+  requestDownloadFile?: (
+    options: DownloadFileRequestOptions
+  ) => Promise<BrijioDownloadFileResult>
+  requestFetchResource?: (
+    options: FetchResourceRequestOptions
+  ) => Promise<BrijioFetchResourceResult>
 }
 
 export async function clickCurrentPageElement (
@@ -264,5 +282,64 @@ export async function performBatch (
     readAfterActions: options?.readAfterActions,
     pageContextId: options?.pageContextId,
     visibleContextId: options?.visibleContextId
+  })
+}
+
+export async function getDownloadStatus (
+  config: BrijioPageActionsConfig,
+  ids?: Array<number | string>,
+  browserInstanceId?: string
+): Promise<BrijioDownloadStatusResult> {
+  const requestDownloadStatus =
+    config.requestDownloadStatus ?? defaultRequestDownloadStatus
+
+  return await requestDownloadStatus({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    ids
+  })
+}
+
+export async function downloadFile (
+  config: BrijioPageActionsConfig,
+  url: string,
+  filename?: string,
+  conflictAction?: 'uniquify' | 'overwrite',
+  browserInstanceId?: string
+): Promise<BrijioDownloadFileResult> {
+  const requestDownloadFile =
+    config.requestDownloadFile ?? defaultRequestDownloadFile
+
+  return await requestDownloadFile({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    url,
+    filename,
+    conflictAction
+  })
+}
+
+export async function fetchResource (
+  config: BrijioPageActionsConfig,
+  url: string,
+  maxSizeBytes?: number,
+  fetchTimeout?: number,
+  browserInstanceId?: string
+): Promise<BrijioFetchResourceResult> {
+  const requestFetchResource =
+    config.requestFetchResource ?? defaultRequestFetchResource
+
+  return await requestFetchResource({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    url,
+    maxSizeBytes,
+    fetchTimeout
   })
 }

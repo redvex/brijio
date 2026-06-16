@@ -318,6 +318,41 @@ export type BrijioBrowserListResult = BrijioResourceResult<{
   browsers: BrowserPresence[]
 }>
 
+// --- Download & Fetch result types (ADR 0047) ---
+
+export interface DownloadStatusResultData {
+  capability: 'full' | 'not_supported'
+  items: Array<{
+    id: number | string
+    kind: 'download' | 'fetch'
+    filename?: string
+    url: string
+    mime?: string | null
+    size?: number | null
+    state: string
+    error?: string
+  }>
+}
+
+export type BrijioDownloadStatusResult = BrijioResourceResult<DownloadStatusResultData>
+
+export interface DownloadFileResultData {
+  downloadId: number | null
+  status: 'initiated' | 'initiated_fire_and_forget'
+}
+
+export type BrijioDownloadFileResult = BrijioResourceResult<DownloadFileResultData>
+
+export interface FetchResourceResultData {
+  fetchId: string
+  contentType: string | null
+  totalBytes: number
+  sha256: string
+  dataBase64: string
+}
+
+export type BrijioFetchResourceResult = BrijioResourceResult<FetchResourceResultData>
+
 export type PageContextParseResult =
   | BrijioPageContextResult
   | { ok: false, ignored: true }
@@ -383,6 +418,20 @@ export type BrijioBatchResultParseResult =
   | { ok: true, data: BrijioBatchResult }
   | { ok: false, data: BrijioBatchResult }
   | { ok: false, error: { code: BrijioErrorCode, message: string, detail?: StaleContextDetail, browsers?: BrowserPresence[] } }
+  | { ok: false, ignored: true }
+
+// --- Download & Fetch parse result types (ADR 0047) ---
+
+export type DownloadStatusParseResult =
+  | BrijioDownloadStatusResult
+  | { ok: false, ignored: true }
+
+export type DownloadFileParseResult =
+  | BrijioDownloadFileResult
+  | { ok: false, ignored: true }
+
+export type FetchResourceParseResult =
+  | BrijioFetchResourceResult
   | { ok: false, ignored: true }
 
 export function createNavigateToUrlEnvelope (
@@ -599,6 +648,60 @@ export function createPerformBatchEnvelope (
   return {
     type: 'message',
     id: requestId,
+    payload
+  }
+}
+
+export function createDownloadStatusEnvelope (
+  requestId: string,
+  ids?: Array<number | string>,
+  browserInstanceId?: string
+): WebSocketEnvelope {
+  const payload: Record<string, unknown> = { type: 'download_status' }
+  if (ids !== undefined) { payload.ids = ids }
+
+  return {
+    type: 'message',
+    id: requestId,
+    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    payload
+  }
+}
+
+export function createDownloadFileEnvelope (
+  requestId: string,
+  url: string,
+  filename?: string,
+  conflictAction?: 'uniquify' | 'overwrite',
+  browserInstanceId?: string
+): WebSocketEnvelope {
+  const payload: Record<string, unknown> = { type: 'download_file', url }
+  if (filename !== undefined) { payload.filename = filename }
+  if (conflictAction !== undefined) { payload.conflictAction = conflictAction }
+
+  return {
+    type: 'message',
+    id: requestId,
+    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    payload
+  }
+}
+
+export function createFetchResourceEnvelope (
+  requestId: string,
+  url: string,
+  maxSizeBytes?: number,
+  timeout?: number,
+  browserInstanceId?: string
+): WebSocketEnvelope {
+  const payload: Record<string, unknown> = { type: 'fetch_resource', url }
+  if (maxSizeBytes !== undefined) { payload.maxSizeBytes = maxSizeBytes }
+  if (timeout !== undefined) { payload.timeout = timeout }
+
+  return {
+    type: 'message',
+    id: requestId,
+    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
     payload
   }
 }
@@ -885,6 +988,186 @@ export function parseNavigateToUrlEnvelope (
 
   if (value.payload.ok === true) {
     return parseNavigateToUrlSuccessPayload(value.payload)
+  }
+
+  if (value.payload.ok === false) {
+    return parseErrorPayload(value.payload, invalidResponse())
+  }
+
+  return invalidResponse()
+}
+
+export function parseDownloadStatusEnvelope (
+  value: unknown,
+  requestId: string
+): DownloadStatusParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  if (value.payload.type !== 'download_status_response') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok === true) {
+    const capability = value.payload.capability
+    if (capability !== 'full' && capability !== 'not_supported') {
+      return invalidResponse()
+    }
+
+    if (!Array.isArray(value.payload.items)) {
+      return invalidResponse()
+    }
+
+    const items = value.payload.items
+      .map((item: unknown) => {
+        if (!isRecord(item)) return null
+        return {
+          id: (item as Record<string, unknown>).id as number | string,
+          kind: (item as Record<string, unknown>).kind as 'download' | 'fetch',
+          filename: (item as Record<string, unknown>).filename as string | undefined,
+          url: (item as Record<string, unknown>).url as string,
+          mime: (item as Record<string, unknown>).mime as string | null | undefined,
+          size: (item as Record<string, unknown>).size as number | null | undefined,
+          state: (item as Record<string, unknown>).state as string,
+          error: (item as Record<string, unknown>).error as string | undefined
+        }
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null)
+
+    return {
+      ok: true,
+      data: {
+        capability,
+        items
+      }
+    }
+  }
+
+  if (value.payload.ok === false) {
+    return parseErrorPayload(value.payload, invalidResponse())
+  }
+
+  return invalidResponse()
+}
+
+export function parseDownloadFileEnvelope (
+  value: unknown,
+  requestId: string
+): DownloadFileParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  if (value.payload.type !== 'download_file_response') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok === true) {
+    const downloadId = value.payload.downloadId
+    const status = value.payload.status
+    if (status !== 'initiated' && status !== 'initiated_fire_and_forget') {
+      return invalidResponse()
+    }
+
+    return {
+      ok: true,
+      data: {
+        downloadId: downloadId as number | null,
+        status
+      }
+    }
+  }
+
+  if (value.payload.ok === false) {
+    return parseErrorPayload(value.payload, invalidResponse())
+  }
+
+  return invalidResponse()
+}
+
+export function parseFetchResourceEnvelope (
+  value: unknown,
+  requestId: string
+): FetchResourceParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  // fetch_resource uses a streaming protocol — the response may arrive as
+  // multiple messages (start, chunks, complete) or a single error.
+  // For the MCP tool we reassemble everything, so the final message
+  // from the extension is either fetch_resource_complete or fetch_resource_error.
+
+  if (value.payload.type === 'fetch_resource_complete') {
+    const fetchId = value.payload.fetchId
+    const sha256 = value.payload.sha256
+    const totalBytes = value.payload.totalBytes
+
+    if (typeof fetchId !== 'string' || typeof sha256 !== 'string' || typeof totalBytes !== 'number') {
+      return invalidResponse()
+    }
+
+    // The dataBase64 is collected from preceding chunk messages and
+    // passed through the websocket-client's response accumulator.
+    // For now, we expect it on the payload directly (single-chunk fast path).
+    const dataBase64 = typeof value.payload.dataBase64 === 'string'
+      ? value.payload.dataBase64
+      : ''
+
+    return {
+      ok: true,
+      data: {
+        fetchId,
+        contentType: typeof value.payload.contentType === 'string' ? value.payload.contentType : null,
+        totalBytes,
+        sha256,
+        dataBase64
+      }
+    }
+  }
+
+  if (value.payload.type === 'fetch_resource_error') {
+    const errorCode = typeof value.payload.error === 'string'
+      ? value.payload.error
+      : 'unknown'
+    const message = value.payload.message
+
+    if (typeof message !== 'string') {
+      return invalidResponse()
+    }
+
+    return {
+      ok: false,
+      error: {
+        code: 'browser_error' as BrijioErrorCode,
+        message: `fetch_resource_error:${errorCode}: ${message}`
+      }
+    }
   }
 
   if (value.payload.ok === false) {
