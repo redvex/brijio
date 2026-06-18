@@ -1,0 +1,6 @@
+Brijio demo fixture
+
+This local text file is served by the same static demo server as the SPA. It is used as a deterministic download target for browser download tests.
+
+Expected filename: brijio-demo-summary.txt
+Expected content type: text/plain

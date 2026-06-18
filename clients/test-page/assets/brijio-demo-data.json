@@ -1,0 +1,13 @@
+{
+  "fixture": "brijio-demo-data",
+  "purpose": "same-origin fetch and download fixture",
+  "expected": {
+    "ok": true,
+    "source": "clients/test-page/assets/brijio-demo-data.json"
+  },
+  "tools": [
+    "download_file",
+    "download_status",
+    "fetch_resource"
+  ]
+}
