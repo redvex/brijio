@@ -15,10 +15,13 @@ import {
 
 interface MockTabs {
   queryResult: Array<{ id?: number, title?: string, url?: string }>
+  createResult: unknown
   updateResult: { id?: number, title?: string, url?: string }
+  createdTabs: Array<{ url: string }>
   sentMessages: Array<{ tabId: number, message: unknown }>
   executedScripts: Array<{ target: { tabId: number }, files: string[] }>
   query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
+  create: (properties: { url: string }) => Promise<unknown>
   sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   update: (tabId: number, updateProperties: { url: string }) => Promise<{ id?: number, title?: string, url?: string }>
 }
@@ -26,11 +29,17 @@ interface MockTabs {
 function createMockTabs (): MockTabs {
   return {
     queryResult: [],
+    createResult: { id: 1 },
     updateResult: { id: 1 },
+    createdTabs: [],
     sentMessages: [],
     executedScripts: [],
     async query (_queryInfo: { active: boolean, currentWindow: boolean }) {
       return this.queryResult
+    },
+    async create (properties: { url: string }) {
+      this.createdTabs.push(properties)
+      return this.createResult
     },
     async sendMessage (tabId: number, message: unknown) {
       this.sentMessages.push({ tabId, message })
