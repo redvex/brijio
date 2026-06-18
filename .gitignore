@@ -7,3 +7,7 @@ docs/superpowers
 .DS_Store
 clients/extensions/safari/Brijio/Brijio
 clients/extensions/safari/Brijio
+clients/extensions/safari/Brijio-iOS
+clients/extensions/safari/Brijio-macOS
+clients/extensions/safari/dist-ios
+clients/extensions/safari/dist-macos
