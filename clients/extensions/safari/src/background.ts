@@ -9,7 +9,10 @@ import {
   type PageReadResult,
   normalizeBridgeSettings,
   readActiveTabPage as sharedReadActiveTabPage,
-  type ActiveTabDeps
+  type ActiveTabDeps,
+  type ApprovalAdapter,
+  type ApprovalDecision,
+  type ApprovalRequest
 } from '@brijio/shared'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
@@ -94,6 +97,84 @@ const previewMaxBytes = 4096
 const maxContentBytes = 120000
 
 // --- Safari-specific adapter classes ---
+
+export function createSafariApprovalAdapter (browserApi: BrowserApi): ApprovalAdapter {
+  return {
+    async getActiveOrigin () {
+      const tab = await getActiveApprovalTab(browserApi)
+      if (tab?.url === undefined || !isRegularPageUrl(tab.url)) {
+        return undefined
+      }
+
+      return new URL(tab.url).origin
+    },
+    async requestApproval (request: ApprovalRequest) {
+      const tab = await requireActiveApprovalTab(browserApi)
+      await browserApi.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      })
+
+      const response = await browserApi.tabs.sendMessage(tab.id, {
+        type: 'show_brijio_approval',
+        actionUUID: request.actionUUID,
+        actionType: request.actionType,
+        origin: request.origin,
+        timeoutMs: request.timeoutMs
+      })
+
+      return parseApprovalDecision(response)
+    },
+    async hideApproval (actionUUID: string) {
+      const tab = await getActiveApprovalTab(browserApi)
+      if (tab?.id === undefined) {
+        return
+      }
+
+      await browserApi.tabs.sendMessage(tab.id, {
+        type: 'hide_brijio_approval',
+        actionUUID
+      })
+    }
+  }
+}
+
+async function getActiveApprovalTab (
+  browserApi: BrowserApi
+): Promise<{ id?: number, url?: string } | undefined> {
+  const tabs = await browserApi.tabs.query({ active: true, currentWindow: true })
+  return tabs[0]
+}
+
+async function requireActiveApprovalTab (
+  browserApi: BrowserApi
+): Promise<{ id: number, url?: string }> {
+  const tab = await getActiveApprovalTab(browserApi)
+  if (tab?.id === undefined) {
+    throw new Error('No active tab is available for approval.')
+  }
+
+  return { id: tab.id, url: tab.url }
+}
+
+function parseApprovalDecision (response: unknown): ApprovalDecision {
+  if (
+    typeof response === 'object' &&
+    response !== null &&
+    'decision' in response
+  ) {
+    const decision = (response as { decision?: unknown }).decision
+    if (
+      decision === 'approve' ||
+      decision === 'approve_session' ||
+      decision === 'deny'
+    ) {
+      return decision
+    }
+  }
+
+  return 'deny'
+}
 
 export class SafariActionBadge {
   constructor (private readonly browserAction: BrowserApi['browserAction']) {}
