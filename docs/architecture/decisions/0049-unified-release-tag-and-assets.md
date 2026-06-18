@@ -37,24 +37,30 @@ does not have publish rights for the `@brijio/mcp` package or `@brijio` scope.
 
 ## Decision
 
-Use only `vX.Y.Z` tags for release automation. Remove `ext-chrome-v*` and
+Use only `vX.Y.Z` tags for release identity. Remove `ext-chrome-v*` and
 `ext-safari-v*` release triggers.
 
-The main `tag-and-release.yml` workflow will own all release outputs:
+The main `tag-and-release.yml` workflow starts from merges to `main`. It reads
+the root package version, checks whether `vX.Y.Z` already exists, and only
+continues when the tag is missing. The workflow then creates and pushes the
+annotated `vX.Y.Z` tag itself.
+
+The workflow will own all release outputs:
 
 1. Build and test the repository.
 2. Extract the matching `CHANGELOG.md` section.
-3. Build the Chrome extension.
-4. Validate Chrome `dist/manifest.json` version equals the tag version.
-5. Zip Chrome `dist/` and attach it to the `vX.Y.Z` GitHub release.
-6. Build the Safari extension web-extension bundle.
-7. Zip the Safari web-extension `dist/` output and attach it to the same GitHub
+3. Create and push the annotated `vX.Y.Z` tag.
+4. Build the Chrome extension.
+5. Validate Chrome `dist/manifest.json` version equals the release version.
+6. Zip Chrome `dist/` and attach it to the `vX.Y.Z` GitHub release.
+7. Build the Safari extension web-extension bundle.
+8. Zip the Safari web-extension `dist/` output and attach it to the same GitHub
    release.
-8. On a macOS runner, attempt to run `xcrun safari-web-extension-converter`
+9. On a macOS runner, attempt to run `xcrun safari-web-extension-converter`
    against the Safari extension `dist/` output.
-9. If conversion succeeds, zip the generated Safari Xcode project and attach it
-   to the same GitHub release.
-10. Publish npm package and Docker image after release validation.
+10. If conversion succeeds, zip the generated Safari Xcode project and attach it
+    to the same GitHub release.
+11. Publish npm package and Docker image after release validation.
 
 If Safari conversion is unavailable on GitHub-hosted macOS runners or cannot
 parse the current Safari extension manifest, the workflow should still publish
@@ -64,8 +70,12 @@ signing credentials are later added.
 
 ```mermaid
 flowchart TD
-  Tag[vX.Y.Z tag] --> Validate[Build and test]
+  Main[Merge to main] --> Version[Read package version]
+  Version --> Exists{vX.Y.Z exists?}
+  Exists -- Yes --> Skip[Skip release]
+  Exists -- No --> Validate[Build and test]
   Validate --> Notes[Extract changelog section]
+  Validate --> Tag[Create vX.Y.Z tag]
   Validate --> Chrome[Build Chrome extension ZIP]
   Validate --> Safari[Build Safari dist]
   Safari --> SafariZip[Safari web-extension ZIP]
@@ -80,26 +90,24 @@ flowchart TD
 
 ## npm Publish Handling
 
-The workflow should keep `pnpm publish --access public --no-git-checks`, but add
-clear preflight diagnostics before publishing:
+Use npm trusted publishing for `@brijio/mcp`, not a long-lived `NPM_TOKEN`.
+npm trusted publishing requires a GitHub-hosted runner, `permissions:
+id-token: write`, and npm CLI 11.5.1+ / Node 22.14.0+. The publish job uses
+Node 24 and `npm publish --access public --provenance --no-git-checks`.
 
-- `npm whoami` with `NODE_AUTH_TOKEN`.
-- `npm view @brijio/mcp version` to distinguish existing package checks from
-  auth/publish failures.
-- A failure message that tells maintainers to verify the npm automation token
-  has publish access to `@brijio/mcp` and the `@brijio` scope.
-
-The repository cannot fix missing npm permissions in code. The external release
+The workflow should keep `npm view @brijio/mcp@X.Y.Z version` to distinguish
+existing package checks from publish failures. The external npm setup
 requirement is:
 
-- The GitHub `NPM_TOKEN` secret must be an npm automation token owned by an
-  account or organization with publish rights for `@brijio/mcp`.
+- `@brijio/mcp` must configure `.github/workflows/tag-and-release.yml` as its
+  trusted publisher on npm.
 
 ## Consequences
 
 Positive:
 
-- One Git tag creates one complete release page.
+- One merge to `main` creates one complete release page when the package version
+  has not already been tagged.
 - Release notes live in one place and cover server plus extension artifacts.
 - Chrome and Safari assets are easier to find for each version.
 - The extension release workflow no longer duplicates GitHub releases.
@@ -127,6 +135,6 @@ Implementation should verify:
   ZIP.
 - Safari conversion is attempted with `xcrun safari-web-extension-converter`,
   and the converted Xcode project is attached only when conversion succeeds.
+- The workflow skips release work when the version tag already exists.
 - Changelog extraction fails if the release section is absent.
-- npm publish preflight reports token identity and gives an actionable error
-  when publish rights are missing.
+- npm publish uses OIDC trusted publishing without `NPM_TOKEN`.

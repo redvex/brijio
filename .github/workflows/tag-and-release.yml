@@ -2,11 +2,13 @@ name: Tag and Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+  workflow_dispatch:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   release:
@@ -14,9 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.VERSION }}
+      should_release: ${{ steps.release_tag.outputs.SHOULD_RELEASE }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -30,17 +35,35 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Extract package version
+        id: version
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether release tag already exists
+        id: release_tag
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+
+          if git ls-remote --exit-code --tags origin "v${VERSION}" >/dev/null 2>&1; then
+            echo "SHOULD_RELEASE=false" >> "$GITHUB_OUTPUT"
+            echo "Release tag v${VERSION} already exists; skipping release."
+            exit 0
+          fi
+
+          echo "SHOULD_RELEASE=true" >> "$GITHUB_OUTPUT"
+
       - name: Build
+        if: steps.release_tag.outputs.SHOULD_RELEASE == 'true'
         run: pnpm build
 
       - name: Test
+        if: steps.release_tag.outputs.SHOULD_RELEASE == 'true'
         run: pnpm test
 
-      - name: Extract version tag
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
-
       - name: Extract changelog
+        if: steps.release_tag.outputs.SHOULD_RELEASE == 'true'
         id: changelog
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
@@ -69,7 +92,17 @@ jobs:
             echo "EOFMARKER"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Create release tag
+        if: steps.release_tag.outputs.SHOULD_RELEASE == 'true'
+        run: |
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${VERSION}" -m "v${VERSION}"
+          git push origin "v${VERSION}"
+
       - name: Create GitHub Release
+        if: steps.release_tag.outputs.SHOULD_RELEASE == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.VERSION }}
@@ -82,6 +115,7 @@ jobs:
     name: Build Chrome extension asset
     runs-on: ubuntu-latest
     needs: release
+    if: needs.release.outputs.should_release == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -146,6 +180,7 @@ jobs:
     name: Build Safari extension asset
     runs-on: macos-latest
     needs: release
+    if: needs.release.outputs.should_release == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -222,6 +257,7 @@ jobs:
     name: Publish npm package
     runs-on: ubuntu-latest
     needs: release
+    if: needs.release.outputs.should_release == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -230,37 +266,30 @@ jobs:
         uses: pnpm/action-setup@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: pnpm
+          node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify npm token identity
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          if [ -z "${NODE_AUTH_TOKEN:-}" ]; then
-            echo "::error::NPM_TOKEN secret is required to publish @brijio/mcp."
-            exit 1
-          fi
-
-          npm whoami --registry=https://registry.npmjs.org/
-          echo "If publish fails with E404, verify this token has publish access to @brijio/mcp and the @brijio scope."
-
-      - name: Verify package version matches tag
+      - name: Verify package version matches release
         id: package
         working-directory: servers/mcp
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${{ needs.release.outputs.version }}"
           PACKAGE_NAME="$(node -p "require('./package.json').name")"
           PACKAGE_VERSION="$(node -p "require('./package.json').version")"
 
+          if [ "$PACKAGE_NAME" != "@brijio/mcp" ]; then
+            echo "::error::Expected publish package @brijio/mcp, got ${PACKAGE_NAME}."
+            exit 1
+          fi
+
           if [ "$PACKAGE_VERSION" != "$VERSION" ]; then
-            echo "::error::Tag v${VERSION} does not match servers/mcp package version ${PACKAGE_VERSION}."
+            echo "::error::Release v${VERSION} does not match servers/mcp package version ${PACKAGE_VERSION}."
             exit 1
           fi
 
@@ -296,14 +325,15 @@ jobs:
       - name: Publish npm package
         if: steps.npm.outputs.exists != 'true'
         working-directory: servers/mcp
-        run: pnpm publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance --no-git-checks
 
   publish-docker:
     name: Publish Docker image
     runs-on: ubuntu-latest
-    needs: publish-npm
+    needs:
+      - release
+      - publish-npm
+    if: needs.release.outputs.should_release == 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -321,7 +351,7 @@ jobs:
             exit 1
           fi
 
-          VERSION="${GITHUB_REF_NAME#v}"
+          VERSION="${{ needs.release.outputs.version }}"
           IMAGE="${DOCKER_HUB_USER}/mcp"
 
           {
