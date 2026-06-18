@@ -45,14 +45,13 @@ import {
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
   type BatchAction,
+  type BatchActionError,
+  type BatchResultEntry,
   type DownloadInfo,
   type FetchResourceInfo
 } from './protocol.js'
 
-import {
-  type ContentBatchRequest,
-  type BatchResult
-} from './batch-handler.js'
+import { type ContentBatchRequest, type BatchResult } from './batch-handler.js'
 
 export interface ConnectionStatus {
   state: 'disconnected' | 'connecting' | 'reconnecting' | 'connected' | 'error'
@@ -128,7 +127,11 @@ export interface PageReaderAdapter {
 }
 
 export interface PageActionAdapter {
-  click: (target: ClickActionTarget, pageContextId?: number, visibleContextId?: string) => Promise<PageActionResult>
+  click: (
+    target: ClickActionTarget,
+    pageContextId?: number,
+    visibleContextId?: string,
+  ) => Promise<PageActionResult>
   writeText: (
     target: WriteTextActionTarget | WriteTextEditableTarget,
     text: string,
@@ -147,8 +150,17 @@ export interface PageActionAdapter {
     pageContextId?: number,
     visibleContextId?: string,
   ) => Promise<PageActionResult>
-  submitForm: (target: { formId: string, expectedLabel?: string }, pageContextId?: number, visibleContextId?: string) => Promise<PageActionResult>
-  uploadFile: (target: WriteTextActionTarget, file: FileUploadPayload, pageContextId?: number, visibleContextId?: string) => Promise<PageActionResult>
+  submitForm: (
+    target: { formId: string, expectedLabel?: string },
+    pageContextId?: number,
+    visibleContextId?: string,
+  ) => Promise<PageActionResult>
+  uploadFile: (
+    target: WriteTextActionTarget,
+    file: FileUploadPayload,
+    pageContextId?: number,
+    visibleContextId?: string,
+  ) => Promise<PageActionResult>
 }
 
 export interface PageBatchAdapter {
@@ -170,22 +182,86 @@ export interface PageNavigationAdapter {
 }
 
 export type DownloadStatusResult =
-  | { ok: true, data: { capability: 'full' | 'not_supported', items: Array<DownloadInfo | FetchResourceInfo> } }
+  | {
+    ok: true
+    data: {
+      capability: 'full' | 'not_supported'
+      items: Array<DownloadInfo | FetchResourceInfo>
+    }
+  }
   | { ok: false, error: { code: string, message: string } }
 
 export type DownloadFileResult =
-  | { ok: true, data: { downloadId: number | null, status: 'initiated' | 'initiated_fire_and_forget' } }
+  | {
+    ok: true
+    data: {
+      downloadId: number | null
+      status: 'initiated' | 'initiated_fire_and_forget'
+    }
+  }
   | { ok: false, error: { code: string, message: string } }
 
 export type FetchResourceResult =
-  | { ok: true, data: { fetchId: string, contentType: string | null, totalBytes: number | null, dataBase64: string, sha256: string } }
+  | {
+    ok: true
+    data: {
+      fetchId: string
+      contentType: string | null
+      totalBytes: number | null
+      dataBase64: string
+      sha256: string
+    }
+  }
   | { ok: false, error: { code: string, message: string } }
 
 export interface DownloadAdapter {
-  downloadStatus: (ids?: Array<number | string>) => Promise<DownloadStatusResult>
-  downloadFile: (url: string, filename?: string, conflictAction?: 'uniquify' | 'overwrite') => Promise<DownloadFileResult>
-  fetchResource: (url: string, maxSizeBytes?: number, timeout?: number) => Promise<FetchResourceResult>
+  downloadStatus: (
+    ids?: Array<number | string>,
+  ) => Promise<DownloadStatusResult>
+  downloadFile: (
+    url: string,
+    filename?: string,
+    conflictAction?: 'uniquify' | 'overwrite',
+  ) => Promise<DownloadFileResult>
+  fetchResource: (
+    url: string,
+    maxSizeBytes?: number,
+    timeout?: number,
+  ) => Promise<FetchResourceResult>
 }
+
+export type ApprovalActionType =
+  | 'submit_form'
+  | 'fetch_resource'
+  | 'download_file'
+
+export type ApprovalDecision = 'approve' | 'approve_session' | 'deny'
+
+export interface ApprovalRequest {
+  actionUUID: string
+  actionType: ApprovalActionType
+  origin: string
+  timeoutMs: number
+}
+
+export interface ApprovalAdapter {
+  getActiveOrigin: () => Promise<string | undefined>
+  requestApproval: (request: ApprovalRequest) => Promise<ApprovalDecision>
+  hideApproval: (actionUUID: string) => Promise<void>
+}
+
+type ApprovalCheckResult =
+  | { ok: true }
+  | {
+    ok: false
+    error: {
+      code: ActionResultErrorCode
+      message: string
+      actionUUID?: string
+    }
+  }
+
+type ApprovalCheckError = Extract<ApprovalCheckResult, { ok: false }>['error']
 
 export interface BrijioSocket {
   onopen: (() => void) | undefined
@@ -198,6 +274,8 @@ export interface BrijioSocket {
 
 export interface BrijioBackgroundControllerOptions {
   action: ActionAdapter
+  approval?: ApprovalAdapter
+  approvalTimeoutMs?: number
   createWebSocket: (url: string) => BrijioSocket
   download?: DownloadAdapter
   pageActions: PageActionAdapter
@@ -209,7 +287,12 @@ export interface BrijioBackgroundControllerOptions {
   timers: TimersAdapter
 }
 
-type ConnectionState = 'disconnected' | 'connecting' | 'reconnecting' | 'connected' | 'error'
+type ConnectionState =
+  | 'disconnected'
+  | 'connecting'
+  | 'reconnecting'
+  | 'connected'
+  | 'error'
 
 const INITIAL_RECONNECT_DELAY_MS = 1000
 const MAX_RECONNECT_DELAY_MS = 30000
@@ -220,17 +303,28 @@ function describeCloseEvent (code: number, reason: string): string {
     return `Connection closed (${code}): ${reason}`
   }
   switch (code) {
-    case 1000: return 'Connection closed normally'
-    case 1001: return 'Endpoint going away'
-    case 1005: return 'Connection closed without status code'
-    case 1006: return 'Connection lost (abnormal closure)'
-    case 1007: return 'Invalid frame payload data'
-    case 1008: return 'Policy violation'
-    case 1009: return 'Message too large'
-    case 1010: return 'Extension negotiation failed'
-    case 1011: return 'Internal server error'
-    case 1015: return 'TLS handshake failure'
-    default: return `Connection closed (${code})`
+    case 1000:
+      return 'Connection closed normally'
+    case 1001:
+      return 'Endpoint going away'
+    case 1005:
+      return 'Connection closed without status code'
+    case 1006:
+      return 'Connection lost (abnormal closure)'
+    case 1007:
+      return 'Invalid frame payload data'
+    case 1008:
+      return 'Policy violation'
+    case 1009:
+      return 'Message too large'
+    case 1010:
+      return 'Extension negotiation failed'
+    case 1011:
+      return 'Internal server error'
+    case 1015:
+      return 'TLS handshake failure'
+    default:
+      return `Connection closed (${code})`
   }
 }
 
@@ -244,10 +338,9 @@ export class BrijioBackgroundController {
   private lastErrorMessage: string | undefined
   private manualDisconnect: boolean = false
   private pendingRequestCount: number = 0
+  private readonly approvalSessionGrants = new Set<string>()
 
-  constructor (
-    private readonly options: BrijioBackgroundControllerOptions
-  ) {}
+  constructor (private readonly options: BrijioBackgroundControllerOptions) {}
 
   async handleActionClicked (): Promise<void> {
     if (this.socket !== undefined) {
@@ -300,7 +393,10 @@ export class BrijioBackgroundController {
       state: this.connectionState,
       pendingRequests: this.pendingRequestCount
     }
-    if (this.connectionState === 'error' && this.lastErrorMessage !== undefined) {
+    if (
+      this.connectionState === 'error' &&
+      this.lastErrorMessage !== undefined
+    ) {
       base.lastError = this.lastErrorMessage
     }
     if (this.connectionState === 'reconnecting') {
@@ -354,7 +450,8 @@ export class BrijioBackgroundController {
         void this.setStoppedState()
         return
       }
-      const hadConnected = this.connectionState === 'connected' || this.reconnectAttempt > 0
+      const hadConnected =
+        this.connectionState === 'connected' || this.reconnectAttempt > 0
       this.lastErrorMessage = hadConnected
         ? 'Connection lost unexpectedly'
         : 'Failed to connect to WebSocket server'
@@ -370,6 +467,7 @@ export class BrijioBackgroundController {
     const socket = this.socket
     this.socket = undefined
     this.settings = undefined
+    this.approvalSessionGrants.clear()
 
     this.stopKeepalive()
     socket?.close()
@@ -378,7 +476,8 @@ export class BrijioBackgroundController {
 
   private async scheduleReconnect (): Promise<void> {
     const delay = Math.min(
-      INITIAL_RECONNECT_DELAY_MS * Math.pow(RECONNECT_BACKOFF_MULTIPLIER, this.reconnectAttempt),
+      INITIAL_RECONNECT_DELAY_MS *
+        Math.pow(RECONNECT_BACKOFF_MULTIPLIER, this.reconnectAttempt),
       MAX_RECONNECT_DELAY_MS
     )
     const jitter = delay * 0.25 * (Math.random() * 2 - 1)
@@ -499,7 +598,14 @@ export class BrijioBackgroundController {
     if (isDownloadFileEnvelope(message)) {
       this.pendingRequestCount++
       try {
-        await this.handleDownloadFileRequest(message.id, message.payload.url, message.payload.filename, message.payload.conflictAction)
+        await this.handleDownloadFileRequest(
+          message.id,
+          message.payload.url,
+          message.payload.filename,
+          message.payload.conflictAction,
+          message.payload.actionUUID,
+          message.payload.approvalRequest
+        )
       } finally {
         this.pendingRequestCount--
       }
@@ -509,7 +615,14 @@ export class BrijioBackgroundController {
     if (isFetchResourceEnvelope(message)) {
       this.pendingRequestCount++
       try {
-        await this.handleFetchResourceRequest(message.id, message.payload.url, message.payload.maxSizeBytes, message.payload.timeout)
+        await this.handleFetchResourceRequest(
+          message.id,
+          message.payload.url,
+          message.payload.maxSizeBytes,
+          message.payload.timeout,
+          message.payload.actionUUID,
+          message.payload.approvalRequest
+        )
       } finally {
         this.pendingRequestCount--
       }
@@ -578,42 +691,30 @@ export class BrijioBackgroundController {
 
   private async handlePerformActionRequest (
     requestId: string | undefined,
-    action:
-    | {
-      type: 'click'
-      target: ClickActionTarget
-    }
-    | {
-      type: 'write_text'
-      target: WriteTextActionTarget | WriteTextEditableTarget
-      text: string
-    }
-    | {
-      type: 'set_checked'
-      target: WriteTextActionTarget
-      checked: boolean
-    }
-    | {
-      type: 'select_options'
-      target: WriteTextActionTarget
-      values: string[]
-    }
-    | {
-      type: 'submit_form'
-      target: {
-        formId: string
-        expectedLabel?: string
-      }
-    }
-    | {
-      type: 'upload_file'
-      target: WriteTextActionTarget
-      file: FileUploadPayload
-    },
+    action: BatchAction,
     pageContextId?: number,
     visibleContextId?: string
   ): Promise<void> {
-    const result = await this.performPageAction(action, pageContextId, visibleContextId)
+    const approval = await this.ensureApprovedAction(action)
+    if (!approval.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createActionResultErrorResponse(
+            requestId,
+            approval.error.code,
+            approval.error.message,
+            approval.error.actionUUID
+          )
+        )
+      )
+      return
+    }
+
+    const result = await this.performPageAction(
+      action,
+      pageContextId,
+      visibleContextId
+    )
 
     if (!result.ok) {
       this.socket?.send(
@@ -635,30 +736,69 @@ export class BrijioBackgroundController {
 
   private async handlePerformBatchRequest (
     requestId: string | undefined,
-    payload: { actions: BatchAction[], continueOnError?: boolean, readAfterActions?: boolean, pageContextId?: number, visibleContextId?: string }
+    payload: {
+      actions: BatchAction[]
+      continueOnError?: boolean
+      readAfterActions?: boolean
+      pageContextId?: number
+      visibleContextId?: string
+    }
   ): Promise<void> {
     const batchMessage: ContentBatchRequest = {
       type: 'perform_batch',
       actions: payload.actions,
-      ...(payload.pageContextId !== undefined ? { pageContextId: payload.pageContextId } : {}),
-      ...(payload.visibleContextId !== undefined ? { visibleContextId: payload.visibleContextId } : {}),
-      ...(payload.continueOnError !== undefined ? { continueOnError: payload.continueOnError } : {}),
-      ...(payload.readAfterActions !== undefined ? { readAfterActions: payload.readAfterActions } : {})
+      ...(payload.pageContextId !== undefined
+        ? { pageContextId: payload.pageContextId }
+        : {}),
+      ...(payload.visibleContextId !== undefined
+        ? { visibleContextId: payload.visibleContextId }
+        : {}),
+      ...(payload.continueOnError !== undefined
+        ? { continueOnError: payload.continueOnError }
+        : {}),
+      ...(payload.readAfterActions !== undefined
+        ? { readAfterActions: payload.readAfterActions }
+        : {})
+    }
+
+    if (hasApprovalGatedAction(payload.actions)) {
+      const result = await this.performApprovalAwareBatch(batchMessage)
+      this.socket?.send(
+        JSON.stringify(
+          createBatchResultResponse(
+            requestId,
+            result.results,
+            result.aborted,
+            result.ok
+          )
+        )
+      )
+      return
     }
 
     let result: BatchResult
     try {
       result = await this.options.pageBatch.performBatch(batchMessage)
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Unexpected batch error.'
+      const message =
+        error instanceof Error ? error.message : 'Unexpected batch error.'
       this.socket?.send(
-        JSON.stringify(createBatchResultErrorResponse(requestId, 'batch_failed', message))
+        JSON.stringify(
+          createBatchResultErrorResponse(requestId, 'batch_failed', message)
+        )
       )
       return
     }
 
     this.socket?.send(
-      JSON.stringify(createBatchResultResponse(requestId, result.results, result.aborted, result.ok))
+      JSON.stringify(
+        createBatchResultResponse(
+          requestId,
+          result.results,
+          result.aborted,
+          result.ok
+        )
+      )
     )
   }
 
@@ -707,105 +847,397 @@ export class BrijioBackgroundController {
     ids?: Array<number | string>
   ): Promise<void> {
     if (this.options.download === undefined) {
-      this.socket?.send(JSON.stringify(createDownloadStatusErrorResponse(requestId, 'not_supported', 'Download status is not supported by this browser.')))
+      this.socket?.send(
+        JSON.stringify(
+          createDownloadStatusErrorResponse(
+            requestId,
+            'not_supported',
+            'Download status is not supported by this browser.'
+          )
+        )
+      )
       return
     }
 
     const result = await this.options.download.downloadStatus(ids)
     if (!result.ok) {
-      this.socket?.send(JSON.stringify(createDownloadStatusErrorResponse(requestId, result.error.code, result.error.message)))
+      this.socket?.send(
+        JSON.stringify(
+          createDownloadStatusErrorResponse(
+            requestId,
+            result.error.code,
+            result.error.message
+          )
+        )
+      )
       return
     }
 
-    this.socket?.send(JSON.stringify(createDownloadStatusResponse(requestId, result.data.capability, result.data.items)))
+    this.socket?.send(
+      JSON.stringify(
+        createDownloadStatusResponse(
+          requestId,
+          result.data.capability,
+          result.data.items
+        )
+      )
+    )
   }
 
   private async handleDownloadFileRequest (
     requestId: string | undefined,
     url: string,
     filename?: string,
-    conflictAction?: 'uniquify' | 'overwrite'
+    conflictAction?: 'uniquify' | 'overwrite',
+    actionUUID?: string,
+    approvalRequest?: boolean
   ): Promise<void> {
     if (this.options.download === undefined) {
-      this.socket?.send(JSON.stringify(createDownloadFileErrorResponse(requestId, 'not_supported', 'File download is not supported by this browser.')))
+      this.socket?.send(
+        JSON.stringify(
+          createDownloadFileErrorResponse(
+            requestId,
+            'not_supported',
+            'File download is not supported by this browser.'
+          )
+        )
+      )
       return
     }
 
-    const result = await this.options.download.downloadFile(url, filename, conflictAction)
+    const approval = await this.ensureApprovedAction({
+      type: 'download_file',
+      actionUUID,
+      approvalRequest
+    })
+    if (!approval.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createDownloadFileErrorResponse(
+            requestId,
+            approval.error.code,
+            approval.error.message
+          )
+        )
+      )
+      return
+    }
+
+    const result = await this.options.download.downloadFile(
+      url,
+      filename,
+      conflictAction
+    )
     if (!result.ok) {
-      this.socket?.send(JSON.stringify(createDownloadFileErrorResponse(requestId, result.error.code, result.error.message)))
+      this.socket?.send(
+        JSON.stringify(
+          createDownloadFileErrorResponse(
+            requestId,
+            result.error.code,
+            result.error.message
+          )
+        )
+      )
       return
     }
 
-    this.socket?.send(JSON.stringify(createDownloadFileResponse(requestId, result.data.downloadId, result.data.status)))
+    this.socket?.send(
+      JSON.stringify(
+        createDownloadFileResponse(
+          requestId,
+          result.data.downloadId,
+          result.data.status
+        )
+      )
+    )
   }
 
   private async handleFetchResourceRequest (
     requestId: string | undefined,
     url: string,
     maxSizeBytes?: number,
-    timeout?: number
+    timeout?: number,
+    actionUUID?: string,
+    approvalRequest?: boolean
   ): Promise<void> {
     if (this.options.download === undefined) {
-      this.socket?.send(JSON.stringify(createFetchResourceErrorResponse(requestId, 'not_supported', 'Fetch resource is not supported by this browser.')))
+      this.socket?.send(
+        JSON.stringify(
+          createFetchResourceErrorResponse(
+            requestId,
+            'not_supported',
+            'Fetch resource is not supported by this browser.'
+          )
+        )
+      )
       return
     }
 
-    const result = await this.options.download.fetchResource(url, maxSizeBytes, timeout)
+    const approval = await this.ensureApprovedAction({
+      type: 'fetch_resource',
+      actionUUID,
+      approvalRequest
+    })
+    if (!approval.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createFetchResourceErrorResponse(
+            requestId,
+            approval.error.code,
+            approval.error.message
+          )
+        )
+      )
+      return
+    }
+
+    const result = await this.options.download.fetchResource(
+      url,
+      maxSizeBytes,
+      timeout
+    )
     if (!result.ok) {
-      this.socket?.send(JSON.stringify(createFetchResourceErrorResponse(requestId, result.error.code, result.error.message)))
+      this.socket?.send(
+        JSON.stringify(
+          createFetchResourceErrorResponse(
+            requestId,
+            result.error.code,
+            result.error.message
+          )
+        )
+      )
       return
     }
 
     // Single-message fast path; start/chunk streaming can be added later.
-    this.socket?.send(JSON.stringify(createFetchResourceCompleteResponse(
-      requestId,
-      result.data.fetchId,
-      result.data.sha256,
-      result.data.totalBytes ?? 0,
-      result.data.dataBase64,
-      result.data.contentType
-    )))
+    this.socket?.send(
+      JSON.stringify(
+        createFetchResourceCompleteResponse(
+          requestId,
+          result.data.fetchId,
+          result.data.sha256,
+          result.data.totalBytes ?? 0,
+          result.data.dataBase64,
+          result.data.contentType
+        )
+      )
+    )
+  }
+
+  private async performApprovalAwareBatch (
+    request: ContentBatchRequest
+  ): Promise<BatchResult> {
+    const results: BatchResultEntry[] = []
+    let aborted = false
+    const continueOnError = request.continueOnError === true
+
+    for (let index = 0; index < request.actions.length; index++) {
+      if (aborted) {
+        results.push(createSkippedBatchEntry())
+        continue
+      }
+
+      const action = request.actions[index]
+      const approval = await this.ensureApprovedAction(action)
+      if (!approval.ok) {
+        const isTimeout = approval.error.code === 'approval_timeout'
+        results.push({
+          ok: false,
+          error: createBatchErrorFromApproval(approval.error, isTimeout)
+        })
+
+        if (isTimeout) {
+          aborted = true
+          for (let remaining = index + 1; remaining < request.actions.length; remaining++) {
+            results.push(createSkippedAfterApprovalTimeoutEntry(request.actions[remaining]))
+          }
+          break
+        }
+
+        continue
+      }
+
+      const result = await this.performPageAction(
+        action,
+        request.pageContextId,
+        request.visibleContextId
+      )
+
+      if (result.ok) {
+        results.push({ ok: true, data: result.data })
+        continue
+      }
+
+      results.push({
+        ok: false,
+        error: {
+          code: result.error.code,
+          message: result.error.message,
+          aborted: false
+        }
+      })
+
+      if (!continueOnError) {
+        aborted = true
+      }
+    }
+
+    if (request.readAfterActions === true) {
+      const readResult = await this.options.pageReader.getPageContext()
+      if (readResult.ok) {
+        results.push({ ok: true, data: readResult.data })
+      } else {
+        results.push({
+          ok: false,
+          error: {
+            code: readResult.error.code as BatchActionError['code'],
+            message: readResult.error.message,
+            aborted: false
+          }
+        })
+      }
+    }
+
+    return {
+      ok: results.every((entry) => entry.ok),
+      results,
+      aborted
+    }
+  }
+
+  private async ensureApprovedAction (
+    action: { type: string, actionUUID?: string, approvalRequest?: boolean }
+  ): Promise<ApprovalCheckResult> {
+    const actionType = getApprovalActionType(action.type)
+    if (actionType === undefined || action.approvalRequest !== true) {
+      return { ok: true }
+    }
+
+    const actionUUID = action.actionUUID
+    if (actionUUID === undefined || actionUUID.trim() === '') {
+      return {
+        ok: false,
+        error: {
+          code: 'approval_unavailable',
+          message: 'Approval request is missing an actionUUID.'
+        }
+      }
+    }
+
+    const approval = this.options.approval
+    if (approval === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'approval_unavailable',
+          message: 'Action approval is not available.',
+          actionUUID
+        }
+      }
+    }
+
+    const origin = await approval.getActiveOrigin()
+    if (origin === undefined || origin.trim() === '') {
+      return {
+        ok: false,
+        error: {
+          code: 'approval_unavailable',
+          message: 'Active tab origin is not available for approval.',
+          actionUUID
+        }
+      }
+    }
+
+    const grantKey = createApprovalGrantKey(origin, actionType)
+    if (this.approvalSessionGrants.has(grantKey)) {
+      return { ok: true }
+    }
+
+    const timeoutMs = this.options.approvalTimeoutMs ?? 55000
+    const decision = await this.waitForApprovalDecision({
+      actionUUID,
+      actionType,
+      origin,
+      timeoutMs
+    })
+    if (decision === 'timeout') {
+      return {
+        ok: false,
+        error: {
+          code: 'approval_timeout',
+          message: 'Timed out waiting for user approval.',
+          actionUUID
+        }
+      }
+    }
+
+    if (decision === 'deny') {
+      return {
+        ok: false,
+        error: {
+          code: 'approval_denied',
+          message: `User denied approval for ${actionType}.`,
+          actionUUID
+        }
+      }
+    }
+
+    const activeOrigin = await approval.getActiveOrigin()
+    if (activeOrigin !== origin) {
+      return {
+        ok: false,
+        error: {
+          code: 'approval_origin_changed',
+          message: 'Active tab origin changed before approved action could run.',
+          actionUUID
+        }
+      }
+    }
+
+    if (decision === 'approve_session') {
+      this.approvalSessionGrants.add(grantKey)
+    }
+
+    return { ok: true }
+  }
+
+  private async waitForApprovalDecision (
+    request: ApprovalRequest
+  ): Promise<ApprovalDecision | 'timeout'> {
+    const approval = this.options.approval
+    if (approval === undefined) {
+      return 'timeout'
+    }
+
+    let timeoutId: number | undefined
+    const timeout = new Promise<'timeout'>((resolve) => {
+      timeoutId = this.options.timers.setTimeout(() => {
+        void approval.hideApproval(request.actionUUID)
+        resolve('timeout')
+      }, request.timeoutMs)
+    })
+
+    const decision = approval.requestApproval(request)
+    const result = await Promise.race([decision, timeout])
+
+    if (timeoutId !== undefined) {
+      this.options.timers.clearTimeout(timeoutId)
+    }
+
+    return result
   }
 
   private async performPageAction (
-    action:
-    | {
-      type: 'click'
-      target: ClickActionTarget
-    }
-    | {
-      type: 'write_text'
-      target: WriteTextActionTarget | WriteTextEditableTarget
-      text: string
-    }
-    | {
-      type: 'set_checked'
-      target: WriteTextActionTarget
-      checked: boolean
-    }
-    | {
-      type: 'select_options'
-      target: WriteTextActionTarget
-      values: string[]
-    }
-    | {
-      type: 'submit_form'
-      target: {
-        formId: string
-        expectedLabel?: string
-      }
-    }
-    | {
-      type: 'upload_file'
-      target: WriteTextActionTarget
-      file: FileUploadPayload
-    },
+    action: BatchAction,
     pageContextId?: number,
     visibleContextId?: string
   ): Promise<PageActionResult> {
     if (action.type === 'click') {
-      return await this.options.pageActions.click(action.target, pageContextId, visibleContextId)
+      return await this.options.pageActions.click(
+        action.target,
+        pageContextId,
+        visibleContextId
+      )
     }
 
     if (action.type === 'write_text') {
@@ -844,7 +1276,11 @@ export class BrijioBackgroundController {
       )
     }
 
-    return await this.options.pageActions.submitForm(action.target, pageContextId, visibleContextId)
+    return await this.options.pageActions.submitForm(
+      action.target,
+      pageContextId,
+      visibleContextId
+    )
   }
 
   private async handleInvalidPerformActionRequest (
@@ -880,7 +1316,8 @@ export class BrijioBackgroundController {
                 : isRecord(action) && action.type === 'upload_file'
                   ? {
                       code: 'invalid_action_target' as const,
-                      message: 'Upload targets must identify a file input by ID.'
+                      message:
+                        'Upload targets must identify a file input by ID.'
                     }
                   : {
                       code: 'unsupported_action' as const,
@@ -919,7 +1356,9 @@ export class BrijioBackgroundController {
     await this.options.action.setBadgeText('RCY')
     await this.options.action.setBadgeColor('#f59e0b')
     await this.options.action.setBadgeTextColor('#ffffff')
-    await this.options.action.setTitle(`Brijio reconnecting (attempt ${this.reconnectAttempt})`)
+    await this.options.action.setTitle(
+      `Brijio reconnecting (attempt ${this.reconnectAttempt})`
+    )
   }
 
   private async setStoppedState (): Promise<void> {
@@ -932,7 +1371,9 @@ export class BrijioBackgroundController {
     await this.options.action.setTitle('Brijio stopped')
   }
 
-  private async setErrorState (message: string = 'Brijio connection error'): Promise<void> {
+  private async setErrorState (
+    message: string = 'Brijio connection error'
+  ): Promise<void> {
     this.connectionState = 'error'
     this.lastErrorMessage = message
     await this.options.action.setBadgeText('ERR')
@@ -986,7 +1427,13 @@ export class BrijioBackgroundController {
             'select_options',
             'submit_form',
             'navigate',
-            ...(this.options.download !== undefined ? ['download_status', 'download_file', 'fetch_resource'] as const : [])
+            ...(this.options.download !== undefined
+              ? ([
+                  'download_status',
+                  'download_file',
+                  'fetch_resource'
+                ] as const)
+              : [])
           ]
         })
       )
@@ -1006,6 +1453,70 @@ function isUsableSettings (
     settings.profileName.trim() !== '' &&
     settings.label.trim() !== ''
   )
+}
+
+function getApprovalActionType (type: string): ApprovalActionType | undefined {
+  if (
+    type === 'submit_form' ||
+    type === 'fetch_resource' ||
+    type === 'download_file'
+  ) {
+    return type
+  }
+
+  return undefined
+}
+
+function hasApprovalGatedAction (actions: BatchAction[]): boolean {
+  return actions.some(
+    (action) =>
+      action.approvalRequest === true &&
+      getApprovalActionType(action.type) !== undefined
+  )
+}
+
+function createApprovalGrantKey (
+  origin: string,
+  actionType: ApprovalActionType
+): string {
+  return `${origin}\u0000${actionType}`
+}
+
+function createBatchErrorFromApproval (
+  error: ApprovalCheckError,
+  aborted: boolean
+): BatchActionError {
+  return {
+    code: error.code,
+    message: error.message,
+    aborted,
+    ...(error.actionUUID !== undefined ? { actionUUID: error.actionUUID } : {})
+  }
+}
+
+function createSkippedAfterApprovalTimeoutEntry (
+  action: BatchAction
+): BatchResultEntry {
+  return {
+    ok: false,
+    error: {
+      code: 'approval_timeout',
+      message: 'Skipped because approval timed out before this action.',
+      aborted: true,
+      ...(action.actionUUID !== undefined ? { actionUUID: action.actionUUID } : {})
+    }
+  }
+}
+
+function createSkippedBatchEntry (): BatchResultEntry {
+  return {
+    ok: false,
+    error: {
+      code: 'page_navigated',
+      message: 'Action skipped: previous action caused page navigation or abort.',
+      aborted: true
+    }
+  }
 }
 
 function isPerformActionRequestEnvelope (
