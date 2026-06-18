@@ -44,6 +44,7 @@ type IncomingMessage =
 
 interface BrowserRuntimeApi {
   runtime: {
+    sendMessage: (message: { type: 'brijio_page_active' }) => Promise<unknown>
     onMessage: {
       addListener: (
         callback: (
@@ -180,8 +181,46 @@ function isHideBrijioApprovalMessage (
   return message.type === 'hide_brijio_approval'
 }
 
+function notifyPageActive (browserApi: BrowserRuntimeApi): void {
+  void browserApi.runtime.sendMessage({ type: 'brijio_page_active' }).catch(() => {})
+}
+
+export function registerPageActivityListeners (browserApi: BrowserRuntimeApi): void {
+  const globalRef = globalThis as unknown as Record<string, unknown>
+  const previousCleanup = globalRef.__brijioPageActivityCleanup as (() => void) | undefined
+  previousCleanup?.()
+
+  const notify = (): void => {
+    notifyPageActive(browserApi)
+  }
+  const notifyWhenVisible = (): void => {
+    if (!globalThis.document.hidden) {
+      notify()
+    }
+  }
+
+  if (typeof globalThis.addEventListener === 'function') {
+    globalThis.addEventListener('pageshow', notify)
+    globalThis.addEventListener('focus', notify)
+  }
+  globalThis.document.addEventListener('visibilitychange', notifyWhenVisible)
+
+  globalRef.__brijioPageActivityCleanup = () => {
+    if (typeof globalThis.removeEventListener === 'function') {
+      globalThis.removeEventListener('pageshow', notify)
+      globalThis.removeEventListener('focus', notify)
+    }
+    globalThis.document.removeEventListener('visibilitychange', notifyWhenVisible)
+  }
+
+  if (!globalThis.document.hidden) {
+    notify()
+  }
+}
+
 if (typeof browser !== 'undefined') {
   registerPageNavigationListener()
+  registerPageActivityListeners(browser)
 
   type OnMessageCallback = (
     message: IncomingMessage,
