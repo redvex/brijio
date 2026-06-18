@@ -646,13 +646,24 @@ void describe('Brijio WebSocket client', () => {
         }
       }
     )
-    assert.equal(receivedPayload?.type, 'perform_action')
-    assert.equal(receivedPayload?.action.type, 'submit_form')
-    assert.deepEqual(receivedPayload?.action.target, {
+    const payload = receivedPayload as {
+      type?: string
+      action?: {
+        type?: string
+        target?: unknown
+        approvalRequest?: boolean
+        actionUUID?: string
+      }
+    }
+    assert.equal(payload.type, 'perform_action')
+    assert.equal(payload.action?.type, 'submit_form')
+    assert.deepEqual(payload.action?.target, {
       formId: 'form-1'
     })
-    assert.equal(receivedPayload?.action.approvalRequest, true)
-    assert.match(receivedPayload?.action.actionUUID, /^action-/)
+    assert.equal(payload.action?.approvalRequest, true)
+    const actionUUID = payload.action?.actionUUID
+    assert.ok(typeof actionUUID === 'string')
+    assert.match(actionUUID, /^action-/)
   })
 
   void it('times out when no matching response arrives', async () => {
