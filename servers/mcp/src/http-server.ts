@@ -24,6 +24,8 @@ export interface BrijioMcpHttpServerOptions {
   path: string
   authToken: string
   allowedOrigins: string[]
+  httpTimeoutMs?: number
+  approvalTimeoutMs?: number
   pageContextConfig?: BrijioPageContextConfig
 }
 
@@ -57,6 +59,18 @@ export function getMcpHttpServerOptionsFromEnv (
   const host = env.MCP_HTTP_HOST ?? '0.0.0.0'
   const port = parsePort(env.MCP_HTTP_PORT)
   const authToken = env.MCP_HTTP_AUTH_TOKEN ?? ''
+  const httpTimeoutMs = parsePositiveInteger(
+    env.BRIJIO_MCP_HTTP_TIMEOUT_MS,
+    60000
+  )
+  const approvalTimeoutBufferMs = parsePositiveInteger(
+    env.BRIJIO_APPROVAL_TIMEOUT_BUFFER_MS,
+    5000
+  )
+  const approvalTimeoutMs = Math.max(
+    1000,
+    httpTimeoutMs - approvalTimeoutBufferMs
+  )
 
   if (authToken.trim() === '') {
     throw new Error('MCP_HTTP_AUTH_TOKEN is required for MCP HTTP transport.')
@@ -68,6 +82,8 @@ export function getMcpHttpServerOptionsFromEnv (
     path: normalizePath(env.MCP_HTTP_PATH ?? '/mcp'),
     authToken,
     allowedOrigins: parseList(env.MCP_HTTP_ALLOWED_ORIGINS, []),
+    httpTimeoutMs,
+    approvalTimeoutMs,
     pageContextConfig: getPageContextConfigFromEnv(env)
   }
 }
@@ -81,6 +97,9 @@ export async function startBrijioMcpHttpServer (
   const server = createServer((request, response) => {
     void handleMcpHttpRequest(request, response, options, startTime, wsUrl)
   })
+  const httpTimeoutMs = options.httpTimeoutMs ?? 60000
+  server.timeout = httpTimeoutMs
+  server.requestTimeout = httpTimeoutMs
 
   await new Promise<void>((resolve, reject) => {
     server.once('listening', resolve)
@@ -174,7 +193,14 @@ async function handleMcpHttpRequest (
     return
   }
 
-  const mcpServer = await createBrijioMcpServer(options.pageContextConfig)
+  const mcpServer = await createBrijioMcpServer(
+    options.pageContextConfig === undefined
+      ? undefined
+      : {
+          ...options.pageContextConfig,
+          approvalTimeoutMs: options.approvalTimeoutMs
+        }
+  )
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true
@@ -186,7 +212,9 @@ async function handleMcpHttpRequest (
     await mcpServer.connect(transport)
     await transport.handleRequest(request, response)
   } catch (error) {
-    logger.error('mcp_request_error', { message: error instanceof Error ? error.message : String(error) })
+    logger.error('mcp_request_error', {
+      message: error instanceof Error ? error.message : String(error)
+    })
     if (!response.headersSent) {
       writeJsonError(response, 500, {
         ok: false,
@@ -215,6 +243,22 @@ function parsePort (value: string | undefined): number {
 
   if (!Number.isSafeInteger(parsed) || parsed < 0 || parsed > 65535) {
     return 8788
+  }
+
+  return parsed
+}
+
+function parsePositiveInteger (
+  value: string | undefined,
+  fallback: number
+): number {
+  if (value === undefined) {
+    return fallback
+  }
+
+  const parsed = Number.parseInt(value, 10)
+  if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+    return fallback
   }
 
   return parsed
@@ -298,10 +342,7 @@ function matchesWildcardHost (hostName: string, allowedHost: string): boolean {
   return hostName.toLowerCase().endsWith(suffix)
 }
 
-function isAuthorized (
-  request: IncomingMessage,
-  authToken: string
-): boolean {
+function isAuthorized (request: IncomingMessage, authToken: string): boolean {
   return request.headers.authorization === `Bearer ${authToken}`
 }
 

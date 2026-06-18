@@ -36,6 +36,7 @@ import {
   type EditableTarget,
   type FileUploadPayload,
   type FillInputTarget,
+  type ApprovalRequestOptions,
   authRequiredResponse,
   invalidResponse,
   parseActionResultEnvelope,
@@ -59,6 +60,7 @@ export interface PageContextRequestOptions {
   websocketUrl: string
   pairingToken: string
   timeoutMs: number
+  approvalTimeoutMs?: number
   browserInstanceId?: string
   createRequestId?: () => string
 }
@@ -168,7 +170,12 @@ export async function requestClickElement (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createClickElementEnvelope(requestId, options.target, options.pageContextId, options.visibleContextId),
+    requestEnvelope: createClickElementEnvelope(
+      requestId,
+      options.target,
+      options.pageContextId,
+      options.visibleContextId
+    ),
     parseEnvelope: (value) => parseClickActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
@@ -188,7 +195,8 @@ export async function requestFillInput (
       requestId,
       options.target,
       options.text,
-      options.pageContextId, options.visibleContextId
+      options.pageContextId,
+      options.visibleContextId
     ),
     parseEnvelope: (value) => parseFillActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
@@ -209,9 +217,11 @@ export async function requestWriteEditable (
       requestId,
       options.target,
       options.text,
-      options.pageContextId, options.visibleContextId
+      options.pageContextId,
+      options.visibleContextId
     ),
-    parseEnvelope: (value) => parseWriteTextActionResultEnvelope(value, requestId),
+    parseEnvelope: (value) =>
+      parseWriteTextActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
 }
@@ -230,9 +240,11 @@ export async function requestSetChecked (
       requestId,
       options.target,
       options.checked,
-      options.pageContextId, options.visibleContextId
+      options.pageContextId,
+      options.visibleContextId
     ),
-    parseEnvelope: (value) => parseSetCheckedActionResultEnvelope(value, requestId),
+    parseEnvelope: (value) =>
+      parseSetCheckedActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
 }
@@ -251,9 +263,11 @@ export async function requestSelectOptions (
       requestId,
       options.target,
       options.values,
-      options.pageContextId, options.visibleContextId
+      options.pageContextId,
+      options.visibleContextId
     ),
-    parseEnvelope: (value) => parseSelectOptionsActionResultEnvelope(value, requestId),
+    parseEnvelope: (value) =>
+      parseSelectOptionsActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
 }
@@ -262,14 +276,22 @@ export async function requestSubmitForm (
   options: SubmitFormRequestOptions
 ): Promise<BrijioSubmitFormResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
+  const approval = createApprovalRequestOptions()
 
   return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
-    timeoutMs: options.timeoutMs,
+    timeoutMs: options.approvalTimeoutMs ?? options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createSubmitFormEnvelope(requestId, options.target, options.pageContextId, options.visibleContextId),
-    parseEnvelope: (value) => parseSubmitFormActionResultEnvelope(value, requestId),
+    requestEnvelope: createSubmitFormEnvelope(
+      requestId,
+      options.target,
+      options.pageContextId,
+      options.visibleContextId,
+      approval
+    ),
+    parseEnvelope: (value) =>
+      parseSubmitFormActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
 }
@@ -288,9 +310,11 @@ export async function requestUploadFile (
       requestId,
       options.target,
       options.file,
-      options.pageContextId, options.visibleContextId
+      options.pageContextId,
+      options.visibleContextId
     ),
-    parseEnvelope: (value) => parseUploadFileActionResultEnvelope(value, requestId),
+    parseEnvelope: (value) =>
+      parseUploadFileActionResultEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser action result.'
   })
 }
@@ -339,13 +363,19 @@ export async function requestPerformBatch (
   options: PerformBatchRequestOptions
 ): Promise<BrijioResourceResult<BrijioBatchResult>> {
   const requestId = options.createRequestId?.() ?? createRequestId()
+  const actions = options.actions.map(addBatchActionApprovalMetadata)
+  const hasApprovalGatedAction = actions.some(
+    (action) => action.approvalRequest === true
+  )
 
   return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
-    timeoutMs: options.timeoutMs,
+    timeoutMs: hasApprovalGatedAction
+      ? (options.approvalTimeoutMs ?? options.timeoutMs)
+      : options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createPerformBatchEnvelope(requestId, options.actions, {
+    requestEnvelope: createPerformBatchEnvelope(requestId, actions, {
       pageContextId: options.pageContextId,
       visibleContextId: options.visibleContextId,
       continueOnError: options.continueOnError,
@@ -359,7 +389,9 @@ export async function requestPerformBatch (
         return { ok: true as const, data: result.data }
       }
       // Error or ignored — pass through
-      return result as BrijioResourceResult<BrijioBatchResult> | { ok: false, ignored: true }
+      return result as
+        | BrijioResourceResult<BrijioBatchResult>
+        | { ok: false, ignored: true }
     },
     timeoutMessage: 'Timed out waiting for a batch action response.'
   })
@@ -384,7 +416,11 @@ export async function requestDownloadStatus (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createDownloadStatusEnvelope(requestId, options.ids, options.browserInstanceId),
+    requestEnvelope: createDownloadStatusEnvelope(
+      requestId,
+      options.ids,
+      options.browserInstanceId
+    ),
     parseEnvelope: (value) => parseDownloadStatusEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a download status response.'
   })
@@ -405,13 +441,21 @@ export async function requestDownloadFile (
   options: DownloadFileRequestOptions
 ): Promise<BrijioDownloadFileResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
+  const approval = createApprovalRequestOptions()
 
   return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
-    timeoutMs: options.timeoutMs,
+    timeoutMs: options.approvalTimeoutMs ?? options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createDownloadFileEnvelope(requestId, options.url, options.filename, options.conflictAction, options.browserInstanceId),
+    requestEnvelope: createDownloadFileEnvelope(
+      requestId,
+      options.url,
+      options.filename,
+      options.conflictAction,
+      options.browserInstanceId,
+      approval
+    ),
     parseEnvelope: (value) => parseDownloadFileEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a download file response.'
   })
@@ -432,13 +476,21 @@ export async function requestFetchResource (
   options: FetchResourceRequestOptions
 ): Promise<BrijioFetchResourceResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
+  const approval = createApprovalRequestOptions()
 
   return await requestBrijio({
     websocketUrl: options.websocketUrl,
     pairingToken: options.pairingToken,
-    timeoutMs: options.timeoutMs,
+    timeoutMs: options.approvalTimeoutMs ?? options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
-    requestEnvelope: createFetchResourceEnvelope(requestId, options.url, options.maxSizeBytes, options.fetchTimeout, options.browserInstanceId),
+    requestEnvelope: createFetchResourceEnvelope(
+      requestId,
+      options.url,
+      options.maxSizeBytes,
+      options.fetchTimeout,
+      options.browserInstanceId,
+      approval
+    ),
     parseEnvelope: (value) => parseFetchResourceEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a fetch resource response.'
   })
@@ -584,15 +636,20 @@ async function requestBrijio<T> (options: {
   }
   timeoutMessage: string
   parseEnvelope: (
-    value: unknown
+    value: unknown,
   ) => BrijioResourceResult<T> | { ok: false, ignored: true }
 }): Promise<BrijioResourceResult<T>> {
   if (options.pairingToken.trim() === '') {
     return authRequiredResponse()
   }
 
-  const tokenScopeKey = createHash('sha256').update(options.pairingToken).digest('hex')
-  wsLogger.debug('ws_connecting', { url: options.websocketUrl, scopeKey: tokenScopeKey.slice(0, 8) })
+  const tokenScopeKey = createHash('sha256')
+    .update(options.pairingToken)
+    .digest('hex')
+  wsLogger.debug('ws_connecting', {
+    url: options.websocketUrl,
+    scopeKey: tokenScopeKey.slice(0, 8)
+  })
 
   return await new Promise((resolve) => {
     const socket = new WebSocket(options.websocketUrl)
@@ -647,7 +704,10 @@ async function requestBrijio<T> (options: {
     })
 
     socket.once('error', (error) => {
-      wsLogger.error('ws_error', { url: options.websocketUrl, message: error.message })
+      wsLogger.error('ws_error', {
+        url: options.websocketUrl,
+        message: error.message
+      })
       settle(connectionFailedResponse(options.websocketUrl))
     })
 
@@ -715,6 +775,39 @@ function isAuthSuccessEnvelope (value: unknown): boolean {
 
 function createRequestId (): string {
   return `mcp-${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+function createActionUUID (): string {
+  return `action-${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+function createApprovalRequestOptions (): ApprovalRequestOptions {
+  return {
+    actionUUID: createActionUUID(),
+    approvalRequest: true
+  }
+}
+
+function addBatchActionApprovalMetadata (
+  action: Record<string, unknown>
+): Record<string, unknown> {
+  const actionUUID =
+    typeof action.actionUUID === 'string' && action.actionUUID.trim() !== ''
+      ? action.actionUUID
+      : createActionUUID()
+
+  if (action.type === 'submit_form') {
+    return {
+      ...action,
+      actionUUID,
+      approvalRequest: true
+    }
+  }
+
+  return {
+    ...action,
+    actionUUID
+  }
 }
 
 function rawDataToString (data: RawData): string {
