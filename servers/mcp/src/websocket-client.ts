@@ -397,12 +397,7 @@ export async function requestPerformBatch (
   })
 }
 
-export interface DownloadStatusRequestOptions {
-  websocketUrl: string
-  pairingToken: string
-  timeoutMs: number
-  browserInstanceId?: string
-  createRequestId?: () => string
+export interface DownloadStatusRequestOptions extends PageContextRequestOptions {
   ids?: Array<number | string>
 }
 
@@ -426,12 +421,7 @@ export async function requestDownloadStatus (
   })
 }
 
-export interface DownloadFileRequestOptions {
-  websocketUrl: string
-  pairingToken: string
-  timeoutMs: number
-  browserInstanceId?: string
-  createRequestId?: () => string
+export interface DownloadFileRequestOptions extends PageContextRequestOptions {
   url: string
   filename?: string
   conflictAction?: 'uniquify' | 'overwrite'
@@ -461,12 +451,7 @@ export async function requestDownloadFile (
   })
 }
 
-export interface FetchResourceRequestOptions {
-  websocketUrl: string
-  pairingToken: string
-  timeoutMs: number
-  browserInstanceId?: string
-  createRequestId?: () => string
+export interface FetchResourceRequestOptions extends PageContextRequestOptions {
   url: string
   maxSizeBytes?: number
   fetchTimeout?: number
