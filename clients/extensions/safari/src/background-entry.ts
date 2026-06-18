@@ -1,7 +1,8 @@
 // Safari background script entry point.
 //
-// Per ADR 0019, Safari uses persistent background scripts (not service workers),
-// the browser.* namespace (not chrome.*), and text-only badges (no color API).
+// Per ADR 0019 and ADR 0051, Safari uses MV2 background scripts with
+// platform-specific persistence, the browser.* namespace (not chrome.*), and
+// text-only badges (no color API).
 //
 // This file instantiates the controller with Safari-specific adapters and
 // registers the browser.browserAction.onClicked and browser.runtime.onMessage listeners.
@@ -40,6 +41,8 @@ import {
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
 declare const browser: BrowserApi
+
+const desiredConnectionStateKey = 'desiredConnectionState'
 
 const action = new SafariActionBadge(browser.browserAction)
 const storage = new SafariStorageAdapter(browser.storage)
@@ -166,14 +169,23 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   }
 
   if (message.type === 'connect') {
-    void controller.requestConnect().then(() => {
+    void setDesiredConnectionState('connected').then(async () => {
+      await controller.requestConnect()
       sendResponse({ ok: true })
     })
     return true
   }
 
   if (message.type === 'disconnect') {
-    void controller.requestDisconnect().then(() => {
+    void setDesiredConnectionState('disconnected').then(async () => {
+      await controller.requestDisconnect()
+      sendResponse({ ok: true })
+    })
+    return true
+  }
+
+  if (message.type === 'brijio_page_active') {
+    void reconnectIfDesired().then(() => {
       sendResponse({ ok: true })
     })
     return true
@@ -193,6 +205,33 @@ browser.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   })
   return undefined
 })
+
+void reconnectIfDesired()
+
+async function getDesiredConnectionState (): Promise<'connected' | 'disconnected'> {
+  const values = await browser.storage.local.get([desiredConnectionStateKey])
+  return values[desiredConnectionStateKey] === 'connected'
+    ? 'connected'
+    : 'disconnected'
+}
+
+async function setDesiredConnectionState (
+  state: 'connected' | 'disconnected'
+): Promise<void> {
+  await browser.storage.local.set({ [desiredConnectionStateKey]: state })
+}
+
+async function reconnectIfDesired (): Promise<void> {
+  if (controller.isConnected()) {
+    return
+  }
+
+  if (await getDesiredConnectionState() !== 'connected') {
+    return
+  }
+
+  await controller.requestConnect()
+}
 
 async function saveRuntimeSettings (message: {
   websocketUrl?: unknown
