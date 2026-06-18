@@ -48,16 +48,19 @@ The main `tag-and-release.yml` workflow will own all release outputs:
 4. Validate Chrome `dist/manifest.json` version equals the tag version.
 5. Zip Chrome `dist/` and attach it to the `vX.Y.Z` GitHub release.
 6. Build the Safari extension web-extension bundle.
-7. On a macOS runner, run `xcrun safari-web-extension-converter` against the
-   Safari extension `dist/` output.
-8. Zip the generated Safari Xcode project and attach it to the same GitHub
+7. Zip the Safari web-extension `dist/` output and attach it to the same GitHub
    release.
-9. Publish npm package and Docker image after release validation.
+8. On a macOS runner, attempt to run `xcrun safari-web-extension-converter`
+   against the Safari extension `dist/` output.
+9. If conversion succeeds, zip the generated Safari Xcode project and attach it
+   to the same GitHub release.
+10. Publish npm package and Docker image after release validation.
 
-If Safari conversion is unavailable on GitHub-hosted macOS runners, the workflow
-should fail that asset job clearly rather than silently publishing an incomplete
-release. Producing a signed App Store submission package is out of scope unless
-Apple signing credentials are later added.
+If Safari conversion is unavailable on GitHub-hosted macOS runners or cannot
+parse the current Safari extension manifest, the workflow should still publish
+the Safari web-extension ZIP and skip only the converted Xcode project asset.
+Producing a signed App Store submission package is out of scope unless Apple
+signing credentials are later added.
 
 ```mermaid
 flowchart TD
@@ -65,9 +68,11 @@ flowchart TD
   Validate --> Notes[Extract changelog section]
   Validate --> Chrome[Build Chrome extension ZIP]
   Validate --> Safari[Build Safari dist]
+  Safari --> SafariZip[Safari web-extension ZIP]
   Safari --> Convert[xcrun safari-web-extension-converter on macOS]
   Notes --> Release[GitHub Release]
   Chrome --> Release
+  SafariZip --> Release
   Convert --> Release
   Release --> Npm[Publish @brijio/mcp]
   Release --> Docker[Publish Docker image]
@@ -118,7 +123,10 @@ Implementation should verify:
 - `vX.Y.Z` workflow creates or updates one GitHub release.
 - Chrome ZIP is attached to the main release.
 - Chrome manifest version must match `X.Y.Z`.
-- Safari conversion job runs on `macos-latest` and attaches a Safari artifact.
+- Safari job runs on `macos-latest` and always attaches a Safari web-extension
+  ZIP.
+- Safari conversion is attempted with `xcrun safari-web-extension-converter`,
+  and the converted Xcode project is attached only when conversion succeeds.
 - Changelog extraction fails if the release section is absent.
 - npm publish preflight reports token identity and gives an actionable error
   when publish rights are missing.
