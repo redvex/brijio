@@ -10,6 +10,8 @@ import {
   createSubmitFormEnvelope,
   createWriteEditableEnvelope,
   createNavigateToUrlEnvelope,
+  createDownloadFileEnvelope,
+  createFetchResourceEnvelope,
   parseActionResultEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
@@ -191,6 +193,77 @@ void describe('MCP page context protocol helpers', () => {
               formId: 'form-1'
             }
           }
+        }
+      }
+    )
+  })
+
+  void it('creates approval-gated submit_form envelopes with action metadata', () => {
+    assert.deepEqual(
+      createSubmitFormEnvelope(
+        'request-submit-approval-1',
+        { formId: 'form-1' },
+        undefined,
+        undefined,
+        { actionUUID: 'action-1', approvalRequest: true }
+      ),
+      {
+        type: 'message',
+        id: 'request-submit-approval-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'submit_form',
+            target: { formId: 'form-1' },
+            actionUUID: 'action-1',
+            approvalRequest: true
+          }
+        }
+      }
+    )
+  })
+
+  void it('creates approval-gated download_file envelopes with action metadata', () => {
+    assert.deepEqual(
+      createDownloadFileEnvelope(
+        'request-download-approval-1',
+        'https://example.com/file.csv',
+        undefined,
+        undefined,
+        undefined,
+        { actionUUID: 'action-2', approvalRequest: true }
+      ),
+      {
+        type: 'message',
+        id: 'request-download-approval-1',
+        payload: {
+          type: 'download_file',
+          url: 'https://example.com/file.csv',
+          actionUUID: 'action-2',
+          approvalRequest: true
+        }
+      }
+    )
+  })
+
+  void it('creates approval-gated fetch_resource envelopes with action metadata', () => {
+    assert.deepEqual(
+      createFetchResourceEnvelope(
+        'request-fetch-approval-1',
+        'https://example.com/private.csv',
+        undefined,
+        undefined,
+        undefined,
+        { actionUUID: 'action-3', approvalRequest: true }
+      ),
+      {
+        type: 'message',
+        id: 'request-fetch-approval-1',
+        payload: {
+          type: 'fetch_resource',
+          url: 'https://example.com/private.csv',
+          actionUUID: 'action-3',
+          approvalRequest: true
         }
       }
     )
@@ -834,7 +907,8 @@ void describe('MCP navigate_to_url protocol helpers', () => {
       ok: false,
       error: {
         code: 'unsupported_scheme',
-        message: 'URL scheme \'ftp\' is not supported. Only http and https are allowed.'
+        message:
+          "URL scheme 'ftp' is not supported. Only http and https are allowed."
       }
     })
   })
