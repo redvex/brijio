@@ -1,23 +1,45 @@
 // Chrome content script entry point.
 //
-// Per ADR 0019, this is a thin file that registers a
-// chrome.runtime.onMessage listener and delegates to the shared
-// handleContentRequest / executeBatch functions from @brijio/shared.
+// Per ADR 0019, this file registers the chrome.runtime.onMessage listener and
+// delegates page operations to shared handlers from @brijio/shared.
 
 import {
-  handleContentRequest,
   executeBatch,
+  handleContentRequest,
   isContentBatchRequest,
   registerPageNavigationListener,
-  type ContentRequest,
-  type ContentResponse,
+  type BatchResult,
   type ContentBatchRequest,
-  type BatchResult
+  type ContentRequest,
+  type ContentResponse
 } from '@brijio/shared'
 
-type SendResponse = (response: ContentResponse | BatchResult) => void
+export type BrijioApprovalDecision = 'approve' | 'approve_session' | 'deny'
 
-type IncomingMessage = ContentRequest | ContentBatchRequest
+export interface ShowBrijioApprovalMessage {
+  type: 'show_brijio_approval'
+  actionUUID: string
+  actionType: string
+  origin: string
+  timeoutMs: number
+}
+
+export interface HideBrijioApprovalMessage {
+  type: 'hide_brijio_approval'
+  actionUUID: string
+}
+
+type ApprovalResponse =
+  | { ok: true, decision: BrijioApprovalDecision }
+  | { ok: true }
+
+type SendResponse = (response: ContentResponse | BatchResult | ApprovalResponse) => void
+
+type IncomingMessage =
+  | ContentRequest
+  | ContentBatchRequest
+  | ShowBrijioApprovalMessage
+  | HideBrijioApprovalMessage
 
 interface ChromeRuntimeApi {
   runtime: {
@@ -42,17 +64,116 @@ interface ChromeRuntimeApi {
 
 declare const chrome: ChromeRuntimeApi | undefined
 
+const approvalBannerId = 'brijio-approval-banner'
+
+export function showBrijioApprovalBanner (
+  documentRef: Document,
+  message: ShowBrijioApprovalMessage,
+  onDecision: (decision: BrijioApprovalDecision) => void
+): void {
+  hideBrijioApprovalBanner(documentRef, message.actionUUID)
+
+  const banner = documentRef.createElement('section')
+  banner.id = approvalBannerId
+  banner.dataset.brijioActionUuid = message.actionUUID
+  banner.setAttribute('role', 'dialog')
+  banner.setAttribute('aria-live', 'polite')
+  Object.assign(banner.style, {
+    alignItems: 'center',
+    background: '#fff8d6',
+    border: '1px solid #8a6f00',
+    borderRadius: '6px',
+    boxSizing: 'border-box',
+    boxShadow: '0 8px 24px rgba(15, 23, 42, 0.18)',
+    color: '#1f2933',
+    display: 'flex',
+    flexWrap: 'wrap',
+    font: '13px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    gap: '10px',
+    left: '16px',
+    maxWidth: 'min(720px, calc(100vw - 32px))',
+    padding: '10px 12px',
+    position: 'fixed',
+    top: '16px',
+    width: 'max-content',
+    zIndex: '2147483647'
+  })
+
+  const label = documentRef.createElement('div')
+  label.textContent = `Brijio wants to ${message.actionType.replace(/_/g, ' ')} on ${message.origin}`
+  label.style.flex = '1 1 260px'
+  label.style.minWidth = '220px'
+  banner.append(label)
+
+  const actions = documentRef.createElement('div')
+  actions.style.display = 'flex'
+  actions.style.flex = '0 0 auto'
+  actions.style.flexWrap = 'wrap'
+  actions.style.gap = '8px'
+  actions.append(
+    createApprovalButton(documentRef, 'Approve', 'approve', onDecision),
+    createApprovalButton(documentRef, 'Approve session', 'approve_session', onDecision),
+    createApprovalButton(documentRef, 'Deny', 'deny', onDecision)
+  )
+  banner.append(actions)
+
+  documentRef.body.prepend(banner)
+}
+
+export function hideBrijioApprovalBanner (
+  documentRef: Document,
+  actionUUID: string
+): void {
+  const banner = documentRef.getElementById(approvalBannerId)
+  if (banner?.dataset.brijioActionUuid === actionUUID) {
+    banner.remove()
+  }
+}
+
+function createApprovalButton (
+  documentRef: Document,
+  label: string,
+  decision: BrijioApprovalDecision,
+  onDecision: (decision: BrijioApprovalDecision) => void
+): HTMLButtonElement {
+  const button = documentRef.createElement('button')
+  button.type = 'button'
+  button.textContent = label
+  button.dataset.brijioApprovalDecision = decision
+  Object.assign(button.style, {
+    background: decision === 'deny' ? '#ffffff' : '#1f8f4d',
+    border: '1px solid #8a6f00',
+    borderRadius: '4px',
+    color: decision === 'deny' ? '#1f2933' : '#ffffff',
+    cursor: 'pointer',
+    font: 'inherit',
+    lineHeight: '1.2',
+    minHeight: '34px',
+    whiteSpace: 'nowrap',
+    padding: '6px 8px'
+  })
+  button.addEventListener('click', () => {
+    button.closest(`#${approvalBannerId}`)?.remove()
+    onDecision(decision)
+  })
+  return button
+}
+
+function isShowBrijioApprovalMessage (
+  message: IncomingMessage
+): message is ShowBrijioApprovalMessage {
+  return message.type === 'show_brijio_approval'
+}
+
+function isHideBrijioApprovalMessage (
+  message: IncomingMessage
+): message is HideBrijioApprovalMessage {
+  return message.type === 'hide_brijio_approval'
+}
+
 if (typeof chrome !== 'undefined') {
-  // Per ADR 0041, register a pageshow listener so content-handler
-  // increments pageContextVersion on back/forward navigation.
-  // Per ADR 0043, this also replaces any previous injection's listener.
   registerPageNavigationListener()
 
-  // Per ADR 0043: When scripting.executeScript re-injects this script,
-  // a new module scope is created with a fresh pageContextVersion.
-  // We must remove the PREVIOUS injection's listener (stored on globalThis)
-  // before adding the new one, so only one listener is active and
-  // pageContextVersion matches the current module scope.
   type OnMessageCallback = (
     message: IncomingMessage,
     sender: unknown,
@@ -66,45 +187,55 @@ if (typeof chrome !== 'undefined') {
     _sender: unknown,
     sendResponse: SendResponse
   ): boolean => {
-    if (isContentBatchRequest(message)) {
-      const result = executeBatch({
-        actions: message.actions,
-        ...(message.pageContextId !== undefined ? { pageContextId: message.pageContextId } : {}),
-        ...(message.visibleContextId !== undefined ? { visibleContextId: message.visibleContextId } : {}),
-        ...(message.continueOnError !== undefined ? { continueOnError: message.continueOnError } : {}),
-        ...(message.readAfterActions !== undefined ? { readAfterActions: message.readAfterActions } : {})
-      }, {
-        document: globalThis.document,
-        locationHref: globalThis.location.href,
-        title: globalThis.document.title,
-        selectedText: globalThis.getSelection?.()?.toString() ?? '',
-        now: () => new Date().toISOString()
+    if (isShowBrijioApprovalMessage(message)) {
+      showBrijioApprovalBanner(globalThis.document, message, decision => {
+        sendResponse({ ok: true, decision })
       })
+      return true
+    }
+
+    if (isHideBrijioApprovalMessage(message)) {
+      hideBrijioApprovalBanner(globalThis.document, message.actionUUID)
+      sendResponse({ ok: true })
+      return false
+    }
+
+    if (isContentBatchRequest(message)) {
+      const result = executeBatch(
+        {
+          actions: message.actions,
+          ...(message.pageContextId !== undefined ? { pageContextId: message.pageContextId } : {}),
+          ...(message.visibleContextId !== undefined ? { visibleContextId: message.visibleContextId } : {}),
+          ...(message.continueOnError !== undefined ? { continueOnError: message.continueOnError } : {}),
+          ...(message.readAfterActions !== undefined ? { readAfterActions: message.readAfterActions } : {})
+        },
+        {
+          document: globalThis.document,
+          locationHref: globalThis.location.href,
+          title: globalThis.document.title,
+          selectedText: globalThis.getSelection?.()?.toString() ?? '',
+          now: () => new Date().toISOString()
+        }
+      )
 
       sendResponse(result)
       return false
     }
 
-    sendResponse(
-      handleContentRequest(message, {
-        document: globalThis.document,
-        locationHref: globalThis.location.href,
-        title: globalThis.document.title,
-        selectedText: globalThis.getSelection?.()?.toString() ?? '',
-        now: () => new Date().toISOString()
-      })
-    )
-
+    sendResponse(handleContentRequest(message, {
+      document: globalThis.document,
+      locationHref: globalThis.location.href,
+      title: globalThis.document.title,
+      selectedText: globalThis.getSelection?.()?.toString() ?? '',
+      now: () => new Date().toISOString()
+    }))
     return false
   }
 
-  // Remove the previous injection's listener if it exists
   const previousListener = globalRef.__brijioOnMessageListener as OnMessageCallback | undefined
   if (previousListener !== undefined) {
     chrome.runtime.onMessage.removeListener(previousListener)
   }
-
   chrome.runtime.onMessage.addListener(onMessage)
-  // Store reference so the next injection can remove this one
   globalRef.__brijioOnMessageListener = onMessage
 }

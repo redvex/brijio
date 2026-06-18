@@ -21,6 +21,9 @@ import {
   readActiveTabPage as sharedReadActiveTabPage,
   performActiveTabAction as sharedPerformActiveTabAction,
   performActiveTabBatch as sharedPerformActiveTabBatch,
+  type ApprovalAdapter,
+  type ApprovalDecision,
+  type ApprovalRequest,
   type ActiveTabDeps
 } from '@brijio/shared'
 import { isRegularPageUrl } from './permissions.js'
@@ -126,6 +129,84 @@ const bridgeSettingsKeys = [
 ]
 const previewMaxBytes = 4096
 const maxContentBytes = 120000
+
+export function createChromeApprovalAdapter (chromeApi: ChromeApi): ApprovalAdapter {
+  return {
+    async getActiveOrigin () {
+      const tab = await getActiveApprovalTab(chromeApi)
+      if (tab?.url === undefined || !isRegularPageUrl(tab.url)) {
+        return undefined
+      }
+
+      return new URL(tab.url).origin
+    },
+    async requestApproval (request: ApprovalRequest) {
+      const tab = await requireActiveApprovalTab(chromeApi)
+      await chromeApi.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['content.js']
+      })
+
+      const response = await chromeApi.tabs.sendMessage(tab.id, {
+        type: 'show_brijio_approval',
+        actionUUID: request.actionUUID,
+        actionType: request.actionType,
+        origin: request.origin,
+        timeoutMs: request.timeoutMs
+      })
+
+      return parseApprovalDecision(response)
+    },
+    async hideApproval (actionUUID: string) {
+      const tab = await getActiveApprovalTab(chromeApi)
+      if (tab?.id === undefined) {
+        return
+      }
+
+      await chromeApi.tabs.sendMessage(tab.id, {
+        type: 'hide_brijio_approval',
+        actionUUID
+      })
+    }
+  }
+}
+
+async function getActiveApprovalTab (
+  chromeApi: ChromeApi
+): Promise<{ id?: number, url?: string } | undefined> {
+  const tabs = await chromeApi.tabs.query({ active: true, currentWindow: true })
+  return tabs[0]
+}
+
+async function requireActiveApprovalTab (
+  chromeApi: ChromeApi
+): Promise<{ id: number, url?: string }> {
+  const tab = await getActiveApprovalTab(chromeApi)
+  if (tab?.id === undefined) {
+    throw new Error('No active tab is available for approval.')
+  }
+
+  return { id: tab.id, url: tab.url }
+}
+
+function parseApprovalDecision (response: unknown): ApprovalDecision {
+  if (
+    typeof response === 'object' &&
+    response !== null &&
+    'decision' in response
+  ) {
+    const decision = (response as { decision?: unknown }).decision
+    if (
+      decision === 'approve' ||
+      decision === 'approve_session' ||
+      decision === 'deny'
+    ) {
+      return decision
+    }
+  }
+
+  return 'deny'
+}
 
 const downloadAdapter: DownloadAdapter = {
   async downloadStatus (ids?: Array<number | string>) {
@@ -293,6 +374,17 @@ const controller = new BrijioBackgroundController({
     },
     async setTitle (title) {
       await chrome.action.setTitle({ title })
+    }
+  },
+  approval: {
+    async getActiveOrigin () {
+      return await createChromeApprovalAdapter(chrome).getActiveOrigin()
+    },
+    async requestApproval (request) {
+      return await createChromeApprovalAdapter(chrome).requestApproval(request)
+    },
+    async hideApproval (actionUUID) {
+      await createChromeApprovalAdapter(chrome).hideApproval(actionUUID)
     }
   },
   createWebSocket (url) {
