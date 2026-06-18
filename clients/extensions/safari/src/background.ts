@@ -17,9 +17,9 @@ import {
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
 
 // --- Browser API types for Safari (browser.* namespace) ---
-// Per ADR 0019, Safari uses the browser.* namespace (not chrome.*),
-// persistent background scripts (not service workers),
-// and text-only badges (no color API).
+// Per ADR 0019 and ADR 0051, Safari uses the browser.* namespace (not
+// chrome.*), MV2 background scripts with platform-specific persistence, and
+// text-only badges (no color API).
 
 interface RuntimeMessage {
   type?: unknown
@@ -33,6 +33,7 @@ interface RuntimeMessage {
 
 type SendResponse = (response: unknown) => void
 type MessageListener = (event: { data: string }) => void | Promise<void>
+type CloseListener = (event: { code: number, reason: string }) => void
 
 export interface BrowserApi {
   browserAction: {
@@ -487,7 +488,7 @@ async function withTimeout<T> (
 export class SafariWebSocketConnection implements BrijioSocket {
   private openListener: (() => void) | undefined
   private messageListener: MessageListener | undefined
-  private closeListener: (() => void) | undefined
+  private closeListener: CloseListener | undefined
   private errorListener: (() => void) | undefined
   private socket: WebSocket | undefined
 
@@ -527,18 +528,18 @@ export class SafariWebSocketConnection implements BrijioSocket {
     }
   }
 
-  get onclose (): (() => void) | undefined {
+  get onclose (): CloseListener | undefined {
     return this.closeListener
   }
 
-  set onclose (listener: (() => void) | undefined) {
+  set onclose (listener: CloseListener | undefined) {
     this.closeListener = listener
     if (this.socket !== undefined) {
       this.socket.onclose =
         listener === undefined
           ? null
-          : () => {
-              listener()
+          : (event) => {
+              listener({ code: event.code, reason: event.reason })
             }
     }
   }
@@ -577,8 +578,11 @@ export class SafariWebSocketConnection implements BrijioSocket {
       }
     }
     if (this.closeListener !== undefined) {
-      this.socket.onclose = () => {
-        (this.closeListener as () => void)()
+      this.socket.onclose = (event) => {
+        (this.closeListener as CloseListener)({
+          code: event.code,
+          reason: event.reason
+        })
       }
     }
     if (this.errorListener !== undefined) {
