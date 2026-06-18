@@ -4,6 +4,7 @@ import { parseHTML } from 'linkedom'
 import { handleContentRequest, type ContentRequest, type ContentResponse, type ContentEnvironment } from '@brijio/shared'
 import {
   hideBrijioApprovalBanner,
+  registerPageActivityListeners,
   showBrijioApprovalBanner,
   type BrijioApprovalDecision
 } from './content-script-entry.js'
@@ -11,6 +12,47 @@ import {
 void describe('Safari content-script-entry module', () => {
   void it('exports handleContentRequest from @brijio/shared', () => {
     assert.equal(typeof handleContentRequest, 'function')
+  })
+
+  void it('sends page activity message when visible page becomes active', () => {
+    const { document } = parseHTML('<main></main>')
+    const originalDocument = globalThis.document
+    Object.defineProperty(globalThis, 'document', {
+      configurable: true,
+      value: document
+    })
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      value: false
+    })
+    const messages: unknown[] = []
+
+    try {
+      registerPageActivityListeners({
+        runtime: {
+          async sendMessage (message: unknown) {
+            messages.push(message)
+          },
+          onMessage: {
+            addListener () {},
+            removeListener () {}
+          }
+        }
+      })
+
+      const DocumentEvent = (document.defaultView as unknown as { Event: typeof Event }).Event
+      document.dispatchEvent(new DocumentEvent('visibilitychange'))
+
+      assert.deepEqual(messages, [
+        { type: 'brijio_page_active' },
+        { type: 'brijio_page_active' }
+      ])
+    } finally {
+      Object.defineProperty(globalThis, 'document', {
+        configurable: true,
+        value: originalDocument
+      })
+    }
   })
 
   void it('handles extract_page_context via shared handler with DOM-based ContentEnvironment', () => {
