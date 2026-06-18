@@ -34,6 +34,7 @@ import {
   SafariWebSocketConnection,
   SafariDownloadAdapter,
   SafariPageNavigationAdapter,
+  createSafariApprovalAdapter,
   type BrowserApi
 } from './background.js'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
@@ -111,6 +112,7 @@ const pageBatch = {
 
 const pageNavigation = new SafariPageNavigationAdapter(browser.tabs)
 const download = new SafariDownloadAdapter(browser.tabs)
+const approval = createSafariApprovalAdapter(browser)
 
 const controller = new BrijioBackgroundController({
   action,
@@ -126,6 +128,7 @@ const controller = new BrijioBackgroundController({
   pageActions,
   pageBatch,
   pageNavigation,
+  approval,
   timers: createGlobalTimers()
 })
 

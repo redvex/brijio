@@ -14,6 +14,7 @@ import {
   SafariSetupAdapter,
   SafariPageReaderAdapter,
   SafariPageNavigationAdapter,
+  createSafariApprovalAdapter,
   SafariWebSocketConnection
 } from './background.js'
 
@@ -48,6 +49,7 @@ interface MockStorage {
 
 interface MockTabs {
   queryResult: Array<{ id?: number, title?: string, url?: string }>
+  sentMessages: Array<{ tabId: number, message: unknown }>
   sendMessageResult: unknown
   createResult: unknown
   updateResult: { id?: number, title?: string, url?: string }
@@ -58,6 +60,7 @@ interface MockTabs {
 }
 
 interface MockScripting {
+  executedScripts: Array<{ target: { tabId: number }, files: string[] }>
   executeScript: (details: { target: { tabId: number }, files: string[] }) => Promise<void>
 }
 
@@ -133,11 +136,13 @@ function createMockBrowser (): MockBrowser {
   const emptyUpdateResult: MockTab = {}
   const tabs: MockTabs = {
     queryResult: [] as MockTab[],
+    sentMessages: [],
     async query (_queryInfo: { active: boolean, currentWindow: boolean }) {
       return tabs.queryResult
     },
     sendMessageResult: {} as unknown,
-    async sendMessage (_tabId: number, _message: unknown) {
+    async sendMessage (tabId: number, message: unknown) {
+      tabs.sentMessages.push({ tabId, message })
       return tabs.sendMessageResult
     },
     createResult: {} as unknown,
@@ -151,8 +156,9 @@ function createMockBrowser (): MockBrowser {
   }
 
   const scripting: MockScripting = {
-    async executeScript (_details: { target: { tabId: number }, files: string[] }) {
-      // no-op for tests
+    executedScripts: [],
+    async executeScript (details: { target: { tabId: number }, files: string[] }) {
+      scripting.executedScripts.push(details)
     }
   }
 
@@ -291,6 +297,70 @@ void describe('SafariSetupAdapter', () => {
     const setup = new SafariSetupAdapter()
     // Should resolve without error
     await setup.openSetupPage()
+  })
+})
+
+// --- SafariApprovalAdapter tests ---
+
+void describe('createSafariApprovalAdapter', () => {
+  void it('reads active tab origin', async () => {
+    const browser = createMockBrowser()
+    browser.tabs.queryResult = [{ id: 7, url: 'https://example.com/path?x=1' }]
+    const adapter = createSafariApprovalAdapter(browser)
+
+    assert.equal(await adapter.getActiveOrigin(), 'https://example.com')
+  })
+
+  void it('sends approval request to active tab content script', async () => {
+    const browser = createMockBrowser()
+    browser.tabs.queryResult = [{ id: 7, url: 'https://example.com/form' }]
+    browser.tabs.sendMessageResult = { ok: true, decision: 'approve_session' }
+    const adapter = createSafariApprovalAdapter(browser)
+
+    const decision = await adapter.requestApproval({
+      actionUUID: 'action-1',
+      actionType: 'submit_form',
+      origin: 'https://example.com',
+      timeoutMs: 55000
+    })
+
+    assert.equal(decision, 'approve_session')
+    assert.deepEqual(browser.scripting.executedScripts, [
+      {
+        target: { tabId: 7 },
+        files: ['content.js']
+      }
+    ])
+    assert.deepEqual(browser.tabs.sentMessages, [
+      {
+        tabId: 7,
+        message: {
+          type: 'show_brijio_approval',
+          actionUUID: 'action-1',
+          actionType: 'submit_form',
+          origin: 'https://example.com',
+          timeoutMs: 55000
+        }
+      }
+    ])
+  })
+
+  void it('hides approval request in active tab content script', async () => {
+    const browser = createMockBrowser()
+    browser.tabs.queryResult = [{ id: 7, url: 'https://example.com/form' }]
+    const adapter = createSafariApprovalAdapter(browser)
+
+    await adapter.hideApproval('action-1')
+
+    assert.deepEqual(browser.tabs.sentMessages, [
+      {
+        tabId: 7,
+        message: {
+          type: 'hide_brijio_approval',
+          actionUUID: 'action-1'
+        }
+      }
+    ])
   })
 })
 
