@@ -9,9 +9,36 @@ Server packages and browser extensions use **independent versioning** — extens
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-18
+
 ### Added
 
-- Added client-side approval for `submit_form`, `fetch_resource`, and `download_file`, including action UUIDs, session-scoped approvals, structured approval errors, and Chrome/Safari approval banner UI.
+- Added a richer visible form model with `visibleContextId`,
+  `requiredSource`, `valueState`, `filledBy`, and field validity metadata so
+  agents can reason from user-visible form state instead of raw DOM structure.
+- Added stale visible-context validation for form actions and batches,
+  including validation errors before submit when required fields are missing.
+- Added `upload_file` support across the MCP server, shared protocol,
+  Chrome extension, and Safari extension. Agents now send file content directly
+  as base64 payloads instead of browser-local file paths.
+- Added file-upload coverage to the demo page, including a required story
+  summary upload field and validation result reporting.
+- Added download awareness through `download_status`, `download_file`, and
+  `fetch_resource` tooling, plus shared protocol routing and MCP integration
+  tests.
+- Added Chrome downloads API support and Safari fire-and-forget download
+  support, with a dedicated download test page.
+- Added client-side approval prompts for critical actions:
+  `submit_form`, `fetch_resource`, and `download_file`.
+- Added approval action UUIDs, session-scoped approval grants, structured
+  approval denial/timeout/origin-change errors, and Chrome/Safari approval
+  banner UI.
+
+### Changed
+
+- Improved the browser interaction surface around forms, files, downloads, and
+  critical actions while preserving Brijio's explicit user-control security
+  model.
 
 ## [0.1.2] - 2026-06-10
 
