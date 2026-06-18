@@ -9,6 +9,10 @@ Server packages and browser extensions use **independent versioning** — extens
 
 ## [Unreleased]
 
+### Added
+
+- Added client-side approval for `submit_form`, `fetch_resource`, and `download_file`, including action UUIDs, session-scoped approvals, structured approval errors, and Chrome/Safari approval banner UI.
+
 ## [0.1.2] - 2026-06-10
 
 ### Changed
