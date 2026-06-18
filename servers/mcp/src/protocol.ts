@@ -228,6 +228,11 @@ export interface UploadFileActionResultData {
   contextStaleReason?: 'visible_controls_changed'
 }
 
+export interface ApprovalRequestOptions {
+  actionUUID?: string
+  approvalRequest?: boolean
+}
+
 export interface SubmitFormActionResultData {
   action: 'submit_form'
   target: SubmitFormTarget
@@ -290,11 +295,9 @@ export type BrijioResourceResult<T> =
     }
   }
 
-export type BrijioPageContextResult =
-  BrijioResourceResult<PageContext>
+export type BrijioPageContextResult = BrijioResourceResult<PageContext>
 
-export type BrijioPageContentResult =
-  BrijioResourceResult<PageContent>
+export type BrijioPageContentResult = BrijioResourceResult<PageContent>
 
 export type BrijioClickElementResult =
   BrijioResourceResult<ClickElementActionResultData>
@@ -334,14 +337,16 @@ export interface DownloadStatusResultData {
   }>
 }
 
-export type BrijioDownloadStatusResult = BrijioResourceResult<DownloadStatusResultData>
+export type BrijioDownloadStatusResult =
+  BrijioResourceResult<DownloadStatusResultData>
 
 export interface DownloadFileResultData {
   downloadId: number | null
   status: 'initiated' | 'initiated_fire_and_forget'
 }
 
-export type BrijioDownloadFileResult = BrijioResourceResult<DownloadFileResultData>
+export type BrijioDownloadFileResult =
+  BrijioResourceResult<DownloadFileResultData>
 
 export interface FetchResourceResultData {
   fetchId: string
@@ -351,7 +356,8 @@ export interface FetchResourceResultData {
   dataBase64: string
 }
 
-export type BrijioFetchResourceResult = BrijioResourceResult<FetchResourceResultData>
+export type BrijioFetchResourceResult =
+  BrijioResourceResult<FetchResourceResultData>
 
 export type PageContextParseResult =
   | BrijioPageContextResult
@@ -399,7 +405,16 @@ export interface BatchActionError {
 }
 
 export type BatchActionOutcome =
-  | { ok: true, data: ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | UploadFileActionResultData }
+  | {
+    ok: true
+    data:
+    | ClickElementActionResultData
+    | FillInputActionResultData
+    | SetCheckedActionResultData
+    | SelectOptionsActionResultData
+    | SubmitFormActionResultData
+    | UploadFileActionResultData
+  }
   | { ok: false, error: BatchActionError }
 
 export type BatchReadOutcome =
@@ -417,7 +432,15 @@ export interface BrijioBatchResult {
 export type BrijioBatchResultParseResult =
   | { ok: true, data: BrijioBatchResult }
   | { ok: false, data: BrijioBatchResult }
-  | { ok: false, error: { code: BrijioErrorCode, message: string, detail?: StaleContextDetail, browsers?: BrowserPresence[] } }
+  | {
+    ok: false
+    error: {
+      code: BrijioErrorCode
+      message: string
+      detail?: StaleContextDetail
+      browsers?: BrowserPresence[]
+    }
+  }
   | { ok: false, ignored: true }
 
 // --- Download & Fetch parse result types (ADR 0047) ---
@@ -614,7 +637,8 @@ export function createSubmitFormEnvelope (
   requestId: string,
   target: SubmitFormTarget,
   pageContextId?: number,
-  visibleContextId?: string
+  visibleContextId?: string,
+  approval?: ApprovalRequestOptions
 ): WebSocketEnvelope {
   return {
     type: 'message',
@@ -625,7 +649,13 @@ export function createSubmitFormEnvelope (
       ...(visibleContextId !== undefined ? { visibleContextId } : {}),
       action: {
         type: 'submit_form',
-        target
+        target,
+        ...(approval?.actionUUID !== undefined
+          ? { actionUUID: approval.actionUUID }
+          : {}),
+        ...(approval?.approvalRequest !== undefined
+          ? { approvalRequest: approval.approvalRequest }
+          : {})
       }
     }
   }
@@ -634,15 +664,28 @@ export function createSubmitFormEnvelope (
 export function createPerformBatchEnvelope (
   requestId: string,
   actions: Array<Record<string, unknown>>,
-  options?: { pageContextId?: number, visibleContextId?: string, continueOnError?: boolean, readAfterActions?: boolean }
+  options?: {
+    pageContextId?: number
+    visibleContextId?: string
+    continueOnError?: boolean
+    readAfterActions?: boolean
+  }
 ): WebSocketEnvelope {
   const payload: Record<string, unknown> = {
     type: 'perform_batch',
     actions,
-    ...(options?.pageContextId !== undefined ? { pageContextId: options.pageContextId } : {}),
-    ...(options?.visibleContextId !== undefined ? { visibleContextId: options.visibleContextId } : {}),
-    ...(options?.continueOnError !== undefined ? { continueOnError: options.continueOnError } : {}),
-    ...(options?.readAfterActions !== undefined ? { readAfterActions: options.readAfterActions } : {})
+    ...(options?.pageContextId !== undefined
+      ? { pageContextId: options.pageContextId }
+      : {}),
+    ...(options?.visibleContextId !== undefined
+      ? { visibleContextId: options.visibleContextId }
+      : {}),
+    ...(options?.continueOnError !== undefined
+      ? { continueOnError: options.continueOnError }
+      : {}),
+    ...(options?.readAfterActions !== undefined
+      ? { readAfterActions: options.readAfterActions }
+      : {})
   }
 
   return {
@@ -658,12 +701,16 @@ export function createDownloadStatusEnvelope (
   browserInstanceId?: string
 ): WebSocketEnvelope {
   const payload: Record<string, unknown> = { type: 'download_status' }
-  if (ids !== undefined) { payload.ids = ids }
+  if (ids !== undefined) {
+    payload.ids = ids
+  }
 
   return {
     type: 'message',
     id: requestId,
-    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    ...(browserInstanceId !== undefined
+      ? { target: { browserInstanceId } }
+      : {}),
     payload
   }
 }
@@ -673,16 +720,29 @@ export function createDownloadFileEnvelope (
   url: string,
   filename?: string,
   conflictAction?: 'uniquify' | 'overwrite',
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  approval?: ApprovalRequestOptions
 ): WebSocketEnvelope {
   const payload: Record<string, unknown> = { type: 'download_file', url }
-  if (filename !== undefined) { payload.filename = filename }
-  if (conflictAction !== undefined) { payload.conflictAction = conflictAction }
+  if (filename !== undefined) {
+    payload.filename = filename
+  }
+  if (conflictAction !== undefined) {
+    payload.conflictAction = conflictAction
+  }
+  if (approval?.actionUUID !== undefined) {
+    payload.actionUUID = approval.actionUUID
+  }
+  if (approval?.approvalRequest !== undefined) {
+    payload.approvalRequest = approval.approvalRequest
+  }
 
   return {
     type: 'message',
     id: requestId,
-    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    ...(browserInstanceId !== undefined
+      ? { target: { browserInstanceId } }
+      : {}),
     payload
   }
 }
@@ -692,16 +752,29 @@ export function createFetchResourceEnvelope (
   url: string,
   maxSizeBytes?: number,
   timeout?: number,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  approval?: ApprovalRequestOptions
 ): WebSocketEnvelope {
   const payload: Record<string, unknown> = { type: 'fetch_resource', url }
-  if (maxSizeBytes !== undefined) { payload.maxSizeBytes = maxSizeBytes }
-  if (timeout !== undefined) { payload.timeout = timeout }
+  if (maxSizeBytes !== undefined) {
+    payload.maxSizeBytes = maxSizeBytes
+  }
+  if (timeout !== undefined) {
+    payload.timeout = timeout
+  }
+  if (approval?.actionUUID !== undefined) {
+    payload.actionUUID = approval.actionUUID
+  }
+  if (approval?.approvalRequest !== undefined) {
+    payload.approvalRequest = approval.approvalRequest
+  }
 
   return {
     type: 'message',
     id: requestId,
-    ...(browserInstanceId !== undefined ? { target: { browserInstanceId } } : {}),
+    ...(browserInstanceId !== undefined
+      ? { target: { browserInstanceId } }
+      : {}),
     payload
   }
 }
@@ -728,7 +801,10 @@ export function parseBatchResultEnvelope (
 
   // Batch-level error (no browser, timeout, etc.)
   if (value.payload.ok === false && !Object.hasOwn(value.payload, 'results')) {
-    if (!isRecord(value.payload.error) || typeof value.payload.error.message !== 'string') {
+    if (
+      !isRecord(value.payload.error) ||
+      typeof value.payload.error.message !== 'string'
+    ) {
       return invalidResponse()
     }
 
@@ -792,7 +868,7 @@ export function parseBatchResultEnvelope (
 
   const aborted = value.payload.aborted === true
 
-  if (results.every(entry => entry.ok)) {
+  if (results.every((entry) => entry.ok)) {
     return {
       ok: true,
       data: { ok: true, results, aborted }
@@ -807,7 +883,14 @@ export function parseBatchResultEnvelope (
 
 function parseActionResultData (
   data: Record<PropertyKey, unknown>
-): ClickElementActionResultData | FillInputActionResultData | SetCheckedActionResultData | SelectOptionsActionResultData | SubmitFormActionResultData | UploadFileActionResultData | null {
+):
+  | ClickElementActionResultData
+  | FillInputActionResultData
+  | SetCheckedActionResultData
+  | SelectOptionsActionResultData
+  | SubmitFormActionResultData
+  | UploadFileActionResultData
+  | null {
   if (isClickElementActionResultData(data)) {
     return data
   }
@@ -1033,10 +1116,18 @@ export function parseDownloadStatusEnvelope (
         return {
           id: (item as Record<string, unknown>).id as number | string,
           kind: (item as Record<string, unknown>).kind as 'download' | 'fetch',
-          filename: (item as Record<string, unknown>).filename as string | undefined,
+          filename: (item as Record<string, unknown>).filename as
+            | string
+            | undefined,
           url: (item as Record<string, unknown>).url as string,
-          mime: (item as Record<string, unknown>).mime as string | null | undefined,
-          size: (item as Record<string, unknown>).size as number | null | undefined,
+          mime: (item as Record<string, unknown>).mime as
+            | string
+            | null
+            | undefined,
+          size: (item as Record<string, unknown>).size as
+            | number
+            | null
+            | undefined,
           state: (item as Record<string, unknown>).state as string,
           error: (item as Record<string, unknown>).error as string | undefined
         }
@@ -1128,22 +1219,30 @@ export function parseFetchResourceEnvelope (
     const sha256 = value.payload.sha256
     const totalBytes = value.payload.totalBytes
 
-    if (typeof fetchId !== 'string' || typeof sha256 !== 'string' || typeof totalBytes !== 'number') {
+    if (
+      typeof fetchId !== 'string' ||
+      typeof sha256 !== 'string' ||
+      typeof totalBytes !== 'number'
+    ) {
       return invalidResponse()
     }
 
     // The dataBase64 is collected from preceding chunk messages and
     // passed through the websocket-client's response accumulator.
     // For now, we expect it on the payload directly (single-chunk fast path).
-    const dataBase64 = typeof value.payload.dataBase64 === 'string'
-      ? value.payload.dataBase64
-      : ''
+    const dataBase64 =
+      typeof value.payload.dataBase64 === 'string'
+        ? value.payload.dataBase64
+        : ''
 
     return {
       ok: true,
       data: {
         fetchId,
-        contentType: typeof value.payload.contentType === 'string' ? value.payload.contentType : null,
+        contentType:
+          typeof value.payload.contentType === 'string'
+            ? value.payload.contentType
+            : null,
         totalBytes,
         sha256,
         dataBase64
@@ -1152,9 +1251,8 @@ export function parseFetchResourceEnvelope (
   }
 
   if (value.payload.type === 'fetch_resource_error') {
-    const errorCode = typeof value.payload.error === 'string'
-      ? value.payload.error
-      : 'unknown'
+    const errorCode =
+      typeof value.payload.error === 'string' ? value.payload.error : 'unknown'
     const message = value.payload.message
 
     if (typeof message !== 'string') {
@@ -1434,7 +1532,8 @@ export function authRequiredResponse (): BrijioResourceResult<never> {
     ok: false,
     error: {
       code: 'auth_required',
-      message: 'BRIJIO_PAIRING_TOKEN or BROWSERBRIDGE_PAIRING_TOKEN must be configured.'
+      message:
+        'BRIJIO_PAIRING_TOKEN or BROWSERBRIDGE_PAIRING_TOKEN must be configured.'
     }
   }
 }
@@ -1606,9 +1705,7 @@ function isBrowserPresence (value: unknown): value is BrowserPresence {
   )
 }
 
-function isBrijioErrorCode (
-  value: unknown
-): value is BrijioErrorCode {
+function isBrijioErrorCode (value: unknown): value is BrijioErrorCode {
   return (
     value === 'auth_required' ||
     value === 'auth_failed' ||

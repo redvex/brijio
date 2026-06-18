@@ -48,42 +48,43 @@ export interface BrijioPageActionsConfig {
   websocketUrl: string
   pairingToken?: string
   timeoutMs: number
+  approvalTimeoutMs?: number
   defaultBrowserInstanceId?: string
   requestClickElement?: (
-    options: ClickElementRequestOptions
+    options: ClickElementRequestOptions,
   ) => Promise<BrijioClickElementResult>
   requestFillInput?: (
-    options: FillInputRequestOptions
+    options: FillInputRequestOptions,
   ) => Promise<BrijioFillInputResult>
   requestWriteEditable?: (
-    options: WriteEditableRequestOptions
+    options: WriteEditableRequestOptions,
   ) => Promise<BrijioFillInputResult>
   requestSetChecked?: (
-    options: SetCheckedRequestOptions
+    options: SetCheckedRequestOptions,
   ) => Promise<BrijioSetCheckedResult>
   requestSelectOptions?: (
-    options: SelectOptionsRequestOptions
+    options: SelectOptionsRequestOptions,
   ) => Promise<BrijioSelectOptionsResult>
   requestSubmitForm?: (
-    options: SubmitFormRequestOptions
+    options: SubmitFormRequestOptions,
   ) => Promise<BrijioSubmitFormResult>
   requestUploadFile?: (
-    options: UploadFileRequestOptions
+    options: UploadFileRequestOptions,
   ) => Promise<BrijioUploadFileResult>
   requestNavigateToUrl?: (
-    options: NavigateToUrlRequestOptions
+    options: NavigateToUrlRequestOptions,
   ) => Promise<BrijioNavigateToUrlResult>
   requestPerformBatch?: (
-    options: PerformBatchRequestOptions
+    options: PerformBatchRequestOptions,
   ) => Promise<BrijioResourceResult<BrijioBatchResult>>
   requestDownloadStatus?: (
-    options: DownloadStatusRequestOptions
+    options: DownloadStatusRequestOptions,
   ) => Promise<BrijioDownloadStatusResult>
   requestDownloadFile?: (
-    options: DownloadFileRequestOptions
+    options: DownloadFileRequestOptions,
   ) => Promise<BrijioDownloadFileResult>
   requestFetchResource?: (
-    options: FetchResourceRequestOptions
+    options: FetchResourceRequestOptions,
   ) => Promise<BrijioFetchResourceResult>
 }
 
@@ -101,6 +102,7 @@ export async function clickCurrentPageElement (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     pageContextId,
@@ -122,6 +124,7 @@ export async function fillCurrentPageInput (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     text,
@@ -145,6 +148,7 @@ export async function fillCurrentPageEditable (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     text,
@@ -168,6 +172,7 @@ export async function setCurrentPageChecked (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     checked,
@@ -191,6 +196,7 @@ export async function selectCurrentPageOptions (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     values,
@@ -213,6 +219,7 @@ export async function submitCurrentPageForm (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     pageContextId,
@@ -228,12 +235,14 @@ export async function uploadCurrentPageFile (
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioUploadFileResult> {
-  const requestUploadFile = config.requestUploadFile ?? defaultRequestUploadFile
+  const requestUploadFile =
+    config.requestUploadFile ?? defaultRequestUploadFile
 
   return await requestUploadFile({
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     target,
     file,
@@ -254,6 +263,7 @@ export async function navigateToCurrentPageUrl (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     url
   })
@@ -270,13 +280,16 @@ export async function performBatch (
     visibleContextId?: string
   }
 ): Promise<BrijioResourceResult<BrijioBatchResult>> {
-  const requestPerformBatch = config.requestPerformBatch ?? defaultRequestPerformBatch
+  const requestPerformBatch =
+    config.requestPerformBatch ?? defaultRequestPerformBatch
 
   return await requestPerformBatch({
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
-    browserInstanceId: options?.browserInstanceId ?? config.defaultBrowserInstanceId,
+    approvalTimeoutMs: config.approvalTimeoutMs,
+    browserInstanceId:
+      options?.browserInstanceId ?? config.defaultBrowserInstanceId,
     actions,
     continueOnError: options?.continueOnError,
     readAfterActions: options?.readAfterActions,
@@ -297,6 +310,7 @@ export async function getDownloadStatus (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     ids
   })
@@ -316,6 +330,7 @@ export async function downloadFile (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     url,
     filename,
@@ -337,6 +352,7 @@ export async function fetchResource (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     url,
     maxSizeBytes,
