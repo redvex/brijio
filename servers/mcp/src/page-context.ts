@@ -14,12 +14,13 @@ export interface BrijioPageContextConfig {
   websocketUrl: string
   pairingToken?: string
   timeoutMs: number
+  approvalTimeoutMs?: number
   defaultBrowserInstanceId?: string
   requestPageContext?: (
-    options: PageContextRequestOptions
+    options: PageContextRequestOptions,
   ) => Promise<BrijioPageContextResult>
   requestPageContent?: (
-    options: PageContentRequestOptions
+    options: PageContentRequestOptions,
   ) => Promise<BrijioPageContentResult>
 }
 
@@ -27,32 +28,40 @@ export function getPageContextConfigFromEnv (
   env: NodeJS.ProcessEnv = process.env,
   warn: (message: string) => void = console.warn
 ): Omit<BrijioPageContextConfig, 'requestPageContext'> {
-  const websocketUrl = resolveRenamedEnv({
-    env,
-    newName: 'BRIJIO_WS_URL',
-    oldNames: ['BROWSERBRIDGE_WEBSOCKET_URL', 'BRIJIO_WEBSOCKET_URL', 'WEBSOCKET_URL'],
-    defaultValue: 'ws://127.0.0.1:8787',
-    warn
-  }) ?? 'ws://127.0.0.1:8787'
-  const pairingToken = resolveRenamedEnv({
-    env,
-    newName: 'BRIJIO_PAIRING_TOKEN',
-    oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BRIJIO_TOKEN'],
-    defaultValue: '',
-    warn
-  }) ?? ''
+  const websocketUrl =
+    resolveRenamedEnv({
+      env,
+      newName: 'BRIJIO_WS_URL',
+      oldNames: [
+        'BROWSERBRIDGE_WEBSOCKET_URL',
+        'BRIJIO_WEBSOCKET_URL',
+        'WEBSOCKET_URL'
+      ],
+      defaultValue: 'ws://127.0.0.1:8787',
+      warn
+    }) ?? 'ws://127.0.0.1:8787'
+  const pairingToken =
+    resolveRenamedEnv({
+      env,
+      newName: 'BRIJIO_PAIRING_TOKEN',
+      oldNames: ['BROWSERBRIDGE_PAIRING_TOKEN', 'BRIJIO_TOKEN'],
+      defaultValue: '',
+      warn
+    }) ?? ''
   const defaultBrowserInstanceId = resolveRenamedEnv({
     env,
     newName: 'BRIJIO_BROWSER_INSTANCE_ID',
     oldNames: ['BROWSERBRIDGE_BROWSER_INSTANCE_ID'],
     warn
   })
-  const timeoutMs = parseTimeoutMs(resolveRenamedEnv({
-    env,
-    newName: 'BRIJIO_REQUEST_TIMEOUT_MS',
-    oldNames: ['BROWSERBRIDGE_REQUEST_TIMEOUT_MS'],
-    warn
-  }))
+  const timeoutMs = parseTimeoutMs(
+    resolveRenamedEnv({
+      env,
+      newName: 'BRIJIO_REQUEST_TIMEOUT_MS',
+      oldNames: ['BROWSERBRIDGE_REQUEST_TIMEOUT_MS'],
+      warn
+    })
+  )
 
   return {
     websocketUrl,
@@ -99,7 +108,9 @@ export async function getCurrentPageContent (
 export function parsePageContentResourceIndex (
   resourceUri: string
 ): number | BrijioPageContentResult {
-  const match = /^browser:\/\/page\/current\/content\/([^/]+)$/.exec(resourceUri)
+  const match = /^browser:\/\/page\/current\/content\/([^/]+)$/.exec(
+    resourceUri
+  )
 
   if (match === null) {
     return invalidResourceUriResponse()
@@ -140,7 +151,11 @@ function resolveRenamedEnv (options: {
   for (const oldName of options.oldNames) {
     const oldValue = normalizedEnvValue(options.env[oldName])
 
-    if (newValue !== undefined && oldValue !== undefined && newValue !== oldValue) {
+    if (
+      newValue !== undefined &&
+      oldValue !== undefined &&
+      newValue !== oldValue
+    ) {
       options.warn(
         `Both ${options.newName} and ${oldName} are set; preferring ${options.newName}.`
       )
