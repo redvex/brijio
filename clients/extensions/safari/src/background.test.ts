@@ -489,6 +489,41 @@ void describe('SafariWebSocketConnection', () => {
     ws.disconnect()
     // Should not throw
   })
+
+  void it('forwards WebSocket close code and reason to close listener', () => {
+    const originalWebSocket = globalThis.WebSocket
+    class MockWebSocket {
+      static latest: MockWebSocket | undefined
+      onopen: ((event: Event) => void) | null = null
+      onmessage: ((event: MessageEvent) => void) | null = null
+      onclose: ((event: CloseEvent) => void) | null = null
+      onerror: ((event: Event) => void) | null = null
+
+      constructor (readonly url: string) {
+        MockWebSocket.latest = this
+      }
+
+      send (_message: string): void {}
+      close (): void {}
+    }
+    globalThis.WebSocket = MockWebSocket as unknown as typeof WebSocket
+
+    try {
+      const ws = new SafariWebSocketConnection('wss://example.com')
+      let closeEvent: { code: number, reason: string } | undefined
+      ws.onclose = (event) => {
+        closeEvent = event
+      }
+
+      ws.connect()
+      const event: CloseEvent = { code: 1006, reason: 'network lost' }
+      MockWebSocket.latest?.onclose?.(event)
+
+      assert.deepEqual(closeEvent, { code: 1006, reason: 'network lost' })
+    } finally {
+      globalThis.WebSocket = originalWebSocket
+    }
+  })
 })
 
 // --- SafariPageNavigationAdapter tests ---
