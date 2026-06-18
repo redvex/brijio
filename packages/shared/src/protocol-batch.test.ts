@@ -66,6 +66,73 @@ void describe('batch request protocol', () => {
       )
     })
 
+    void it('recognizes approval metadata on perform_batch actions', () => {
+      assert.equal(
+        isPerformBatchEnvelope({
+          type: 'message',
+          id: 'batch-approval-1',
+          payload: {
+            type: 'perform_batch',
+            actions: [
+              {
+                type: 'write_text',
+                actionUUID: 'action-1',
+                target: { formId: 'bb-1', controlId: 'bb-2' },
+                text: 'Ada Lovelace'
+              },
+              {
+                type: 'submit_form',
+                actionUUID: 'action-2',
+                approvalRequest: true,
+                target: { formId: 'bb-1' }
+              }
+            ]
+          }
+        }),
+        true
+      )
+    })
+
+    void it('rejects invalid approval metadata on perform_batch actions', () => {
+      assert.equal(
+        isPerformBatchEnvelope({
+          type: 'message',
+          id: 'batch-approval-bad',
+          payload: {
+            type: 'perform_batch',
+            actions: [
+              {
+                type: 'submit_form',
+                actionUUID: '',
+                approvalRequest: true,
+                target: { formId: 'bb-1' }
+              }
+            ]
+          }
+        }),
+        false
+      )
+
+      assert.equal(
+        isPerformBatchEnvelope({
+          type: 'message',
+          id: 'batch-approval-bad-2',
+          payload: {
+            type: 'perform_batch',
+            actions: [
+              {
+                type: 'submit_form',
+                actionUUID: 'action-2',
+                approvalRequest: 'true',
+                target: { formId: 'bb-1' }
+              }
+            ]
+          }
+        }),
+        false
+      )
+    })
+
     void it('recognizes perform_batch envelope with write_text editable target', () => {
       assert.equal(
         isPerformBatchEnvelope({
