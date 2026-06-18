@@ -203,55 +203,93 @@ jobs:
       - name: Build Safari extension
         run: pnpm --filter @brijio/safari-extension build
 
-      - name: Validate Safari manifest version
+      - name: Validate Safari manifest versions
         run: |
-          MANIFEST="clients/extensions/safari/dist/manifest.json"
-          VERSION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$MANIFEST','utf8')).version)")
           TAG_VERSION="${{ needs.release.outputs.version }}"
 
-          if [ "$VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::Safari manifest version $VERSION does not match tag version $TAG_VERSION"
-            exit 1
-          fi
+          for MANIFEST in \
+            clients/extensions/safari/dist-ios/manifest.json \
+            clients/extensions/safari/dist-macos/manifest.json
+          do
+            VERSION=$(node -e "console.log(JSON.parse(require('fs').readFileSync('$MANIFEST','utf8')).version)")
 
-      - name: Create Safari web extension ZIP
+            if [ "$VERSION" != "$TAG_VERSION" ]; then
+              echo "::error::Safari manifest $MANIFEST version $VERSION does not match tag version $TAG_VERSION"
+              exit 1
+            fi
+          done
+
+      - name: Create Safari web extension ZIPs
         run: |
           VERSION="${{ needs.release.outputs.version }}"
-          cd clients/extensions/safari/dist
-          zip -r "${GITHUB_WORKSPACE}/brijio-safari-web-extension-${VERSION}.zip" .
+          cd clients/extensions/safari/dist-ios
+          zip -r "${GITHUB_WORKSPACE}/brijio-safari-ios-web-extension-${VERSION}.zip" .
+          cd "${GITHUB_WORKSPACE}/clients/extensions/safari/dist-macos"
+          zip -r "${GITHUB_WORKSPACE}/brijio-safari-macos-web-extension-${VERSION}.zip" .
 
-      - name: Upload Safari web extension asset
+      - name: Upload Safari web extension assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.release.outputs.version }}
-          files: brijio-safari-web-extension-${{ needs.release.outputs.version }}.zip
+          files: |
+            brijio-safari-ios-web-extension-${{ needs.release.outputs.version }}.zip
+            brijio-safari-macos-web-extension-${{ needs.release.outputs.version }}.zip
 
-      - name: Convert Safari web extension to Xcode project
-        id: convert-safari
+      - name: Convert iOS Safari web extension to Xcode project
+        id: convert-safari-ios
         continue-on-error: true
         run: |
           xcrun --find safari-web-extension-converter
           xcrun safari-web-extension-converter \
             --force \
+            --ios-only \
             --no-prompt \
             --no-open \
             --copy-resources \
             --bundle-identifier uk.co.redvex.Brijio \
-            --project-location "${GITHUB_WORKSPACE}/safari-release" \
-            clients/extensions/safari/dist
+            --project-location "${GITHUB_WORKSPACE}/safari-ios-release" \
+            clients/extensions/safari/dist-ios
 
-      - name: Create Safari Xcode project ZIP
-        if: steps.convert-safari.outcome == 'success'
+      - name: Convert macOS Safari web extension to Xcode project
+        id: convert-safari-macos
+        continue-on-error: true
+        run: |
+          xcrun --find safari-web-extension-converter
+          xcrun safari-web-extension-converter \
+            --force \
+            --macos-only \
+            --no-prompt \
+            --no-open \
+            --copy-resources \
+            --bundle-identifier uk.co.redvex.Brijio \
+            --project-location "${GITHUB_WORKSPACE}/safari-macos-release" \
+            clients/extensions/safari/dist-macos
+
+      - name: Create iOS Safari Xcode project ZIP
+        if: steps.convert-safari-ios.outcome == 'success'
         run: |
           VERSION="${{ needs.release.outputs.version }}"
-          zip -r "brijio-safari-xcode-project-${VERSION}.zip" safari-release
+          zip -r "brijio-safari-ios-xcode-project-${VERSION}.zip" safari-ios-release
 
-      - name: Upload Safari Xcode project asset
-        if: steps.convert-safari.outcome == 'success'
+      - name: Create macOS Safari Xcode project ZIP
+        if: steps.convert-safari-macos.outcome == 'success'
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+          zip -r "brijio-safari-macos-xcode-project-${VERSION}.zip" safari-macos-release
+
+      - name: Upload iOS Safari Xcode project asset
+        if: steps.convert-safari-ios.outcome == 'success'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.release.outputs.version }}
-          files: brijio-safari-xcode-project-${{ needs.release.outputs.version }}.zip
+          files: brijio-safari-ios-xcode-project-${{ needs.release.outputs.version }}.zip
+
+      - name: Upload macOS Safari Xcode project asset
+        if: steps.convert-safari-macos.outcome == 'success'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.release.outputs.version }}
+          files: brijio-safari-macos-xcode-project-${{ needs.release.outputs.version }}.zip
 
   publish-npm:
     name: Publish npm package
