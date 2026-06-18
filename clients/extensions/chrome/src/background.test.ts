@@ -5,8 +5,10 @@ import {
   type BrijioBackgroundController
 } from '@brijio/shared'
 import {
+  createChromeApprovalAdapter,
   createMessageHandler,
-  navigateActiveTabToUrl
+  navigateActiveTabToUrl,
+  type ChromeApi
 } from './background.js'
 
 // --- Chrome API mock for navigateActiveTabToUrl tests ---
@@ -14,7 +16,10 @@ import {
 interface MockTabs {
   queryResult: Array<{ id?: number, title?: string, url?: string }>
   updateResult: { id?: number, title?: string, url?: string }
+  sentMessages: Array<{ tabId: number, message: unknown }>
+  executedScripts: Array<{ target: { tabId: number }, files: string[] }>
   query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
+  sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   update: (tabId: number, updateProperties: { url: string }) => Promise<{ id?: number, title?: string, url?: string }>
 }
 
@@ -22,12 +27,40 @@ function createMockTabs (): MockTabs {
   return {
     queryResult: [],
     updateResult: { id: 1 },
+    sentMessages: [],
+    executedScripts: [],
     async query (_queryInfo: { active: boolean, currentWindow: boolean }) {
       return this.queryResult
+    },
+    async sendMessage (tabId: number, message: unknown) {
+      this.sentMessages.push({ tabId, message })
+      return { ok: true, decision: 'approve_session' }
     },
     async update (_tabId: number, _updateProperties: { url: string }) {
       return this.updateResult
     }
+  }
+}
+
+function createMockChromeApi (tabs: MockTabs): ChromeApi {
+  return {
+    action: {
+      setBadgeText: async () => {},
+      setBadgeBackgroundColor: async () => {},
+      setBadgeTextColor: async () => {},
+      setTitle: async () => {}
+    },
+    runtime: {
+      getURL: (path: string) => `chrome-extension://abc/${path}`,
+      onMessage: { addListener: () => {} }
+    },
+    storage: { local: { get: async () => ({}), set: async () => {} } },
+    scripting: {
+      executeScript: async (details) => {
+        tabs.executedScripts.push(details)
+      }
+    },
+    tabs
   }
 }
 
@@ -291,6 +324,67 @@ void describe('createMessageHandler', () => {
         message: 'Unsupported extension message.'
       }
     })
+  })
+})
+
+void describe('createChromeApprovalAdapter', () => {
+  void it('reads active tab origin', async () => {
+    const tabs = createMockTabs()
+    tabs.queryResult = [{ id: 7, url: 'https://example.com/path?x=1' }]
+    const adapter = createChromeApprovalAdapter(createMockChromeApi(tabs))
+
+    assert.equal(await adapter.getActiveOrigin(), 'https://example.com')
+  })
+
+  void it('sends approval request to active tab content script', async () => {
+    const tabs = createMockTabs()
+    tabs.queryResult = [{ id: 7, url: 'https://example.com/form' }]
+    const adapter = createChromeApprovalAdapter(createMockChromeApi(tabs))
+
+    const decision = await adapter.requestApproval({
+      actionUUID: 'action-1',
+      actionType: 'submit_form',
+      origin: 'https://example.com',
+      timeoutMs: 55000
+    })
+
+    assert.equal(decision, 'approve_session')
+    assert.deepEqual(tabs.executedScripts, [
+      {
+        target: { tabId: 7 },
+        files: ['content.js']
+      }
+    ])
+    assert.deepEqual(tabs.sentMessages, [
+      {
+        tabId: 7,
+        message: {
+          type: 'show_brijio_approval',
+          actionUUID: 'action-1',
+          actionType: 'submit_form',
+          origin: 'https://example.com',
+          timeoutMs: 55000
+        }
+      }
+    ])
+  })
+
+  void it('hides approval request in active tab content script', async () => {
+    const tabs = createMockTabs()
+    tabs.queryResult = [{ id: 7, url: 'https://example.com/form' }]
+    const adapter = createChromeApprovalAdapter(createMockChromeApi(tabs))
+
+    await adapter.hideApproval('action-1')
+
+    assert.deepEqual(tabs.sentMessages, [
+      {
+        tabId: 7,
+        message: {
+          type: 'hide_brijio_approval',
+          actionUUID: 'action-1'
+        }
+      }
+    ])
   })
 })
 
