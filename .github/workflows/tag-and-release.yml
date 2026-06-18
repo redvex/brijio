@@ -179,27 +179,44 @@ jobs:
             exit 1
           fi
 
-      - name: Verify Safari converter is available
-        run: xcrun --find safari-web-extension-converter
+      - name: Create Safari web extension ZIP
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+          cd clients/extensions/safari/dist
+          zip -r "${GITHUB_WORKSPACE}/brijio-safari-web-extension-${VERSION}.zip" .
+
+      - name: Upload Safari web extension asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.release.outputs.version }}
+          files: brijio-safari-web-extension-${{ needs.release.outputs.version }}.zip
 
       - name: Convert Safari web extension to Xcode project
+        id: convert-safari
+        continue-on-error: true
         run: |
+          xcrun --find safari-web-extension-converter
           xcrun safari-web-extension-converter \
             --force \
+            --no-prompt \
+            --no-open \
+            --copy-resources \
             --bundle-identifier uk.co.redvex.Brijio \
             --project-location "${GITHUB_WORKSPACE}/safari-release" \
             clients/extensions/safari/dist
 
-      - name: Create Safari extension ZIP
+      - name: Create Safari Xcode project ZIP
+        if: steps.convert-safari.outcome == 'success'
         run: |
           VERSION="${{ needs.release.outputs.version }}"
-          zip -r "brijio-safari-extension-${VERSION}.zip" safari-release
+          zip -r "brijio-safari-xcode-project-${VERSION}.zip" safari-release
 
-      - name: Upload Safari extension asset
+      - name: Upload Safari Xcode project asset
+        if: steps.convert-safari.outcome == 'success'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.release.outputs.version }}
-          files: brijio-safari-extension-${{ needs.release.outputs.version }}.zip
+          files: brijio-safari-xcode-project-${{ needs.release.outputs.version }}.zip
 
   publish-npm:
     name: Publish npm package
