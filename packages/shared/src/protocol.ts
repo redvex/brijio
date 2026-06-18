@@ -188,7 +188,7 @@ export interface DownloadStatusErrorResponse {
 }
 
 // Download file request/response
-export interface DownloadFileRequest {
+export interface DownloadFileRequest extends ApprovalMetadata {
   type: 'download_file'
   url: string
   filename?: string
@@ -213,7 +213,7 @@ export interface DownloadFileErrorResponse {
 }
 
 // Fetch resource request/response
-export interface FetchResourceRequest {
+export interface FetchResourceRequest extends ApprovalMetadata {
   type: 'fetch_resource'
   url: string
   maxSizeBytes?: number
@@ -339,30 +339,35 @@ export type WriteTextActionTarget = FormControlTarget
 /** @deprecated Use EditableActionTarget instead — WriteTextEditableTarget is now EditableActionTarget with optional expectedText */
 export type WriteTextEditableTarget = EditableActionTarget
 
-export interface PerformClickAction {
+export interface ApprovalMetadata {
+  actionUUID?: string
+  approvalRequest?: boolean
+}
+
+export interface PerformClickAction extends ApprovalMetadata {
   type: 'click'
   target: ClickActionTarget
 }
 
-export interface PerformWriteTextAction {
+export interface PerformWriteTextAction extends ApprovalMetadata {
   type: 'write_text'
   target: WriteTextActionTarget | WriteTextEditableTarget
   text: string
 }
 
-export interface PerformSetCheckedAction {
+export interface PerformSetCheckedAction extends ApprovalMetadata {
   type: 'set_checked'
   target: FormControlTarget
   checked: boolean
 }
 
-export interface PerformSelectOptionsAction {
+export interface PerformSelectOptionsAction extends ApprovalMetadata {
   type: 'select_options'
   target: FormControlTarget
   values: string[]
 }
 
-export interface PerformSubmitFormAction {
+export interface PerformSubmitFormAction extends ApprovalMetadata {
   type: 'submit_form'
   target: FormSubmitTarget
 }
@@ -375,7 +380,7 @@ export interface FileUploadPayload {
   lastModified?: number
 }
 
-export interface PerformUploadFileAction {
+export interface PerformUploadFileAction extends ApprovalMetadata {
   type: 'upload_file'
   target: FormControlTarget
   file: FileUploadPayload
@@ -421,6 +426,7 @@ export interface BatchActionError {
   message: string
   detail?: StaleContextDetail
   aborted: boolean
+  actionUUID?: string
 }
 
 export type BatchActionOutcome =
@@ -618,6 +624,10 @@ export type ActionResultErrorCode =
   | 'stale_context'
   | 'page_navigated'
   | 'upload_not_staged'
+  | 'approval_denied'
+  | 'approval_timeout'
+  | 'approval_unavailable'
+  | 'approval_origin_changed'
 
 export interface PageContextResponse {
   type: 'page_context_response'
@@ -762,6 +772,7 @@ export interface ActionResultErrorResponse {
   error: {
     code: ActionResultErrorCode
     message: string
+    actionUUID?: string
     detail?: StaleContextDetail
   }
 }
@@ -1068,6 +1079,10 @@ export function isPerformActionEnvelope (
     return false
   }
 
+  if (!hasValidApprovalMetadata(value.payload.action)) {
+    return false
+  }
+
   if (value.payload.action.type === 'click') {
     return isClickAction(value.payload.action)
   }
@@ -1219,14 +1234,16 @@ export function createActionResultResponse (
 export function createActionResultErrorResponse (
   id: string | undefined,
   code: ActionResultErrorCode,
-  message: string
+  message: string,
+  actionUUID?: string
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'action_result',
     ok: false,
     error: {
       code,
-      message
+      message,
+      ...(actionUUID !== undefined ? { actionUUID } : {})
     }
   })
 }
@@ -1570,6 +1587,10 @@ function isBatchAction (value: unknown): value is BatchAction {
     return false
   }
 
+  if (!hasValidApprovalMetadata(value)) {
+    return false
+  }
+
   if (value.type === 'click') {
     return isClickAction(value)
   }
@@ -1595,6 +1616,24 @@ function isBatchAction (value: unknown): value is BatchAction {
   }
 
   return false
+}
+
+function hasValidApprovalMetadata (value: Record<PropertyKey, unknown>): boolean {
+  if (
+    Object.hasOwn(value, 'actionUUID') &&
+    (typeof value.actionUUID !== 'string' || value.actionUUID.trim() === '')
+  ) {
+    return false
+  }
+
+  if (
+    Object.hasOwn(value, 'approvalRequest') &&
+    typeof value.approvalRequest !== 'boolean'
+  ) {
+    return false
+  }
+
+  return true
 }
 
 function createEnvelope (

@@ -251,6 +251,61 @@ void describe('Chrome extension protocol helpers', () => {
     )
   })
 
+  void it('recognizes approval metadata on perform_action submit_form envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-submit-approval-1',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'submit_form',
+            actionUUID: 'action-1',
+            approvalRequest: true,
+            target: { formId: 'bb-1' }
+          }
+        }
+      }),
+      true
+    )
+  })
+
+  void it('rejects invalid approval metadata on perform_action envelopes', () => {
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-submit-approval-bad',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'submit_form',
+            actionUUID: '',
+            approvalRequest: true,
+            target: { formId: 'bb-1' }
+          }
+        }
+      }),
+      false
+    )
+
+    assert.equal(
+      isPerformActionEnvelope({
+        type: 'message',
+        id: 'action-submit-approval-bad-2',
+        payload: {
+          type: 'perform_action',
+          action: {
+            type: 'submit_form',
+            actionUUID: 'action-1',
+            approvalRequest: 'yes',
+            target: { formId: 'bb-1' }
+          }
+        }
+      }),
+      false
+    )
+  })
+
   void it('recognizes perform_action upload_file message envelopes', () => {
     assert.equal(
       isPerformActionEnvelope({
