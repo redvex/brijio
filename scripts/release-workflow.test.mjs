@@ -17,11 +17,27 @@ function readAllWorkflows () {
 }
 
 void describe('release workflows', () => {
-  void it('uses only v-prefixed release tags', () => {
+  void it('starts release automation from main branch merges', () => {
+    const workflow = readWorkflow('tag-and-release.yml')
+
+    assert.match(workflow, /branches:\s*\n\s+- main/)
+    assert.doesNotMatch(workflow, /tags:\s*\n\s+- "v\*"/)
+  })
+
+  void it('uses only unified version tags', () => {
     const workflows = readAllWorkflows()
 
     assert.doesNotMatch(workflows, /ext-chrome-v\*/)
     assert.doesNotMatch(workflows, /ext-safari-v\*/)
+  })
+
+  void it('creates the release tag from the package version', () => {
+    const workflow = readWorkflow('tag-and-release.yml')
+
+    assert.match(workflow, /require\('\.\/package\.json'\)\.version/)
+    assert.match(workflow, /git tag -a "v\$\{VERSION\}"/)
+    assert.match(workflow, /git push origin "v\$\{VERSION\}"/)
+    assert.match(workflow, /git ls-remote .*--tags origin "v\$\{VERSION\}"/)
   })
 
   void it('publishes browser extension assets from the main release workflow', () => {
@@ -37,13 +53,17 @@ void describe('release workflows', () => {
     assert.match(workflow, /files:/)
   })
 
-  void it('keeps npm publish preflight diagnostics actionable', () => {
+  void it('publishes npm with trusted publishing instead of a long-lived token', () => {
     const workflow = readWorkflow('tag-and-release.yml')
 
-    assert.match(workflow, /npm whoami/)
-    assert.match(workflow, /NPM_TOKEN/)
+    assert.match(workflow, /id-token: write/)
+    assert.match(workflow, /actions\/setup-node@v6/)
+    assert.match(workflow, /node-version: 24/)
+    assert.match(workflow, /package-manager-cache: false/)
+    assert.doesNotMatch(workflow, /NODE_AUTH_TOKEN/)
+    assert.doesNotMatch(workflow, /NPM_TOKEN/)
     assert.match(workflow, /@brijio\/mcp/)
-    assert.match(workflow, /publish access/)
+    assert.match(workflow, /npm publish --access public --provenance --no-git-checks/)
   })
 
   void it('removes the split extension release workflow', () => {
