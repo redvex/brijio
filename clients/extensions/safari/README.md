@@ -1,76 +1,67 @@
 # Brijio Safari Extension
 
-The Safari Web Extension brings full Brijio functionality to Safari,
-using `@brijio/shared` for browser-agnostic logic and Safari-specific
-adapters for API differences.
+The Safari Web Extension brings Brijio functionality to Safari using
+`@brijio/shared` for browser-agnostic logic and Safari-specific adapters for
+WebExtension API differences.
 
-For the complete and current list of Brijio capabilities, browser support
-status, and product boundaries, see the
+For the complete current list of Brijio capabilities, browser support status,
+and product boundaries, see the
 [canonical capability matrix](../../docs/project/CAPABILITY_MATRIX.md).
 
 ## Architecture
 
 The Safari extension follows the same adapter pattern as the Chrome extension.
-Shared logic — protocol types, background controller, page extraction, content
-handling, and timers — lives in `@brijio/shared`. The Safari package
+Shared logic such as protocol types, the background controller, page extraction,
+content handling, and timers lives in `@brijio/shared`. The Safari package
 contributes only browser-specific wiring:
 
 ```text
 @brijio/shared
-  protocol.ts           WebSocket envelope types, request/response types, guards
+  protocol.ts               WebSocket envelope types, request/response types, guards
   background-controller.ts  Background controller (adapter-driven, no browser API)
-  page-context.ts       Pure DOM page-context extraction
-  page-content.ts       Pure DOM page-content chunking
-  content-handler.ts    Content-script request handler
-  timers.ts             createGlobalTimers factory
+  page-context.ts           Pure DOM page-context extraction
+  page-content.ts           Pure DOM page-content chunking
+  content-handler.ts        Content-script request handler
+  timers.ts                 createGlobalTimers factory
 
 clients/extensions/safari/src/
-  background.ts         Safari adapter classes (SafariActionBadge, SafariStorageAdapter,
-                        SafariSetupAdapter, SafariPageReaderAdapter, SafariWebSocketConnection)
-  background-entry.ts   Wires BrijioBackgroundController to browser.* APIs
-  content-script-entry.ts  Registers browser.runtime.onMessage listener, delegates to shared handler
-  popup.ts              Pure popup message construction and parsing logic
-  popup-entry.ts        DOM wiring for popup.html
-  permissions.ts        Safari permissions (always returns true for regular page access)
+  background.ts             Safari adapter classes
+  background-entry.ts       Wires BrijioBackgroundController to browser.* APIs
+  content-script-entry.ts   Registers runtime listeners and delegates shared handlers
+  popup.ts                  Pure popup message construction and parsing logic
+  popup-entry.ts            DOM wiring
+  popup.html
+  permissions.ts            Safari permissions helpers
 ```
 
-### Adapter mapping
+### Adapter Mapping
 
-| Chrome concept                                  | Safari adapter                                      |
-| ----------------------------------------------- | --------------------------------------------------- |
-| `chrome.*` API namespace                        | `browser.*` namespace (WebExtension API)            |
-| Service worker (MV3)                            | Persistent background script (MV2)                  |
-| `setBadgeBackgroundColor` / `setBadgeTextColor` | No-op (`SafariActionBadge`)                         |
-| `chrome.permissions.request()`                  | Not needed — broad host permissions at install time |
-| Setup page (`chrome.tabs.create`)               | `popup.html` overlay                                |
-| `chrome.runtime.sendMessage`                    | `browser.runtime.sendMessage`                       |
+| Chrome concept                                  | Safari adapter                                                  |
+| ----------------------------------------------- | --------------------------------------------------------------- |
+| `chrome.*` API namespace                        | `browser.*` namespace (WebExtension API)                        |
+| Service worker (MV3)                            | Platform-specific MV2 background page                           |
+| `setBadgeBackgroundColor` / `setBadgeTextColor` | No-op (`SafariActionBadge`)                                     |
+| `chrome.permissions.request()`                  | Not needed because host permissions are granted at install time |
+| Setup page (`chrome.tabs.create`)               | `popup.html` overlay                                            |
+| `chrome.runtime.sendMessage`                    | `browser.runtime.sendMessage`                                   |
 
-## Key Safari differences from Chrome (ADR 0019)
+## Key Safari Differences From Chrome
 
 - **`browser.*` namespace**: Safari uses the standard WebExtension `browser.*`
   API instead of Chrome's `chrome.*`. All API calls go through `browser.*`.
-
-- **MV2 background scripts**: Safari uses persistent background scripts
-  (`"scripts": ["background.js"]` in the manifest), not Manifest V3 service
-  workers. The background script runs in a persistent page context.
-
-- **Text-only badge**: Safari's MV2 `browser_action` uses
-  `browser.browserAction.setBadgeText()` but
-  does _not_ support `setBadgeBackgroundColor()` or `setBadgeTextColor()`.
-  Connection state is shown through badge text only (`ON`, `OFF`, `ERR`).
-  The `SafariActionBadge` adapter provides no-op implementations for color
-  methods.
-
+- **MV2 background page**: Safari uses Manifest V2 background scripts
+  (`"scripts": ["background.js"]`). The iOS/iPadOS build uses
+  `"persistent": false`; the macOS build uses `"persistent": true`.
+- **Text-only badge**: Safari's MV2 `browser_action` supports
+  `browser.browserAction.setBadgeText()` but does not support
+  `setBadgeBackgroundColor()` or `setBadgeTextColor()`. Connection state is
+  shown through badge text only (`ON`, `OFF`, `ERR`).
 - **Broad host permissions at install time**: Safari does not support
-  `optional_host_permissions` or runtime permission requests. The manifest
-  declares `"*://*/*"` as a required permission. Users grant this access when
-  they install or enable the extension. There is no "regular page access not
-  enabled" state on Safari — `hasRegularPageAccess()` always returns `true`.
-
-- **`popup.html` instead of setup page**: Safari does not have a convenient
-  setup-page pattern like Chrome's `chrome.tabs.create()`. Configuration,
-  connect/disconnect, and status display all happen in a popup overlay
-  (`popup.html`).
+  `optional_host_permissions` runtime permission requests. The manifest declares
+  `"*://*/*"` as a required permission. Users grant access when they install or
+  enable the extension.
+- **`popup.html` instead of a setup page**: Configuration, connect/disconnect,
+  and status display happen in the popup overlay.
 
 ## Build
 
@@ -78,14 +69,15 @@ clients/extensions/safari/src/
 pnpm --filter @brijio/safari-extension build
 ```
 
-This compiles TypeScript and bundles the extension into
-`clients/extensions/safari/dist/` with:
+This compiles TypeScript bundles into platform-specific extension outputs:
 
-- `background.js` — background script bundle
-- `content.js` — content script bundle
-- `popup.js` — popup script bundle
-- `manifest.json` — copied from source
-- `popup.html` — copied from source
+- `clients/extensions/safari/dist-ios/` - iOS/iPadOS-safe manifest with
+  `persistent: false`.
+- `clients/extensions/safari/dist-macos/` - desktop Safari manifest with
+  `persistent: true`.
+
+Each output includes `background.js`, `content.js`, `popup.js`, `manifest.json`,
+`popup.html`, and icons.
 
 ## Test
 
@@ -93,37 +85,40 @@ This compiles TypeScript and bundles the extension into
 pnpm --filter @brijio/safari-extension test
 ```
 
-Tests cover the Safari adapter classes, permission logic, and popup message
-handling. The shared controller, content handler, and extraction logic are
-tested in `@brijio/shared`.
+Tests cover Safari adapter classes, permission logic, popup message handling,
+platform manifest generation, and reconnect-on-wake behavior. Shared
+controller, content handler, and extraction logic are tested in
+`@brijio/shared`.
 
-## Build and convert to Xcode project
+## Build And Convert To Xcode Projects
 
-Safari Web Extensions must be wrapped in a native macOS app. Use the Makefile
-target to build the extension and generate the Xcode project:
+Safari Web Extensions must be wrapped in native Apple app projects. Use the
+platform-specific Makefile targets:
 
 ```sh
-make safari
+make safari-macos
 ```
 
-This runs two steps:
+This builds the desktop Safari extension and converts `dist-macos` into
+`clients/extensions/safari/Brijio-macOS/`.
 
-1. `pnpm --filter @brijio/safari-extension build` — compiles and
-   bundles the extension.
-2. `xcrun safari-web-extension-converter --force --project-location
-clients/extensions/safari/Brijio clients/extensions/safari/dist` —
-   converts the built extension into an Xcode project at
-   `clients/extensions/safari/Brijio/`.
+```sh
+make safari-ios
+```
 
-After running `make safari`:
+This builds the iOS/iPadOS-safe extension and converts `dist-ios` into
+`clients/extensions/safari/Brijio-iOS/`.
 
-1. Open `clients/extensions/safari/Brijio/Brijio.xcodeproj` in
-   Xcode.
+`make safari` builds both platform projects.
+
+After running one of the targets:
+
+1. Open the generated Xcode project in Xcode.
 2. Build and run to install the extension into Safari.
-3. Enable the extension in Safari Preferences → Extensions.
-4. After source changes, rebuild with `make safari` and then rebuild in Xcode.
+3. Enable the extension in Safari settings.
+4. After source changes, rerun the same Makefile target and rebuild in Xcode.
 
-To clean the build output and Xcode project:
+To clean build output and generated Xcode projects:
 
 ```sh
 make clean
@@ -133,29 +128,28 @@ make clean
 
 The Safari manifest declares these permissions:
 
-- `activeTab` — access the active tab when the user interacts with the
+- `activeTab` - access the active tab when the user interacts with the
   extension.
-- `scripting` — inject content scripts on demand.
-- `storage` — store the WebSocket URL, pairing token, profile name, browser
-  label, and stable browser instance ID.
-- `tabs` — read tab URLs and titles, send messages to tabs.
-- `*://*/*` — broad host access for regular HTTP and HTTPS pages.
+- `scripting` - inject content scripts on demand.
+- `storage` - store WebSocket URL, pairing token, profile name, browser label,
+  stable browser instance ID, and desired connection state.
+- `tabs` - read tab URLs and titles, and send messages to tabs.
+- `*://*/*` - broad host access for regular HTTP and HTTPS pages.
 
 Unlike Chrome, Safari does not have runtime permission prompts. Broad host
 access is granted when the user installs or enables the extension. See ADR 0019
 for details.
 
-## User flow
+## User Flow
 
-1. Load the extension in Safari (via Xcode build or enabled in Safari
-   Preferences → Extensions).
+1. Load the extension in Safari through an Xcode build or Safari settings.
 2. Click the Brijio toolbar button to open the popup.
-3. Enter the local WebSocket URL (for example `ws://127.0.0.1:8787`).
+3. Enter the local WebSocket URL, for example `ws://127.0.0.1:8787`.
 4. Enter the pairing token used by the local WebSocket and MCP servers.
 5. Confirm or edit the profile name and browser label used for browser
    discovery.
-6. Click Save or Connect. Connect saves the current settings before starting the
-   bridge.
+6. Click Save or Connect. Connect saves the current settings before starting
+   the bridge.
 7. The badge shows `ON` while connected, `OFF` when stopped, and `ERR` on
    error.
 8. Click Disconnect to stop the bridge.
@@ -163,9 +157,14 @@ for details.
 No page context or page content is sent until the extension receives an
 explicit read request over the user-started WebSocket connection.
 
-## Current limitations
+## Current Limitations
 
 - The WebSocket server, MCP server, and Safari extension must be configured with
   the same local pairing token.
-- Safari may suspend extension background pages under memory pressure. The
-  keepalive mechanism (every 20 seconds) helps prevent unexpected suspension.
+- The iOS/iPadOS build uses a non-persistent background page, so Safari may
+  unload it. Brijio reconnects when the extension wakes again if the user
+  previously clicked Connect.
+- Page activity events are wake/reconnect hints only. They cannot keep iOS
+  extension JavaScript running after Safari unloads the background page.
+- The macOS build uses a persistent background page for a more stable desktop
+  Safari WebSocket session.
