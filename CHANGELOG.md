@@ -5,7 +5,8 @@ All notable changes to Brijio are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Server packages and browser extensions use **independent versioning** — extension releases are tagged separately (`ext-chrome-v*`, `ext-safari-v*`) from server releases (`v*`).
+Server packages and browser extension assets are released together from `v*`
+tags. Historical extension-only tags remain valid for older releases.
 
 ## [Unreleased]
 
