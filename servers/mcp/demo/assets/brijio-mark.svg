@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Brijio">
+  <rect width="96" height="96" rx="22" fill="#14211f"/>
+  <path d="M24 51c0-13.25 10.75-24 24-24h6" fill="none" stroke="#8ee0cc" stroke-width="8" stroke-linecap="round"/>
+  <path d="M72 45c0 13.25-10.75 24-24 24h-6" fill="none" stroke="#f4b15d" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="31" cy="51" r="7" fill="#ffffff"/>
+  <circle cx="65" cy="45" r="7" fill="#ffffff"/>
+</svg>
