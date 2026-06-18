@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Brijio demo fixture image">
+  <rect width="640" height="360" fill="#f7f4ed"/>
+  <rect x="44" y="44" width="552" height="272" rx="12" fill="#ffffff" stroke="#cfd8d2" stroke-width="3"/>
+  <rect x="76" y="82" width="196" height="34" rx="8" fill="#14211f"/>
+  <rect x="76" y="144" width="232" height="18" rx="9" fill="#0f766e"/>
+  <rect x="76" y="184" width="174" height="18" rx="9" fill="#9aa8a1"/>
+  <rect x="76" y="224" width="260" height="18" rx="9" fill="#9aa8a1"/>
+  <path d="M390 112v84" stroke="#275efe" stroke-width="18" stroke-linecap="round"/>
+  <path d="M352 162l38 38 38-38" fill="none" stroke="#275efe" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="342" y="224" width="132" height="22" rx="11" fill="#c97912"/>
+  <text x="76" y="288" fill="#14211f" font-family="Arial, sans-serif" font-size="28" font-weight="700">Brijio local fixture</text>
+</svg>
