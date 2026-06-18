@@ -13,7 +13,11 @@ import {
   type PageReadResult,
   type PageReaderAdapter,
   type SetupAdapter,
-  type StorageAdapter
+  type StorageAdapter,
+  type ApprovalAdapter,
+  type ApprovalDecision,
+  type ApprovalRequest,
+  type DownloadAdapter
 } from './background-controller.js'
 import type {
   ActionResultErrorCode,
@@ -28,14 +32,11 @@ import type {
   SubmitFormActionResultData,
   FileUploadPayload,
   WriteTextEditableTarget,
-  WriteTextActionTarget
-  , BatchResultEntry
+  WriteTextActionTarget,
+  BatchResultEntry
 } from './protocol.js'
 
-import type {
-  ContentBatchRequest,
-  BatchResult
-} from './batch-handler.js'
+import type { ContentBatchRequest, BatchResult } from './batch-handler.js'
 
 void describe('Brijio background controller', () => {
   void it('opens setup when action is clicked without a stored WebSocket URL', async () => {
@@ -597,6 +598,225 @@ void describe('Brijio background controller', () => {
     })
   })
 
+  void it('requests approval before approval-gated submit_form and executes after approve', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'approve',
+      activeOrigin: 'https://example.com',
+      submitFormResult: { action: 'submit_form', target: { formId: 'bb-1' } }
+    })
+
+    await sendApprovalGatedSubmitForm(harness, 'action-approve-1')
+
+    assert.equal(harness.approvals.requests.length, 1)
+    assert.deepEqual(harness.approvals.requests[0], {
+      actionUUID: 'action-approve-1',
+      actionType: 'submit_form',
+      origin: 'https://example.com',
+      timeoutMs: 55000
+    })
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'action-submit-approval-1',
+      payload: {
+        type: 'action_result',
+        ok: true,
+        data: {
+          action: 'submit_form',
+          target: { formId: 'bb-1' }
+        }
+      }
+    })
+  })
+
+  void it('returns approval_denied when user denies approval-gated submit_form', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'deny',
+      activeOrigin: 'https://example.com'
+    })
+
+    await sendApprovalGatedSubmitForm(harness, 'action-deny-1')
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'action-submit-approval-1',
+      payload: {
+        type: 'action_result',
+        ok: false,
+        error: {
+          code: 'approval_denied',
+          message: 'User denied approval for submit_form.',
+          actionUUID: 'action-deny-1'
+        }
+      }
+    })
+  })
+
+  void it('returns approval_timeout and hides banner when approval timer fires', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'timeout',
+      activeOrigin: 'https://example.com'
+    })
+
+    const pending = sendApprovalGatedSubmitForm(harness, 'action-timeout-1')
+    await waitForApprovalTimeout(harness)
+    harness.timers.tickTimeout()
+    await pending
+
+    assert.deepEqual(harness.approvals.hidden, ['action-timeout-1'])
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'action-submit-approval-1',
+      payload: {
+        type: 'action_result',
+        ok: false,
+        error: {
+          code: 'approval_timeout',
+          message: 'Timed out waiting for user approval.',
+          actionUUID: 'action-timeout-1'
+        }
+      }
+    })
+  })
+
+  void it('reuses approve_session grant for same origin and action type', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'approve_session',
+      activeOrigin: 'https://example.com',
+      submitFormResult: { action: 'submit_form', target: { formId: 'bb-1' } }
+    })
+
+    await sendApprovalGatedSubmitForm(harness, 'action-session-1')
+    await sendApprovalGatedSubmitForm(harness, 'action-session-2')
+
+    assert.equal(harness.approvals.requests.length, 1)
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'action-submit-approval-1',
+      payload: {
+        type: 'action_result',
+        ok: true,
+        data: {
+          action: 'submit_form',
+          target: { formId: 'bb-1' }
+        }
+      }
+    })
+  })
+
+  void it('returns approval_origin_changed when active origin changes before execution', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'approve',
+      activeOrigin: 'https://example.com',
+      originAfterApproval: 'https://other.example'
+    })
+
+    await sendApprovalGatedSubmitForm(harness, 'action-origin-1')
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'action-submit-approval-1',
+      payload: {
+        type: 'action_result',
+        ok: false,
+        error: {
+          code: 'approval_origin_changed',
+          message:
+            'Active tab origin changed before approved action could run.',
+          actionUUID: 'action-origin-1'
+        }
+      }
+    })
+  })
+
+  void it('requests approval before approval-gated download_file executes', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'approve',
+      activeOrigin: 'https://example.com',
+      download: true
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'download-approval-1',
+        payload: {
+          type: 'download_file',
+          actionUUID: 'download-action-1',
+          approvalRequest: true,
+          url: 'https://example.com/file.csv'
+        }
+      })
+    )
+
+    assert.deepEqual(harness.approvals.requests[0], {
+      actionUUID: 'download-action-1',
+      actionType: 'download_file',
+      origin: 'https://example.com',
+      timeoutMs: 55000
+    })
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'download-approval-1',
+      payload: {
+        type: 'download_file_response',
+        ok: true,
+        downloadId: 42,
+        status: 'initiated'
+      }
+    })
+  })
+
+  void it('requests approval before approval-gated fetch_resource executes', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'approve',
+      activeOrigin: 'https://example.com',
+      download: true
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'fetch-approval-1',
+        payload: {
+          type: 'fetch_resource',
+          actionUUID: 'fetch-action-1',
+          approvalRequest: true,
+          url: 'https://example.com/private.csv'
+        }
+      })
+    )
+
+    assert.deepEqual(harness.approvals.requests[0], {
+      actionUUID: 'fetch-action-1',
+      actionType: 'fetch_resource',
+      origin: 'https://example.com',
+      timeoutMs: 55000
+    })
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'fetch-approval-1',
+      payload: {
+        type: 'fetch_resource_complete',
+        fetchId: 'fetch-1',
+        sha256: 'abc123',
+        totalBytes: 4,
+        dataBase64: 'ZGF0YQ==',
+        contentType: 'text/csv'
+      }
+    })
+  })
+
   void it('returns action errors from perform_action click requests', async () => {
     const harness = createHarness({
       websocketUrl: 'ws://127.0.0.1:8787',
@@ -950,7 +1170,11 @@ void describe('Brijio background controller', () => {
           type: 'perform_batch',
           actions: [
             { type: 'click', target: { kind: 'link', id: 'bb-1' } },
-            { type: 'write_text', target: { formId: 'bb-2', controlId: 'bb-3' }, text: 'hello' }
+            {
+              type: 'write_text',
+              target: { formId: 'bb-2', controlId: 'bb-3' },
+              text: 'hello'
+            }
           ]
         }
       })
@@ -963,8 +1187,14 @@ void describe('Brijio background controller', () => {
         type: 'batch_result',
         ok: true,
         results: [
-          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } },
-          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } }
+          {
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+          },
+          {
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+          }
         ],
         aborted: false
       }
@@ -977,8 +1207,18 @@ void describe('Brijio background controller', () => {
       batchResult: {
         ok: false,
         results: [
-          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } },
-          { ok: false, error: { code: 'target_not_found', message: 'Target not found', aborted: false } }
+          {
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+          },
+          {
+            ok: false,
+            error: {
+              code: 'target_not_found',
+              message: 'Target not found',
+              aborted: false
+            }
+          }
         ],
         aborted: false
       }
@@ -1008,8 +1248,18 @@ void describe('Brijio background controller', () => {
         type: 'batch_result',
         ok: false,
         results: [
-          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } },
-          { ok: false, error: { code: 'target_not_found', message: 'Target not found', aborted: false } }
+          {
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+          },
+          {
+            ok: false,
+            error: {
+              code: 'target_not_found',
+              message: 'Target not found',
+              aborted: false
+            }
+          }
         ],
         aborted: false
       }
@@ -1022,7 +1272,10 @@ void describe('Brijio background controller', () => {
       batchResult: {
         ok: false,
         results: [
-          { ok: true, data: { action: 'click', target: { kind: 'link', id: 'bb-1' } } }
+          {
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+          }
         ],
         aborted: true
       }
@@ -1044,11 +1297,195 @@ void describe('Brijio background controller', () => {
       })
     )
 
-    const sent = parseLastSent(harness) as { payload: { type: string, ok: boolean, results: unknown[], aborted: boolean } }
+    const sent = parseLastSent(harness) as {
+      payload: {
+        type: string
+        ok: boolean
+        results: unknown[]
+        aborted: boolean
+      }
+    }
     assert.equal(sent.payload.type, 'batch_result')
     assert.equal(sent.payload.ok, false)
     assert.equal(sent.payload.results.length, 1)
     assert.equal(sent.payload.aborted, true)
+  })
+
+  void it('continues perform_batch after denied approval-gated submit_form', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'deny',
+      activeOrigin: 'https://example.com'
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'batch-approval-deny-1',
+        payload: {
+          type: 'perform_batch',
+          actions: [
+            {
+              type: 'submit_form',
+              actionUUID: 'batch-action-deny-1',
+              approvalRequest: true,
+              target: { formId: 'bb-1' }
+            },
+            { type: 'click', target: { kind: 'link', id: 'bb-2' } }
+          ]
+        }
+      })
+    )
+
+    assert.equal(harness.approvals.requests.length, 1)
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'batch-approval-deny-1',
+      payload: {
+        type: 'batch_result',
+        ok: false,
+        results: [
+          {
+            ok: false,
+            error: {
+              code: 'approval_denied',
+              message: 'User denied approval for submit_form.',
+              aborted: false,
+              actionUUID: 'batch-action-deny-1'
+            }
+          },
+          {
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-2' } }
+          }
+        ],
+        aborted: false
+      }
+    })
+  })
+
+  void it('returns partial perform_batch result when approval timeout fires', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'timeout',
+      activeOrigin: 'https://example.com'
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    const pending = harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'batch-approval-timeout-1',
+        payload: {
+          type: 'perform_batch',
+          actions: [
+            { type: 'click', target: { kind: 'link', id: 'bb-1' } },
+            {
+              type: 'submit_form',
+              actionUUID: 'batch-action-timeout-1',
+              approvalRequest: true,
+              target: { formId: 'bb-1' }
+            },
+            { type: 'click', target: { kind: 'link', id: 'bb-3' } }
+          ]
+        }
+      })
+    )
+    await waitForApprovalTimeout(harness)
+    harness.timers.tickTimeout()
+    await pending
+
+    assert.deepEqual(harness.approvals.hidden, ['batch-action-timeout-1'])
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'batch-approval-timeout-1',
+      payload: {
+        type: 'batch_result',
+        ok: false,
+        results: [
+          {
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+          },
+          {
+            ok: false,
+            error: {
+              code: 'approval_timeout',
+              message: 'Timed out waiting for user approval.',
+              aborted: true,
+              actionUUID: 'batch-action-timeout-1'
+            }
+          },
+          {
+            ok: false,
+            error: {
+              code: 'approval_timeout',
+              message: 'Skipped because approval timed out before this action.',
+              aborted: true
+            }
+          }
+        ],
+        aborted: true
+      }
+    })
+  })
+
+  void it('reuses approve_session grant inside approval-gated perform_batch', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      approvalDecision: 'approve_session',
+      activeOrigin: 'https://example.com'
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'batch-approval-session-1',
+        payload: {
+          type: 'perform_batch',
+          actions: [
+            {
+              type: 'submit_form',
+              actionUUID: 'batch-action-session-1',
+              approvalRequest: true,
+              target: { formId: 'bb-1' }
+            },
+            {
+              type: 'submit_form',
+              actionUUID: 'batch-action-session-2',
+              approvalRequest: true,
+              target: { formId: 'bb-2' }
+            }
+          ]
+        }
+      })
+    )
+
+    assert.equal(harness.approvals.requests.length, 1)
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'batch-approval-session-1',
+      payload: {
+        type: 'batch_result',
+        ok: true,
+        results: [
+          {
+            ok: true,
+            data: { action: 'submit_form', target: { formId: 'bb-1' } }
+          },
+          {
+            ok: true,
+            data: { action: 'submit_form', target: { formId: 'bb-2' } }
+          }
+        ],
+        aborted: false
+      }
+    })
   })
 
   void it('returns batch_error when performBatch throws', async () => {
@@ -1065,9 +1502,7 @@ void describe('Brijio background controller', () => {
         id: 'batch-4',
         payload: {
           type: 'perform_batch',
-          actions: [
-            { type: 'click', target: { kind: 'link', id: 'bb-1' } }
-          ]
+          actions: [{ type: 'click', target: { kind: 'link', id: 'bb-1' } }]
         }
       })
     )
@@ -1440,7 +1875,10 @@ void describe('Brijio background controller', () => {
     await new Promise((resolve) => setImmediate(resolve))
 
     assert.equal(harness.action.badgeText, 'RCY')
-    assert.equal(harness.controller.getConnectionStatus().state, 'reconnecting')
+    assert.equal(
+      harness.controller.getConnectionStatus().state,
+      'reconnecting'
+    )
   })
 
   void it('transitions to reconnecting on socket error before first connection', async () => {
@@ -1451,7 +1889,10 @@ void describe('Brijio background controller', () => {
     harness.sockets.created[0].fail()
     await new Promise((resolve) => setImmediate(resolve))
 
-    assert.equal(harness.controller.getConnectionStatus().state, 'reconnecting')
+    assert.equal(
+      harness.controller.getConnectionStatus().state,
+      'reconnecting'
+    )
   })
 
   // --- Pending request tracking ---
@@ -1539,10 +1980,15 @@ interface HarnessOptions {
   navigateThrowsError?: boolean
   batchResult?: BatchResult
   batchError?: { code: string, message: string }
+  approvalDecision?: ApprovalDecision | 'timeout'
+  activeOrigin?: string
+  originAfterApproval?: string
+  download?: boolean
 }
 
 interface Harness {
   action: FakeActionAdapter
+  approvals: FakeApprovalAdapter
   controller: BrijioBackgroundController
   setup: FakeSetupAdapter
   sockets: FakeSocketFactory
@@ -1552,9 +1998,9 @@ interface Harness {
 function createHarness (options: HarnessOptions = {}): Harness {
   const storage = new FakeStorageAdapter(
     options.bridgeSettings ??
-    (options.websocketUrl === undefined
-      ? undefined
-      : createBridgeSettings({ websocketUrl: options.websocketUrl }))
+      (options.websocketUrl === undefined
+        ? undefined
+        : createBridgeSettings({ websocketUrl: options.websocketUrl }))
   )
   const setup = new FakeSetupAdapter()
   const action = new FakeActionAdapter()
@@ -1562,11 +2008,16 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const pageActions = new FakePageActionAdapter(options)
   const pageBatch = new FakePageBatchAdapter(options)
   const pageNavigation = new FakePageNavigationAdapter(options)
+  const download = options.download === true ? new FakeDownloadAdapter() : undefined
+  const approvals = new FakeApprovalAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
   const controller = new BrijioBackgroundController({
     action,
+    approval: approvals,
+    approvalTimeoutMs: 55000,
     createWebSocket: sockets.create,
+    ...(download !== undefined ? { download } : {}),
     setup,
     storage,
     pageReader,
@@ -1578,11 +2029,38 @@ function createHarness (options: HarnessOptions = {}): Harness {
 
   return {
     action,
+    approvals,
     controller,
     setup,
     sockets,
     timers
   }
+}
+
+async function sendApprovalGatedSubmitForm (
+  harness: Harness,
+  actionUUID: string
+): Promise<void> {
+  if (harness.sockets.created.length === 0) {
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+  }
+
+  await harness.sockets.created[harness.sockets.created.length - 1].receive(
+    JSON.stringify({
+      type: 'message',
+      id: 'action-submit-approval-1',
+      payload: {
+        type: 'perform_action',
+        action: {
+          type: 'submit_form',
+          actionUUID,
+          approvalRequest: true,
+          target: { formId: 'bb-1' }
+        }
+      }
+    })
+  )
 }
 
 function parseLastSent (harness: Harness): unknown {
@@ -1593,6 +2071,49 @@ function parseLastSent (harness: Harness): unknown {
   }
 
   return JSON.parse(message)
+}
+
+async function waitForApprovalTimeout (harness: Harness): Promise<void> {
+  for (let index = 0; index < 20; index++) {
+    if (harness.timers.timeoutCallback !== undefined) {
+      return
+    }
+
+    await Promise.resolve()
+  }
+
+  assert.fail('Expected approval timeout to be scheduled.')
+}
+
+class FakeApprovalAdapter implements ApprovalAdapter {
+  readonly requests: ApprovalRequest[] = []
+  readonly hidden: string[] = []
+  private approvalCount = 0
+
+  constructor (private readonly options: HarnessOptions) {}
+
+  async getActiveOrigin (): Promise<string | undefined> {
+    if (this.approvalCount > 0 && this.options.originAfterApproval !== undefined) {
+      return this.options.originAfterApproval
+    }
+
+    return this.options.activeOrigin ?? 'https://example.com'
+  }
+
+  async requestApproval (request: ApprovalRequest): Promise<ApprovalDecision> {
+    this.requests.push(request)
+    this.approvalCount++
+
+    if (this.options.approvalDecision === 'timeout') {
+      return await new Promise<ApprovalDecision>(() => {})
+    }
+
+    return this.options.approvalDecision ?? 'approve'
+  }
+
+  async hideApproval (actionUUID: string): Promise<void> {
+    this.hidden.push(actionUUID)
+  }
 }
 
 class FakePageActionAdapter implements PageActionAdapter {
@@ -1679,7 +2200,10 @@ class FakePageActionAdapter implements PageActionAdapter {
     }
   }
 
-  async uploadFile (target: WriteTextActionTarget, file: FileUploadPayload): Promise<PageActionResult> {
+  async uploadFile (
+    target: WriteTextActionTarget,
+    file: FileUploadPayload
+  ): Promise<PageActionResult> {
     if (this.options.pageActionError !== undefined) {
       return {
         ok: false,
@@ -1731,14 +2255,45 @@ class FakePageBatchAdapter implements PageBatchAdapter {
     }
 
     // Default fake implementation: return success for all actions
-    const results: BatchResultEntry[] = message.actions.map((): BatchResultEntry => ({
+    const results: BatchResultEntry[] = message.actions.map(
+      (): BatchResultEntry => ({
+        ok: true,
+        data: {
+          action: 'click',
+          target: { kind: 'link', id: 'bb-1' }
+        }
+      })
+    )
+    return { ok: true, results, aborted: false }
+  }
+}
+
+class FakeDownloadAdapter implements DownloadAdapter {
+  async downloadStatus (): ReturnType<DownloadAdapter['downloadStatus']> {
+    return { ok: true, data: { capability: 'full', items: [] } }
+  }
+
+  async downloadFile (): ReturnType<DownloadAdapter['downloadFile']> {
+    return {
       ok: true,
       data: {
-        action: 'click',
-        target: { kind: 'link', id: 'bb-1' }
+        downloadId: 42,
+        status: 'initiated'
       }
-    }))
-    return { ok: true, results, aborted: false }
+    }
+  }
+
+  async fetchResource (): ReturnType<DownloadAdapter['fetchResource']> {
+    return {
+      ok: true,
+      data: {
+        fetchId: 'fetch-1',
+        contentType: 'text/csv',
+        totalBytes: 4,
+        dataBase64: 'ZGF0YQ==',
+        sha256: 'abc123'
+      }
+    }
   }
 }
 
