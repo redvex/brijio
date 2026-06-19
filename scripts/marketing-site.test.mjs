@@ -10,8 +10,8 @@ function readText(path) {
 }
 
 describe("GitHub Pages marketing site", () => {
- it("defines separate marketing routes demo dropdown navigation", () => {
-   const html = readText("clients/test-page/index.html");
+  it("defines separate marketing routes demo dropdown navigation", () => {
+    const html = readText("clients/test-page/index.html");
 
    assert.match(html, /class="marketing-view"[^>]*data-view="home"/);
    assert.match(html, /class="marketing-view"[^>]*data-view="install"/);
@@ -29,8 +29,28 @@ describe("GitHub Pages marketing site", () => {
 
    assert.match(html, /content\/download-and-install\.md/);
    assert.match(html, /content\/privacy-policy\.md/);
-   assert.match(html, /content\/faq\.md/);
- });
+    assert.match(html, /content\/faq\.md/);
+  });
+
+  it("restores the home hero to the approved two-column bridge composition", () => {
+    const html = readText("clients/test-page/index.html");
+
+    assert.match(html, /<section class="marketing-section hero home-hero"/);
+    assert.match(html, /class="home-hero-copy"/);
+    assert.match(html, /class="hero-image"/);
+    assert.match(html, /class="mock-browser"/);
+    assert.match(html, /class="mock-agent"/);
+    assert.match(html, /class="hero-mark"/);
+    assert.match(html, /class="hero-flow"/);
+    assert.match(html, /\.home-hero\s*\{/);
+    assert.match(html, /\.hero-image\s*\{/);
+    assert.match(html, /\.mock-browser,\s*\.mock-agent\s*\{/);
+    assert.match(html, /\.home-hero\s*\{[\s\S]*?max-width:\s*1280px;/);
+    assert.match(html, /\.hero-image\s*\{[\s\S]*?min-height:\s*550px;/);
+    assert.doesNotMatch(html, /\.home-bridge-visual\s*\{/);
+    assert.doesNotMatch(html, /\.agent-tool-panel\s*\{/);
+    assert.doesNotMatch(html, /data-route-name="home"\]\s+\.topbar\s*\{/);
+  });
 
   it("keeps main navigation visible on demo routes", () => {
     const html = readText("clients/test-page/index.html");
