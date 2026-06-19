@@ -57,11 +57,11 @@ void describe('read and respond shared layout', () => {
     for (const spaPath of spaPages) {
       const html = readHtml(spaPath)
 
-      assert.doesNotMatch(html, /doc\.head\.querySelectorAll\('style, link\[rel="stylesheet"\]'\)/)
-      assert.match(html, /container\.replaceChildren\.apply\(container, Array\.from\(doc\.body\.childNodes\)\);/)
-      assert.match(html, /source === 'read-respond\.html'/)
-      assert.match(html, /var standaloneView = doc\.body\.querySelector\('\.demo-view\.active'\);/)
-      assert.match(html, /doc\.body\.replaceChildren\.apply\(doc\.body, Array\.from\(standaloneView\.childNodes\)\.concat\(scripts\)\);/)
+      assert.doesNotMatch(html, /doc\.head\.querySelectorAll\(["']style, link\[rel="stylesheet"\]["']\)/)
+      assert.match(html, /container\.replaceChildren\.apply\(\s*container,\s*Array\.from\(doc\.body\.childNodes\),?\s*\);/)
+      assert.match(html, /source === ["']read-respond\.html["']/)
+      assert.match(html, /var standaloneView = doc\.body\.querySelector\(["']\.demo-view\.active["']\);/)
+      assert.match(html, /doc\.body\.replaceChildren\.apply\(\s*doc\.body,\s*Array\.from\(standaloneView\.childNodes\)\.concat\(scripts\),?\s*\);/)
     }
   })
 })
