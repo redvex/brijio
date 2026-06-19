@@ -17,6 +17,7 @@
     "lint:md": "prettier --check \"**/*.md\"",
     "lint:ts": "XDG_CACHE_HOME=.cache ts-standard \"**/*.ts\"",
     "precommit": "scripts/pre-commit",
+    "serve:test-pages": "node scripts/build-pages-site.mjs .pages-site && npx serve .pages-site",
     "test": "pnpm -r test && node --test scripts/*.test.mjs",
     "token": "node scripts/brijio-token.mjs"
   },
