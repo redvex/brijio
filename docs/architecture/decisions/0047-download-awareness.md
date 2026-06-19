@@ -1,8 +1,14 @@
 # ADR 0047: Download Awareness
 
-**Status:** Proposed | **Date:** 2026-06-15
+## Status
 
-## Context & Motivation
+Accepted
+
+## Date
+
+2026-06-15
+
+## Context
 
 Brijio agents currently have no visibility into browser downloads. When a page action triggers a download (export button, PDF save, file generation), the agent receives no feedback. When an agent wants to _initiate_ a download or _fetch a resource_ on behalf of the user, it has no mechanism to do so.
 
@@ -33,8 +39,6 @@ Add three MCP tools, a session download registry, and a content staging protocol
 
 Observation ships first. `download_file` and `fetch_resource` are built on the same protocol foundation but are separate tools with separate risk profiles.
 
----
-
 ## Cross-Browser Capability Matrix
 
 | Browser | Observation      | Save to disk (`download_file`) | Authenticated fetch (`fetch_resource`)                |
@@ -44,8 +48,6 @@ Observation ships first. `download_file` and `fetch_resource` are built on the s
 | Safari  | ❌ Not available | ⚠️ Fire-and-forget             | ⚠️ Same-origin works, cross-origin may fail with CORS |
 
 **Safari `fetch_resource` detail:** The extension's background script attempts `fetch(url, {credentials: 'include'})`. For same-origin URLs, cookies are sent and the fetch succeeds. For cross-origin URLs, the server must provide `Access-Control-Allow-Origin` headers — otherwise the fetch fails with a CORS error, which is reported back to the agent as `{ state: "interrupted", error: "cors_blocked" }`. This is honest: the agent knows exactly what went wrong rather than receiving a generic "not supported" response.
-
----
 
 ## Polling Model
 
@@ -72,8 +74,6 @@ Agent → MCP: [fetch_resource(url)] → WS → Background script
 ```
 
 If Brijio adds push events in the future, download/fetch notifications could be delivered that way — but polling remains the primary interface.
-
----
 
 ## MCP Tool Shapes
 
@@ -215,8 +215,6 @@ The extension starts the fetch immediately and returns a `fetchId`. The agent po
 }
 ```
 
----
-
 ## `fetch_resource` Staging Protocol
 
 The extension fetches the resource using `fetch(url, {credentials: 'include'})` — the browser's cookie jar is attached automatically. Response bytes are streamed back to MCP via a chunked staging protocol, mirroring ADR 0046's upload staging in reverse.
@@ -309,8 +307,6 @@ BRIJIO_FETCH_MAX_BYTES=10485760    # max response size to accept (default 10 MiB
 BRIJIO_FETCH_TIMEOUT=30000         # max ms to wait for response headers (default 30s)
 ```
 
----
-
 ## `fetch_resource` Security and Approvals
 
 `fetch_resource` is a **high-risk tool**. It fetches authenticated content from the browser's session and delivers it to the agent. This has significant security implications:
@@ -325,8 +321,6 @@ BRIJIO_FETCH_TIMEOUT=30000         # max ms to wait for response headers (defaul
 **When the approvals system is implemented**, `fetch_resource` will be classified as a high-risk tool requiring explicit user approval per invocation. `download_file` and `download_status` will be classified as standard risk (they only save to the user's own Downloads folder or return metadata).
 
 This forward-looking constraint is recorded here so that the implementation can be built with the right hooks — even if the approvals UI ships later.
-
----
 
 ## Download Metadata in Action Results
 
@@ -352,8 +346,6 @@ When a `click_element` or `perform_batch` action triggers a download that the ba
 ```
 
 This field is **absent on Safari** (no observation capability).
-
----
 
 ## Download Metadata Schema
 
@@ -386,8 +378,6 @@ interface FetchResourceInfo {
 
 `error` and `danger` on `DownloadInfo` map from Chrome's `InterruptReason` and `DangerType` enums as structured strings.
 
----
-
 ## Privacy Boundaries
 
 | Boundary                   | Applies to                         | Rationale                                                                                          |
@@ -400,8 +390,6 @@ interface FetchResourceInfo {
 | No `downloads.open`        | All                                | `"downloads.open"` permission is explicitly excluded — agent cannot open files                     |
 | Chunk content not logged   | `fetch_resource`                   | Error details may include `fetchId`, chunk indexes, sizes — but never chunk `dataBase64`           |
 | `sha256` integrity check   | `fetch_resource`                   | Agent can verify received content matches what the extension fetched                               |
-
----
 
 ## Session Download Registry
 
@@ -419,8 +407,6 @@ The background script maintains two registries:
 5. Bridge disconnects → background script unsubscribes from events and clears both registries.
 
 **Per-download/fetch timeout:** If an item stays `in_progress` beyond a configurable window, the background script reports it as `interrupted` with a timeout error. Default: 5 minutes.
-
----
 
 ## Safari — Honest Capability Disclosure
 
@@ -461,8 +447,6 @@ The extension attempts `fetch(url, {credentials: 'include'})`. Results depend on
 
 The agent receives a clear error message, not a generic "not supported" response. This is honest: the agent knows exactly what went wrong and can inform the user or try a different approach (e.g., asking the user to download manually).
 
----
-
 ## Internal WebSocket Messages
 
 | Direction         | Message Type              | Purpose                                     |
@@ -476,8 +460,6 @@ The agent receives a clear error message, not a generic "not supported" response
 | Extension → Agent | `fetch_resource_chunk`    | Content chunk (base64)                      |
 | Extension → Agent | `fetch_resource_complete` | All content streamed, sha256 provided       |
 | Extension → Agent | `fetch_resource_error`    | Fetch failed (CORS, timeout, size, network) |
-
----
 
 ## Consequences
 
@@ -509,8 +491,6 @@ The agent receives a clear error message, not a generic "not supported" response
 - **Download spam:** An agent could trigger many downloads or fetches in a loop. Rate limiting should be considered in a follow-up, but is out of scope for the initial implementation.
 - **Memory pressure:** `fetch_resource` streams response bytes through the extension and WS. Very large resources could pressure memory. The `maxSizeBytes` limit mitigates this, but the default (10 MiB) may need tuning for different deployment scenarios.
 - **Exfiltration surface:** `fetch_resource` allows the agent to access any URL the user's session can reach, including private/internal resources. The approvals system must treat this as high-risk and show the exact URL being fetched before allowing it.
-
----
 
 ## Scope
 

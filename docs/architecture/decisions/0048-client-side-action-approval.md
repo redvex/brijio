@@ -1,6 +1,12 @@
 # ADR 0048: Client-Side Action Approval
 
-**Status:** Accepted | **Date:** 2026-06-18
+## Status
+
+Accepted
+
+## Date
+
+2026-06-18
 
 ## Context
 
