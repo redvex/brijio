@@ -18,10 +18,11 @@ The SPA uses hash routes so it works with the existing static file server and ng
 
 - `/#home`
 - `/#read`
+- `/#parse`
 - `/#actions`
 - `/#downloads`
 
-The three demo routes load their existing fixture pages in same-origin iframes. Each fixture page also remains directly reachable for standalone MCP testing.
+Four demo routes fetch their existing same-origin fixture pages, remove duplicated page-level navigation, and insert the fixture body into the SPA route. Each fixture page also remains directly reachable for standalone MCP testing.
 
 ## Download Fixtures
 
