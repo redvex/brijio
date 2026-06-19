@@ -1,6 +1,12 @@
-# ADR 0049: Unified Release Tag and Extension Assets
+# ADR 0049: Unified Release Tag Extension Assets
 
-**Status:** Accepted | **Date:** 2026-06-18
+## Status
+
+Accepted
+
+## Date
+
+2026-06-18
 
 ## Context
 
