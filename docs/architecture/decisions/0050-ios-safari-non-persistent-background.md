@@ -1,6 +1,12 @@
 # ADR 0050: iOS Safari Non-Persistent Background Page
 
-**Status:** Accepted | **Date:** 2026-06-18
+## Status
+
+Accepted
+
+## Date
+
+2026-06-18
 
 ## Context
 

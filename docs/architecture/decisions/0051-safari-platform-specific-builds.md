@@ -1,6 +1,12 @@
 # ADR 0051: Safari Platform-Specific Builds
 
-**Status:** Accepted | **Date:** 2026-06-18
+## Status
+
+Accepted
+
+## Date
+
+2026-06-18
 
 ## Context
 
@@ -89,4 +95,3 @@ Implementation should verify:
 - `pnpm --filter @brijio/safari-extension test` passes.
 - `pnpm --filter @brijio/safari-extension build` produces `dist-ios` and
   `dist-macos`.
-
