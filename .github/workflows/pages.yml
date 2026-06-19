@@ -6,6 +6,10 @@ on:
       - develop
     paths:
       - "clients/test-page/**"
+      - "clients/extensions/chrome/PRIVACY-POLICY.md"
+      - "docs/artifacts/download-and-install.md"
+      - "docs/artifacts/faq.md"
+      - "scripts/build-pages-site.mjs"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -29,10 +33,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Assemble Pages artifact
+        run: node scripts/build-pages-site.mjs .pages-site
+
       - name: Upload demo pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: clients/test-page
+          path: .pages-site
 
       - name: Deploy to GitHub Pages
         id: deployment
