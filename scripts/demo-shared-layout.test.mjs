@@ -54,8 +54,8 @@ void describe('standalone demo shared layout', () => {
     for (const filePath of ['clients/test-page/index.html', 'servers/mcp/demo/index.html']) {
       const html = readHtml(filePath)
 
-      assert.match(html, /var standaloneView = doc\.body\.querySelector\('\.demo-view\.active'\);/)
-      assert.match(html, /doc\.body\.replaceChildren\.apply\(doc\.body, Array\.from\(standaloneView\.childNodes\)\.concat\(scripts\)\);/)
+      assert.match(html, /var standaloneView = doc\.body\.querySelector\(["']\.demo-view\.active["']\);/)
+      assert.match(html, /doc\.body\.replaceChildren\.apply\(\s*doc\.body,\s*Array\.from\(standaloneView\.childNodes\)\.concat\(scripts\),?\s*\);/)
     }
   })
 
