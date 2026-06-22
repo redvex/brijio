@@ -1,325 +1,1462 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Brijio Demo</title>
-<link rel="icon" href="assets/brijio-mark.svg">
-<style>
-:root {
-  color-scheme: light;
-  --ink: #14211f;
-  --muted: #5d6d68;
-  --paper: #f7f4ed;
-  --surface: #ffffff;
-  --line: #d9ddd2;
-  --blue: #275efe;
-  --teal: #0f766e;
-  --amber: #c97912;
-  --green: #2f6f4e;
-  --red: #b3261e;
-  --shadow: 0 18px 50px rgba(20, 33, 31, 0.12);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  line-height: 1.5;
-}
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-body {
-margin: 0;
-min-height: 100vh;
-overflow-x: hidden;
-background: linear-gradient(180deg, rgba(255,255,255,.84), rgba(247,244,237,.98)), repeating-linear-gradient(90deg, rgba(20,33,31,.035) 0 1px, transparent 1px 78px), var(--paper);
-color: var(--ink);
-}
-a { color: inherit; }
-.shell { min-height: 100vh; display: flex; flex-direction: column; }
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 14px clamp(18px, 4vw, 48px);
-  border-bottom: 1px solid rgba(20,33,31,.12);
-  background: rgba(247,244,237,.92);
-  backdrop-filter: blur(14px);
-}
-.brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; text-decoration: none; font-weight: 900; }
-.brand img { width: 34px; height: 34px; }
-.nav { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
-.nav a { display: inline-flex; align-items: center; min-height: 36px; padding: 7px 12px; border: 1px solid transparent; border-radius: 8px; color: var(--muted); font-size: .92rem; font-weight: 800; text-decoration: none; }
-.nav a:hover { color: var(--ink); border-color: rgba(20,33,31,.14); background: rgba(255,255,255,.64); }
-.nav a[aria-current="page"] { color: #fff; background: var(--ink); border-color: var(--ink); }
-main { flex: 1; }
-.home { display: grid; gap: 56px; padding: clamp(32px,6vw,72px) clamp(18px,4vw,48px) 56px; }
-.hero { display: grid; grid-template-columns: minmax(0,.9fr) minmax(360px,1.1fr); gap: clamp(32px,5vw,72px); align-items: center; max-width: 1280px; width: 100%; margin: 0 auto; }
-.eyebrow { width: fit-content; margin: 0 0 18px; padding: 6px 10px; border: 1px solid rgba(20,33,31,.18); border-radius: 999px; color: var(--green); background: rgba(255,255,255,.68); font-size: .78rem; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
-h1 { margin: 0; max-width: 780px; font-size: clamp(4.4rem,10vw,9.4rem); line-height: .88; letter-spacing: 0; }
-.hero-copy { max-width: 680px; margin: 24px 0 0; color: var(--muted); font-size: clamp(1.08rem,2vw,1.35rem); }
-.hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 30px; }
-.button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 11px 16px; border: 1px solid var(--ink); border-radius: 8px; background: var(--ink); color: #fff; font-weight: 900; text-decoration: none; }
-.button.secondary { background: rgba(255,255,255,.72); color: var(--ink); }
-.hero-image { position: relative; min-height: 550px; border: 1px solid rgba(20,33,31,.16); border-radius: 8px; overflow: hidden; background: #10211e; box-shadow: var(--shadow); }
-.hero-image::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 26% 28%, rgba(142,224,204,.24), transparent 26%), radial-gradient(circle at 80% 70%, rgba(244,177,93,.22), transparent 28%); }
-.hero-mark { position: absolute; top: 32px; left: 32px; width: 104px; height: 104px; filter: drop-shadow(0 18px 30px rgba(0,0,0,.28)); }
-.hero-flow { position: absolute; inset: 0; pointer-events: none; }
-.hero-flow path { fill: none; stroke: #8ee0cc; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 10 12; opacity: .88; }
-.hero-flow circle { fill: #f4b15d; }
-.mock-browser, .mock-agent { position: absolute; border: 1px solid rgba(255,255,255,.16); border-radius: 8px; overflow: hidden; background: rgba(255,255,255,.96); }
-.mock-browser { left: 32px; bottom: 34px; width: 44%; min-height: 330px; }
-.mock-agent { right: 32px; top: 72px; width: 44%; min-height: 360px; color: #d8ece7; background: #172b27; }
-.panel-bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid #dfe4dc; background: #f8f7f2; }
-.mock-agent .panel-bar { border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.06); }
-.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--amber); }
-.dot:nth-child(2) { background: var(--teal); }
-.dot:nth-child(3) { background: var(--blue); }
-.mock-body { padding: 18px; }
-.mock-body h2, .mock-body p { margin: 0; }
-.mock-body h2 { font-size: 1.15rem; color: var(--ink); }
-.mock-body p { margin-top: 8px; color: #61716c; font-size: .92rem; }
-.mock-lines { display: grid; gap: 10px; margin-top: 18px; }
-.mock-lines span { display: block; height: 12px; border-radius: 999px; background: #dfe6df; }
-.mock-lines span:nth-child(1) { width: 82%; background: #0f766e; }
-.mock-lines span:nth-child(2) { width: 64%; }
-.mock-lines span:nth-child(3) { width: 92%; }
-.tool-list { display: grid; gap: 10px; padding: 18px; }
-.tool-card { padding: 14px; border: 1px solid rgba(216,236,231,.18); border-radius: 8px; background: rgba(255,255,255,.07); }
-.tool-card strong { display: block; color: #fff; font-size: .95rem; }
-.tool-card span { display: block; margin-top: 4px; color: rgba(216,236,231,.74); font-size: .84rem; }
-.section { max-width: 1280px; width: 100%; margin: 0 auto; }
-.section h2 { margin: 0; font-size: clamp(2rem,4vw,3.2rem); line-height: 1; letter-spacing: 0; }
-.section-intro { max-width: 760px; margin: 12px 0 24px; color: var(--muted); font-size: 1.08rem; }
-.feature-grid, .demo-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; }
-.feature-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
-.feature, .demo-card { border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.78); box-shadow: 0 8px 24px rgba(20,33,31,.06); }
-.feature { padding: 20px; }
-.feature b { display: block; margin-bottom: 8px; font-size: 1.04rem; }
-.feature p, .demo-card p { margin: 0; color: var(--muted); }
-.demo-card { display: flex; min-height: 260px; flex-direction: column; padding: 18px; text-decoration: none; }
-.demo-card:hover { border-color: rgba(39,94,254,.46); box-shadow: 0 14px 34px rgba(20,33,31,.12); }
-.demo-art { display: grid; min-height: 116px; margin-bottom: 18px; place-items: center; border: 1px solid rgba(20,33,31,.12); border-radius: 8px; background: #f8f7f2; }
-.demo-art svg { width: min(72%, 220px); height: auto; }
-.demo-card h3 { margin: 0 0 8px; font-size: 1.24rem; }
-.demo-view { min-height: calc(100vh - 64px); background: #f2f4ef; }
-.demo-view.active { display: grid; grid-template-rows: auto 1fr; }
-.demo-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 22px clamp(18px,4vw,48px); border-bottom: 1px solid rgba(20,33,31,.12); background: rgba(255,255,255,.82); }
-.demo-header h1 { margin: 0; font-size: clamp(2.4rem,5vw,4.6rem); line-height: .96; }
-.demo-header p { max-width: 680px; margin: 8px 0 0; color: var(--muted); font-size: 1.06rem; }
-.demo-content { min-height: calc(100vh - 190px); padding: 24px clamp(18px,4vw,48px) 48px; background: linear-gradient(180deg,rgba(255,255,255,.86),rgba(247,244,237,.98)), #f7f4ed; }
-.demo-content.loading, .demo-content.error { display: grid; place-items: center; color: var(--muted); font-weight: 900; }
-.demo-content .layout, .demo-content .page, .demo-content > main, .demo-content > section { width: min(1280px,100%); margin: 0 auto; }
-.demo-content h1, .demo-content h2, .demo-content h3 { color: var(--ink); letter-spacing: 0; }
-.demo-content h2 { color: var(--teal); }
-.demo-content section, .demo-content fieldset, .demo-content .card, .demo-content .summary, .demo-content .panel, .demo-content .status-log, .demo-content .results { border-color: var(--line) !important; border-radius: 8px !important; background: rgba(255,255,255,.84) !important; box-shadow: 0 8px 24px rgba(20,33,31,.06); }
-.demo-content label { display: block; margin: 10px 0; }
-.demo-content input, .demo-content select, .demo-content textarea, .demo-content [contenteditable] { max-width: 100%; border: 1px solid #cfd8d2; background: #fff; }
-.demo-content input:not([type="checkbox"]):not([type="radio"]), .demo-content select, .demo-content textarea, .demo-content [contenteditable] { width: 100%; padding: 10px; }
-.demo-content button, .demo-content .download-link, .demo-content .nav-btn { min-height: 38px; border-radius: 8px !important; font-weight: 900; }
-.demo-content input[type="image"] { display: block; width: min(100%, 420px); height: 120px; object-fit: contain; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--blue); color: #fff; }
-.demo-content table { display: block; width: 100%; max-width: 100%; margin: 1rem 0 2rem; border: 1px solid #b8c7be; border-radius: 8px; border-spacing: 0; border-collapse: separate; overflow: auto; background: #fff; font-size: .94rem; }
-.demo-content thead { position: sticky; top: 0; z-index: 1; }
-.demo-content th, .demo-content td { min-width: 150px; padding: 11px 13px; border: 0 !important; border-right: 1px solid var(--line) !important; border-bottom: 1px solid var(--line) !important; text-align: left; vertical-align: top; }
-.demo-content th:last-child, .demo-content td:last-child { border-right: 0 !important; }
-.demo-content tbody tr:last-child td { border-bottom: 0 !important; }
-.demo-content th { background: #e9f3ef; color: #243632; font-size: .78rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
-.demo-content tbody tr:nth-child(even) td { background: #fbfcf8; }
-.demo-content tbody tr:hover td { background: rgba(39,94,254,.06); }
-.demo-content td:first-child { font-weight: 750; color: #1e3f3a; }
-.demo-content .parse-callout { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; margin: 22px 0; }
-.demo-content .parse-callout div { padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
-.demo-content .parse-callout b { display: block; margin-bottom: 4px; color: var(--teal); }
-.demo-content .layout { display: flex; gap: 24px; align-items: flex-start; }
-.demo-content .left-col { width: 62%; min-width: 0; }
-.demo-content .right-col, .demo-content .aside { position: sticky; top: 88px; width: 38%; min-width: 360px; max-height: calc(100vh - 110px); overflow-y: auto; }
-.demo-content .right-col .story-toc { margin-bottom: 16px; }
-.demo-content .right-col #form { border-color: rgba(15,118,110,.28) !important; }
-.demo-content .right-col #form h2 { margin-top: 0; }
-.demo-content .grid { display: grid; grid-template-columns: minmax(0,1fr) 340px; gap: 20px; align-items: start; }
-.demo-content .cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
-.demo-content .action-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; align-items: stretch; }
-.demo-content .action-grid > * { min-width: 0; max-width: 100%; }
-.demo-content [role="tab"], .demo-content [role="menuitem"], .demo-content [role="switch"], .demo-content [role="treeitem"], .demo-content [role="option"], .demo-content [role="menuitemcheckbox"], .demo-content [role="menuitemradio"], .demo-content .meta-card { display: block; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; cursor: pointer; }
-.demo-content [aria-selected="true"], .demo-content [aria-checked="true"] { border-color: rgba(39,94,254,.44); background: rgba(39,94,254,.1); font-weight: 900; }
-.demo-content .tab-bar { display: flex; flex-wrap: wrap; gap: 6px; }
-.demo-content .tab-panel { border: 1px solid var(--line); border-radius: 8px; padding: 1rem; background: #fff; min-height: 3rem; }
-.demo-content .tree-group { margin-left: 0; overflow: hidden; transition: max-height .2s ease; }
-.demo-content .tree-group.collapsed { max-height: 0; }
-.demo-content .tree-group.expanded { max-height: 10rem; }
-.demo-content .switch-indicator { display: inline-block; width: .75rem; height: .75rem; border-radius: 50%; background: #9ca3af; }
-.demo-content [role="switch"][aria-checked="true"] .switch-indicator { background: var(--blue); }
-.demo-content .url, .demo-content .url-display { display: block; max-width: 100%; padding: 10px; border: 1px solid #dfe4dc; border-radius: 6px; background: #f8f7f2; color: #263331; overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: .9rem; }
-.demo-content .badge { width: fit-content; padding: 3px 8px; border-radius: 999px; background: rgba(15,118,110,.12); color: var(--teal); font-size: .74rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
-.demo-content .download-link { display: inline-flex; align-items: center; width: fit-content; padding: 8px 12px; border: 1px solid var(--ink); background: var(--ink); color: #fff !important; text-decoration: none; }
-@media (max-width: 1100px) { .hero, .feature-grid, .demo-grid { grid-template-columns: 1fr; } .hero-image { min-height: 520px; } }
-@media (max-width: 760px) { .topbar, .demo-header { align-items: flex-start; flex-direction: column; } .topbar { gap: 14px; padding-inline: 18px; } .nav { display: grid; width: 100%; grid-template-columns: 1fr; justify-content: stretch; } .nav a { min-width: 0; justify-content: center; text-align: center; white-space: normal; overflow-wrap: anywhere; } h1 { font-size: clamp(2.8rem,14vw,4.1rem); overflow-wrap: anywhere; } .mock-browser, .mock-agent { position: relative; left: auto; right: auto; top: auto; bottom: auto; width: auto; margin: 18px; } .hero-image { min-height: auto; padding: 120px 0 12px; } .demo-content .layout, .demo-content .grid, .demo-content .cards { display: block; } .demo-content .left-col, .demo-content .right-col, .demo-content .aside { position: static; width: 100%; max-height: none; } }
-@media
-</style>
-</head>
-<body>
-<div class="shell">
-<header class="topbar">
-<a class="brand" href="#home" data-route="home"><img src="assets/brijio-mark.svg" alt=""><span>Brijio Demo</span></a>
-<nav class="nav" aria-label="Demo navigation">
-<a href="#home" data-route="home">Home</a>
-<a href="#read" data-route="read">Read and Respond</a>
-<a href="#parse" data-route="parse">Parse Data</a>
-<a href="#actions" data-route="actions">Navigation and Actions</a>
-<a href="#downloads" data-route="downloads">Downloads</a>
-</nav>
-</header>
-<main>
-<section class="home" data-view="home">
-<div class="hero">
-<div>
-<p class="eyebrow">User-controlled browser bridge for AI agents</p>
-<h1>Brijio</h1>
-<p class="hero-copy">Brijio gives AI agents precise, request-based access to the browser the user has explicitly connected. It is built for demos that need real page context, real DOM actions, and clear user control.</p>
-<div class="hero-actions"><a class="button" href="#read" data-route="read">Run the form demo</a><a class="button secondary" href="#parse" data-route="parse">Parse structured data</a></div>
-</div>
-<div class="hero-image" aria-label="Brijio browser bridge visual">
-<img class="hero-mark" src="assets/brijio-mark.svg" alt="">
-<svg class="hero-flow" viewBox="0 0 720 520" aria-hidden="true"><path d="M188 360 C 300 250, 386 260, 516 150"/><circle cx="188" cy="360" r="8"/><circle cx="516" cy="150" r="8"/></svg>
-<div class="mock-browser"><div class="panel-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="mock-body"><h2>Browser tab</h2><p>Current URL, title, page text, links, forms, and visible actions.</p><div class="mock-lines"><span></span><span></span><span></span></div></div></div>
-<div class="mock-agent"><div class="panel-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><div class="tool-list"><div class="tool-card"><strong>read_current_page</strong><span>Structured context with pagination.</span></div><div class="tool-card"><strong>fill_input and click_element</strong><span>Targeted DOM actions routed through the browser.</span></div><div class="tool-card"><strong>download_file</strong><span>Start downloads and inspect browser status.</span></div></div></div>
-</div>
-</div>
-<section class="section" aria-labelledby="why-title"><h2 id="why-title">Built for controlled browser access</h2><p class="section-intro">The extension is reactive: browser state is requested through MCP tools, routed over WebSocket, and returned as structured results. No continuous page streaming is required for this demo.</p><div class="feature-grid"><div class="feature"><b>User starts the bridge</b><p>The browser connects only after the user chooses to connect from the extension UI.</p></div><div class="feature"><b>Agents make explicit calls</b><p>Every read, click, fill, navigation, fetch, or download action starts as a clear MCP tool request.</p></div><div class="feature"><b>Sessions stay private</b><p>Routing is designed around user, session, and channel identifiers for local and future cloud deployments.</p></div></div></section>
-<section class="section" aria-labelledby="demos-title"><h2 id="demos-title">Test Brijio in four ways</h2><p class="section-intro">Use these local pages to verify reading, structured data extraction, browser actions, and downloads through the Brijio bridge.</p><div class="demo-grid">
-<a class="demo-card" href="#read" data-route="read"><span class="demo-art" aria-hidden="true"><svg viewBox="0 0 320 150"><rect x="20" y="20" width="122" height="110" rx="8" fill="#fff" stroke="#cfd8d2"/><rect x="38" y="42" width="82" height="8" rx="4" fill="#0f766e"/><rect x="38" y="62" width="70" height="6" rx="3" fill="#9aa8a1"/><rect x="176" y="30" width="124" height="90" rx="8" fill="#172b27"/><path d="M152 74h18" stroke="#275efe" stroke-width="6" stroke-linecap="round"/><rect x="194" y="50" width="72" height="10" rx="5" fill="#8ee0cc"/></svg></span><h3>Read and Respond</h3><p>Read Holmes prose, fill a form, upload a file, and verify answers on-page.</p></a>
-<a class="demo-card" href="#parse" data-route="parse"><span class="demo-art" aria-hidden="true"><svg viewBox="0 0 320 150"><rect x="30" y="28" width="260" height="96" rx="8" fill="#fff" stroke="#cfd8d2"/><path d="M52 58h216M52 84h216M52 110h216M116 40v80M204 40v80" stroke="#d9ddd2" stroke-width="5"/><rect x="52" y="44" width="48" height="10" rx="5" fill="#0f766e"/><rect x="132" y="70" width="54" height="10" rx="5" fill="#275efe"/><rect x="222" y="96" width="38" height="10" rx="5" fill="#c97912"/></svg></span><h3>Parse Data</h3><p>Extract structured facts from tables, records, timelines, and references.</p></a>
-<a class="demo-card" href="#actions" data-route="actions"><span class="demo-art" aria-hidden="true"><svg viewBox="0 0 320 150"><rect x="28" y="26" width="264" height="98" rx="8" fill="#fff" stroke="#cfd8d2"/><rect x="48" y="46" width="70" height="28" rx="6" fill="#275efe"/><rect x="132" y="46" width="70" height="28" rx="6" fill="#f1f4ef" stroke="#cfd8d2"/><circle cx="232" cy="60" r="16" fill="#0f766e"/><path d="M68 98h92m20 0h72" stroke="#c97912" stroke-width="8" stroke-linecap="round"/></svg></span><h3>Navigation and Actions</h3><p>Exercise clicks, role selectors, history changes, widgets, and live DOM updates.</p></a>
-<a class="demo-card" href="#downloads" data-route="downloads"><span class="demo-art" aria-hidden="true"><svg viewBox="0 0 320 150"><rect x="42" y="24" width="236" height="102" rx="8" fill="#172b27"/><path d="M160 42v42" stroke="#8ee0cc" stroke-width="12" stroke-linecap="round"/><path d="M138 68l22 22 22-22" fill="none" stroke="#8ee0cc" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/><rect x="96" y="98" width="128" height="10" rx="5" fill="#d8ece7"/></svg></span><h3>Downloads</h3><p>Trigger local fixture downloads, poll browser status, and test fetch behavior.</p></a>
-</div></section>
-</section>
-<section class="demo-view" data-view="read" aria-label="Read and Respond"><div class="demo-content loading" data-source="read-respond.html">Loading demo...</div></section>
-<section class="demo-view" data-view="parse" aria-label="Parse Data"><div class="demo-content loading" data-source="parse-data.html">Loading demo...</div></section>
-<section class="demo-view" data-view="actions" aria-label="Navigation and Actions"><div class="demo-content loading" data-source="navigation.html">Loading demo...</div></section>
-<section class="demo-view" data-view="downloads" aria-label="Downloads"><div class="demo-content loading" data-source="download.html">Loading demo...</div></section>
-</main>
-</div>
-<script>
-(function () {
-  var routes = {
-    home: { title: 'Brijio Demo' },
-    read: { title: 'Brijio Demo - Read and Respond' },
-    parse: { title: 'Brijio Demo - Parse Data' },
-    actions: { title: 'Brijio Demo - Navigation and Actions' },
-    downloads: { title: 'Brijio Demo - Downloads' }
-  };
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Brijio</title>
+    <link rel="icon" href="assets/brijio-mark.svg" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #14211f;
+        --muted: #5d6d68;
+        --paper: #f7f4ed;
+        --surface: #ffffff;
+        --line: #d9ddd2;
+        --blue: #275efe;
+        --teal: #0f766e;
+        --amber: #c97912;
+        --green: #2f6f4e;
+        --red: #b3261e;
+        --shadow: 0 18px 50px rgba(20, 33, 31, 0.12);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
 
-  function routeFromHash () {
-    var raw = window.location.hash.slice(1);
-    if (raw.charAt(0) === '/') raw = raw.slice(1);
-    return Object.prototype.hasOwnProperty.call(routes, raw) ? raw : 'home';
-  }
+      * {
+        box-sizing: border-box;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.84),
+            rgba(247, 244, 237, 0.98)
+          ),
+          repeating-linear-gradient(
+            90deg,
+            rgba(20, 33, 31, 0.035) 0 1px,
+            transparent 1px 78px
+          ),
+          var(--paper);
+        color: var(--ink);
+      }
+      a {
+        color: inherit;
+      }
+      .shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 14px clamp(18px, 4vw, 48px);
+        border-bottom: 1px solid rgba(20, 33, 31, 0.12);
+        background: rgba(247, 244, 237, 0.94);
+        backdrop-filter: blur(14px);
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        min-width: max-content;
+        color: var(--ink);
+        font-weight: 900;
+        text-decoration: none;
+      }
+      .brand img {
+        width: 34px;
+        height: 34px;
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .nav a,
+      .nav button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        padding: 7px 12px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        font-size: 0.92rem;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .nav a:hover,
+      .nav button:hover,
+      .nav a:focus-visible,
+      .nav button:focus-visible {
+        color: var(--ink);
+        border-color: rgba(20, 33, 31, 0.14);
+        background: rgba(255, 255, 255, 0.64);
+        outline: none;
+      }
+      .nav a[aria-current="page"] {
+        color: #fff;
+        background: var(--ink);
+       border-color: var(--ink);
+     }
+      .demo-subnav {
+        display: none;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        padding: 12px clamp(18px, 4vw, 48px);
+        border-bottom: 1px solid rgba(20, 33, 31, 0.08);
+        background: rgba(247, 244, 237, 0.6);
+      }
+      .shell[data-route-type="demo"] .demo-subnav {
+        display: flex;
+      }
+      .demo-subnav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 38px;
+        padding: 8px 18px;
+        border: 1px solid rgba(20, 33, 31, 0.14);
+        border-radius: 999px;
+        background: var(--surface);
+        color: var(--muted);
+        font: inherit;
+        font-size: 0.92rem;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+          color 0.15s,
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .demo-subnav a:hover,
+      .demo-subnav a:focus-visible {
+        color: var(--ink);
+        border-color: rgba(20, 33, 31, 0.28);
+        background: rgba(255, 255, 255, 0.9);
+        outline: none;
+      }
+      .demo-subnav a[aria-current="page"] {
+        color: #fff;
+       background: var(--ink);
+       border-color: var(--ink);
+      }
+      main {
+        flex: 1;
+      }
+      .marketing-view {
+        min-height: calc(100vh - 64px);
+      }
+      .shell[data-route-name="home"] .marketing-view {
+        min-height: 100vh;
+      }
+      .marketing-section {
+        width: min(1180px, 100%);
+        margin: 0 auto;
+        padding: clamp(34px, 6vw, 76px) clamp(18px, 4vw, 48px);
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.96fr) minmax(380px, 1.04fr);
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding-bottom: clamp(28px, 4vw, 52px);
+      }
+      .home-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+        gap: clamp(32px, 5vw, 72px);
+        align-items: center;
+        max-width: 1280px;
+        width: 100%;
+        margin: 0 auto;
+        padding-bottom: 0;
+      }
+      .home-hero + .marketing-section {
+        padding-top: clamp(20px, 3vw, 40px);
+      }
+      .eyebrow {
+        width: fit-content;
+        margin: 0 0 18px;
+        padding: 6px 10px;
+        border: 1px solid rgba(20, 33, 31, 0.18);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.68);
+        color: var(--green);
+        font-size: 0.78rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      h1 {
+        margin: 0;
+        max-width: 780px;
+        font-size: clamp(4.4rem, 10vw, 9.4rem);
+        line-height: 0.88;
+      }
+      .home-hero h1 {
+        color: var(--ink);
+      }
+      .hero-copy {
+        max-width: 680px;
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: clamp(1.08rem, 2vw, 1.35rem);
+      }
+      .hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+      }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 46px;
+        padding: 11px 16px;
+        border: 1px solid var(--ink);
+        border-radius: 8px;
+        background: var(--ink);
+        color: #fff;
+        font-weight: 900;
+        text-decoration: none;
+      }
+      .button.secondary {
+        background: rgba(255, 255, 255, 0.72);
+        color: var(--ink);
+      }
+      .hero-image {
+        position: relative;
+        min-height: 550px;
+        border: 1px solid rgba(20, 33, 31, 0.16);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #10211e;
+        box-shadow: var(--shadow);
+      }
+      .hero-image::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(
+            circle at 26% 28%,
+            rgba(142, 224, 204, 0.24),
+            transparent 26%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(244, 177, 93, 0.22),
+            transparent 28%
+          );
+      }
+      .hero-mark {
+        position: absolute;
+        top: 32px;
+        left: 32px;
+        width: 104px;
+        height: 104px;
+        filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.28));
+      }
+      .hero-flow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .hero-flow path {
+        fill: none;
+        stroke: #8ee0cc;
+        stroke-width: 5;
+        stroke-linecap: round;
+        stroke-dasharray: 10 12;
+        opacity: 0.88;
+      }
+      .hero-flow circle {
+        fill: #f4b15d;
+      }
+      .mock-browser,
+      .mock-agent {
+        position: absolute;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 8px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.96);
+      }
+      .mock-browser {
+        left: 32px;
+        bottom: 34px;
+        width: 44%;
+        min-height: 330px;
+      }
+      .mock-agent {
+        right: 32px;
+        top: 72px;
+        width: 44%;
+        min-height: 360px;
+        color: #d8ece7;
+        background: #172b27;
+      }
+      .panel-bar {
+        display: flex;
+        gap: 6px;
+        padding: 10px 12px;
+        border-bottom: 1px solid #dfe4dc;
+        background: #f8f7f2;
+      }
+      .mock-agent .panel-bar {
+        border-color: rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.06);
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--amber);
+      }
+      .dot:nth-child(2) {
+        background: var(--teal);
+      }
+      .dot:nth-child(3) {
+        background: var(--blue);
+      }
+      .mock-body {
+        padding: 18px;
+      }
+      .mock-body h2,
+      .mock-body p {
+        margin: 0;
+      }
+      .mock-body h2 {
+        font-size: 1.15rem;
+        color: var(--ink);
+      }
+      .mock-body p {
+        margin-top: 8px;
+        color: #61716c;
+        font-size: 0.92rem;
+      }
+      .mock-lines {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .mock-lines span {
+        display: block;
+        height: 12px;
+        border-radius: 999px;
+        background: #dfe6df;
+      }
+      .mock-lines span:nth-child(1) {
+        width: 82%;
+        background: #0f766e;
+      }
+      .mock-lines span:nth-child(2) {
+        width: 64%;
+      }
+      .mock-lines span:nth-child(3) {
+        width: 92%;
+      }
+      .tool-list {
+        display: grid;
+        gap: 10px;
+        padding: 18px;
+      }
+      .tool-card {
+        padding: 14px;
+        border: 1px solid rgba(216, 236, 231, 0.18);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.07);
+      }
+      .tool-card strong {
+        display: block;
+        color: #fff;
+        font-size: 0.95rem;
+      }
+      .tool-card span {
+        display: block;
+        margin-top: 4px;
+        color: rgba(216, 236, 231, 0.74);
+        font-size: 0.84rem;
+      }
+      .section-intro {
+        max-width: 760px;
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 1.06rem;
+      }
+      .feature-grid,
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 26px;
+      }
+      .demo-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .feature,
+      .demo-card {
+        min-height: 100%;
+        padding: 18px;
+        border: 1px solid rgba(20, 33, 31, 0.12);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.72);
+      }
+      .feature b {
+        display: block;
+        margin-bottom: 8px;
+      }
+      .feature p,
+      .demo-card p {
+        margin: 0;
+        color: var(--muted);
+      }
+      .demo-card {
+        display: grid;
+        gap: 10px;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .demo-card:hover {
+        border-color: rgba(39, 94, 254, 0.34);
+        background: #fff;
+      }
+      .demo-art {
+        display: grid;
+        min-height: 106px;
+        place-items: center;
+        border: 1px solid rgba(20, 33, 31, 0.1);
+        border-radius: 8px;
+        background: #f8f7f2;
+      }
+      .demo-art svg {
+        width: min(72%, 210px);
+        height: auto;
+      }
+      .markdown-page {
+        display: grid;
+        grid-template-columns: minmax(0, 280px) minmax(0, 820px);
+        gap: 42px;
+        align-items: start;
+      }
+      .markdown-aside {
+        position: sticky;
+        top: 92px;
+        padding: 18px;
+        border: 1px solid rgba(20, 33, 31, 0.12);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.74);
+      }
+      .markdown-aside p {
+        margin: 10px 0 0;
+        color: var(--muted);
+      }
+      .markdown-body {
+        min-width: 0;
+        padding: clamp(20px, 4vw, 38px);
+        border: 1px solid rgba(20, 33, 31, 0.12);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.82);
+      }
+      .markdown-body.loading,
+      .markdown-body.error {
+        color: var(--muted);
+        font-weight: 900;
+      }
+      .markdown-body h1 {
+        font-size: clamp(2.4rem, 5vw, 4.8rem);
+      }
+      .markdown-body h2 {
+        margin-top: 34px;
+        font-size: clamp(1.5rem, 3vw, 2.4rem);
+      }
+      .markdown-body h3 {
+        margin-top: 24px;
+      }
+      .markdown-body p,
+      .markdown-body li {
+        color: #34443f;
+      }
+      .markdown-body pre {
+        overflow-x: auto;
+        padding: 14px;
+        border-radius: 8px;
+        background: #172b27;
+        color: #d8ece7;
+      }
+      .markdown-body code {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+          monospace;
+      }
+      .markdown-body :not(pre) > code {
+        padding: 2px 5px;
+        border-radius: 5px;
+        background: rgba(20, 33, 31, 0.08);
+      }
+      .markdown-body table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        overflow-wrap: anywhere;
+      }
+      .markdown-body th,
+      .markdown-body td {
+        padding: 10px;
+        border: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+      .markdown-body th {
+        background: #e9f3ef;
+      }
+      .demo-view {
+        min-height: calc(100vh - 64px);
+        background: #f2f4ef;
+      }
+      .demo-view.active {
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+      .demo-header {
+        padding: 22px clamp(18px, 4vw, 48px);
+        border-bottom: 1px solid rgba(20, 33, 31, 0.12);
+        background: rgba(255, 255, 255, 0.82);
+      }
+      .demo-header h1 {
+        font-size: clamp(2.4rem, 5vw, 4.6rem);
+        line-height: 0.96;
+      }
+      .demo-header p {
+        max-width: 680px;
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 1.06rem;
+      }
+      .demo-content {
+        min-height: calc(100vh - 190px);
+        padding: 24px clamp(18px, 4vw, 48px) 48px;
+        background:
+          linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.86),
+            rgba(247, 244, 237, 0.98)
+          ),
+          #f7f4ed;
+      }
+      .demo-content.loading,
+      .demo-content.error {
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        font-weight: 900;
+      }
+      @media (max-width: 1100px) {
+        .hero,
+        .home-hero,
+        .feature-grid,
+        .demo-grid,
+        .markdown-page {
+          grid-template-columns: 1fr;
+        }
+        .home-hero {
+          padding-top: 44px;
+        }
+        .hero-image {
+          min-height: 520px;
+        }
+        .markdown-aside {
+          position: static;
+        }
+        .demo-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 760px) {
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 14px;
+          padding-inline: 18px;
+        }
+        .nav {
+          display: grid;
+          width: 100%;
+          grid-template-columns: 1fr;
+          justify-content: stretch;
+        }
+        .nav a,
+        .nav button {
+          justify-content: center;
+          text-align: center;
+         white-space: normal;
+         overflow-wrap: anywhere;
+       }
+        h1 {
+          font-size: clamp(2.8rem, 14vw, 4.1rem);
+          overflow-wrap: anywhere;
+        }
+        .home-hero {
+          gap: 28px;
+          padding: 28px 18px 32px;
+        }
+        .eyebrow {
+          max-width: 100%;
+          white-space: normal;
+        }
+        .home-hero h1 {
+          font-size: clamp(3.5rem, 22vw, 5rem);
+        }
+        .home-hero .hero-copy {
+          font-size: 1.18rem;
+        }
+        .home-hero .button {
+          width: 100%;
+          min-height: 54px;
+          padding: 12px 16px;
+        }
+        .marketing-section {
+          padding-inline: 18px;
+        }
+        .hero-image {
+          min-height: auto;
+          padding: 80px 12px 12px;
+        }
+        .hero-mark {
+          width: 72px;
+          height: 72px;
+          top: 20px;
+          left: 20px;
+        }
+        .hero-flow {
+          display: none;
+        }
+        .mock-browser,
+        .mock-agent {
+          position: relative;
+          left: auto;
+          right: auto;
+          top: auto;
+          bottom: auto;
+          width: auto;
+          margin: 10px;
+        }
+        .mock-agent {
+          min-height: auto;
+        }
+        .demo-grid {
+          grid-template-columns: 1fr;
+        }
+        .demo-subnav {
+          gap: 6px;
+          padding-inline: 18px;
+        }
+        .demo-subnav a {
+          width: 100%;
+          justify-content: center;
+          text-align: center;
+          white-space: normal;
+          overflow-wrap: anywhere;
+        }
+       .demo-header {
+         align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell" data-route-type="marketing" data-route-name="home">
+      <header class="topbar">
+        <a class="brand" href="#home" data-route="home"
+          ><img src="assets/brijio-mark.svg" alt="" /><span>Brijio</span></a
+        >
+        <nav class="nav" aria-label="Main navigation">
+          <a href="#home" data-route="home">Home</a>
+          <a href="#read" data-route="read" data-demo-nav
+            >Functionalities and Demo</a
+          >
+          <a href="#install" data-route="install">Download and Install</a>
+          <a href="#privacy" data-route="privacy">Privacy Policy</a>
+          <a href="#faq" data-route="faq">FAQ</a>
+        </nav>
+      </header>
+      <nav class="demo-subnav" aria-label="Functionalities and Demo">
+        <a href="#read" data-route="read" data-demo-subnav>Read and Respond</a>
+        <a href="#parse" data-route="parse" data-demo-subnav>Parse Data</a>
+        <a href="#actions" data-route="actions" data-demo-subnav>Navigation and Actions</a>
+        <a href="#downloads" data-route="downloads" data-demo-subnav>Fetch and Download</a>
+      </nav>
+      <main>
+        <section class="marketing-view" data-view="home">
+          <section class="marketing-section hero home-hero" aria-labelledby="home-title">
+            <div class="home-hero-copy">
+              <p class="eyebrow">User-controlled browser bridge for AI agents</p>
+              <h1 id="home-title">Brijio</h1>
+              <p class="hero-copy">
+                Brijio gives AI agents precise, request-based access to the
+                browser the user has explicitly connected. It is built for demos
+                that need real page context, real DOM actions, and clear user
+                control.
+              </p>
+              <div class="hero-actions">
+                <a class="button" href="#read" data-route="read"
+                  >Demo and Functionalities</a
+                >
+                <a class="button secondary" href="#install" data-route="install"
+                  >Install Brijio</a
+                >
+              </div>
+            </div>
+            <div
+              class="hero-image"
+              aria-label="Brijio browser to agent bridge illustration"
+            >
+              <img class="hero-mark" src="assets/brijio-mark.svg" alt="" />
+              <svg class="hero-flow" viewBox="0 0 720 520" aria-hidden="true">
+                <path d="M188 360 C 300 250, 386 260, 516 150"></path>
+                <circle cx="188" cy="360" r="8"></circle>
+                <circle cx="516" cy="150" r="8"></circle>
+              </svg>
+              <div class="mock-browser">
+                <div class="panel-bar">
+                  <span class="dot"></span><span class="dot"></span
+                  ><span class="dot"></span>
+                </div>
+                <div class="mock-body">
+                  <h2>Browser tab</h2>
+                  <p>
+                    Current URL, title, page text, links, forms, and visible
+                    actions.
+                  </p>
+                  <div class="mock-lines">
+                    <span></span><span></span><span></span>
+                  </div>
+                </div>
+              </div>
+              <div class="mock-agent">
+                <div class="panel-bar">
+                  <span class="dot"></span><span class="dot"></span
+                  ><span class="dot"></span>
+                </div>
+                <div class="tool-list">
+                  <div class="tool-card">
+                    <strong>read_current_page</strong
+                    ><span>Structured context with pagination.</span>
+                  </div>
+                  <div class="tool-card">
+                    <strong>fill_input and click_element</strong
+                    ><span>Targeted DOM actions routed through the browser.</span>
+                  </div>
+                  <div class="tool-card">
+                    <strong>download_file</strong
+                    ><span>Start downloads and inspect browser status.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section class="marketing-section" aria-labelledby="why-title">
+            <h2 id="why-title">Built for controlled access</h2>
+            <p class="section-intro">
+              Brijio is reactive. Browser state is requested through explicit
+              MCP calls, routed over a WebSocket channel, and returned as
+              structured results.
+            </p>
+            <div class="feature-grid">
+              <div class="feature">
+                <b>User starts the bridge</b>
+                <p>
+                  The extension connects only after a user action and can be
+                  disconnected any time.
+                </p>
+              </div>
+              <div class="feature">
+                <b>Agents make explicit calls</b>
+                <p>
+                  Every read, click, fill, navigation, fetch, or download action
+                  starts as a tool request.
+                </p>
+              </div>
+              <div class="feature">
+                <b>Sessions stay private</b>
+                <p>
+                  Routing is designed around user, session, and browser instance
+                  boundaries.
+                </p>
+              </div>
+            </div>
+          </section>
+          <section class="marketing-section" aria-labelledby="demos-title">
+            <h2 id="demos-title">Functionalities and demo</h2>
+            <p class="section-intro">
+              Use the static demos to exercise the browser extension and MCP
+              tools without relying on third-party pages.
+            </p>
+            <div class="demo-grid">
+              <a class="demo-card" href="#read" data-route="read"
+                ><span class="demo-art" aria-hidden="true"
+                  ><svg viewBox="0 0 320 150">
+                    <rect
+                      x="24"
+                      y="22"
+                      width="128"
+                      height="106"
+                      rx="8"
+                      fill="#fff"
+                      stroke="#cfd8d2"
+                    />
+                    <rect
+                      x="44"
+                      y="44"
+                      width="82"
+                      height="8"
+                      rx="4"
+                      fill="#0f766e"
+                    />
+                    <rect
+                      x="44"
+                      y="64"
+                      width="70"
+                      height="6"
+                      rx="3"
+                      fill="#9aa8a1"
+                    />
+                    <rect
+                      x="178"
+                      y="32"
+                      width="118"
+                      height="86"
+                      rx="8"
+                      fill="#172b27"
+                    />
+                    <path
+                      d="M154 76h20"
+                      stroke="#275efe"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                    />
+                    <rect
+                      x="196"
+                      y="54"
+                      width="70"
+                      height="10"
+                      rx="5"
+                      fill="#8ee0cc"
+                    /></svg
+                ></span>
+                <h3>Read and Respond</h3>
+                <p>
+                  Read page text, fill form fields, upload files, and verify
+                  answers.
+                </p></a
+              >
+              <a class="demo-card" href="#parse" data-route="parse"
+                ><span class="demo-art" aria-hidden="true"
+                  ><svg viewBox="0 0 320 150">
+                    <rect
+                      x="30"
+                      y="28"
+                      width="260"
+                      height="96"
+                      rx="8"
+                      fill="#fff"
+                      stroke="#cfd8d2"
+                    />
+                    <path
+                      d="M52 58h216M52 84h216M52 110h216M116 40v80M204 40v80"
+                      stroke="#d9ddd2"
+                      stroke-width="5"
+                    />
+                    <rect
+                      x="52"
+                      y="44"
+                      width="48"
+                      height="10"
+                      rx="5"
+                      fill="#0f766e"
+                    />
+                    <rect
+                      x="132"
+                      y="70"
+                      width="54"
+                      height="10"
+                      rx="5"
+                      fill="#275efe"
+                    />
+                    <rect
+                      x="222"
+                      y="96"
+                      width="38"
+                      height="10"
+                      rx="5"
+                      fill="#c97912"
+                    /></svg
+                ></span>
+                <h3>Parse Data</h3>
+                <p>
+                  Extract structured facts, tables, records, timelines, and
+                  references.
+                </p></a
+              >
+              <a class="demo-card" href="#actions" data-route="actions"
+                ><span class="demo-art" aria-hidden="true"
+                  ><svg viewBox="0 0 320 150">
+                    <rect
+                      x="38"
+                      y="30"
+                      width="244"
+                      height="90"
+                      rx="8"
+                      fill="#fff"
+                      stroke="#cfd8d2"
+                    />
+                    <rect
+                      x="58"
+                      y="54"
+                      width="72"
+                      height="16"
+                      rx="8"
+                      fill="#275efe"
+                    />
+                    <rect
+                      x="58"
+                      y="84"
+                      width="104"
+                      height="12"
+                      rx="6"
+                      fill="#d9ddd2"
+                    />
+                    <circle
+                      cx="220"
+                      cy="76"
+                      r="26"
+                      fill="#e9f3ef"
+                      stroke="#0f766e"
+                    />
+                    <path
+                      d="M210 76h20M220 66v20"
+                      stroke="#0f766e"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                    /></svg
+                ></span>
+                <h3>Navigation and Actions</h3>
+                <p>
+                  Click controls, change state, submit forms, and navigate
+                  routes.
+                </p></a
+              >
+              <a class="demo-card" href="#downloads" data-route="downloads"
+                ><span class="demo-art" aria-hidden="true"
+                  ><svg viewBox="0 0 320 150">
+                    <rect
+                      x="42"
+                      y="24"
+                      width="236"
+                      height="102"
+                      rx="8"
+                      fill="#fff"
+                      stroke="#cfd8d2"
+                    />
+                    <path
+                      d="M160 48v42M140 72l20 20 20-20"
+                      stroke="#275efe"
+                      stroke-width="8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <rect
+                      x="98"
+                      y="104"
+                      width="124"
+                      height="10"
+                      rx="5"
+                      fill="#0f766e"
+                    /></svg
+                ></span>
+                <h3>Fetch and Download</h3>
+                <p>
+                  Fetch resources, start downloads, and inspect browser download
+                  status.
+                </p></a
+              >
+            </div>
+          </section>
+        </section>
 
-  function syncDemoStylesheet (viewName) {
-    var existing = document.querySelector('link[data-demo-layout]');
-    if (viewName === 'home') {
-      if (existing != null) existing.remove();
-      return;
-    }
-    if (existing == null) {
-      var link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = 'assets/demo-layout.css';
-      link.setAttribute('data-demo-layout', 'true');
-      document.head.appendChild(link);
-    }
-  }
+        <section class="marketing-view" data-view="install" hidden>
+          <div class="marketing-section markdown-page">
+            <aside class="markdown-aside">
+              <p class="eyebrow">Install</p>
+              <h2>Download and Install</h2>
+              <p>
+                Runtime, extension, and MCP client setup from repository
+                Markdown.
+              </p>
+            </aside>
+            <article
+              class="markdown-body loading"
+              data-markdown-source="content/download-and-install.md"
+            >
+              Loading install guide...
+            </article>
+          </div>
+        </section>
+        <section class="marketing-view" data-view="privacy" hidden>
+          <div class="marketing-section markdown-page">
+            <aside class="markdown-aside">
+              <p class="eyebrow">Policy</p>
+              <h2>Privacy Policy</h2>
+              <p>Rendered from the extension privacy policy source of truth.</p>
+            </aside>
+            <article
+              class="markdown-body loading"
+              data-markdown-source="content/privacy-policy.md"
+            >
+              Loading privacy policy...
+            </article>
+          </div>
+        </section>
+        <section class="marketing-view" data-view="faq" hidden>
+          <div class="marketing-section markdown-page">
+            <aside class="markdown-aside">
+              <p class="eyebrow">Questions</p>
+              <h2>FAQ</h2>
+              <p>
+                Short answers for how Brijio connects, routes, and protects
+                browser access.
+              </p>
+            </aside>
+            <article
+              class="markdown-body loading"
+              data-markdown-source="content/faq.md"
+            >
+              Loading FAQ...
+            </article>
+          </div>
+        </section>
 
-  function activateRoute (route) {
-    var viewName = route || 'home';
-    syncDemoStylesheet(viewName);
+        <section class="demo-view" data-view="read" hidden>
+          <div class="demo-content loading" data-source="read-respond.html">
+            Loading demo...
+          </div>
+        </section>
+        <section class="demo-view" data-view="parse" hidden>
+          <div class="demo-content loading" data-source="parse-data.html">
+            Loading demo...
+          </div>
+        </section>
+        <section class="demo-view" data-view="actions" hidden>
+          <div class="demo-content loading" data-source="navigation.html">
+            Loading demo...
+          </div>
+        </section>
+        <section class="demo-view" data-view="downloads" hidden>
+          <div class="demo-content loading" data-source="download.html">
+            Loading demo...
+          </div>
+        </section>
+      </main>
+    </div>
+    <script>
+      (function () {
+        var routes = {
+          home: { title: "Brijio", type: "marketing" },
+          install: {
+            title: "Download and Install - Brijio",
+            type: "marketing",
+          },
+          privacy: { title: "Privacy Policy - Brijio", type: "marketing" },
+          faq: { title: "FAQ - Brijio", type: "marketing" },
+          read: { title: "Read and Respond - Brijio Demo", type: "demo" },
+          parse: { title: "Parse Data - Brijio Demo", type: "demo" },
+          actions: {
+            title: "Navigation and Actions - Brijio Demo",
+            type: "demo",
+          },
+          downloads: {
+            title: "Fetch and Download - Brijio Demo",
+            type: "demo",
+          },
+        };
 
-    document.querySelectorAll('[data-view]').forEach(function (view) {
-      var isCurrent = view.getAttribute('data-view') === viewName;
-      view.classList.toggle('active', isCurrent && viewName !== 'home');
-      view.hidden = !isCurrent;
-    });
+       var shell = document.querySelector(".shell");
 
-    document.querySelectorAll('[data-route]').forEach(function (link) {
-      var current = link.getAttribute('data-route') === viewName;
-      if (current) link.setAttribute('aria-current', 'page');
-      else link.removeAttribute('aria-current');
-    });
+       function routeFromHash() {
+          var raw = window.location.hash.slice(1);
+          if (raw.charAt(0) === "/") raw = raw.slice(1);
+          return Object.prototype.hasOwnProperty.call(routes, raw)
+            ? raw
+            : "home";
+        }
 
-    var container = document.querySelector('[data-view="' + viewName + '"] .demo-content[data-source]');
-    if (container != null && container.getAttribute('data-loaded') !== 'true') {
-      void loadDemoContent(container);
-    }
+        function syncDemoStylesheet(viewName) {
+          var existing = document.querySelector("link[data-demo-layout]");
+          if (routes[viewName].type !== "demo") {
+            if (existing != null) existing.remove();
+            return;
+          }
+          if (existing == null) {
+            var link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.href = "assets/demo-layout.css";
+            link.setAttribute("data-demo-layout", "true");
+            document.head.appendChild(link);
+          }
+        }
 
-    document.title = routes[viewName].title;
-  }
+        function activateRoute(route) {
+        var viewName = route || "home";
+        if (shell != null) {
+          shell.setAttribute("data-route-type", routes[viewName].type);
+          shell.setAttribute("data-route-name", viewName);
+        }
+         syncDemoStylesheet(viewName);
 
-  async function loadDemoContent (container) {
-    var source = container.getAttribute('data-source');
-    if (source == null) return;
-    try {
-      container.classList.add('loading');
-      var response = await fetch(source, { cache: 'no-cache' });
-      if (!response.ok) throw new Error('Unable to load ' + source);
-      var parser = new DOMParser();
-      var doc = parser.parseFromString(await response.text(), 'text/html');
-      stripDuplicatedChrome(doc, source);
-      var scripts = Array.from(doc.body.querySelectorAll('script'));
-      scripts.forEach(function (script) { script.remove(); });
-      container.replaceChildren.apply(container, Array.from(doc.body.childNodes));
-      container.classList.remove('loading');
-      container.setAttribute('data-loaded', 'true');
-      runDemoScripts(scripts);
-      normalizeLocalFixtureUrls(container);
-    } catch (err) {
-      container.classList.remove('loading');
-      container.classList.add('error');
-      container.textContent = err instanceof Error ? err.message : 'Unable to load demo.';
-    }
-  }
+         document.querySelectorAll("[data-view]").forEach(function (view) {
+            var isCurrent = view.getAttribute("data-view") === viewName;
+            view.hidden = !isCurrent;
+            view.classList.toggle(
+              "active",
+              isCurrent && view.classList.contains("demo-view"),
+            );
+          });
 
-  function stripDuplicatedChrome (doc, source) {
-    doc.querySelectorAll('body > nav, .page > nav, .demo-nav, .sticky-page-header').forEach(function (node) { node.remove(); });
-    var standaloneView = doc.body.querySelector('.demo-view.active');
-    if (standaloneView != null) {
-      var scripts = Array.from(doc.body.querySelectorAll('script'));
-      doc.body.replaceChildren.apply(doc.body, Array.from(standaloneView.childNodes).concat(scripts));
-      return;
-    }
-    if (source === 'navigation.html') {
-      var title = doc.body.querySelector('h1');
-      if (title != null) title.remove();
-    }
-    if (source === 'read-respond.html') {
-      doc.querySelectorAll('.hero-copy, .hero-visual').forEach(function (node) { node.remove(); });
-    }
-    if (source === 'download.html' || source === 'parse-data.html') {
-      var hero = doc.body.querySelector('.hero, header');
-      if (hero != null) hero.remove();
-    }
-  }
+        document.querySelectorAll("[data-route]").forEach(function (link) {
+          var current = link.getAttribute("data-route") === viewName;
+          if (current) link.setAttribute("aria-current", "page");
+          else link.removeAttribute("aria-current");
+        });
+        var demoNavLink = document.querySelector("[data-demo-nav]");
+        if (
+          demoNavLink != null &&
+          routes[viewName] &&
+          routes[viewName].type === "demo" &&
+          viewName !== "read"
+        )
+          demoNavLink.setAttribute("aria-current", "page");
 
-  function runDemoScripts (scripts) {
-    scripts.forEach(function (script) {
-      var next = document.createElement('script');
-      Array.from(script.attributes).forEach(function (attr) { next.setAttribute(attr.name, attr.value); });
-      next.textContent = script.textContent;
-      document.body.appendChild(next);
-      next.remove();
-    });
-  }
+        var demoContainer = document.querySelector(
+            '[data-view="' + viewName + '"] .demo-content[data-source]',
+          );
+          if (
+            demoContainer != null &&
+            demoContainer.getAttribute("data-loaded") !== "true"
+          )
+            void loadDemoContent(demoContainer);
 
-  function normalizeLocalFixtureUrls (container) {
-    container.querySelectorAll('[data-local-url]').forEach(function (el) {
-      el.textContent = new URL(el.getAttribute('data-local-url'), window.location.href).toString();
-    });
-    var selfUrl = container.querySelector('#self-url');
-    if (selfUrl != null) selfUrl.textContent = window.location.href.split('#')[0].replace(/index.html$/, 'download.html');
-  }
+          var markdownContainer = document.querySelector(
+            '[data-view="' +
+              viewName +
+              '"] .markdown-body[data-markdown-source]',
+          );
+          if (
+            markdownContainer != null &&
+            markdownContainer.getAttribute("data-loaded") !== "true"
+          )
+            void loadMarkdownContent(markdownContainer);
 
-  window.addEventListener('hashchange', function () { activateRoute(routeFromHash()); });
-  activateRoute(routeFromHash());
-})();
-</script>
-</body>
+          document.title = routes[viewName].title;
+        }
+
+        async function loadDemoContent(container) {
+          var source = container.getAttribute("data-source");
+          if (source == null) return;
+          try {
+            container.classList.add("loading");
+            var response = await fetch(source, { cache: "no-cache" });
+            if (!response.ok) throw new Error("Unable to load " + source);
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(
+              await response.text(),
+              "text/html",
+            );
+            stripDuplicatedChrome(doc, source);
+            var scripts = Array.from(doc.body.querySelectorAll("script"));
+            scripts.forEach(function (script) {
+              script.remove();
+            });
+            container.replaceChildren.apply(
+              container,
+              Array.from(doc.body.childNodes),
+            );
+            container.classList.remove("loading");
+            container.setAttribute("data-loaded", "true");
+            runDemoScripts(scripts);
+            normalizeLocalFixtureUrls(container);
+          } catch (err) {
+            container.classList.remove("loading");
+            container.classList.add("error");
+            container.textContent =
+              err instanceof Error ? err.message : "Unable to load demo.";
+          }
+        }
+
+        async function loadMarkdownContent(container) {
+          var source = container.getAttribute("data-markdown-source");
+          if (source == null) return;
+          try {
+            container.classList.add("loading");
+            var response = await fetch(source, { cache: "no-cache" });
+            if (!response.ok) throw new Error("Unable to load " + source);
+            container.innerHTML = renderMarkdown(await response.text());
+            container.classList.remove("loading");
+            container.setAttribute("data-loaded", "true");
+          } catch (err) {
+            container.classList.remove("loading");
+            container.classList.add("error");
+            container.textContent =
+              err instanceof Error ? err.message : "Unable to load content.";
+          }
+        }
+
+        function stripDuplicatedChrome(doc, source) {
+          doc
+            .querySelectorAll(
+              "body > nav, .page > nav, .demo-nav, .sticky-page-header",
+            )
+            .forEach(function (node) {
+              node.remove();
+            });
+          var standaloneView = doc.body.querySelector(".demo-view.active");
+          if (standaloneView != null) {
+            var scripts = Array.from(doc.body.querySelectorAll("script"));
+            doc.body.replaceChildren.apply(
+              doc.body,
+              Array.from(standaloneView.childNodes).concat(scripts),
+            );
+            return;
+          }
+          if (source === "navigation.html") {
+            var title = doc.body.querySelector("h1");
+            if (title != null) title.remove();
+          }
+          if (source === "read-respond.html") {
+            doc
+              .querySelectorAll(".hero-copy, .hero-visual")
+              .forEach(function (node) {
+                node.remove();
+              });
+          }
+        }
+
+        function runDemoScripts(scripts) {
+          scripts.forEach(function (script) {
+            var next = document.createElement("script");
+            Array.from(script.attributes).forEach(function (attr) {
+              next.setAttribute(attr.name, attr.value);
+            });
+            next.textContent = script.textContent;
+            document.body.appendChild(next);
+            next.remove();
+          });
+        }
+
+        function normalizeLocalFixtureUrls(container) {
+          container.querySelectorAll("[data-local-url]").forEach(function (el) {
+            el.textContent = new URL(
+              el.getAttribute("data-local-url"),
+              window.location.href,
+            ).toString();
+          });
+          var selfUrl = container.querySelector("#self-url");
+          if (selfUrl != null)
+            selfUrl.textContent = window.location.href
+              .split("#")[0]
+              .replace(/index.html$/, "download.html");
+        }
+
+        function renderMarkdown(markdown) {
+          var lines = markdown.replace(/\r\n/g, "\n").split("\n");
+          var html = [];
+          var listOpen = false;
+          var table = [];
+          var code = [];
+          var inCode = false;
+
+          function closeList() {
+            if (listOpen) {
+              html.push("</ul>");
+              listOpen = false;
+            }
+          }
+          function flushTable() {
+            if (table.length === 0) return;
+            html.push(renderTable(table));
+            table = [];
+          }
+          function flushParagraph(paragraph) {
+            if (paragraph.length > 0)
+              html.push("<p>" + inline(paragraph.join(" ")) + "</p>");
+          }
+
+          var paragraph = [];
+          lines.forEach(function (line) {
+            if (line.startsWith("```")) {
+              if (inCode) {
+                html.push(
+                  "<pre><code>" + escapeHtml(code.join("\n")) + "</code></pre>",
+                );
+                code = [];
+                inCode = false;
+              } else {
+                closeList();
+                flushTable();
+                flushParagraph(paragraph);
+                paragraph = [];
+                inCode = true;
+              }
+              return;
+            }
+            if (inCode) {
+              code.push(line);
+              return;
+            }
+            if (/^\s*$/.test(line)) {
+              closeList();
+              flushTable();
+              flushParagraph(paragraph);
+              paragraph = [];
+              return;
+            }
+            if (/^\|.+\|$/.test(line)) {
+              closeList();
+              flushParagraph(paragraph);
+              paragraph = [];
+              table.push(line);
+              return;
+            }
+            flushTable();
+            var heading = /^(#{1,3})\s+(.+)$/.exec(line);
+            if (heading != null) {
+              closeList();
+              flushParagraph(paragraph);
+              paragraph = [];
+              html.push(
+                "<h" +
+                  heading[1].length +
+                  ">" +
+                  inline(heading[2]) +
+                  "</h" +
+                  heading[1].length +
+                  ">",
+              );
+              return;
+            }
+            var item = /^-\s+(.+)$/.exec(line);
+            if (item != null) {
+              flushParagraph(paragraph);
+              paragraph = [];
+              if (!listOpen) {
+                html.push("<ul>");
+                listOpen = true;
+              }
+              html.push("<li>" + inline(item[1]) + "</li>");
+              return;
+            }
+            paragraph.push(line);
+          });
+          closeList();
+          flushTable();
+          flushParagraph(paragraph);
+          if (inCode)
+            html.push(
+              "<pre><code>" + escapeHtml(code.join("\n")) + "</code></pre>",
+            );
+          return html.join("\n");
+        }
+
+        function renderTable(rows) {
+          var parsed = rows
+            .filter(function (row) {
+              return !/^\|\s*-/.test(row);
+            })
+            .map(function (row) {
+              return row
+                .split("|")
+                .slice(1, -1)
+                .map(function (cell) {
+                  return cell.trim();
+                });
+            });
+          if (parsed.length === 0) return "";
+          var head = parsed[0]
+            .map(function (cell) {
+              return "<th>" + inline(cell) + "</th>";
+            })
+            .join("");
+          var body = parsed
+            .slice(1)
+            .map(function (row) {
+              return (
+                "<tr>" +
+                row
+                  .map(function (cell) {
+                    return "<td>" + inline(cell) + "</td>";
+                  })
+                  .join("") +
+                "</tr>"
+              );
+            })
+            .join("");
+          return (
+            "<table><thead><tr>" +
+            head +
+            "</tr></thead><tbody>" +
+            body +
+            "</tbody></table>"
+          );
+        }
+
+        function inline(text) {
+          return escapeHtml(text)
+            .replace(/`([^`]+)`/g, "<code>$1</code>")
+            .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+        }
+
+        function escapeHtml(value) {
+          return value
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;");
+       }
+
+       window.addEventListener("hashchange", function () {
+          activateRoute(routeFromHash());
+        });
+        activateRoute(routeFromHash());
+      })();
+    </script>
+  </body>
 </html>
