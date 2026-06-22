@@ -40,7 +40,8 @@ void describe('parse download shared demo layout', () => {
 
     assert.equal(serverCss, clientCss)
     assert.match(clientCss, /\.demo-view\.active\s*\{[\s\S]*?grid-template-rows:\s*auto 1fr;/)
-    assert.match(clientCss, /\.demo-header,\s*\.demo-content \.layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) minmax\(340px, 0\.48fr\);/)
+    assert.match(clientCss, /\.demo-header,\s*\.demo-content \.layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\);/)
+    assert.doesNotMatch(clientCss, /\.demo-header,\s*\.demo-content \.layout\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\)\s+minmax\(/)
     assert.match(clientCss, /\.hero-visual \.form-art\[aria-hidden="true"\]\s*\{[\s\S]*?display:\s*block !important;/)
     assert.match(clientCss, /\.full-col\s*\{[\s\S]*?grid-column:\s*1 \/ -1;/)
     assert.match(clientCss, /\.browser-table-row\s*\{[\s\S]*?grid-template-columns:\s*0\.9fr 1fr 0\.8fr;/)

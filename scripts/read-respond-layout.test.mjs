@@ -39,8 +39,10 @@ void describe('read and respond shared layout', () => {
       assert.match(html, /<div class="browser-field-card"><span>Helen's surname<\/span><b>Stoner<\/b><\/div>/)
       assert.match(html, /<span class="form-step">fill<\/span>/)
       assert.match(html, /<div class="demo-content" data-source="read-respond\.html" data-loaded="true">/)
-      assert.match(html, /<div class="layout">\s*<div class="left-col">\s*<section id="stories"/)
-      assert.match(html, /<div class="right-col">\s*<section id="story-toc"/)
+      assert.match(html, /<div class="layout">\s*<section id="story-toc"/)
+      assert.match(html, /<section id="story-toc" class="story-toc toc-col"/)
+      assert.match(html, /<div class="left-col">\s*<section id="stories"/)
+      assert.match(html, /<div class="right-col">\s*<section id="form"/)
     })
   }
 
@@ -51,6 +53,23 @@ void describe('read and respond shared layout', () => {
     assert.match(css, /\.demo-view\[data-view="read"\] \.layout > \.right-col\s*\{[\s\S]*?display:\s*grid;/)
     assert.match(css, /\.form-action-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\);/)
     assert.match(css, /\.browser-field-card\.wide\s*\{[\s\S]*?grid-column:\s*1 \/ -1;/)
+  })
+
+  void it('gives TOC section same padding as other sections', () => {
+    const css = readCss()
+
+    assert.match(css, /#story-toc,\s*\n\.demo-panel,/)
+    assert.match(css, /#story-toc\s*\{[\s\S]*?padding:\s*20px/)
+  })
+
+  void it('keeps mobile stories visible and ordered below the TOC', () => {
+    const css = readCss()
+
+    assert.match(css, /#story-toc\s*\{[\s\S]*?order:\s*-1;/)
+    assert.match(css, /#stories\s*\{[\s\S]*?order:\s*2;/)
+    assert.match(css, /#form\s*\{[\s\S]*?order:\s*3;/)
+    assert.doesNotMatch(css, /#stories \.story-accordion\s*\{[\s\S]*?display:\s*none/)
+    assert.doesNotMatch(css, /#stories \.story-accordion\.toc-open/)
   })
 
   void it('keeps SPA loader stripping external page shell before embedding', () => {
