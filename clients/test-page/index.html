@@ -191,7 +191,7 @@
       }
       .home-hero {
         display: grid;
-        grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+        grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
         gap: clamp(32px, 5vw, 72px);
         align-items: center;
         max-width: 1280px;
@@ -548,10 +548,6 @@
         grid-template-rows: auto 1fr;
       }
       .demo-header {
-        display: flex;
-        align-items: flex-end;
-        justify-content: space-between;
-        gap: 20px;
         padding: 22px clamp(18px, 4vw, 48px);
         border-bottom: 1px solid rgba(20, 33, 31, 0.12);
         background: rgba(255, 255, 255, 0.82);
@@ -586,6 +582,7 @@
       }
       @media (max-width: 1100px) {
         .hero,
+        .home-hero,
         .feature-grid,
         .demo-grid,
         .markdown-page {
@@ -629,33 +626,36 @@
           overflow-wrap: anywhere;
         }
         .home-hero {
-          gap: 32px;
-          padding: 34px 18px 40px;
+          gap: 28px;
+          padding: 28px 18px 32px;
         }
         .eyebrow {
           max-width: 100%;
           white-space: normal;
         }
         .home-hero h1 {
-          font-size: clamp(4rem, 24vw, 6rem);
+          font-size: clamp(3.5rem, 22vw, 5rem);
         }
         .home-hero .hero-copy {
-          font-size: 1.24rem;
+          font-size: 1.18rem;
         }
         .home-hero .button {
           width: 100%;
-          min-height: 58px;
-          padding: 14px 18px;
+          min-height: 54px;
+          padding: 12px 16px;
         }
         .marketing-section {
           padding-inline: 18px;
         }
         .hero-image {
           min-height: auto;
-          padding: 112px 14px 14px;
+          padding: 80px 12px 12px;
         }
         .hero-mark {
-          width: 86px;
+          width: 72px;
+          height: 72px;
+          top: 20px;
+          left: 20px;
         }
         .hero-flow {
           display: none;
@@ -668,7 +668,7 @@
           top: auto;
           bottom: auto;
           width: auto;
-          margin: 14px;
+          margin: 10px;
         }
         .mock-agent {
           min-height: auto;
@@ -689,7 +689,6 @@
         }
        .demo-header {
          align-items: flex-start;
-          flex-direction: column;
         }
       }
     </style>
