@@ -18,12 +18,14 @@
 <main class="demo-shell read-demo">
 <section class="demo-view active" data-view="read" aria-labelledby="title">
 <div class="demo-header">
-<div>
+<div class="demo-header-copy">
+<div class="demo-header-text">
 <p class="eyebrow">READ AND RESPOND SURFACE</p>
 <h1 id="title">Read and Respond.</h1>
 <p>Brijio reads visible story content, fills explicit page controls, and validates the result through user-approved browser actions.</p>
 <div class="tags"><span>Stories</span><span>Form fields</span><span>File upload</span><span>Validation</span></div>
 </div>
+<div class="demo-header-visual">
 <section class="hero-visual" aria-label="Agent typing response form">
 <div class="form-art" aria-hidden="true">
 <div class="browser">
@@ -46,15 +48,28 @@
 </div>
 </section>
 </div>
+</div>
+</div>
 <div class="demo-content" data-source="read-respond.html" data-loaded="true">
 <div class="layout">
+<section id="story-toc" class="story-toc toc-col">
+<h2>Story Contents</h2>
+<p>Use these links to jump to each full Sherlock Holmes story.</p>
+<ol>
+<li><a href="#speckled-band">The Adventure of the Speckled Band</a></li>
+<li><a href="#scandal-bohemia">A Scandal in Bohemia</a></li>
+<li><a href="#red-headed-league">The Red-Headed League</a></li>
+<li><a href="#blue-carbuncle">The Adventure of the Blue Carbuncle</a></li>
+</ol>
+</section>
+
 <div class="left-col">
 
 <section id="stories" class="stories passage">
 <h2>Sherlock Holmes Stories</h2>
 <p><em>By Arthur Conan Doyle. Public-domain text from Project Gutenberg's <cite>The Adventures of Sherlock Holmes</cite>.</em></p>
 <p>Open a story below to read the full text. The response form remains available in the right rail while the stories stay focused on narrative reading.</p>
-<details id="speckled-band" class="story-accordion" open>
+<details id="speckled-band" class="story-accordion">
 <summary>The Adventure of the Speckled Band</summary>
 <div class="story-body">
 <p>On glancing over my notes of the seventy odd cases in which I have during the last eight years studied the methods of my friend Sherlock Holmes, I find many tragic, some comic, a large number merely strange, but none commonplace; for, working as he did rather for the love of his art than for the acquirement of wealth, he refused to associate himself with any investigation which did not tend towards the unusual, and even the fantastic. Of all these varied cases, however, I cannot recall any which presented more singular features than that which was associated with the well-known Surrey family of the Roylotts of Stoke Moran. The events in question occurred in the early days of my association with Holmes, when we were sharing rooms as bachelors in Baker Street. It is possible that I might have placed them upon record before, but a promise of secrecy was made at the time, from which I have only been freed during the last month by the untimely death of the lady to whom the pledge was given. It is perhaps as well that the facts should now come to light, for I have reasons to know that there are widespread rumours as to the death of Dr. Grimesby Roylott which tend to make the matter even more terrible than the truth.</p>
@@ -1020,16 +1035,6 @@
 
 </div>
 <div class="right-col">
-<section id="story-toc" class="story-toc">
-<h2>Story Contents</h2>
-<p>Use these links to jump to each full Sherlock Holmes story.</p>
-<ol>
-<li><a href="#speckled-band">The Adventure of the Speckled Band</a></li>
-<li><a href="#scandal-bohemia">A Scandal in Bohemia</a></li>
-<li><a href="#red-headed-league">The Red-Headed League</a></li>
-<li><a href="#blue-carbuncle">The Adventure of the Blue Carbuncle</a></li>
-</ol>
-</section>
 <section id="form">
 <h2>Response Form</h2>
 <p>Answer each question based on the story passage above. Submit the form to see which answers match.</p>
@@ -1188,22 +1193,10 @@
 </fieldset>
 
 <fieldset>
-<legend>Links &amp; Buttons</legend>
-
-<div class="nav-links form-nav-actions">
-<a href="#speckled-band">Jump to Story</a>
-<a href="#form">Jump to Form</a>
-<a href="#dynamic">Jump to Dynamic Content</a>
-<button type="button" id="btn-clear" style="font:inherit; padding:6px 12px; border-radius:4px; border:1px solid color-mix(in srgb, CanvasText 20%, transparent); cursor:pointer;">Clear All Fields</button>
-
-</div>
+  <legend>File Upload</legend>
+  <label for="story-summary-file">Upload the story summary as a text file</label>
+  <input id="story-summary-file" name="story_summary_file" type="file" accept=".txt,.text,text/plain" required>
 </fieldset>
-
-      <fieldset>
-        <legend>File Upload</legend>
-        <label for="story-summary-file">Upload the story summary as a text file</label>
-        <input id="story-summary-file" name="story_summary_file" type="file" accept=".txt,.text,text/plain" required>
-      </fieldset>
 
 <div class="form-action-grid">
 <button type="submit" id="btn-submit">Submit Answers</button>
@@ -1211,14 +1204,6 @@
 </div>
 </fieldset>
 </form>
-</section><section id="dynamic">
-<h2>Dynamic Content</h2>
-<p>This section tests <code>read_current_page</code> polling for JS-driven content updates. Call <code>read_current_page</code> and verify the dynamic timestamp appears below.</p>
-<div id="dynamic-section" class="dynamic-section">
-<p id="dynamic-timestamp">Waiting for page load...</p>
-<p id="dynamic-counter">Counter: 0</p>
-<p id="dynamic-list"></p>
-</div>
 </section><section id="results" class="results" style="display:none;">
 <h2>Results</h2>
 <div id="results-content"></div>
@@ -1229,42 +1214,6 @@
 </section>
 </main>
 <script>
-
-// — Dynamic content updater — exercises read_current_page polling —
-(function() {
-  var loadTime = new Date().toLocaleTimeString();
-  document.getElementById('dynamic-timestamp').textContent = 'Content loaded at ' + loadTime;
-
-  var counter = 0;
-  setInterval(function() {
-    counter += 1;
-    document.getElementById('dynamic-counter').textContent = 'Counter: ' + counter;
-  }, 5000);
-
-  // Dynamic list — adds a new item every 3 seconds, up to 10
-  var listEl = document.getElementById('dynamic-list');
-  var listItems = [
-    'Live fixture event: demo-widget-mounted',
-    'Live fixture event: websocket-channel-ready',
-    'Live fixture event: polling-snapshot-queued',
-    'Live fixture event: viewport-metadata-refreshed',
-    'Live fixture event: accessibility-tree-sampled',
-    'Live fixture event: stable-selector-cache-warmed',
-    'Live fixture event: form-controls-indexed',
-    'Live fixture event: scroll-boundary-observed',
-    'Live fixture event: synthetic-latency-check-complete',
-    'Live fixture event: dynamic-content-cycle-finished'
-  ];
-  var nextItem = 0;
-  setInterval(function() {
-    if (nextItem < listItems.length) {
-      var li = document.createElement('div');
-      li.textContent = '• ' + listItems[nextItem];
-      listEl.appendChild(li);
-      nextItem += 1;
-    }
-  }, 3000);
-})();
 
 // — Results display — self-verifying form submission —
 function renderResults(params) {
@@ -1512,6 +1461,26 @@ function syncControlledCheckboxVisual() {
     setTimeout(syncControlledCheckboxVisual, 0);
   });
   syncControlledCheckboxVisual();
+})();
+
+// — TOC: open matching story accordion on click —
+(function() {
+  var tocLinks = document.querySelectorAll('#story-toc a[href^="#"]');
+  for (var i = 0; i < tocLinks.length; i++) {
+    tocLinks[i].addEventListener('click', function(event) {
+      var targetId = this.getAttribute('href').slice(1);
+      var target = document.getElementById(targetId);
+      if (target && target.classList.contains('story-accordion')) {
+        // Close any previously opened accordion
+        var opened = document.querySelectorAll('#stories .story-accordion');
+        for (var j = 0; j < opened.length; j++) {
+          opened[j].open = false;
+        }
+        // Open the clicked one
+        target.open = true;
+      }
+    });
+  }
 })();
 
 </script>
