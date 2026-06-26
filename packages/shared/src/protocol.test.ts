@@ -4,6 +4,8 @@ import {
   createAuthEnvelope,
   createBrowserPresenceAnnounceEnvelope,
   createBrowserPresenceRequestEnvelope,
+  createListTabsEnvelope,
+  createTabListResponse,
   createPageContentErrorResponse,
   createPageContentResponse,
   createPageContextErrorResponse,
@@ -12,13 +14,15 @@ import {
   createActionResultResponse,
   createNavigateToUrlResponse,
   createNavigateToUrlErrorResponse,
+  isListTabsEnvelope,
   isPerformActionEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
   isNavigateToUrlEnvelope,
+  isTabListResponsePayload,
   parseBrijioEnvelope
 } from './protocol.js'
-import type { PageContext } from './protocol.js'
+import type { PageContext, TabInfo } from './protocol.js'
 
 void describe('shared Brijio protocol', () => {
   void it('parses auth envelopes', () => {
@@ -760,6 +764,67 @@ void describe('navigate_to_url protocol helpers', () => {
       ok: true,
       message: envelope
     })
+  })
+
+  void it('parses list_tabs envelopes', () => {
+    const envelope = createListTabsEnvelope('tabs-1')
+    assert.deepEqual(parseBrijioEnvelope(JSON.stringify(envelope)), {
+      ok: true,
+      message: envelope
+    })
+  })
+
+  void it('isListTabsEnvelope recognises list_tabs payloads', () => {
+    const envelope = createListTabsEnvelope('tabs-2')
+    assert.equal(isListTabsEnvelope(envelope), true)
+    assert.equal(isListTabsEnvelope({ type: 'message', payload: { type: 'get_page_context' } }), false)
+  })
+
+  void it('isTabListResponsePayload validates tab list response', () => {
+    const tabs: TabInfo[] = [
+      {
+        tabId: 'tab-1',
+        windowId: 'win-1',
+        title: 'Example',
+        url: 'https://example.com/',
+        active: true,
+        supported: true
+      }
+    ]
+    const payload = createTabListResponse('tabs-1', tabs)
+    assert.equal(isTabListResponsePayload(payload.payload), true)
+    assert.equal(isTabListResponsePayload({ type: 'other' }), false)
+  })
+
+  void it('createListTabsEnvelope produces correct payload type', () => {
+    const envelope = createListTabsEnvelope('tabs-3')
+    assert.equal(envelope.payload.type, 'list_tabs')
+    assert.equal(envelope.id, 'tabs-3')
+  })
+
+  void it('createTabListResponse includes tabs in data', () => {
+    const tabs: TabInfo[] = [
+      {
+        tabId: 'tab-1',
+        windowId: 'win-1',
+        title: 'Page A',
+        url: 'https://a.example.com/',
+        active: true,
+        supported: true
+      },
+      {
+        tabId: 'tab-2',
+        windowId: 'win-1',
+        title: 'Page B',
+        url: 'https://b.example.com/',
+        active: false,
+        supported: true
+      }
+    ]
+    const response = createTabListResponse('tabs-4', tabs)
+    assert.equal(response.payload.type, 'tab_list_response')
+    assert.equal(response.id, 'tabs-4')
+    assert.deepEqual(response.payload.data.tabs, tabs)
   })
 })
 

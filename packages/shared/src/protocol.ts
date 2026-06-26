@@ -57,6 +57,39 @@ export interface BrowserPresenceAnnouncePayload extends BrowserPresence {
   type: 'browser_presence_announce'
 }
 
+// --- Tab listing types (ADR 0060) ---
+
+export interface TabInfo {
+  /** Opaque tab identifier (raw Chrome/Safari tab ID as string) */
+  tabId: string
+  /** Opaque window identifier (raw Chrome/Safari window ID as string) */
+  windowId: string
+  /** Page title */
+  title: string
+  /** Full URL (HTTP/HTTPS only) */
+  url: string
+  /** Whether this is the user's currently focused tab */
+  active: boolean
+  /** Whether the tab is eligible for Brijio actions (always true for listed tabs) */
+  supported: boolean
+}
+
+export interface ListTabsRequestPayload {
+  type: 'list_tabs'
+}
+
+export interface TabListResponsePayload {
+  type: 'tab_list_response'
+  ok: true
+  data: { tabs: TabInfo[] }
+}
+
+export interface TabListErrorResponsePayload {
+  type: 'tab_list_response'
+  ok: false
+  error: { code: string, message: string }
+}
+
 export interface StageFileUploadStartPayload {
   type: 'stage_file_upload_start'
   uploadId: string
@@ -906,6 +939,63 @@ export function createBrowserPresenceAnnounceEnvelope (
       capabilities: input.capabilities
     }
   }
+}
+
+export function createListTabsEnvelope (requestId?: string): BrijioEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'list_tabs'
+    }
+  }
+}
+
+export function createTabListResponse (
+  requestId: string | undefined,
+  tabs: TabInfo[]
+): BrijioEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'tab_list_response',
+      ok: true,
+      data: { tabs }
+    }
+  }
+}
+
+export function isListTabsEnvelope (
+  value: unknown
+): value is BrijioEnvelope & { payload: ListTabsRequestPayload } {
+  return hasPayloadType(value, 'list_tabs')
+}
+
+export function isTabListResponsePayload (
+  value: unknown
+): value is TabListResponsePayload {
+  if (!isRecord(value) || value.type !== 'tab_list_response') {
+    return false
+  }
+  if (value.ok !== true || !isRecord(value.data)) {
+    return false
+  }
+  return isArrayOf(value.data.tabs, isTabInfo)
+}
+
+export function isTabInfo (value: unknown): value is TabInfo {
+  if (!isRecord(value)) {
+    return false
+  }
+  return (
+    typeof value.tabId === 'string' &&
+    typeof value.windowId === 'string' &&
+    typeof value.title === 'string' &&
+    typeof value.url === 'string' &&
+    typeof value.active === 'boolean' &&
+    typeof value.supported === 'boolean'
+  )
 }
 
 export function createErrorEnvelope (
@@ -1789,4 +1879,8 @@ function hasPayloadType (value: unknown, type: string): boolean {
 
 function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function isArrayOf<T> (value: unknown, guard: (item: unknown) => item is T): value is T[] {
+  return Array.isArray(value) && value.every(guard)
 }
