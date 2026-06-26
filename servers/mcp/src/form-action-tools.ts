@@ -25,6 +25,7 @@ export interface SetCheckedInput {
   checked?: unknown
   expectedLabel?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
   pageContextId?: unknown
   visibleContextId?: unknown
 }
@@ -35,6 +36,7 @@ export interface SelectOptionsInput {
   values?: unknown
   expectedLabel?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
   pageContextId?: unknown
   visibleContextId?: unknown
 }
@@ -43,6 +45,7 @@ export interface SubmitFormInput {
   formId?: unknown
   expectedLabel?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
   pageContextId?: unknown
   visibleContextId?: unknown
 }
@@ -55,6 +58,7 @@ export interface UploadFileInput {
   mimeType?: unknown
   expectedLabel?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
   pageContextId?: unknown
   visibleContextId?: unknown
 }
@@ -64,6 +68,7 @@ export interface FillEditableInput {
   text?: unknown
   expectedText?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
   pageContextId?: unknown
   visibleContextId?: unknown
 }
@@ -102,6 +107,7 @@ export async function setChecked (
     targetResult.data.target,
     input.checked,
     targetResult.data.browserInstanceId,
+    targetResult.data.tabId,
     targetResult.data.pageContextId,
     targetResult.data.visibleContextId
   )
@@ -129,6 +135,7 @@ export async function selectOptions (
     targetResult.data.target,
     input.values,
     targetResult.data.browserInstanceId,
+    targetResult.data.tabId,
     targetResult.data.pageContextId,
     targetResult.data.visibleContextId
   )
@@ -148,6 +155,12 @@ export async function submitForm (
 
   if (!browserInstanceId.ok) {
     return browserInstanceId
+  }
+
+  const tabId = normalizeTabId(input.tabId)
+
+  if (!tabId.ok) {
+    return tabId
   }
 
   if (
@@ -188,6 +201,7 @@ export async function submitForm (
     config,
     target,
     browserInstanceId.data,
+    tabId.data,
     input.pageContextId !== undefined ? input.pageContextId : undefined,
     typeof input.visibleContextId === 'string' ? input.visibleContextId : undefined
   )
@@ -225,6 +239,7 @@ export async function uploadFile (
     targetResult.data.target,
     fileResult.data,
     targetResult.data.browserInstanceId,
+    targetResult.data.tabId,
     targetResult.data.pageContextId,
     targetResult.data.visibleContextId
   )
@@ -298,6 +313,7 @@ export async function fillEditable (
     targetResult.data.target,
     input.text,
     targetResult.data.browserInstanceId,
+    targetResult.data.tabId,
     targetResult.data.pageContextId,
     targetResult.data.visibleContextId
   )
@@ -308,9 +324,15 @@ function normalizeFormControlTarget (
 ): BrijioToolResult<{
     target: FillInputTarget
     browserInstanceId?: string
+    tabId?: string
     pageContextId?: number
     visibleContextId?: string
   }> {
+  const tabId = normalizeTabId(input.tabId)
+
+  if (!tabId.ok) {
+    return tabId
+  }
   if (typeof input.formId !== 'string' || input.formId.length === 0) {
     return invalidToolInputResponse('formId must be a non-empty string.')
   }
@@ -370,6 +392,9 @@ function normalizeFormControlTarget (
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
         : {}),
+      ...(tabId.data !== undefined
+        ? { tabId: tabId.data }
+        : {}),
       ...(input.pageContextId !== undefined
         ? { pageContextId: input.pageContextId }
         : {}),
@@ -385,9 +410,15 @@ function normalizeEditableTarget (
 ): BrijioToolResult<{
     target: EditableTarget
     browserInstanceId?: string
+    tabId?: string
     pageContextId?: number
     visibleContextId?: string
   }> {
+  const tabId = normalizeTabId(input.tabId)
+
+  if (!tabId.ok) {
+    return tabId
+  }
   if (typeof input.id !== 'string' || input.id.length === 0) {
     return invalidToolInputResponse('id must be a non-empty string.')
   }
@@ -440,6 +471,9 @@ function normalizeEditableTarget (
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
         : {}),
+      ...(tabId.data !== undefined
+        ? { tabId: tabId.data }
+        : {}),
       ...(input.pageContextId !== undefined
         ? { pageContextId: input.pageContextId }
         : {}),
@@ -447,6 +481,28 @@ function normalizeEditableTarget (
         ? { visibleContextId: input.visibleContextId }
         : {})
     }
+  }
+}
+
+function normalizeTabId (
+  value: unknown
+): BrijioToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'tabId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 

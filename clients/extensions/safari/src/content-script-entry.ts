@@ -355,6 +355,18 @@ if (typeof browser !== 'undefined') {
       return false
     }
 
+    if (isShowBrijioTabIndicatorMessage(message)) {
+      showBrijioTabIndicator(globalThis.document)
+      sendResponse({ ok: true })
+      return false
+    }
+
+    if (isHideBrijioTabIndicatorMessage(message)) {
+      hideBrijioTabIndicator(globalThis.document)
+      sendResponse({ ok: true })
+      return false
+    }
+
     if (isContentBatchRequest(message)) {
       const result = executeBatch(
         {

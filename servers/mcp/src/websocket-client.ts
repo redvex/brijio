@@ -65,6 +65,7 @@ export interface PageContextRequestOptions {
   timeoutMs: number
   approvalTimeoutMs?: number
   browserInstanceId?: string
+  tabId?: string
   createRequestId?: () => string
 }
 
@@ -141,6 +142,7 @@ export async function requestPageContext (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createGetPageContextEnvelope(requestId),
     parseEnvelope: (value) => parsePageContextEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser page context response.'
@@ -157,6 +159,7 @@ export async function requestPageContent (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createGetPageContentEnvelope(requestId, options.index),
     parseEnvelope: (value) => parsePageContentEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser page content response.'
@@ -173,6 +176,7 @@ export async function requestClickElement (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createClickElementEnvelope(
       requestId,
       options.target,
@@ -194,6 +198,7 @@ export async function requestFillInput (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createFillInputEnvelope(
       requestId,
       options.target,
@@ -216,6 +221,7 @@ export async function requestWriteEditable (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createWriteEditableEnvelope(
       requestId,
       options.target,
@@ -239,6 +245,7 @@ export async function requestSetChecked (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createSetCheckedEnvelope(
       requestId,
       options.target,
@@ -262,6 +269,7 @@ export async function requestSelectOptions (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createSelectOptionsEnvelope(
       requestId,
       options.target,
@@ -286,6 +294,7 @@ export async function requestSubmitForm (
     pairingToken: options.pairingToken,
     timeoutMs: options.approvalTimeoutMs ?? options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createSubmitFormEnvelope(
       requestId,
       options.target,
@@ -309,6 +318,7 @@ export async function requestUploadFile (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createUploadFileEnvelope(
       requestId,
       options.target,
@@ -332,6 +342,7 @@ export async function requestNavigateToUrl (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createNavigateToUrlEnvelope(requestId, options.url),
     parseEnvelope: (value) => parseNavigateToUrlEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser navigation response.'
@@ -367,6 +378,7 @@ export async function requestListTabs (options: {
   pairingToken: string
   timeoutMs: number
   browserInstanceId?: string
+  tabId?: string
   createRequestId?: () => string
 }): Promise<BrijioTabListResult> {
   const requestId = options.createRequestId?.() ?? createRequestId()
@@ -376,6 +388,7 @@ export async function requestListTabs (options: {
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createListTabsEnvelope(requestId),
     parseEnvelope: (value) => parseTabListEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a tab list response.'
@@ -398,6 +411,7 @@ export async function requestPerformBatch (
       ? (options.approvalTimeoutMs ?? options.timeoutMs)
       : options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createPerformBatchEnvelope(requestId, actions, {
       pageContextId: options.pageContextId,
       visibleContextId: options.visibleContextId,
@@ -434,6 +448,7 @@ export async function requestDownloadStatus (
     pairingToken: options.pairingToken,
     timeoutMs: options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createDownloadStatusEnvelope(
       requestId,
       options.ids,
@@ -461,6 +476,7 @@ export async function requestDownloadFile (
     pairingToken: options.pairingToken,
     timeoutMs: options.approvalTimeoutMs ?? options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createDownloadFileEnvelope(
       requestId,
       options.url,
@@ -491,6 +507,7 @@ export async function requestFetchResource (
     pairingToken: options.pairingToken,
     timeoutMs: options.approvalTimeoutMs ?? options.timeoutMs,
     browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
     requestEnvelope: createFetchResourceEnvelope(
       requestId,
       options.url,
@@ -636,6 +653,7 @@ async function requestBrijio<T> (options: {
   pairingToken: string
   timeoutMs: number
   browserInstanceId?: string
+  tabId?: string
   requestEnvelope: {
     type: 'message'
     id?: string
@@ -741,6 +759,7 @@ async function requestBrijio<T> (options: {
 
 function targetEnvelope (options: {
   browserInstanceId?: string
+  tabId?: string
   requestEnvelope: {
     type: 'message'
     id?: string
@@ -753,15 +772,21 @@ function targetEnvelope (options: {
     target?: { browserInstanceId?: string, tabId?: string }
     payload: unknown
   } {
-  if (options.browserInstanceId === undefined) {
+  if (options.browserInstanceId === undefined && options.tabId === undefined) {
     return options.requestEnvelope
+  }
+
+  const target: { browserInstanceId?: string, tabId?: string } = {}
+  if (options.browserInstanceId !== undefined) {
+    target.browserInstanceId = options.browserInstanceId
+  }
+  if (options.tabId !== undefined) {
+    target.tabId = options.tabId
   }
 
   return {
     ...options.requestEnvelope,
-    target: {
-      browserInstanceId: options.browserInstanceId
-    }
+    target
   }
 }
 

@@ -255,8 +255,8 @@ export interface ApprovalAdapter {
 
 export interface TabListerAdapter {
   listTabs: () => Promise<
-    | { ok: true, data: { tabs: TabInfo[] } }
-    | { ok: false, error: { code: string, message: string } }
+  | { ok: true, data: { tabs: TabInfo[] } }
+  | { ok: false, error: { code: string, message: string } }
   >
 }
 

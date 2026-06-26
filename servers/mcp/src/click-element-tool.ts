@@ -9,6 +9,7 @@ export interface ClickElementInput {
   kind?: unknown
   id?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
   expectedText?: unknown
   expectedHref?: unknown
   expectedRole?: unknown
@@ -39,6 +40,7 @@ export async function clickElement (
     config,
     normalizedInput.data.target,
     normalizedInput.data.browserInstanceId,
+    normalizedInput.data.tabId,
     normalizedInput.data.pageContextId,
     normalizedInput.data.visibleContextId
   )
@@ -47,6 +49,7 @@ export async function clickElement (
 function normalizeInput (input: ClickElementInput): BrijioToolResult<{
   target: ClickElementTarget
   browserInstanceId?: string
+  tabId?: string
   pageContextId?: number
   visibleContextId?: string
 }> {
@@ -62,6 +65,12 @@ function normalizeInput (input: ClickElementInput): BrijioToolResult<{
 
   if (!browserInstanceId.ok) {
     return browserInstanceId
+  }
+
+  const tabId = normalizeTabId(input.tabId)
+
+  if (!tabId.ok) {
+    return tabId
   }
 
   // Validate optional expected fields — if provided, must be strings
@@ -131,6 +140,9 @@ function normalizeInput (input: ClickElementInput): BrijioToolResult<{
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
         : {}),
+      ...(tabId.data !== undefined
+        ? { tabId: tabId.data }
+        : {}),
       ...(input.pageContextId !== undefined
         ? { pageContextId: input.pageContextId }
         : {}),
@@ -138,6 +150,28 @@ function normalizeInput (input: ClickElementInput): BrijioToolResult<{
         ? { visibleContextId: input.visibleContextId }
         : {})
     }
+  }
+}
+
+function normalizeTabId (
+  value: unknown
+): BrijioToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'tabId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 

@@ -122,7 +122,7 @@ existing `isRegularPageUrl()` check:
 - `chrome://`, `chrome-extension://`, `about:`, `file://`, `safari://` →
   excluded.
 - Incognito tabs → excluded for P2.1 (extension would need `"incognito":
-  "split"` mode).
+"split"` mode).
 
 ### 5. Extension changes
 
@@ -246,17 +246,17 @@ New types mirroring the `list_browsers` pattern:
 
 ```ts
 interface ListTabsRequest {
-  type: 'list_tabs';
+  type: "list_tabs";
 }
 
 interface TabListResponse {
-  type: 'tab_list_response';
+  type: "tab_list_response";
   ok: true;
   data: { tabs: TabInfo[] };
 }
 
 interface TabListErrorResponse {
-  type: 'tab_list_response';
+  type: "tab_list_response";
   ok: false;
   error: { code: string; message: string };
 }
@@ -267,10 +267,10 @@ existing `parseBrowserListEnvelope` pattern.
 
 ## Cross-Browser Capability Matrix
 
-| Browser | `list_tabs`   | `tabId` targeting | Tab title indicator | In-page banner |
-| ------- | ------------- | ----------------- | ------------------- | -------------- |
-| Chrome  | ✅ Full       | ✅ Full           | ✅ Full              | ✅ Full        |
-| Safari  | ✅ Full       | ✅ Full           | ✅ Full              | ✅ Full        |
+| Browser | `list_tabs` | `tabId` targeting | Tab title indicator | In-page banner |
+| ------- | ----------- | ----------------- | ------------------- | -------------- |
+| Chrome  | ✅ Full     | ✅ Full           | ✅ Full             | ✅ Full        |
+| Safari  | ✅ Full     | ✅ Full           | ✅ Full             | ✅ Full        |
 
 Both extensions use the same `BrijioBackgroundController` from `@brijio/shared`
 and the same `TabsApi` interface. The `browser.*` namespace in Safari supports
@@ -288,12 +288,12 @@ and the same `TabsApi` interface. The `browser.*` namespace in Safari supports
 
 ## Internal WebSocket Messages
 
-| Direction         | Message Type           | Purpose                                    |
-| ----------------- | ---------------------- | ------------------------------------------ |
-| Agent → Extension | `list_tabs`            | Request list of open tabs                  |
-| Extension → Agent | `tab_list_response`    | Tab list with metadata                     |
+| Direction         | Message Type                | Purpose                                              |
+| ----------------- | --------------------------- | ---------------------------------------------------- |
+| Agent → Extension | `list_tabs`                 | Request list of open tabs                            |
+| Extension → Agent | `tab_list_response`         | Tab list with metadata                               |
 | Extension → Tab   | `show_brijio_tab_indicator` | Prepend `● ` to tab title + inject persistent banner |
-| Extension → Tab   | `hide_brijio_tab_indicator` | Restore original title + remove banner |
+| Extension → Tab   | `hide_brijio_tab_indicator` | Restore original title + remove banner               |
 
 ## Consequences
 
