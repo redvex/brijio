@@ -32,9 +32,9 @@ export interface TabHandle {
 }
 
 export interface TabsApi {
-  query: (queryInfo: {
-    active: boolean
-    currentWindow: boolean
+  query: (queryInfo?: {
+    active?: boolean
+    currentWindow?: boolean
   }) => Promise<TabHandle[]>
   sendMessage: (tabId: number, message: unknown) => Promise<unknown>
 }
@@ -118,32 +118,41 @@ export function actionRegularPagePermissionRequired (): PageActionResult {
 
 export async function readActiveTabPage<T> (
   message: ContentRequest,
-  deps: ActiveTabDeps
+  deps: ActiveTabDeps,
+  tabId?: number
 ): Promise<PageReadResult<T>> {
-  const [activeTab] = await deps.tabs.query({
-    active: true,
-    currentWindow: true
-  })
+  let resolvedTabId: number
 
-  if (activeTab?.id === undefined || activeTab.url === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: 'no_active_tab',
-        message: 'No active tab with a URL is available.'
+  if (tabId !== undefined) {
+    resolvedTabId = tabId
+  } else {
+    const [activeTab] = await deps.tabs.query({
+      active: true,
+      currentWindow: true
+    })
+
+    if (activeTab?.id === undefined || activeTab.url === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'no_active_tab',
+          message: 'No active tab with a URL is available.'
+        }
       }
     }
-  }
 
-  if (!deps.isRegularPageUrl(activeTab.url)) {
-    return {
-      ok: false,
-      error: {
-        code: 'unsupported_page',
-        message:
-          'Brijio can read page content only from HTTP and HTTPS tabs.'
+    if (!deps.isRegularPageUrl(activeTab.url)) {
+      return {
+        ok: false,
+        error: {
+          code: 'unsupported_page',
+          message:
+            'Brijio can read page content only from HTTP and HTTPS tabs.'
+        }
       }
     }
+
+    resolvedTabId = activeTab.id
   }
 
   try {
@@ -152,11 +161,11 @@ export async function readActiveTabPage<T> (
     // mechanism (globalThis.__brijioOnMessageListener) prevents duplicate
     // listeners when re-injecting.
     await deps.scripting.executeScript({
-      target: { tabId: activeTab.id },
+      target: { tabId: resolvedTabId },
       files: ['content.js']
     })
 
-    const response = await deps.tabs.sendMessage(activeTab.id, message)
+    const response = await deps.tabs.sendMessage(resolvedTabId, message)
 
     if (!isContentResponse(response)) {
       return contentScriptUnavailable<T>()
@@ -192,32 +201,41 @@ export async function readActiveTabPage<T> (
 
 export async function performActiveTabAction (
   message: ContentRequest,
-  deps: ActiveTabDeps
+  deps: ActiveTabDeps,
+  tabId?: number
 ): Promise<PageActionResult> {
-  const [activeTab] = await deps.tabs.query({
-    active: true,
-    currentWindow: true
-  })
+  let resolvedTabId: number
 
-  if (activeTab?.id === undefined || activeTab.url === undefined) {
-    return {
-      ok: false,
-      error: {
-        code: 'no_active_tab',
-        message: 'No active tab with a URL is available.'
+  if (tabId !== undefined) {
+    resolvedTabId = tabId
+  } else {
+    const [activeTab] = await deps.tabs.query({
+      active: true,
+      currentWindow: true
+    })
+
+    if (activeTab?.id === undefined || activeTab.url === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'no_active_tab',
+          message: 'No active tab with a URL is available.'
+        }
       }
     }
-  }
 
-  if (!deps.isRegularPageUrl(activeTab.url)) {
-    return {
-      ok: false,
-      error: {
-        code: 'unsupported_page',
-        message:
-          'Brijio can perform actions only on HTTP and HTTPS tabs.'
+    if (!deps.isRegularPageUrl(activeTab.url)) {
+      return {
+        ok: false,
+        error: {
+          code: 'unsupported_page',
+          message:
+            'Brijio can perform actions only on HTTP and HTTPS tabs.'
+        }
       }
     }
+
+    resolvedTabId = activeTab.id
   }
 
   try {
@@ -226,11 +244,11 @@ export async function performActiveTabAction (
     // mechanism (globalThis.__brijioOnMessageListener) prevents duplicate
     // listeners when re-injecting.
     await deps.scripting.executeScript({
-      target: { tabId: activeTab.id },
+      target: { tabId: resolvedTabId },
       files: ['content.js']
     })
 
-    const response = await deps.tabs.sendMessage(activeTab.id, message)
+    const response = await deps.tabs.sendMessage(resolvedTabId, message)
 
     if (!isContentResponse(response)) {
       return actionContentScriptUnavailable()
@@ -450,40 +468,49 @@ async function performActiveTabBatchViaSingleActions (
 
 export async function performActiveTabBatch (
   message: ContentBatchRequest,
-  deps: ActiveTabDeps
+  deps: ActiveTabDeps,
+  tabId?: number
 ): Promise<BatchResult> {
-  const [activeTab] = await deps.tabs.query({
-    active: true,
-    currentWindow: true
-  })
+  let resolvedTabId: number
 
-  if (activeTab?.id === undefined || activeTab.url === undefined) {
-    return {
-      ...BATCH_DEFAULT_RESULT,
-      results: message.actions.map(() => ({
-        ok: false,
-        error: { code: 'no_active_tab', message: 'No active tab with a URL is available.', aborted: true }
-      }))
-    }
-  }
+  if (tabId !== undefined) {
+    resolvedTabId = tabId
+  } else {
+    const [activeTab] = await deps.tabs.query({
+      active: true,
+      currentWindow: true
+    })
 
-  if (!deps.isRegularPageUrl(activeTab.url)) {
-    return {
-      ...BATCH_DEFAULT_RESULT,
-      results: message.actions.map(() => ({
-        ok: false,
-        error: { code: 'unsupported_page', message: 'Brijio can perform actions only on HTTP and HTTPS tabs.', aborted: true }
-      }))
+    if (activeTab?.id === undefined || activeTab.url === undefined) {
+      return {
+        ...BATCH_DEFAULT_RESULT,
+        results: message.actions.map(() => ({
+          ok: false,
+          error: { code: 'no_active_tab', message: 'No active tab with a URL is available.', aborted: true }
+        }))
+      }
     }
+
+    if (!deps.isRegularPageUrl(activeTab.url)) {
+      return {
+        ...BATCH_DEFAULT_RESULT,
+        results: message.actions.map(() => ({
+          ok: false,
+          error: { code: 'unsupported_page', message: 'Brijio can perform actions only on HTTP and HTTPS tabs.', aborted: true }
+        }))
+      }
+    }
+
+    resolvedTabId = activeTab.id
   }
 
   try {
     await deps.scripting.executeScript({
-      target: { tabId: activeTab.id },
+      target: { tabId: resolvedTabId },
       files: ['content.js']
     })
 
-    const response = await sendMessageWithTimeout(deps, activeTab.id, message)
+    const response = await sendMessageWithTimeout(deps, resolvedTabId, message)
 
     if (isBatchResult(response)) {
       return response
@@ -495,7 +522,7 @@ export async function performActiveTabBatch (
     return await performActiveTabBatchViaSingleActions(
       message,
       deps,
-      activeTab.id
+      resolvedTabId
     )
   } catch {
     if (
@@ -514,7 +541,7 @@ export async function performActiveTabBatch (
     const fallbackResult = await performActiveTabBatchViaSingleActions(
       message,
       deps,
-      activeTab.id
+      resolvedTabId
     )
 
     if (fallbackResult.results.some(entry => entry.ok)) {
