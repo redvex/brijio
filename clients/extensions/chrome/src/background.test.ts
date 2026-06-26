@@ -8,6 +8,7 @@ import {
   createChromeApprovalAdapter,
   createMessageHandler,
   navigateActiveTabToUrl,
+  tabLister,
   type ChromeApi
 } from './background.js'
 
@@ -20,7 +21,7 @@ interface MockTabs {
   createdTabs: Array<{ url: string }>
   sentMessages: Array<{ tabId: number, message: unknown }>
   executedScripts: Array<{ target: { tabId: number }, files: string[] }>
-  query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
+  query: (queryInfo?: { active?: boolean, currentWindow?: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
   create: (properties: { url: string }) => Promise<unknown>
   sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   update: (tabId: number, updateProperties: { url: string }) => Promise<{ id?: number, title?: string, url?: string }>
@@ -34,7 +35,7 @@ function createMockTabs (): MockTabs {
     createdTabs: [],
     sentMessages: [],
     executedScripts: [],
-    async query (_queryInfo: { active: boolean, currentWindow: boolean }) {
+    async query (_queryInfo?: { active?: boolean, currentWindow?: boolean }) {
       return this.queryResult
     },
     async create (properties: { url: string }) {
@@ -569,6 +570,96 @@ void describe('navigateActiveTabToUrl', () => {
       // Unexpected early result — either ok or error, verify it's not a crash.
       const navigationResult = result as Awaited<ReturnType<typeof navigateActiveTabToUrl>>
       assert.equal(navigationResult.ok, false)
+    }
+  })
+})
+
+// --- tabLister tests ---
+
+void describe('tabLister', () => {
+  let mockTabs: MockTabs
+
+  beforeEach(() => {
+    mockTabs = createMockTabs()
+    ;(globalThis as unknown as Record<string, unknown>).chrome = {
+      tabs: mockTabs,
+      action: {
+        setBadgeText: async () => {},
+        setBadgeBackgroundColor: async () => {},
+        setBadgeTextColor: async () => {},
+        setTitle: async () => {}
+      },
+      runtime: {
+        getURL: (path: string) => `chrome-extension://abc/${path}`,
+        onMessage: { addListener: () => {} }
+      },
+      storage: {
+        local: {
+          get: async () => ({}),
+          set: async () => {}
+        }
+      },
+      scripting: {
+        executeScript: async () => {}
+      }
+    }
+  })
+
+  afterEach(() => {
+    delete (globalThis as unknown as Record<string, unknown>).chrome
+  })
+
+  void it('calls chrome.tabs.query({}) and returns filtered regular-page tabs', async () => {
+    mockTabs.queryResult = [
+      { id: 1, title: 'Google', url: 'https://google.com' },
+      { id: 2, title: 'Chrome', url: 'chrome://extensions' },
+      { id: 3, title: 'Local', url: 'http://localhost:3000' },
+      { id: 4, title: 'New Tab', url: 'chrome://newtab' }
+    ]
+
+    const result = await tabLister.listTabs()
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.tabs.length, 2)
+      assert.equal(result.data.tabs[0].tabId, '1')
+      assert.equal(result.data.tabs[0].url, 'https://google.com')
+      assert.equal(result.data.tabs[0].title, 'Google')
+      assert.equal(result.data.tabs[0].supported, true)
+      assert.equal(result.data.tabs[1].tabId, '3')
+      assert.equal(result.data.tabs[1].url, 'http://localhost:3000')
+    }
+  })
+
+  void it('returns browser_error when chrome.tabs.query throws', async () => {
+    mockTabs.query = async () => {
+      throw new Error('Extension context invalidated')
+    }
+
+    const result = await tabLister.listTabs()
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'browser_error')
+      assert.equal(result.error.message, 'Extension context invalidated')
+    }
+  })
+
+  void it('filters out tabs without id or url', async () => {
+    mockTabs.queryResult = [
+      { id: 1, title: 'OK', url: 'https://example.com' },
+      { id: undefined, title: 'No ID', url: 'https://no-id.com' },
+      { id: 3, title: 'No URL', url: undefined },
+      { id: 4, title: 'Empty', url: '' },
+      { id: 5, title: 'Chrome', url: 'chrome://settings' }
+    ]
+
+    const result = await tabLister.listTabs()
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.tabs.length, 1)
+      assert.equal(result.data.tabs[0].tabId, '1')
     }
   })
 })

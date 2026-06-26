@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { describe, it, beforeEach } from 'node:test'
+import { describe, it, beforeEach, afterEach } from 'node:test'
 import {
   BrijioBackgroundController,
   createGlobalTimers,
@@ -15,7 +15,8 @@ import {
   SafariPageReaderAdapter,
   SafariPageNavigationAdapter,
   createSafariApprovalAdapter,
-  SafariWebSocketConnection
+  SafariWebSocketConnection,
+  tabLister
 } from './background.js'
 
 // --- Mock browser.* API ---
@@ -53,7 +54,7 @@ interface MockTabs {
   sendMessageResult: unknown
   createResult: unknown
   updateResult: { id?: number, title?: string, url?: string }
-  query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
+  query: (queryInfo?: { active?: boolean, currentWindow?: boolean }) => Promise<Array<{ id?: number, title?: string, url?: string }>>
   sendMessage: (tabId: number, message: unknown) => Promise<unknown>
   create: (properties: { url: string }) => Promise<unknown>
   update: (tabId: number, updateProperties: { url: string }) => Promise<{ id?: number, title?: string, url?: string }>
@@ -137,7 +138,7 @@ function createMockBrowser (): MockBrowser {
   const tabs: MockTabs = {
     queryResult: [] as MockTab[],
     sentMessages: [],
-    async query (_queryInfo: { active: boolean, currentWindow: boolean }) {
+    async query (_queryInfo?: { active?: boolean, currentWindow?: boolean }) {
       return tabs.queryResult
     },
     sendMessageResult: {} as unknown,
@@ -656,6 +657,75 @@ void describe('SafariPageNavigationAdapter', () => {
       // Unexpected early result — verify it's an error, not a crash.
       const navigationResult = result as Awaited<ReturnType<SafariPageNavigationAdapter['navigateToUrl']>>
       assert.equal(navigationResult.ok, false)
+    }
+  })
+})
+
+// --- tabLister tests ---
+
+void describe('tabLister', () => {
+  let browser: MockBrowser
+
+  beforeEach(() => {
+    browser = createMockBrowser()
+    ;(globalThis as unknown as Record<string, unknown>).browser = browser
+  })
+
+  afterEach(() => {
+    delete (globalThis as unknown as Record<string, unknown>).browser
+  })
+
+  void it('calls browser.tabs.query({}) and returns filtered regular-page tabs', async () => {
+    browser.tabs.queryResult = [
+      { id: 1, title: 'Google', url: 'https://google.com' },
+      { id: 2, title: 'Safari', url: 'safari-extension://page' },
+      { id: 3, title: 'Local', url: 'http://localhost:3000' },
+      { id: 4, title: 'New Tab', url: 'about:blank' }
+    ]
+
+    const result = await tabLister.listTabs()
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.tabs.length, 2)
+      assert.equal(result.data.tabs[0].tabId, '1')
+      assert.equal(result.data.tabs[0].url, 'https://google.com')
+      assert.equal(result.data.tabs[0].title, 'Google')
+      assert.equal(result.data.tabs[0].supported, true)
+      assert.equal(result.data.tabs[1].tabId, '3')
+      assert.equal(result.data.tabs[1].url, 'http://localhost:3000')
+    }
+  })
+
+  void it('returns browser_error when browser.tabs.query throws', async () => {
+    browser.tabs.query = async () => {
+      throw new Error('Extension context invalidated')
+    }
+
+    const result = await tabLister.listTabs()
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'browser_error')
+      assert.equal(result.error.message, 'Extension context invalidated')
+    }
+  })
+
+  void it('filters out tabs without id or url', async () => {
+    browser.tabs.queryResult = [
+      { id: 1, title: 'OK', url: 'https://example.com' },
+      { id: undefined, title: 'No ID', url: 'https://no-id.com' },
+      { id: 3, title: 'No URL', url: undefined },
+      { id: 4, title: 'Empty', url: '' },
+      { id: 5, title: 'Safari', url: 'safari-extension://settings' }
+    ]
+
+    const result = await tabLister.listTabs()
+
+    assert.equal(result.ok, true)
+    if (result.ok) {
+      assert.equal(result.data.tabs.length, 1)
+      assert.equal(result.data.tabs[0].tabId, '1')
     }
   })
 })

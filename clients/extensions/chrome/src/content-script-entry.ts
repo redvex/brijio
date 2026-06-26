@@ -29,17 +29,27 @@ export interface HideBrijioApprovalMessage {
   actionUUID: string
 }
 
+export interface ShowBrijioTabIndicatorMessage {
+  type: 'show_brijio_tab_indicator'
+}
+
+export interface HideBrijioTabIndicatorMessage {
+  type: 'hide_brijio_tab_indicator'
+}
+
 type ApprovalResponse =
   | { ok: true, decision: BrijioApprovalDecision }
   | { ok: true }
 
-type SendResponse = (response: ContentResponse | BatchResult | ApprovalResponse) => void
+type SendResponse = (response: ContentResponse | BatchResult | ApprovalResponse | { ok: true }) => void
 
 type IncomingMessage =
   | ContentRequest
   | ContentBatchRequest
   | ShowBrijioApprovalMessage
   | HideBrijioApprovalMessage
+  | ShowBrijioTabIndicatorMessage
+  | HideBrijioTabIndicatorMessage
 
 interface ChromeRuntimeApi {
   runtime: {
@@ -171,6 +181,103 @@ function isHideBrijioApprovalMessage (
   return message.type === 'hide_brijio_approval'
 }
 
+// --- Tab indicator banner ---
+
+const tabIndicatorBannerId = 'brijio-tab-indicator'
+const tabIndicatorTitlePrefix = '● '
+
+interface TabIndicatorState {
+  originalTitle: string
+  observer: MutationObserver
+}
+
+const tabIndicatorStateMap = new WeakMap<Document, TabIndicatorState>()
+
+export function showBrijioTabIndicator (documentRef: Document): void {
+  hideBrijioTabIndicator(documentRef)
+
+  const originalTitle = documentRef.title
+
+  // Prepend the indicator prefix to the title
+  if (!documentRef.title.startsWith(tabIndicatorTitlePrefix)) {
+    documentRef.title = tabIndicatorTitlePrefix + documentRef.title
+  }
+
+  // Set up MutationObserver to re-apply prefix if the page changes its title
+  const observer = new MutationObserver(() => {
+    if (!documentRef.title.startsWith(tabIndicatorTitlePrefix)) {
+      documentRef.title = tabIndicatorTitlePrefix + documentRef.title
+    }
+  })
+
+  const titleElement = documentRef.querySelector('title')
+  if (titleElement !== null) {
+    observer.observe(titleElement, { childList: true, characterData: true, subtree: true })
+  } else {
+    // If no <title> element, observe the head
+    const head = documentRef.querySelector('head')
+    if (head !== null) {
+      observer.observe(head, { childList: true })
+    }
+  }
+
+  tabIndicatorStateMap.set(documentRef, { originalTitle, observer })
+
+  // Inject the persistent blue banner
+  const banner = documentRef.createElement('div')
+  banner.id = tabIndicatorBannerId
+  banner.setAttribute('role', 'status')
+  banner.setAttribute('aria-live', 'polite')
+  banner.textContent = 'Brijio is active on this tab'
+  Object.assign(banner.style, {
+    alignItems: 'center',
+    background: '#1a56db',
+    borderRadius: '4px',
+    boxSizing: 'border-box',
+    boxShadow: '0 4px 12px rgba(15, 23, 42, 0.15)',
+    color: '#ffffff',
+    display: 'flex',
+    font: '12px/1.4 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    fontWeight: '600',
+    gap: '6px',
+    left: '16px',
+    maxWidth: 'calc(100vw - 32px)',
+    padding: '6px 12px',
+    position: 'fixed',
+    bottom: '16px',
+    width: 'max-content',
+    zIndex: '2147483647'
+  })
+
+  documentRef.body.append(banner)
+}
+
+export function hideBrijioTabIndicator (documentRef: Document): void {
+  const state = tabIndicatorStateMap.get(documentRef)
+  if (state !== undefined) {
+    state.observer.disconnect()
+    documentRef.title = state.originalTitle
+    tabIndicatorStateMap.delete(documentRef)
+  }
+
+  const banner = documentRef.getElementById(tabIndicatorBannerId)
+  if (banner !== null) {
+    banner.remove()
+  }
+}
+
+function isShowBrijioTabIndicatorMessage (
+  message: IncomingMessage
+): message is ShowBrijioTabIndicatorMessage {
+  return message.type === 'show_brijio_tab_indicator'
+}
+
+function isHideBrijioTabIndicatorMessage (
+  message: IncomingMessage
+): message is HideBrijioTabIndicatorMessage {
+  return message.type === 'hide_brijio_tab_indicator'
+}
+
 if (typeof chrome !== 'undefined') {
   registerPageNavigationListener()
 
@@ -196,6 +303,18 @@ if (typeof chrome !== 'undefined') {
 
     if (isHideBrijioApprovalMessage(message)) {
       hideBrijioApprovalBanner(globalThis.document, message.actionUUID)
+      sendResponse({ ok: true })
+      return false
+    }
+
+    if (isShowBrijioTabIndicatorMessage(message)) {
+      showBrijioTabIndicator(globalThis.document)
+      sendResponse({ ok: true })
+      return false
+    }
+
+    if (isHideBrijioTabIndicatorMessage(message)) {
+      hideBrijioTabIndicator(globalThis.document)
       sendResponse({ ok: true })
       return false
     }
