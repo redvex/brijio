@@ -3,6 +3,7 @@ export interface WebSocketEnvelope {
   id?: string
   target?: {
     browserInstanceId?: string
+    tabId?: string
   }
   payload: unknown
 }

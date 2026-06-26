@@ -11,6 +11,7 @@ import {
   parsePageContentResourceIndex
 } from './page-context.js'
 import { listBrowsers } from './browser-list-tool.js'
+import { listTabs } from './list-tabs-tool.js'
 import { clickElement } from './click-element-tool.js'
 import { fillInput } from './fill-input-tool.js'
 import { navigateToUrl } from './navigate-to-url-tool.js'
@@ -74,6 +75,31 @@ export async function createBrijioMcpServer (
     async () => {
       logger.info('tool_call', { tool: 'list_browsers' })
       const result = await listBrowsers(pageContextConfig)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
+    'list_tabs',
+    {
+      title: 'List Tabs',
+      description:
+        'List open browser tabs for the connected Brijio browser instance. Returns tab metadata including tab ID, window ID, title, URL, active status, and supported flag. Only HTTP/HTTPS tabs are listed.',
+      inputSchema: {
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input: { browserInstanceId?: string }) => {
+      logger.info('tool_call', { tool: 'list_tabs', ...input })
+      const result = await listTabs(pageContextConfig)
 
       return {
         content: [

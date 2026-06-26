@@ -4,6 +4,7 @@ import {
   type BrijioBatchResult,
   type BrijioClickElementResult,
   type BrijioBrowserListResult,
+  type BrijioTabListResult,
   type BrijioFillInputResult,
   type BrijioNavigateToUrlResult,
   type BrijioPageContentResult,
@@ -30,6 +31,7 @@ import {
   createDownloadStatusEnvelope,
   createDownloadFileEnvelope,
   createFetchResourceEnvelope,
+  createListTabsEnvelope,
   connectionFailedResponse,
   createGetPageContentEnvelope,
   createGetPageContextEnvelope,
@@ -42,6 +44,7 @@ import {
   parseActionResultEnvelope,
   parseBatchResultEnvelope,
   parseBrowserListEnvelope,
+  parseTabListEnvelope,
   parseDownloadStatusEnvelope,
   parseDownloadFileEnvelope,
   parseFetchResourceEnvelope,
@@ -359,6 +362,26 @@ export async function requestBrowserList (options: {
   })
 }
 
+export async function requestListTabs (options: {
+  websocketUrl: string
+  pairingToken: string
+  timeoutMs: number
+  browserInstanceId?: string
+  createRequestId?: () => string
+}): Promise<BrijioTabListResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createListTabsEnvelope(requestId),
+    parseEnvelope: (value) => parseTabListEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a tab list response.'
+  })
+}
+
 export async function requestPerformBatch (
   options: PerformBatchRequestOptions
 ): Promise<BrijioResourceResult<BrijioBatchResult>> {
@@ -616,7 +639,7 @@ async function requestBrijio<T> (options: {
   requestEnvelope: {
     type: 'message'
     id?: string
-    target?: { browserInstanceId?: string }
+    target?: { browserInstanceId?: string, tabId?: string }
     payload: unknown
   }
   timeoutMessage: string
@@ -721,13 +744,13 @@ function targetEnvelope (options: {
   requestEnvelope: {
     type: 'message'
     id?: string
-    target?: { browserInstanceId?: string }
+    target?: { browserInstanceId?: string, tabId?: string }
     payload: unknown
   }
 }): {
     type: 'message'
     id?: string
-    target?: { browserInstanceId?: string }
+    target?: { browserInstanceId?: string, tabId?: string }
     payload: unknown
   } {
   if (options.browserInstanceId === undefined) {
