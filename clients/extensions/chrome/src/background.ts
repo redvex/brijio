@@ -24,7 +24,8 @@ import {
   type ApprovalAdapter,
   type ApprovalDecision,
   type ApprovalRequest,
-  type ActiveTabDeps
+  type ActiveTabDeps,
+  type TabListerAdapter
 } from '@brijio/shared'
 import { isRegularPageUrl } from './permissions.js'
 
@@ -93,7 +94,7 @@ export interface ChromeApi {
   }
   tabs: {
     create: (properties: { url: string }) => Promise<unknown>
-    query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<
+    query: (queryInfo?: { active?: boolean, currentWindow?: boolean }) => Promise<
     Array<{
       id?: number
       title?: string
@@ -361,6 +362,33 @@ const downloadAdapter: DownloadAdapter = {
   }
 }
 
+export const tabLister: TabListerAdapter = {
+  async listTabs () {
+    try {
+      const allTabs = await chrome.tabs.query({})
+      const tabs = allTabs
+        .filter(tab => tab.id !== undefined && typeof tab.url === 'string' && isRegularPageUrl(tab.url))
+        .map(tab => ({
+          tabId: String(tab.id),
+          windowId: '0',
+          title: tab.title ?? '',
+          url: tab.url!,
+          active: false,
+          supported: true
+        }))
+      return { ok: true, data: { tabs } }
+    } catch (error: unknown) {
+      return {
+        ok: false,
+        error: {
+          code: 'browser_error',
+          message: error instanceof Error ? error.message : 'Failed to list tabs.'
+        }
+      }
+    }
+  }
+}
+
 const controller = new BrijioBackgroundController({
   action: {
     async setBadgeText (text) {
@@ -459,6 +487,7 @@ const controller = new BrijioBackgroundController({
       return await navigateActiveTabToUrl(url)
     }
   },
+  tabLister,
   timers: createGlobalTimers()
 })
 
