@@ -323,6 +323,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           }
         },
         additionalProperties: false,
@@ -335,6 +339,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           includeContent: {
             type: 'boolean',
@@ -362,6 +370,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           expectedHref: {
             type: 'string',
@@ -411,6 +423,10 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional Brijio browser instance ID to target.'
           },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
+          },
           controlId: {
             type: 'string',
             description:
@@ -453,6 +469,10 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional Brijio browser instance ID to target.'
           },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
+          },
           expectedText: {
             type: 'string',
             description:
@@ -490,6 +510,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           checked: {
             type: 'boolean',
@@ -532,6 +556,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           controlId: {
             type: 'string',
@@ -578,6 +606,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           controlId: {
             type: 'string',
@@ -630,6 +662,10 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional Brijio browser instance ID to target.'
           },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
+          },
           expectedLabel: {
             type: 'string',
             description:
@@ -667,6 +703,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           }
         },
         required: ['url'],

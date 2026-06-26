@@ -14,6 +14,7 @@ export interface FillInputInput {
   text?: unknown
   expectedLabel?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
   pageContextId?: unknown
   visibleContextId?: unknown
 }
@@ -36,6 +37,7 @@ export async function fillInput (
     normalizedInput.data.target,
     normalizedInput.data.text,
     normalizedInput.data.browserInstanceId,
+    normalizedInput.data.tabId,
     normalizedInput.data.pageContextId,
     normalizedInput.data.visibleContextId
   )
@@ -47,6 +49,7 @@ function normalizeInput (
     target: FillInputTarget
     text: string
     browserInstanceId?: string
+    tabId?: string
     pageContextId?: number
     visibleContextId?: string
   }> {
@@ -71,6 +74,12 @@ function normalizeInput (
 
   if (!browserInstanceId.ok) {
     return browserInstanceId
+  }
+
+  const tabId = normalizeTabId(input.tabId)
+
+  if (!tabId.ok) {
+    return tabId
   }
 
   if (
@@ -114,6 +123,9 @@ function normalizeInput (
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
         : {}),
+      ...(tabId.data !== undefined
+        ? { tabId: tabId.data }
+        : {}),
       ...(input.pageContextId !== undefined
         ? { pageContextId: input.pageContextId }
         : {}),
@@ -121,6 +133,28 @@ function normalizeInput (
         ? { visibleContextId: input.visibleContextId }
         : {})
     }
+  }
+}
+
+function normalizeTabId (
+  value: unknown
+): BrijioToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'tabId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 

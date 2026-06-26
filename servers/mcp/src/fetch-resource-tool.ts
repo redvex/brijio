@@ -9,6 +9,7 @@ export interface FetchResourceInput {
   maxSizeBytes?: unknown
   fetchTimeout?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
 }
 
 export interface FetchResourceResultData {

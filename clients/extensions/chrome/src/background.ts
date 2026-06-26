@@ -372,7 +372,7 @@ export const tabLister: TabListerAdapter = {
           tabId: String(tab.id),
           windowId: '0',
           title: tab.title ?? '',
-          url: tab.url!,
+          url: tab.url ?? '',
           active: false,
           supported: true
         }))
