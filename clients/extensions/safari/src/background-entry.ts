@@ -36,6 +36,7 @@ import {
   SafariDownloadAdapter,
   SafariPageNavigationAdapter,
   createSafariApprovalAdapter,
+  tabLister,
   type BrowserApi
 } from './background.js'
 import { hasRegularPageAccess, isRegularPageUrl } from './permissions.js'
@@ -131,6 +132,7 @@ const controller = new BrijioBackgroundController({
   pageActions,
   pageBatch,
   pageNavigation,
+  tabLister,
   approval,
   timers: createGlobalTimers()
 })
