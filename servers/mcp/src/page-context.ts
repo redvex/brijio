@@ -75,7 +75,8 @@ export function getPageContextConfigFromEnv (
 
 export async function getCurrentPageContext (
   config: BrijioPageContextConfig,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  tabId?: string
 ): Promise<BrijioPageContextResult> {
   const requestPageContext =
     config.requestPageContext ?? defaultRequestPageContext
@@ -84,14 +85,16 @@ export async function getCurrentPageContext (
     websocketUrl: config.websocketUrl,
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
-    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId
   })
 }
 
 export async function getCurrentPageContent (
   config: BrijioPageContextConfig,
   index: number,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  tabId?: string
 ): Promise<BrijioPageContentResult> {
   const requestPageContent =
     config.requestPageContent ?? defaultRequestPageContent
@@ -101,7 +104,8 @@ export async function getCurrentPageContent (
     pairingToken: config.pairingToken ?? '',
     timeoutMs: config.timeoutMs,
     index,
-    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId
   })
 }
 

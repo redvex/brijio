@@ -259,6 +259,82 @@ void describe('Brijio WebSocket client', () => {
     })
   })
 
+  void it('adds tabId to the target when provided', async () => {
+    let receivedTarget: unknown
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id: string
+          target: unknown
+        }
+        receivedTarget = request.target
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'page_context_response',
+              ok: true,
+              data: createRichPageContext()
+            }
+          })
+        )
+      })
+    })
+
+    await requestPageContext({
+      websocketUrl: server.url,
+      pairingToken: 'local-token',
+      timeoutMs: 100,
+      tabId: 'tab-42',
+      createRequestId: () => 'request-tabid-1'
+    })
+
+    assert.deepEqual(receivedTarget, {
+      tabId: 'tab-42'
+    })
+  })
+
+  void it('adds both browserInstanceId and tabId to the target when provided', async () => {
+    let receivedTarget: unknown
+    const server = await startServer((socket) => {
+      onAuthenticatedMessage(socket, (data) => {
+        const request = JSON.parse(rawDataToString(data)) as {
+          id: string
+          target: unknown
+        }
+        receivedTarget = request.target
+
+        socket.send(
+          JSON.stringify({
+            type: 'message',
+            id: request.id,
+            payload: {
+              type: 'page_context_response',
+              ok: true,
+              data: createRichPageContext()
+            }
+          })
+        )
+      })
+    })
+
+    await requestPageContext({
+      websocketUrl: server.url,
+      pairingToken: 'local-token',
+      timeoutMs: 100,
+      browserInstanceId: 'chrome-default-test',
+      tabId: 'tab-42',
+      createRequestId: () => 'request-tabid-2'
+    })
+
+    assert.deepEqual(receivedTarget, {
+      browserInstanceId: 'chrome-default-test',
+      tabId: 'tab-42'
+    })
+  })
+
   void it('requests a click action and returns the matching action result', async () => {
     let receivedPayload: unknown
     const server = await startServer((socket) => {

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it, after } from 'node:test'
 import { parseHTML } from 'linkedom'
 import { handleContentRequest, type ContentRequest, type ContentResponse, type ContentEnvironment } from '@brijio/shared'
 import {
@@ -19,6 +19,15 @@ class MockMutationObserver {
 const savedMutationObserver = (globalThis as unknown as { MutationObserver?: typeof MutationObserver }).MutationObserver
 ;(globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver =
   MockMutationObserver as unknown as typeof MutationObserver
+
+after(() => {
+  if (savedMutationObserver !== undefined) {
+    ;(globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver =
+      savedMutationObserver
+  } else {
+    delete (globalThis as unknown as { MutationObserver?: typeof MutationObserver }).MutationObserver
+  }
+})
 
 void describe('Safari content-script-entry module', () => {
   void it('exports handleContentRequest from @brijio/shared', () => {
