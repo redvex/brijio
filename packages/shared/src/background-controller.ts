@@ -17,6 +17,7 @@ import {
   createPageContentResponse,
   createPageContextErrorResponse,
   createPageContextResponse,
+  createTabListResponse,
   isAuthSuccessEnvelope,
   isBrowserPresenceRequestEnvelope,
   isDownloadFileEnvelope,
@@ -24,6 +25,7 @@ import {
   isFetchResourceEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
+  isListTabsEnvelope,
   isNavigateToUrlEnvelope,
   isPerformActionEnvelope,
   isPerformBatchEnvelope,
@@ -40,6 +42,7 @@ import {
   type PageContent,
   type PageContentErrorCode,
   type PageContext,
+  type TabInfo,
   type WebSocketEnvelope,
   type WriteTextActionResultData,
   type WriteTextEditableTarget,
@@ -250,6 +253,13 @@ export interface ApprovalAdapter {
   hideApproval: (actionUUID: string) => Promise<void>
 }
 
+export interface TabListerAdapter {
+  listTabs: () => Promise<
+    | { ok: true, data: { tabs: TabInfo[] } }
+    | { ok: false, error: { code: string, message: string } }
+  >
+}
+
 type ApprovalCheckResult =
   | { ok: true }
   | {
@@ -284,6 +294,7 @@ export interface BrijioBackgroundControllerOptions {
   pageReader: PageReaderAdapter
   setup: SetupAdapter
   storage: StorageAdapter
+  tabLister?: TabListerAdapter
   timers: TimersAdapter
 }
 
@@ -527,6 +538,16 @@ export class BrijioBackgroundController {
       return
     }
 
+    if (isListTabsEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handleListTabsRequest(message.id)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
+    }
+
     if (isGetPageContextEnvelope(message)) {
       this.pendingRequestCount++
       try {
@@ -662,6 +683,49 @@ export class BrijioBackgroundController {
 
     this.socket?.send(
       JSON.stringify(createPageContextResponse(requestId, result.data))
+    )
+  }
+
+  private async handleListTabsRequest (
+    requestId: string | undefined
+  ): Promise<void> {
+    if (this.options.tabLister === undefined) {
+      this.socket?.send(
+        JSON.stringify({
+          type: 'message',
+          id: requestId,
+          payload: {
+            type: 'tab_list_response',
+            ok: false,
+            error: {
+              code: 'not_supported',
+              message: 'Tab listing is not supported by this browser.'
+            }
+          }
+        })
+      )
+      return
+    }
+
+    const result = await this.options.tabLister.listTabs()
+
+    if (!result.ok) {
+      this.socket?.send(
+        JSON.stringify({
+          type: 'message',
+          id: requestId,
+          payload: {
+            type: 'tab_list_response',
+            ok: false,
+            error: result.error
+          }
+        })
+      )
+      return
+    }
+
+    this.socket?.send(
+      JSON.stringify(createTabListResponse(requestId, result.data.tabs))
     )
   }
 

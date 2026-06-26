@@ -359,6 +359,12 @@ function handleMcpMessage (
     return
   }
 
+  if (isListTabsMessage(message.payload)) {
+    logger.info('list_tabs_forwarded', {
+      scopeKey: scopeKey.slice(0, 8)
+    })
+  }
+
   const selected = selectBrowser(
     listRecordsForScope(presence, scopeKey),
     message.target?.browserInstanceId
@@ -497,6 +503,28 @@ function isListBrowsersMessage (payload: unknown): boolean {
     !Array.isArray(payload) &&
     'type' in payload &&
     payload.type === 'list_browsers'
+  )
+}
+
+/**
+ * Detects a `list_tabs` payload.
+ *
+ * Unlike `list_browsers` (which the WS server answers directly from its
+ * presence table), `list_tabs` is forwarded to the selected browser extension
+ * via the normal `selectBrowser` + `sendJson` path in `handleMcpMessage`.
+ * The extension responds with a `tab_list_response` which is routed back to
+ * the requesting MCP socket via `routeExtensionResponse`.
+ *
+ * This function is provided for symmetry with `isListBrowsersMessage` and is
+ * used to log `list_tabs` requests before forwarding them to the extension.
+ */
+function isListTabsMessage (payload: unknown): boolean {
+  return (
+    typeof payload === 'object' &&
+    payload !== null &&
+    !Array.isArray(payload) &&
+    'type' in payload &&
+    (payload as Record<string, unknown>).type === 'list_tabs'
   )
 }
 
