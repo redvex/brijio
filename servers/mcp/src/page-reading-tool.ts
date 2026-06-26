@@ -34,6 +34,7 @@ export interface ReadCurrentPageInput {
   maxContentChunks?: number
   startContentIndex?: number
   browserInstanceId?: unknown
+  tabId?: unknown
 }
 
 export interface ReadCurrentPageData {
@@ -51,6 +52,7 @@ interface NormalizedReadCurrentPageInput {
   maxContentChunks: number
   startContentIndex: number
   browserInstanceId?: string
+  tabId?: string
 }
 
 export async function readCurrentPage (
@@ -65,7 +67,8 @@ export async function readCurrentPage (
 
   const contextResult = await getCurrentPageContext(
     config,
-    normalizedInput.data.browserInstanceId
+    normalizedInput.data.browserInstanceId,
+    normalizedInput.data.tabId
   )
 
   if (!contextResult.ok) {
@@ -93,7 +96,8 @@ export async function readCurrentPage (
     contextResult.data,
     normalizedInput.data.maxContentChunks,
     normalizedInput.data.startContentIndex,
-    normalizedInput.data.browserInstanceId
+    normalizedInput.data.browserInstanceId,
+    normalizedInput.data.tabId
   )
 }
 
@@ -104,6 +108,7 @@ function normalizeInput (
   const maxContentChunks = input.maxContentChunks ?? defaultMaxContentChunks
   const startContentIndex = input.startContentIndex ?? defaultStartContentIndex
   const browserInstanceId = normalizeBrowserInstanceId(input.browserInstanceId)
+  const tabId = normalizeTabId(input.tabId)
 
   if (typeof includeContent !== 'boolean') {
     return invalidToolInputResponse('includeContent must be a boolean.')
@@ -132,6 +137,10 @@ function normalizeInput (
     return browserInstanceId
   }
 
+  if (!tabId.ok) {
+    return tabId
+  }
+
   return {
     ok: true,
     data: {
@@ -140,6 +149,9 @@ function normalizeInput (
       startContentIndex,
       ...(browserInstanceId.data !== undefined
         ? { browserInstanceId: browserInstanceId.data }
+        : {}),
+      ...(tabId.data !== undefined
+        ? { tabId: tabId.data }
         : {})
     }
   }
@@ -150,7 +162,8 @@ async function readContentChunks (
   context: PageContext,
   maxContentChunks: number,
   startContentIndex: number,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  tabId?: string
 ): Promise<ReadCurrentPageResult> {
   const content: PageContent[] = []
   let nextIndex = startContentIndex
@@ -159,7 +172,8 @@ async function readContentChunks (
     const contentResult = await getCurrentPageContent(
       config,
       nextIndex,
-      browserInstanceId
+      browserInstanceId,
+      tabId
     )
 
     if (!contentResult.ok) {
@@ -194,6 +208,28 @@ async function readContentChunks (
       contentTruncated,
       nextContentIndex: contentTruncated ? nextIndex : null
     }
+  }
+}
+
+function normalizeTabId (
+  value: unknown
+): BrijioToolResult<string | undefined> {
+  if (value === undefined) {
+    return {
+      ok: true,
+      data: undefined
+    }
+  }
+
+  if (typeof value !== 'string' || value.length === 0) {
+    return invalidToolInputResponse(
+      'tabId must be a non-empty string when provided.'
+    )
+  }
+
+  return {
+    ok: true,
+    data: value
   }
 }
 

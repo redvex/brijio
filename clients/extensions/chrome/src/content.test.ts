@@ -16,6 +16,7 @@ class MockMutationObserver {
   constructor (callback: MutationCallback) {
     this.callback = callback
   }
+
   observe (): void {}
   disconnect (): void {}
   takeRecords (): MutationRecord[] { return [] }

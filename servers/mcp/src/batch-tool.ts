@@ -13,6 +13,7 @@ export interface PerformBatchInput {
   pageContextId?: unknown
   visibleContextId?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
 }
 
 export type PerformBatchToolResult = BrijioToolResult<BrijioBatchResult>
