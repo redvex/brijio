@@ -17,7 +17,8 @@ import {
   type ApprovalAdapter,
   type ApprovalDecision,
   type ApprovalRequest,
-  type DownloadAdapter
+  type DownloadAdapter,
+  type TabListerAdapter
 } from './background-controller.js'
 import type {
   ActionResultErrorCode,
@@ -33,7 +34,8 @@ import type {
   FileUploadPayload,
   WriteTextEditableTarget,
   WriteTextActionTarget,
-  BatchResultEntry
+  BatchResultEntry,
+  TabInfo
 } from './protocol.js'
 
 import type { ContentBatchRequest, BatchResult } from './batch-handler.js'
@@ -1952,6 +1954,86 @@ void describe('Brijio background controller', () => {
     assert.equal(status.state, 'connected')
     assert.equal(status.pendingRequests, 0)
   })
+
+  void it('responds to list_tabs with a tab_list_response', async () => {
+    const tabs = [
+      {
+        tabId: '1',
+        windowId: '1',
+        title: 'Example',
+        url: 'https://example.com/',
+        active: true,
+        supported: true
+      },
+      {
+        tabId: '2',
+        windowId: '1',
+        title: 'Another',
+        url: 'https://another.com/',
+        active: false,
+        supported: true
+      }
+    ]
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787',
+      tabList: tabs
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'list-tabs-1',
+        payload: {
+          type: 'list_tabs'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'list-tabs-1',
+      payload: {
+        type: 'tab_list_response',
+        ok: true,
+        data: {
+          tabs
+        }
+      }
+    })
+  })
+
+  void it('returns tab_list_response error when tabLister is not available', async () => {
+    const harness = createHarness({
+      websocketUrl: 'ws://127.0.0.1:8787'
+    })
+
+    await harness.controller.handleActionClicked()
+    harness.sockets.created[0].open()
+    await harness.sockets.created[0].receive(
+      JSON.stringify({
+        type: 'message',
+        id: 'list-tabs-2',
+        payload: {
+          type: 'list_tabs'
+        }
+      })
+    )
+
+    assert.deepEqual(parseLastSent(harness), {
+      type: 'message',
+      id: 'list-tabs-2',
+      payload: {
+        type: 'tab_list_response',
+        ok: false,
+        error: {
+          code: 'not_supported',
+          message: 'Tab listing is not supported by this browser.'
+        }
+      }
+    })
+  })
 })
 
 interface HarnessOptions {
@@ -1984,6 +2066,8 @@ interface HarnessOptions {
   activeOrigin?: string
   originAfterApproval?: string
   download?: boolean
+  tabList?: TabInfo[]
+  tabListError?: { code: string, message: string }
 }
 
 interface Harness {
@@ -2009,6 +2093,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
   const pageBatch = new FakePageBatchAdapter(options)
   const pageNavigation = new FakePageNavigationAdapter(options)
   const download = options.download === true ? new FakeDownloadAdapter() : undefined
+  const tabLister = new FakeTabListerAdapter(options)
   const approvals = new FakeApprovalAdapter(options)
   const sockets = new FakeSocketFactory()
   const timers = new FakeTimersAdapter()
@@ -2018,6 +2103,7 @@ function createHarness (options: HarnessOptions = {}): Harness {
     approvalTimeoutMs: 55000,
     createWebSocket: sockets.create,
     ...(download !== undefined ? { download } : {}),
+    tabLister,
     setup,
     storage,
     pageReader,
@@ -2293,6 +2379,31 @@ class FakeDownloadAdapter implements DownloadAdapter {
         dataBase64: 'ZGF0YQ==',
         sha256: 'abc123'
       }
+    }
+  }
+}
+
+class FakeTabListerAdapter implements TabListerAdapter {
+  constructor (private readonly options: HarnessOptions = {}) {}
+
+  async listTabs (): ReturnType<TabListerAdapter['listTabs']> {
+    if (this.options.tabListError !== undefined) {
+      return { ok: false, error: this.options.tabListError }
+    }
+
+    if (this.options.tabList === undefined) {
+      return {
+        ok: false,
+        error: {
+          code: 'not_supported',
+          message: 'Tab listing is not supported by this browser.'
+        }
+      }
+    }
+
+    return {
+      ok: true,
+      data: { tabs: this.options.tabList }
     }
   }
 }
