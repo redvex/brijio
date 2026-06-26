@@ -197,6 +197,71 @@ void describe('page-reader', () => {
     })
   })
 
+  void describe('readActiveTabPage with explicit tabId', () => {
+    void it('calls sendMessage with the provided tabId, not the active tab', async () => {
+      let calledTabId: number | undefined
+      const deps = makeDeps({
+        tabs: {
+          query: async () => [{ id: 1, url: 'https://example.com' }],
+          sendMessage: async (tabId: number) => {
+            calledTabId = tabId
+            return { ok: true, data: { title: 'Tab 42' } }
+          }
+        }
+      })
+      const result = await readActiveTabPage<{ title: string }>(
+        extractContext,
+        deps,
+        42
+      )
+      assert.strictEqual(calledTabId, 42)
+      assert.deepStrictEqual(result, { ok: true, data: { title: 'Tab 42' } })
+    })
+
+    void it('does not call tabs.query when tabId is provided', async () => {
+      let queryCalled = false
+      const deps = makeDeps({
+        tabs: {
+          query: async () => {
+            queryCalled = true
+            return [{ id: 1, url: 'https://example.com' }]
+          },
+          sendMessage: async () => ({ ok: true, data: { title: 'Test' } })
+        }
+      })
+      await readActiveTabPage(extractContext, deps, 99)
+      assert.strictEqual(queryCalled, false)
+    })
+
+    void it('uses executeScript with the provided tabId', async () => {
+      let executeTargetTabId: number | undefined
+      const deps = makeDeps({
+        scripting: {
+          executeScript: async (details) => {
+            executeTargetTabId = details.target.tabId
+          }
+        }
+      })
+      await readActiveTabPage(extractContext, deps, 77)
+      assert.strictEqual(executeTargetTabId, 77)
+    })
+
+    void it('returns content_script_unavailable on catch with tabId', async () => {
+      const deps = makeDeps({
+        scripting: {
+          executeScript: async () => {
+            throw new Error('inject failed')
+          }
+        }
+      })
+      const result = await readActiveTabPage(extractContext, deps, 55)
+      assert.strictEqual(result.ok, false)
+      if (!result.ok) {
+        assert.strictEqual(result.error.code, 'content_script_unavailable')
+      }
+    })
+  })
+
   void describe('performActiveTabAction', () => {
     void it('returns action result when response is ok', async () => {
       const deps = makeDeps({
@@ -242,7 +307,6 @@ void describe('page-reader', () => {
         )
       }
     })
-
     void it('returns error from failed action response', async () => {
       const deps = makeDeps({
         tabs: {
@@ -258,6 +322,95 @@ void describe('page-reader', () => {
       if (!result.ok) {
         assert.strictEqual(result.error.code, 'target_not_found')
       }
+    })
+  })
+
+  void describe('performActiveTabAction with explicit tabId', () => {
+    void it('calls sendMessage with the provided tabId, not the active tab', async () => {
+      let calledTabId: number | undefined
+      const deps = makeDeps({
+        tabs: {
+          query: async () => [{ id: 1, url: 'https://example.com' }],
+          sendMessage: async (tabId: number) => {
+            calledTabId = tabId
+            return {
+              ok: true,
+              data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+            }
+          }
+        }
+      })
+      await performActiveTabAction(clickMessage, deps, 42)
+      assert.strictEqual(calledTabId, 42)
+    })
+
+    void it('does not call tabs.query when tabId is provided', async () => {
+      let queryCalled = false
+      const deps = makeDeps({
+        tabs: {
+          query: async () => {
+            queryCalled = true
+            return [{ id: 1, url: 'https://example.com' }]
+          },
+          sendMessage: async () => ({
+            ok: true,
+            data: { action: 'click', target: { kind: 'link', id: 'bb-1' } }
+          })
+        }
+      })
+      await performActiveTabAction(clickMessage, deps, 88)
+      assert.strictEqual(queryCalled, false)
+    })
+  })
+
+  void describe('performActiveTabBatch with explicit tabId', () => {
+    const batchMessage: ContentBatchRequest = {
+      type: 'perform_batch',
+      actions: [
+        {
+          type: 'write_text',
+          target: { formId: 'bb-1', controlId: 'bb-2' },
+          text: 'Baker Street'
+        }
+      ]
+    }
+
+    void it('calls sendMessage with the provided tabId, not the active tab', async () => {
+      let calledTabId: number | undefined
+      const deps = makeDeps({
+        tabs: {
+          query: async () => [{ id: 1, url: 'https://example.com' }],
+          sendMessage: async (tabId: number) => {
+            calledTabId = tabId
+            return {
+              ok: true,
+              aborted: false,
+              results: [{ ok: true, data: { action: 'write_text', target: { formId: 'bb-1', controlId: 'bb-2' }, textLength: 12 } }]
+            }
+          }
+        }
+      })
+      await performActiveTabBatch(batchMessage, deps, 42)
+      assert.strictEqual(calledTabId, 42)
+    })
+
+    void it('does not call tabs.query when tabId is provided', async () => {
+      let queryCalled = false
+      const deps = makeDeps({
+        tabs: {
+          query: async () => {
+            queryCalled = true
+            return [{ id: 1, url: 'https://example.com' }]
+          },
+          sendMessage: async () => ({
+            ok: true,
+            aborted: false,
+            results: [{ ok: true, data: { action: 'write_text', target: { formId: 'bb-1', controlId: 'bb-2' }, textLength: 12 } }]
+          })
+        }
+      })
+      await performActiveTabBatch(batchMessage, deps, 88)
+      assert.strictEqual(queryCalled, false)
     })
   })
 
