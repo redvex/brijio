@@ -7,6 +7,7 @@ import {
   type DownloadAdapter,
   type PageNavigationResult,
   type PageReadResult,
+  type TabListerAdapter,
   normalizeBridgeSettings,
   readActiveTabPage as sharedReadActiveTabPage,
   type ActiveTabDeps,
@@ -71,7 +72,7 @@ export interface BrowserApi {
   }
   tabs: {
     create: (properties: { url: string }) => Promise<unknown>
-    query: (queryInfo: { active: boolean, currentWindow: boolean }) => Promise<
+    query: (queryInfo?: { active?: boolean, currentWindow?: boolean }) => Promise<
     Array<{
       id?: number
       title?: string
@@ -454,6 +455,35 @@ export class SafariPageNavigationAdapter {
     }
   }
 }
+
+export const tabLister: TabListerAdapter = {
+  async listTabs () {
+    try {
+      const allTabs = await browser.tabs.query({})
+      const tabs = allTabs
+        .filter(tab => tab.id !== undefined && typeof tab.url === 'string' && isRegularPageUrl(tab.url))
+        .map(tab => ({
+          tabId: String(tab.id),
+          windowId: '0',
+          title: tab.title ?? '',
+          url: tab.url!,
+          active: false,
+          supported: true
+        }))
+      return { ok: true, data: { tabs } }
+    } catch (error: unknown) {
+      return {
+        ok: false,
+        error: {
+          code: 'browser_error',
+          message: error instanceof Error ? error.message : 'Failed to list tabs.'
+        }
+      }
+    }
+  }
+}
+
+declare const browser: BrowserApi
 
 class TimeoutError extends Error {
   constructor (message: string) {
