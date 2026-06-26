@@ -1,8 +1,18 @@
+export interface TabInfo {
+  tabId: string
+  windowId: string
+  title: string
+  url: string
+  active: boolean
+  supported: boolean
+}
+
 export interface WebSocketEnvelope {
   type: 'message'
   id?: string
   target?: {
     browserInstanceId?: string
+    tabId?: string
   }
   payload: unknown
 }
@@ -380,6 +390,14 @@ export type BrowserListParseResult =
   | BrijioBrowserListResult
   | { ok: false, ignored: true }
 
+export type BrijioTabListResult = BrijioResourceResult<{
+  tabs: TabInfo[]
+}>
+
+export type TabListParseResult =
+  | BrijioTabListResult
+  | { ok: false, ignored: true }
+
 export interface NavigateToUrlResultData {
   url: string
   title: string
@@ -715,6 +733,16 @@ export function createDownloadStatusEnvelope (
   }
 }
 
+export function createListTabsEnvelope (requestId: string): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'list_tabs'
+    }
+  }
+}
+
 export function createDownloadFileEnvelope (
   requestId: string,
   url: string,
@@ -1043,6 +1071,38 @@ export function parseBrowserListEnvelope (
     ok: true,
     data: {
       browsers: value.payload.data.browsers
+    }
+  }
+}
+
+export function parseTabListEnvelope (
+  value: unknown,
+  requestId: string
+): TabListParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload) || value.payload.type !== 'tab_list_response') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok !== true || !isRecord(value.payload.data)) {
+    return invalidResponse()
+  }
+
+  if (!isArrayOf(value.payload.data.tabs, isTabInfo)) {
+    return invalidResponse()
+  }
+
+  return {
+    ok: true,
+    data: {
+      tabs: value.payload.data.tabs
     }
   }
 }
@@ -1706,6 +1766,40 @@ function isBrowserPresence (value: unknown): value is BrowserPresence {
     isRecord(value) &&
     Array.isArray(value.capabilities) &&
     value.capabilities.every((capability) => typeof capability === 'string')
+  )
+}
+
+function isTabInfo (value: unknown): value is TabInfo {
+  if (!isRecord(value)) {
+    return false
+  }
+  return (
+    typeof value.tabId === 'string' &&
+    typeof value.windowId === 'string' &&
+    typeof value.title === 'string' &&
+    typeof value.url === 'string' &&
+    typeof value.active === 'boolean' &&
+    typeof value.supported === 'boolean'
+  )
+}
+
+function isBrijioErrorCode (value: unknown): value is BrijioErrorCode {
+  return (
+    value === 'auth_required' ||
+    value === 'auth_failed' ||
+    value === 'invalid_auth_message' ||
+    value === 'browser_unavailable' ||
+    value === 'ambiguous_browser_target' ||
+    value === 'invalid_browser_target' ||
+    value === 'connection_failed' ||
+    value === 'timeout' ||
+    value === 'invalid_response' ||
+    value === 'browser_error' ||
+    value === 'batch_failed' ||
+    value === 'stale_context' ||
+    value === 'page_navigated' ||
+    value === 'invalid_resource_uri' ||
+    value === 'unsupported_scheme'
   )
 }
 
