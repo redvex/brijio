@@ -195,6 +195,7 @@ function isHideBrijioApprovalMessage (
 
 const tabIndicatorBannerId = 'brijio-tab-indicator'
 const tabIndicatorTitlePrefix = '● '
+const indicatorInactivityTimeoutMs = 60_000
 
 interface TabIndicatorState {
   originalTitle: string
@@ -202,6 +203,18 @@ interface TabIndicatorState {
 }
 
 const tabIndicatorStateMap = new WeakMap<Document, TabIndicatorState>()
+const indicatorTimers = new WeakMap<Document, ReturnType<typeof setTimeout>>()
+
+function setIndicatorExpiry (documentRef: Document): void {
+  const existing = indicatorTimers.get(documentRef)
+  if (existing !== undefined) {
+    clearTimeout(existing)
+  }
+  const timer = setTimeout(() => {
+    hideBrijioTabIndicator(documentRef)
+  }, indicatorInactivityTimeoutMs)
+  indicatorTimers.set(documentRef, timer)
+}
 
 export function showBrijioTabIndicator (documentRef: Document): void {
   hideBrijioTabIndicator(documentRef)
@@ -232,6 +245,7 @@ export function showBrijioTabIndicator (documentRef: Document): void {
   }
 
   tabIndicatorStateMap.set(documentRef, { originalTitle, observer })
+  setIndicatorExpiry(documentRef)
 
   // Inject the persistent blue banner
   const banner = documentRef.createElement('div')
@@ -263,6 +277,11 @@ export function showBrijioTabIndicator (documentRef: Document): void {
 }
 
 export function hideBrijioTabIndicator (documentRef: Document): void {
+  const timer = indicatorTimers.get(documentRef)
+  if (timer !== undefined) {
+    clearTimeout(timer)
+    indicatorTimers.delete(documentRef)
+  }
   const state = tabIndicatorStateMap.get(documentRef)
   if (state !== undefined) {
     state.observer.disconnect()
@@ -358,13 +377,13 @@ if (typeof browser !== 'undefined') {
     if (isShowBrijioTabIndicatorMessage(message)) {
       showBrijioTabIndicator(globalThis.document)
       sendResponse({ ok: true })
-      return false
+      return true
     }
 
     if (isHideBrijioTabIndicatorMessage(message)) {
       hideBrijioTabIndicator(globalThis.document)
       sendResponse({ ok: true })
-      return false
+      return true
     }
 
     if (isContentBatchRequest(message)) {

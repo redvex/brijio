@@ -165,6 +165,10 @@ export async function readActiveTabPage<T> (
       files: ['content.js']
     })
 
+    await deps.tabs.sendMessage(resolvedTabId, { type: 'show_brijio_tab_indicator' }).catch(
+      () => {}
+    )
+
     const response = await deps.tabs.sendMessage(resolvedTabId, message)
 
     if (!isContentResponse(response)) {
@@ -194,7 +198,6 @@ export async function readActiveTabPage<T> (
     }
 
     return contentScriptUnavailable<T>()
-  }
 }
 
 // --- Shared performActiveTabAction ---
@@ -248,6 +251,10 @@ export async function performActiveTabAction (
       files: ['content.js']
     })
 
+    await deps.tabs.sendMessage(resolvedTabId, { type: 'show_brijio_tab_indicator' }).catch(
+      () => {}
+    )
+
     const response = await deps.tabs.sendMessage(resolvedTabId, message)
 
     if (!isContentResponse(response)) {
@@ -282,7 +289,6 @@ export async function performActiveTabAction (
     }
 
     return actionContentScriptUnavailable()
-  }
 }
 
 // --- Shared performActiveTabBatch ---
@@ -510,6 +516,10 @@ export async function performActiveTabBatch (
       files: ['content.js']
     })
 
+    await deps.tabs.sendMessage(resolvedTabId, { type: 'show_brijio_tab_indicator' }).catch(
+      () => {}
+    )
+
     const response = await sendMessageWithTimeout(deps, resolvedTabId, message)
 
     if (isBatchResult(response)) {
@@ -552,5 +562,4 @@ export async function performActiveTabBatch (
       message,
       'Content script is not available on this page.'
     )
-  }
 }
