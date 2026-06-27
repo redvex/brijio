@@ -16,6 +16,7 @@ import {
   parsePageContentEnvelope,
   parsePageContextEnvelope,
   parseNavigateToUrlEnvelope,
+  parseRouterErrorEnvelope,
   isNavigateToUrlResultData,
   unsupportedSchemeResponse
 } from './protocol.js'
@@ -525,7 +526,7 @@ void describe('MCP page context protocol helpers', () => {
     })
   })
 
-  void it('parses a matching extension error as a browser_error', () => {
+  void it('forwards the original error code and message from extension errors', () => {
     const result = parsePageContextEnvelope(
       {
         type: 'message',
@@ -545,13 +546,13 @@ void describe('MCP page context protocol helpers', () => {
     assert.deepEqual(result, {
       ok: false,
       error: {
-        code: 'browser_error',
+        code: 'no_active_tab',
         message: 'No active tab is available.'
       }
     })
   })
 
-  void it('parses a matching page content extension error as a browser_error', () => {
+  void it('forwards the original error code for page content extension errors', () => {
     const result = parsePageContentEnvelope(
       {
         type: 'message',
@@ -571,13 +572,13 @@ void describe('MCP page context protocol helpers', () => {
     assert.deepEqual(result, {
       ok: false,
       error: {
-        code: 'browser_error',
+        code: 'invalid_index',
         message: 'Page content chunk index must be available and 1-based.'
       }
     })
   })
 
-  void it('parses a matching click action extension error as a browser_error', () => {
+  void it('forwards the original error code for click action extension errors', () => {
     const result = parseActionResultEnvelope(
       {
         type: 'message',
@@ -597,7 +598,7 @@ void describe('MCP page context protocol helpers', () => {
     assert.deepEqual(result, {
       ok: false,
       error: {
-        code: 'browser_error',
+        code: 'target_not_found',
         message: 'No matching click target was found.'
       }
     })
@@ -804,7 +805,7 @@ void describe('MCP navigate_to_url protocol helpers', () => {
     })
   })
 
-  void it('parses a matching navigate_to_url error response as browser_error', () => {
+  void it('forwards the original error code for navigate_to_url error responses', () => {
     const result = parseNavigateToUrlEnvelope(
       {
         type: 'message',
@@ -824,7 +825,7 @@ void describe('MCP navigate_to_url protocol helpers', () => {
     assert.deepEqual(result, {
       ok: false,
       error: {
-        code: 'browser_error',
+        code: 'navigation_failed',
         message: 'DNS lookup failed.'
       }
     })
@@ -911,5 +912,241 @@ void describe('MCP navigate_to_url protocol helpers', () => {
           "URL scheme 'ftp' is not supported. Only http and https are allowed."
       }
     })
+  })
+})
+
+void describe('parseRouterErrorEnvelope', () => {
+  void it('forwards recognized error codes with message', () => {
+    const result = parseRouterErrorEnvelope({
+      type: 'error',
+      error: {
+        code: 'browser_unavailable',
+        message: 'No Brijio browser is online.'
+      }
+    })
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'browser_unavailable',
+        message: 'No Brijio browser is online.'
+      }
+    })
+  })
+
+  void it('forwards unrecognized error codes instead of returning invalid_response', () => {
+    const result = parseRouterErrorEnvelope({
+      type: 'error',
+      error: {
+        code: 'invalid_message',
+        message: 'Extension messages must announce browser presence or respond to a pending request.'
+      }
+    })
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'invalid_message',
+        message: 'Extension messages must announce browser presence or respond to a pending request.'
+      }
+    })
+  })
+
+  void it('forwards unrecognized error codes from the shared package', () => {
+    const result = parseRouterErrorEnvelope({
+      type: 'error',
+      error: {
+        code: 'invalid_json',
+        message: 'Message must be valid JSON.'
+      }
+    })
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'invalid_json',
+        message: 'Message must be valid JSON.'
+      }
+    })
+  })
+
+  void it('returns ignored for non-error envelope types', () => {
+    const result = parseRouterErrorEnvelope({
+      type: 'message',
+      payload: { type: 'action_result' }
+    })
+
+    assert.deepEqual(result, { ok: false, ignored: true })
+  })
+
+  void it('returns invalid_response when error object is missing', () => {
+    const result = parseRouterErrorEnvelope({
+      type: 'error'
+    })
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'invalid_response',
+        message: 'Received an invalid Brijio response.'
+      }
+    })
+  })
+
+  void it('returns invalid_response when error message is missing', () => {
+    const result = parseRouterErrorEnvelope({
+      type: 'error',
+      error: {
+        code: 'browser_unavailable'
+      }
+    })
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'invalid_response',
+        message: 'Received an invalid Brijio response.'
+      }
+    })
+  })
+
+  void it('forwards browsers array when present', () => {
+    const result = parseRouterErrorEnvelope({
+      type: 'error',
+      error: {
+        code: 'ambiguous_browser_target',
+        message: 'Multiple Brijio browsers are online.',
+        browsers: [
+          {
+            browserInstanceId: 'chrome-1',
+            label: 'Chrome',
+            browserName: 'Chrome',
+            profileName: 'Default',
+            connectedAt: '2026-06-27T10:00:00.000Z',
+            lastSeenAt: '2026-06-27T10:00:00.000Z',
+            capabilities: ['page_context']
+          }
+        ]
+      }
+    })
+
+    assert.equal(result.ok, false)
+    if (!result.ok && 'error' in result) {
+      assert.equal(result.error.code, 'ambiguous_browser_target')
+      assert.equal(result.error.message, 'Multiple Brijio browsers are online.')
+      assert.ok('browsers' in result.error)
+    }
+  })
+})
+
+void describe('parseErrorPayload extension-specific codes', () => {
+  void it('forwards not_supported code from extension action errors', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'req-not-sup',
+        payload: {
+          type: 'action_result',
+          ok: false,
+          error: {
+            code: 'not_supported',
+            message: 'chrome.downloads API not available.'
+          }
+        }
+      },
+      'req-not-sup'
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'not_supported',
+        message: 'chrome.downloads API not available.'
+      }
+    })
+  })
+
+  void it('forwards cors_blocked code from extension fetch errors', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'req-cors',
+        payload: {
+          type: 'action_result',
+          ok: false,
+          error: {
+            code: 'cors_blocked',
+            message: 'CORS blocked the request.'
+          }
+        }
+      },
+      'req-cors'
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'cors_blocked',
+        message: 'CORS blocked the request.'
+      }
+    })
+  })
+
+  void it('preserves stale_context with detail', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'req-stale',
+        payload: {
+          type: 'action_result',
+          ok: false,
+          error: {
+            code: 'stale_context',
+            message: 'Page context has changed.',
+            detail: {
+              id: 'bb-1',
+              kind: 'link'
+            }
+          }
+        }
+      },
+      'req-stale'
+    )
+
+    assert.equal(result.ok, false)
+    if (!result.ok && 'error' in result) {
+      assert.equal(result.error.code, 'stale_context')
+      assert.equal(result.error.message, 'Page context has changed.')
+      assert.ok('detail' in result.error)
+    }
+  })
+
+  void it('preserves page_navigated with detail', () => {
+    const result = parseActionResultEnvelope(
+      {
+        type: 'message',
+        id: 'req-nav',
+        payload: {
+          type: 'action_result',
+          ok: false,
+          error: {
+            code: 'page_navigated',
+            message: 'Page has navigated since last context read.',
+            detail: {
+              id: 'bb-1',
+              kind: 'link'
+            }
+          }
+        }
+      },
+      'req-nav'
+    )
+
+    assert.equal(result.ok, false)
+    if (!result.ok && 'error' in result) {
+      assert.equal(result.error.code, 'page_navigated')
+      assert.equal(result.error.message, 'Page has navigated since last context read.')
+      assert.ok('detail' in result.error)
+    }
   })
 })
