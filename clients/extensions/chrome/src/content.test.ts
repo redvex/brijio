@@ -1,12 +1,42 @@
 import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it, before, after } from 'node:test'
 import { parseHTML } from 'linkedom'
 import { handleContentRequest, type ContentEnvironment } from '@brijio/shared'
 import {
   hideBrijioApprovalBanner,
+  hideBrijioTabIndicator,
   showBrijioApprovalBanner,
+  showBrijioTabIndicator,
   type BrijioApprovalDecision
 } from './content-script-entry.js'
+
+// linkedom does not provide MutationObserver — install a minimal stub.
+class MockMutationObserver {
+  callback: MutationCallback
+  constructor (callback: MutationCallback) {
+    this.callback = callback
+  }
+
+  observe (): void {}
+  disconnect (): void {}
+  takeRecords (): MutationRecord[] { return [] }
+}
+
+const savedMutationObserver = (globalThis as unknown as { MutationObserver?: typeof MutationObserver }).MutationObserver
+
+before(() => {
+  ;(globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver =
+    MockMutationObserver as unknown as typeof MutationObserver
+})
+
+after(() => {
+  if (savedMutationObserver !== undefined) {
+    ;(globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver =
+      savedMutationObserver
+  } else {
+    delete (globalThis as unknown as { MutationObserver?: typeof MutationObserver }).MutationObserver
+  }
+})
 
 void describe('Chrome content script entry', () => {
   void it('delegates to shared handleContentRequest', () => {
@@ -126,6 +156,49 @@ void describe('Chrome content script entry', () => {
     hideBrijioApprovalBanner(document, 'action-4')
 
     assert.equal(document.getElementById('brijio-approval-banner'), null)
+  })
+
+  void it('showBrijioTabIndicator prepends ● to document.title', () => {
+    const { document } = parseHTML('<html><head><title>My Page</title></head><body></body></html>')
+    document.title = 'My Page'
+
+    showBrijioTabIndicator(document)
+
+    assert.equal(document.title, '● My Page')
+  })
+
+  void it('hideBrijioTabIndicator restores original document.title', () => {
+    const { document } = parseHTML('<html><head><title>Original Title</title></head><body></body></html>')
+    document.title = 'Original Title'
+
+    showBrijioTabIndicator(document)
+    assert.equal(document.title, '● Original Title')
+
+    hideBrijioTabIndicator(document)
+    assert.equal(document.title, 'Original Title')
+  })
+
+  void it('showBrijioTabIndicator injects banner element with correct id', () => {
+    const { document } = parseHTML('<html><head><title>Test</title></head><body></body></html>')
+    document.title = 'Test'
+
+    showBrijioTabIndicator(document)
+
+    const banner = document.getElementById('brijio-tab-indicator')
+    assert.ok(banner, 'banner element should exist after show')
+    assert.equal(banner.getAttribute('role'), 'status')
+    assert.equal(banner.getAttribute('aria-live'), 'polite')
+  })
+
+  void it('hideBrijioTabIndicator removes banner element', () => {
+    const { document } = parseHTML('<html><head><title>Test</title></head><body></body></html>')
+    document.title = 'Test'
+
+    showBrijioTabIndicator(document)
+    assert.ok(document.getElementById('brijio-tab-indicator'))
+
+    hideBrijioTabIndicator(document)
+    assert.equal(document.getElementById('brijio-tab-indicator'), null)
   })
 })
 

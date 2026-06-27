@@ -227,6 +227,12 @@ void describe('Brijio MCP HTTP server', () => {
               'List Brijio browser instances currently online for the configured pairing token.'
           },
           {
+            name: 'list_tabs',
+            title: 'List Tabs',
+            description:
+              'List open browser tabs for the connected Brijio browser instance. Returns tab metadata including tab ID, window ID, title, URL, active status, and supported flag. Only HTTP/HTTPS tabs are listed.'
+          },
+          {
             name: 'read_current_page',
             title: 'Read Current Page',
             description:
@@ -318,6 +324,26 @@ void describe('Brijio MCP HTTP server', () => {
             description:
               'Optional Brijio browser instance ID to target.'
           },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
+          }
+        },
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[2].inputSchema, {
+        type: 'object',
+        properties: {
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
+          },
           includeContent: {
             type: 'boolean',
             description:
@@ -337,13 +363,17 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[2].inputSchema, {
+      assert.deepEqual(tools.tools[3].inputSchema, {
         type: 'object',
         properties: {
           browserInstanceId: {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           expectedHref: {
             type: 'string',
@@ -385,13 +415,17 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[3].inputSchema, {
+      assert.deepEqual(tools.tools[4].inputSchema, {
         type: 'object',
         properties: {
           browserInstanceId: {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           controlId: {
             type: 'string',
@@ -427,13 +461,17 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[4].inputSchema, {
+      assert.deepEqual(tools.tools[5].inputSchema, {
         type: 'object',
         properties: {
           browserInstanceId: {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           expectedText: {
             type: 'string',
@@ -465,13 +503,17 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[5].inputSchema, {
+      assert.deepEqual(tools.tools[6].inputSchema, {
         type: 'object',
         properties: {
           browserInstanceId: {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           checked: {
             type: 'boolean',
@@ -507,13 +549,17 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[6].inputSchema, {
+      assert.deepEqual(tools.tools[7].inputSchema, {
         type: 'object',
         properties: {
           browserInstanceId: {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           controlId: {
             type: 'string',
@@ -553,13 +599,17 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[7].inputSchema, {
+      assert.deepEqual(tools.tools[8].inputSchema, {
         type: 'object',
         properties: {
           browserInstanceId: {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           controlId: {
             type: 'string',
@@ -604,13 +654,17 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[8].inputSchema, {
+      assert.deepEqual(tools.tools[9].inputSchema, {
         type: 'object',
         properties: {
           browserInstanceId: {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           },
           expectedLabel: {
             type: 'string',
@@ -637,7 +691,7 @@ void describe('Brijio MCP HTTP server', () => {
         additionalProperties: false,
         $schema: 'http://json-schema.org/draft-07/schema#'
       })
-      assert.deepEqual(tools.tools[9].inputSchema, {
+      assert.deepEqual(tools.tools[10].inputSchema, {
         type: 'object',
         properties: {
           url: {
@@ -649,6 +703,10 @@ void describe('Brijio MCP HTTP server', () => {
             type: 'string',
             description:
               'Optional Brijio browser instance ID to target.'
+          },
+          tabId: {
+            type: 'string',
+            description: 'Optional Brijio tab ID to target.'
           }
         },
         required: ['url'],

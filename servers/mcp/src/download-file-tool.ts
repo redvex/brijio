@@ -9,6 +9,7 @@ export interface DownloadFileInput {
   filename?: unknown
   conflictAction?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
 }
 
 export interface DownloadFileResultData {

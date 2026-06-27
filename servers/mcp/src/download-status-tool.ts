@@ -7,6 +7,7 @@ import { type BrijioToolResult } from './page-reading-tool.js'
 export interface DownloadStatusInput {
   ids?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
 }
 
 export interface DownloadStatusResultData {

@@ -10,6 +10,7 @@ import { type BrijioToolResult } from './page-reading-tool.js'
 export interface NavigateToUrlInput {
   url?: unknown
   browserInstanceId?: unknown
+  tabId?: unknown
 }
 
 export interface NavigateToUrlResultData {

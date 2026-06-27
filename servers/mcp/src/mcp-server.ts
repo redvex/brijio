@@ -11,6 +11,7 @@ import {
   parsePageContentResourceIndex
 } from './page-context.js'
 import { listBrowsers } from './browser-list-tool.js'
+import { listTabs } from './list-tabs-tool.js'
 import { clickElement } from './click-element-tool.js'
 import { fillInput } from './fill-input-tool.js'
 import { navigateToUrl } from './navigate-to-url-tool.js'
@@ -57,6 +58,11 @@ export async function createBrijioMcpServer (
     .optional()
     .describe('Optional Brijio browser instance ID to target.')
 
+  const tabIdInput = z
+    .string()
+    .optional()
+    .describe('Optional Brijio tab ID to target.')
+
   server.server.registerCapabilities({
     tools: {
       listChanged: true
@@ -74,6 +80,32 @@ export async function createBrijioMcpServer (
     async () => {
       logger.info('tool_call', { tool: 'list_browsers' })
       const result = await listBrowsers(pageContextConfig)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
+    'list_tabs',
+    {
+      title: 'List Tabs',
+      description:
+        'List open browser tabs for the connected Brijio browser instance. Returns tab metadata including tab ID, window ID, title, URL, active status, and supported flag. Only HTTP/HTTPS tabs are listed.',
+      inputSchema: {
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
+      }
+    },
+    async (input: { browserInstanceId?: string, tabId?: string }) => {
+      logger.info('tool_call', { tool: 'list_tabs', ...input })
+      const result = await listTabs(pageContextConfig, input.browserInstanceId)
 
       return {
         content: [
@@ -109,7 +141,8 @@ export async function createBrijioMcpServer (
           .describe(
             '1-based index of the first content chunk to fetch. Use the nextContentIndex from a previous truncated response to continue reading. Defaults to 1.'
           ),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -174,7 +207,8 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -230,7 +264,8 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -281,7 +316,8 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -335,7 +371,8 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -391,7 +428,8 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -424,7 +462,8 @@ export async function createBrijioMcpServer (
         expectedLabel: z.string().optional().describe('Optional: validate the form control label contains this substring before uploading.'),
         pageContextId: z.number().optional().describe('Optional page context version from the last read.'),
         visibleContextId: z.string().optional().describe('Optional visible form-state ID from the last read.'),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -471,7 +510,8 @@ export async function createBrijioMcpServer (
           .describe(
             'Optional: visible form-state ID from the last read. If visible form state has changed, the action will fail with stale_context.'
           ),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -499,7 +539,8 @@ export async function createBrijioMcpServer (
         url: z
           .string()
           .describe('The HTTP or HTTPS URL to navigate to.'),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -583,7 +624,8 @@ export async function createBrijioMcpServer (
           .string()
           .optional()
           .describe('Visible form-state ID for stale-context detection.'),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -621,7 +663,8 @@ export async function createBrijioMcpServer (
           .array(z.union([z.number(), z.string()]))
           .optional()
           .describe('Optional: filter by specific download IDs.'),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -658,7 +701,8 @@ export async function createBrijioMcpServer (
           .enum(['uniquify', 'overwrite'])
           .optional()
           .describe('Optional: how to handle filename conflicts. "uniquify" adds a suffix, "overwrite" replaces.'),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {
@@ -697,7 +741,8 @@ export async function createBrijioMcpServer (
           .number()
           .optional()
           .describe('Optional: timeout in milliseconds for the fetch operation.'),
-        browserInstanceId: browserInstanceIdInput
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
       }
     },
     async (input) => {

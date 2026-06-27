@@ -50,6 +50,7 @@ export interface BrijioPageActionsConfig {
   timeoutMs: number
   approvalTimeoutMs?: number
   defaultBrowserInstanceId?: string
+  defaultTabId?: string
   requestClickElement?: (
     options: ClickElementRequestOptions,
   ) => Promise<BrijioClickElementResult>
@@ -92,6 +93,7 @@ export async function clickCurrentPageElement (
   config: BrijioPageActionsConfig,
   target: ClickElementTarget,
   browserInstanceId?: string,
+  tabId?: string,
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioClickElementResult> {
@@ -104,6 +106,7 @@ export async function clickCurrentPageElement (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     target,
     pageContextId,
     visibleContextId
@@ -115,6 +118,7 @@ export async function fillCurrentPageInput (
   target: FillInputTarget,
   text: string,
   browserInstanceId?: string,
+  tabId?: string,
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioFillInputResult> {
@@ -126,6 +130,7 @@ export async function fillCurrentPageInput (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     target,
     text,
     pageContextId,
@@ -138,6 +143,7 @@ export async function fillCurrentPageEditable (
   target: EditableTarget,
   text: string,
   browserInstanceId?: string,
+  tabId?: string,
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioFillInputResult> {
@@ -150,6 +156,7 @@ export async function fillCurrentPageEditable (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     target,
     text,
     pageContextId,
@@ -162,6 +169,7 @@ export async function setCurrentPageChecked (
   target: FillInputTarget,
   checked: boolean,
   browserInstanceId?: string,
+  tabId?: string,
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioSetCheckedResult> {
@@ -174,6 +182,7 @@ export async function setCurrentPageChecked (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     target,
     checked,
     pageContextId,
@@ -186,6 +195,7 @@ export async function selectCurrentPageOptions (
   target: FillInputTarget,
   values: string[],
   browserInstanceId?: string,
+  tabId?: string,
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioSelectOptionsResult> {
@@ -198,6 +208,7 @@ export async function selectCurrentPageOptions (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     target,
     values,
     pageContextId,
@@ -209,6 +220,7 @@ export async function submitCurrentPageForm (
   config: BrijioPageActionsConfig,
   target: SubmitFormTarget,
   browserInstanceId?: string,
+  tabId?: string,
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioSubmitFormResult> {
@@ -221,6 +233,7 @@ export async function submitCurrentPageForm (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     target,
     pageContextId,
     visibleContextId
@@ -232,6 +245,7 @@ export async function uploadCurrentPageFile (
   target: FillInputTarget,
   file: FileUploadPayload,
   browserInstanceId?: string,
+  tabId?: string,
   pageContextId?: number,
   visibleContextId?: string
 ): Promise<BrijioUploadFileResult> {
@@ -244,6 +258,7 @@ export async function uploadCurrentPageFile (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     target,
     file,
     pageContextId,
@@ -254,7 +269,8 @@ export async function uploadCurrentPageFile (
 export async function navigateToCurrentPageUrl (
   config: BrijioPageActionsConfig,
   url: string,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  tabId?: string
 ): Promise<BrijioNavigateToUrlResult> {
   const requestNavigateToUrl =
     config.requestNavigateToUrl ?? defaultRequestNavigateToUrl
@@ -265,6 +281,7 @@ export async function navigateToCurrentPageUrl (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     url
   })
 }
@@ -274,6 +291,7 @@ export async function performBatch (
   actions: Array<Record<string, unknown>>,
   options?: {
     browserInstanceId?: string
+    tabId?: string
     continueOnError?: boolean
     readAfterActions?: boolean
     pageContextId?: number
@@ -290,6 +308,7 @@ export async function performBatch (
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId:
       options?.browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: options?.tabId ?? config.defaultTabId,
     actions,
     continueOnError: options?.continueOnError,
     readAfterActions: options?.readAfterActions,
@@ -301,7 +320,8 @@ export async function performBatch (
 export async function getDownloadStatus (
   config: BrijioPageActionsConfig,
   ids?: Array<number | string>,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  tabId?: string
 ): Promise<BrijioDownloadStatusResult> {
   const requestDownloadStatus =
     config.requestDownloadStatus ?? defaultRequestDownloadStatus
@@ -312,6 +332,7 @@ export async function getDownloadStatus (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     ids
   })
 }
@@ -321,7 +342,8 @@ export async function downloadFile (
   url: string,
   filename?: string,
   conflictAction?: 'uniquify' | 'overwrite',
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  tabId?: string
 ): Promise<BrijioDownloadFileResult> {
   const requestDownloadFile =
     config.requestDownloadFile ?? defaultRequestDownloadFile
@@ -332,6 +354,7 @@ export async function downloadFile (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     url,
     filename,
     conflictAction
@@ -343,7 +366,8 @@ export async function fetchResource (
   url: string,
   maxSizeBytes?: number,
   fetchTimeout?: number,
-  browserInstanceId?: string
+  browserInstanceId?: string,
+  tabId?: string
 ): Promise<BrijioFetchResourceResult> {
   const requestFetchResource =
     config.requestFetchResource ?? defaultRequestFetchResource
@@ -354,6 +378,7 @@ export async function fetchResource (
     timeoutMs: config.timeoutMs,
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId,
     url,
     maxSizeBytes,
     fetchTimeout

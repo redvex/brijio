@@ -261,6 +261,34 @@ void describe('MCP page reading tool', () => {
     })
   })
 
+  void it('forwards tabId to requestPageContext and requestPageContent', async () => {
+    const requestedTabIds: Array<string | undefined> = []
+
+    await readCurrentPage(
+      {
+        websocketUrl: 'ws://127.0.0.1:8787',
+        timeoutMs: 5000,
+        requestPageContext: async (options) => {
+          requestedTabIds.push(options.tabId)
+          return {
+            ok: true,
+            data: createPageContext()
+          }
+        },
+        requestPageContent: async (options) => {
+          requestedTabIds.push(options.tabId)
+          return {
+            ok: true,
+            data: createPageContent(options.index, false)
+          }
+        }
+      },
+      { tabId: 'tab-99' }
+    )
+
+    assert.deepEqual(requestedTabIds, ['tab-99', 'tab-99'])
+  })
+
   void it('returns context request errors without requesting content', async () => {
     const result = await readCurrentPage(
       {

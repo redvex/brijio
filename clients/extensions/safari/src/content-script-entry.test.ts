@@ -1,13 +1,33 @@
 import assert from 'node:assert/strict'
-import { describe, it } from 'node:test'
+import { describe, it, after } from 'node:test'
 import { parseHTML } from 'linkedom'
 import { handleContentRequest, type ContentRequest, type ContentResponse, type ContentEnvironment } from '@brijio/shared'
 import {
   hideBrijioApprovalBanner,
+  hideBrijioTabIndicator,
   registerPageActivityListeners,
   showBrijioApprovalBanner,
+  showBrijioTabIndicator,
   type BrijioApprovalDecision
 } from './content-script-entry.js'
+
+// linkedom does not provide MutationObserver — install a minimal stub.
+class MockMutationObserver {
+  observe (): void {}
+  disconnect (): void {}
+}
+const savedMutationObserver = (globalThis as unknown as { MutationObserver?: typeof MutationObserver }).MutationObserver
+;(globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver =
+  MockMutationObserver as unknown as typeof MutationObserver
+
+after(() => {
+  if (savedMutationObserver !== undefined) {
+    ;(globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver =
+      savedMutationObserver
+  } else {
+    delete (globalThis as unknown as { MutationObserver?: typeof MutationObserver }).MutationObserver
+  }
+})
 
 void describe('Safari content-script-entry module', () => {
   void it('exports handleContentRequest from @brijio/shared', () => {
@@ -156,5 +176,58 @@ void describe('Safari content-script-entry module', () => {
     hideBrijioApprovalBanner(document, 'action-2')
 
     assert.equal(document.getElementById('brijio-approval-banner'), null)
+  })
+})
+
+void describe('showBrijioTabIndicator / hideBrijioTabIndicator', () => {
+  void it('prepends ● to document title', () => {
+    const { document } = parseHTML('<html><head><title>My Page</title></head><body></body></html>')
+
+    showBrijioTabIndicator(document)
+
+    assert.ok(document.title.startsWith('● '))
+    assert.equal(document.title, '● My Page')
+  })
+
+  void it('injects a blue banner element with id brijio-tab-indicator', () => {
+    const { document } = parseHTML('<html><head><title>Test</title></head><body></body></html>')
+
+    showBrijioTabIndicator(document)
+
+    const banner = document.getElementById('brijio-tab-indicator')
+    assert.ok(banner, 'banner should exist in DOM')
+    assert.equal(banner?.getAttribute('role'), 'status')
+    assert.equal(banner?.textContent, 'Brijio is active on this tab')
+  })
+
+  void it('restores original title on hide', () => {
+    const { document } = parseHTML('<html><head><title>Original Title</title></head><body></body></html>')
+
+    showBrijioTabIndicator(document)
+    assert.ok(document.title.startsWith('● '))
+
+    hideBrijioTabIndicator(document)
+
+    assert.equal(document.title, 'Original Title')
+  })
+
+  void it('removes banner on hide', () => {
+    const { document } = parseHTML('<html><head><title>Test</title></head><body></body></html>')
+
+    showBrijioTabIndicator(document)
+    assert.ok(document.getElementById('brijio-tab-indicator'))
+
+    hideBrijioTabIndicator(document)
+
+    assert.equal(document.getElementById('brijio-tab-indicator'), null)
+  })
+
+  void it('does not double-prepend prefix when called twice', () => {
+    const { document } = parseHTML('<html><head><title>Page</title></head><body></body></html>')
+
+    showBrijioTabIndicator(document)
+    showBrijioTabIndicator(document)
+
+    assert.equal(document.title, '● Page')
   })
 })

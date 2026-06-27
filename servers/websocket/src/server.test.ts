@@ -170,6 +170,23 @@ void describe('WebSocket authenticated browser routing', () => {
     mcp.close()
   })
 
+  void it('forwards list_tabs to the connected extension', async () => {
+    const server = await startTestServer()
+    const extension = await authenticatedExtension(server.url)
+    const mcp = await authenticatedMcp(server.url)
+
+    extension.send(
+      JSON.stringify(presenceMessage('chrome-default', 'Chrome Default'))
+    )
+
+    const routed = waitForJsonMessage(extension)
+    mcp.send(JSON.stringify(listTabsMessage()))
+
+    assert.deepEqual(await routed, listTabsMessage())
+    extension.close()
+    mcp.close()
+  })
+
   void it('routes to the only online browser by default', async () => {
     const server = await startTestServer()
     const extension = await authenticatedExtension(server.url)
@@ -442,6 +459,16 @@ function listBrowsersMessage (): unknown {
     id: 'list-1',
     payload: {
       type: 'list_browsers'
+    }
+  }
+}
+
+function listTabsMessage (): unknown {
+  return {
+    type: 'message',
+    id: 'list-tabs-1',
+    payload: {
+      type: 'list_tabs'
     }
   }
 }
