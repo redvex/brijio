@@ -50,6 +50,7 @@ export interface BrijioPageActionsConfig {
   timeoutMs: number
   approvalTimeoutMs?: number
   defaultBrowserInstanceId?: string
+  defaultTabId?: string
   requestClickElement?: (
     options: ClickElementRequestOptions,
   ) => Promise<BrijioClickElementResult>

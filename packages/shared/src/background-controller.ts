@@ -125,8 +125,8 @@ export type PageActionResult =
   }
 
 export interface PageReaderAdapter {
-  getPageContext: () => Promise<PageReadResult<PageContext>>
-  getPageContent: (index: number) => Promise<PageReadResult<PageContent>>
+  getPageContext: (tabId?: number) => Promise<PageReadResult<PageContext>>
+  getPageContent: (index: number, tabId?: number) => Promise<PageReadResult<PageContent>>
 }
 
 export interface PageActionAdapter {
@@ -134,40 +134,46 @@ export interface PageActionAdapter {
     target: ClickActionTarget,
     pageContextId?: number,
     visibleContextId?: string,
+    tabId?: number,
   ) => Promise<PageActionResult>
   writeText: (
     target: WriteTextActionTarget | WriteTextEditableTarget,
     text: string,
     pageContextId?: number,
     visibleContextId?: string,
+    tabId?: number,
   ) => Promise<PageActionResult>
   setChecked: (
     target: WriteTextActionTarget,
     checked: boolean,
     pageContextId?: number,
     visibleContextId?: string,
+    tabId?: number,
   ) => Promise<PageActionResult>
   selectOptions: (
     target: WriteTextActionTarget,
     values: string[],
     pageContextId?: number,
     visibleContextId?: string,
+    tabId?: number,
   ) => Promise<PageActionResult>
   submitForm: (
     target: { formId: string, expectedLabel?: string },
     pageContextId?: number,
     visibleContextId?: string,
+    tabId?: number,
   ) => Promise<PageActionResult>
   uploadFile: (
     target: WriteTextActionTarget,
     file: FileUploadPayload,
     pageContextId?: number,
     visibleContextId?: string,
+    tabId?: number,
   ) => Promise<PageActionResult>
 }
 
 export interface PageBatchAdapter {
-  performBatch: (message: ContentBatchRequest) => Promise<BatchResult>
+  performBatch: (message: ContentBatchRequest, tabId?: number) => Promise<BatchResult>
 }
 
 export type PageNavigationResult =
@@ -181,7 +187,7 @@ export type PageNavigationResult =
   }
 
 export interface PageNavigationAdapter {
-  navigateToUrl: (url: string) => Promise<PageNavigationResult>
+  navigateToUrl: (url: string, tabId?: number) => Promise<PageNavigationResult>
 }
 
 export type DownloadStatusResult =
@@ -528,6 +534,8 @@ export class BrijioBackgroundController {
       return
     }
 
+    const tabId = extractTabId(message)
+
     if (isAuthSuccessEnvelope(message)) {
       this.announcePresence()
       return
@@ -551,7 +559,7 @@ export class BrijioBackgroundController {
     if (isGetPageContextEnvelope(message)) {
       this.pendingRequestCount++
       try {
-        await this.handlePageContextRequest(message.id)
+        await this.handlePageContextRequest(message.id, tabId)
       } finally {
         this.pendingRequestCount--
       }
@@ -563,7 +571,8 @@ export class BrijioBackgroundController {
       try {
         await this.handlePageContentRequest(
           message.id,
-          message.payload.index ?? 1
+          message.payload.index ?? 1,
+          tabId
         )
       } finally {
         this.pendingRequestCount--
@@ -578,7 +587,8 @@ export class BrijioBackgroundController {
           message.id,
           message.payload.action,
           message.payload.pageContextId,
-          message.payload.visibleContextId
+          message.payload.visibleContextId,
+          tabId
         )
       } finally {
         this.pendingRequestCount--
@@ -589,7 +599,7 @@ export class BrijioBackgroundController {
     if (isNavigateToUrlEnvelope(message)) {
       this.pendingRequestCount++
       try {
-        await this.handleNavigateToUrlRequest(message.id, message.payload.url)
+        await this.handleNavigateToUrlRequest(message.id, message.payload.url, tabId)
       } finally {
         this.pendingRequestCount--
       }
@@ -599,7 +609,7 @@ export class BrijioBackgroundController {
     if (isPerformBatchEnvelope(message)) {
       this.pendingRequestCount++
       try {
-        await this.handlePerformBatchRequest(message.id, message.payload)
+        await this.handlePerformBatchRequest(message.id, message.payload, tabId)
       } finally {
         this.pendingRequestCount--
       }
@@ -664,9 +674,10 @@ export class BrijioBackgroundController {
   }
 
   private async handlePageContextRequest (
-    requestId: string | undefined
+    requestId: string | undefined,
+    tabId?: number
   ): Promise<void> {
-    const result = await this.options.pageReader.getPageContext()
+    const result = await this.options.pageReader.getPageContext(tabId)
 
     if (!result.ok) {
       this.socket?.send(
@@ -731,9 +742,10 @@ export class BrijioBackgroundController {
 
   private async handlePageContentRequest (
     requestId: string | undefined,
-    index: number
+    index: number,
+    tabId?: number
   ): Promise<void> {
-    const result = await this.options.pageReader.getPageContent(index)
+    const result = await this.options.pageReader.getPageContent(index, tabId)
 
     if (!result.ok) {
       this.socket?.send(
@@ -757,7 +769,8 @@ export class BrijioBackgroundController {
     requestId: string | undefined,
     action: BatchAction,
     pageContextId?: number,
-    visibleContextId?: string
+    visibleContextId?: string,
+    tabId?: number
   ): Promise<void> {
     const approval = await this.ensureApprovedAction(action)
     if (!approval.ok) {
@@ -777,7 +790,8 @@ export class BrijioBackgroundController {
     const result = await this.performPageAction(
       action,
       pageContextId,
-      visibleContextId
+      visibleContextId,
+      tabId
     )
 
     if (!result.ok) {
@@ -806,7 +820,8 @@ export class BrijioBackgroundController {
       readAfterActions?: boolean
       pageContextId?: number
       visibleContextId?: string
-    }
+    },
+    tabId?: number
   ): Promise<void> {
     const batchMessage: ContentBatchRequest = {
       type: 'perform_batch',
@@ -826,7 +841,7 @@ export class BrijioBackgroundController {
     }
 
     if (hasApprovalGatedAction(payload.actions)) {
-      const result = await this.performApprovalAwareBatch(batchMessage)
+      const result = await this.performApprovalAwareBatch(batchMessage, tabId)
       this.socket?.send(
         JSON.stringify(
           createBatchResultResponse(
@@ -842,7 +857,7 @@ export class BrijioBackgroundController {
 
     let result: BatchResult
     try {
-      result = await this.options.pageBatch.performBatch(batchMessage)
+      result = await this.options.pageBatch.performBatch(batchMessage, tabId)
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : 'Unexpected batch error.'
@@ -868,11 +883,12 @@ export class BrijioBackgroundController {
 
   private async handleNavigateToUrlRequest (
     requestId: string | undefined,
-    url: string
+    url: string,
+    tabId?: number
   ): Promise<void> {
     let result: PageNavigationResult
     try {
-      result = await this.options.pageNavigation.navigateToUrl(url)
+      result = await this.options.pageNavigation.navigateToUrl(url, tabId)
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : 'Unexpected navigation error.'
@@ -1089,7 +1105,8 @@ export class BrijioBackgroundController {
   }
 
   private async performApprovalAwareBatch (
-    request: ContentBatchRequest
+    request: ContentBatchRequest,
+    tabId?: number
   ): Promise<BatchResult> {
     const results: BatchResultEntry[] = []
     let aborted = false
@@ -1124,7 +1141,8 @@ export class BrijioBackgroundController {
       const result = await this.performPageAction(
         action,
         request.pageContextId,
-        request.visibleContextId
+        request.visibleContextId,
+        tabId
       )
 
       if (result.ok) {
@@ -1147,7 +1165,7 @@ export class BrijioBackgroundController {
     }
 
     if (request.readAfterActions === true) {
-      const readResult = await this.options.pageReader.getPageContext()
+      const readResult = await this.options.pageReader.getPageContext(tabId)
       if (readResult.ok) {
         results.push({ ok: true, data: readResult.data })
       } else {
@@ -1294,13 +1312,15 @@ export class BrijioBackgroundController {
   private async performPageAction (
     action: BatchAction,
     pageContextId?: number,
-    visibleContextId?: string
+    visibleContextId?: string,
+    tabId?: number
   ): Promise<PageActionResult> {
     if (action.type === 'click') {
       return await this.options.pageActions.click(
         action.target,
         pageContextId,
-        visibleContextId
+        visibleContextId,
+        tabId
       )
     }
 
@@ -1309,7 +1329,8 @@ export class BrijioBackgroundController {
         action.target,
         action.text,
         pageContextId,
-        visibleContextId
+        visibleContextId,
+        tabId
       )
     }
 
@@ -1318,7 +1339,8 @@ export class BrijioBackgroundController {
         action.target,
         action.checked,
         pageContextId,
-        visibleContextId
+        visibleContextId,
+        tabId
       )
     }
 
@@ -1327,7 +1349,8 @@ export class BrijioBackgroundController {
         action.target,
         action.values,
         pageContextId,
-        visibleContextId
+        visibleContextId,
+        tabId
       )
     }
 
@@ -1336,14 +1359,16 @@ export class BrijioBackgroundController {
         action.target,
         action.file,
         pageContextId,
-        visibleContextId
+        visibleContextId,
+        tabId
       )
     }
 
     return await this.options.pageActions.submitForm(
       action.target,
       pageContextId,
-      visibleContextId
+      visibleContextId,
+      tabId
     )
   }
 
@@ -1609,4 +1634,18 @@ function isPerformActionRequestEnvelope (
 
 function isRecord (value: unknown): value is Record<PropertyKey, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/**
+ * Extract tabId from the envelope's `target` field and parse to a number.
+ * The MCP server puts `tabId` as a string in `message.target.tabId`.
+ * Returns `undefined` when no tabId is present (falls back to active tab).
+ */
+function extractTabId (message: unknown): number | undefined {
+  if (!isRecord(message)) return undefined
+  const target = message.target
+  if (!isRecord(target)) return undefined
+  if (typeof target.tabId !== 'string' || target.tabId.length === 0) return undefined
+  const numericId = Number.parseInt(target.tabId, 10)
+  return Number.isSafeInteger(numericId) ? numericId : undefined
 }

@@ -105,7 +105,7 @@ export async function createBrijioMcpServer (
     },
     async (input: { browserInstanceId?: string, tabId?: string }) => {
       logger.info('tool_call', { tool: 'list_tabs', ...input })
-      const result = await listTabs(pageContextConfig)
+      const result = await listTabs(pageContextConfig, input.browserInstanceId)
 
       return {
         content: [

@@ -79,6 +79,11 @@ export interface BrowserApi {
       url?: string
     }>
     >
+    get?: (tabId: number) => Promise<{
+      id?: number
+      title?: string
+      url?: string
+    }>
     sendMessage: (tabId: number, message: unknown) => Promise<unknown>
     update: (tabId: number, updateProperties: { url: string }) => Promise<
     { id?: number, title?: string, url?: string }
@@ -251,18 +256,19 @@ export class SafariPageReaderAdapter {
     }
   }
 
-  async getPageContext (): Promise<PageReadResult<PageContext>> {
+  async getPageContext (tabId?: number): Promise<PageReadResult<PageContext>> {
     return await sharedReadActiveTabPage(
       {
         type: 'extract_page_context',
         previewMaxBytes,
         defaultMaxPayloadBytes: defaultPageContentMaxPayloadBytes
       },
-      this.deps
+      this.deps,
+      tabId
     )
   }
 
-  async getPageContent (index: number): Promise<PageReadResult<PageContent>> {
+  async getPageContent (index: number, tabId?: number): Promise<PageReadResult<PageContent>> {
     return await sharedReadActiveTabPage(
       {
         type: 'extract_page_content',
@@ -270,7 +276,8 @@ export class SafariPageReaderAdapter {
         maxContentBytes,
         maxPayloadBytes: defaultPageContentMaxPayloadBytes
       },
-      this.deps
+      this.deps,
+      tabId
     )
   }
 }
@@ -384,28 +391,33 @@ export class SafariPageNavigationAdapter {
     private readonly tabs: BrowserApi['tabs']
   ) {}
 
-  async navigateToUrl (url: string): Promise<PageNavigationResult> {
+  async navigateToUrl (url: string, tabId?: number): Promise<PageNavigationResult> {
     try {
-      const tabs = await this.tabs.query({ active: true, currentWindow: true })
+      let targetTabId: number
+      if (tabId !== undefined) {
+        targetTabId = tabId
+      } else {
+        const tabs = await this.tabs.query({ active: true, currentWindow: true })
 
-      if (tabs.length === 0 || tabs[0].id === undefined) {
-        return {
-          ok: false,
-          error: {
-            code: 'no_active_tab',
-            message: 'No active tab is available.'
+        if (tabs.length === 0 || tabs[0].id === undefined) {
+          return {
+            ok: false,
+            error: {
+              code: 'no_active_tab',
+              message: 'No active tab is available.'
+            }
           }
         }
+        targetTabId = tabs[0].id
       }
 
-      const tabId = tabs[0].id
       const startTime = Date.now()
 
       // Safari's browser.tabs.update() may hang or return undefined in some
       // edge-cases (e.g. restricted pages, permission prompts). Wrap the call
       // in a timeout so the MCP client always gets a response.
       const updatedTab = await withTimeout(
-        this.tabs.update(tabId, { url }),
+        this.tabs.update(targetTabId, { url }),
         SafariPageNavigationAdapter.NAVIGATION_TIMEOUT_MS,
         `Navigation to ${url} timed out.`
       )
