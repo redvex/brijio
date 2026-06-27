@@ -4,7 +4,6 @@ import {
   type BrijioPageContextConfig
 } from './page-context.js'
 import {
-  type BrijioErrorCode,
   type PageContent,
   type PageContext,
   type StaleContextDetail
@@ -14,9 +13,7 @@ const defaultMaxContentChunks = 1
 const defaultStartContentIndex = 1
 const maxAllowedContentChunks = 10
 
-export type BrijioToolErrorCode =
-  | BrijioErrorCode
-  | 'invalid_tool_input'
+export type BrijioToolErrorCode = string
 
 export type BrijioToolResult<T> =
   | {

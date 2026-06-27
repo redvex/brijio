@@ -288,7 +288,7 @@ export type BrijioResourceResult<T> =
   | {
     ok: false
     error: {
-      code: BrijioErrorCode
+      code: string
       message: string
       detail?: StaleContextDetail
       browsers?: BrowserPresence[]
@@ -435,7 +435,7 @@ export type BrijioBatchResultParseResult =
   | {
     ok: false
     error: {
-      code: BrijioErrorCode
+      code: string
       message: string
       detail?: StaleContextDetail
       browsers?: BrowserPresence[]
@@ -912,14 +912,12 @@ function parseActionResultData (
   return null
 }
 
-function mapBatchErrorCode (code: unknown): BrijioErrorCode {
+function mapBatchErrorCode (code: unknown): string {
   if (typeof code === 'string') {
     if (code === 'page_navigated') {
       return 'stale_context'
     }
-    if (isBrijioErrorCode(code)) {
-      return code
-    }
+    return code
   }
   return 'browser_error'
 }
@@ -1286,14 +1284,15 @@ export function parseRouterErrorEnvelope (
     return invalidResponse()
   }
 
-  if (!isBrijioErrorCode(value.error.code)) {
-    return invalidResponse()
-  }
+  // Forward any string code — the WS server may emit codes not in the
+  // MCP server's BrijioErrorCode union (e.g. invalid_message, invalid_json).
+  // The agent benefits from seeing the real error, not a generic replacement.
+  const code = typeof value.error.code === 'string' ? value.error.code : 'invalid_response'
 
   return {
     ok: false,
     error: {
-      code: value.error.code,
+      code,
       message: value.error.message,
       ...(isArrayOf(value.error.browsers, isBrowserPresence)
         ? { browsers: value.error.browsers }
@@ -1393,7 +1392,7 @@ function parseErrorPayload<T> (
   }
 
   const code = payload.error.code
-  // Pass through stale_context with its detail; wrap unknown codes as browser_error
+  // Preserve stale_context and page_navigated with their structured detail
   if (code === 'stale_context') {
     const detail = isStaleContextDetail(payload.error.detail)
       ? payload.error.detail
@@ -1422,10 +1421,15 @@ function parseErrorPayload<T> (
     }
   }
 
+  // Forward the original error code from the extension (e.g. not_supported,
+  // cors_blocked, http_error, size_exceeded). The agent can act on the
+  // specific code rather than receiving a generic browser_error.
+  const forwardedCode = typeof code === 'string' ? code : 'browser_error'
+
   return {
     ok: false,
     error: {
-      code: 'browser_error',
+      code: forwardedCode,
       message: payload.error.message
     }
   }
@@ -1702,26 +1706,6 @@ function isBrowserPresence (value: unknown): value is BrowserPresence {
     isRecord(value) &&
     Array.isArray(value.capabilities) &&
     value.capabilities.every((capability) => typeof capability === 'string')
-  )
-}
-
-function isBrijioErrorCode (value: unknown): value is BrijioErrorCode {
-  return (
-    value === 'auth_required' ||
-    value === 'auth_failed' ||
-    value === 'invalid_auth_message' ||
-    value === 'browser_unavailable' ||
-    value === 'ambiguous_browser_target' ||
-    value === 'invalid_browser_target' ||
-    value === 'connection_failed' ||
-    value === 'timeout' ||
-    value === 'invalid_response' ||
-    value === 'browser_error' ||
-    value === 'batch_failed' ||
-    value === 'stale_context' ||
-    value === 'page_navigated' ||
-    value === 'invalid_resource_uri' ||
-    value === 'unsupported_scheme'
   )
 }
 
