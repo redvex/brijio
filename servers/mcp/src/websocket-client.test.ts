@@ -995,7 +995,7 @@ void describe('requestNavigateToUrl', () => {
     })
   })
 
-  void it('returns browser_error for unsupported_scheme from extension', async () => {
+  void it('forwards unsupported_scheme error code from extension', async () => {
     const server = await startServer((socket) => {
       onAuthenticatedMessage(socket, (data) => {
         const request = JSON.parse(rawDataToString(data)) as { id: string }
@@ -1027,7 +1027,7 @@ void describe('requestNavigateToUrl', () => {
 
     assert.equal(result.ok, false)
     if (!result.ok) {
-      assert.equal(result.error.code, 'browser_error')
+      assert.equal(result.error.code, 'unsupported_scheme')
       assert.equal(result.error.message, 'URL scheme \'ftp\' is not supported.')
     }
   })
