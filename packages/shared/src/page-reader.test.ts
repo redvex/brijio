@@ -471,7 +471,7 @@ void describe('page-reader', () => {
       assert.equal(result.results.length, 1)
       assert.deepEqual(
         sentMessages.map(message => (message as { type?: string }).type),
-        ['perform_batch', 'perform_write_text']
+        ['show_brijio_tab_indicator', 'perform_batch', 'perform_write_text']
       )
     })
 
@@ -480,7 +480,12 @@ void describe('page-reader', () => {
         contentScriptMessageTimeoutMs: 5,
         tabs: {
           query: async () => [{ id: 1, url: 'https://example.com' }],
-          sendMessage: async () => await new Promise(() => {})
+          sendMessage: async (_tabId, message) => {
+            if ((message as { type?: string }).type === 'show_brijio_tab_indicator') {
+              return { ok: true }
+            }
+            return await new Promise(() => {})
+          }
         }
       })
 

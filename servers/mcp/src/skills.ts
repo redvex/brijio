@@ -125,6 +125,14 @@ export function buildContextMessage (
     'Call `list_browsers` to see which browsers are currently connected.',
     'Always specify `browserInstanceId` when multiple browsers are available.',
     '',
+    '## Multi-Tab Targeting',
+    '',
+    'Call `list_tabs` to discover all open tabs in a connected browser, including',
+    'background tabs. Each tab has a `tabId` (string). Pass that `tabId` to any',
+    'tool (`read_current_page`, `click_element`, `fill_input`, `navigate_to_url`,',
+    '`perform_batch`, etc.) to target that specific tab instead of the active one.',
+    'When `tabId` is omitted, tools default to the active foreground tab.',
+    '',
     '## Available Skills',
     '',
     'Skills are detailed workflow guides available as MCP resources.',
@@ -141,6 +149,7 @@ export function buildContextMessage (
     '- **Short-lived IDs**: Element IDs (e5, f2, a1) expire when the page changes. Re-read the page after any navigation or DOM update.',
     '- **Never auto-submit**: Always ask the user to review and submit forms manually, unless explicitly asked to submit.',
     '- **Multiple browsers**: When both Chrome and Safari are connected, always specify `browserInstanceId`.',
+    '- **Tab targeting**: Without a `tabId`, tools act on the active tab. If the user refers to a specific background tab, call `list_tabs` first and pass the `tabId` to every subsequent call for that tab.',
     ''
   ].join('\n')
 }
