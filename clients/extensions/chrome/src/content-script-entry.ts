@@ -185,15 +185,62 @@ function isHideBrijioApprovalMessage (
 
 const tabIndicatorBannerId = 'brijio-tab-indicator'
 const tabIndicatorTitlePrefix = '● '
+const indicatorInactivityTimeoutMs = 60_000
 
 interface TabIndicatorState {
   originalTitle: string
   observer: MutationObserver
 }
 
-const tabIndicatorStateMap = new WeakMap<Document, TabIndicatorState>()
+const indicatorStateKey = '__brijioIndicatorStates'
+const indicatorTimerKey = '__brijioIndicatorTimer'
+
+function getIndicatorStates (): Map<Document, TabIndicatorState> {
+  const globalRef = globalThis as Record<string, unknown>
+  let map = globalRef[indicatorStateKey] as Map<Document, TabIndicatorState> | undefined
+  if (map === undefined) {
+    map = new Map()
+    globalRef[indicatorStateKey] = map
+  }
+  return map
+}
+
+function getIndicatorState (documentRef: Document): TabIndicatorState | undefined {
+  return getIndicatorStates().get(documentRef)
+}
+
+function setIndicatorState (documentRef: Document, state: TabIndicatorState): void {
+  getIndicatorStates().set(documentRef, state)
+}
+
+function clearIndicatorState (documentRef: Document): void {
+  getIndicatorStates().delete(documentRef)
+}
+
+function setIndicatorExpiry (documentRef: Document): void {
+  const globalRef = globalThis as Record<string, unknown>
+  const existing = globalRef[indicatorTimerKey] as ReturnType<typeof setTimeout> | undefined
+  if (existing !== undefined) {
+    clearTimeout(existing)
+  }
+  const timer = setTimeout(() => {
+    hideBrijioTabIndicator(documentRef)
+  }, indicatorInactivityTimeoutMs)
+  globalRef[indicatorTimerKey] = timer
+}
 
 export function showBrijioTabIndicator (documentRef: Document): void {
+  // If the indicator is already active, just reset the expiry timer.
+  // This avoids tearing down and re-creating the indicator on every Brijio
+  // interaction, which was causing flicker when executeScript re-injects
+  // the content script (fresh module scope loses the old WeakMap state).
+  const existingState = getIndicatorState(documentRef)
+  if (existingState !== undefined && documentRef.getElementById(tabIndicatorBannerId) !== null) {
+    setIndicatorExpiry(documentRef)
+    return
+  }
+
+  // Fresh show: clean up any stale remnants first
   hideBrijioTabIndicator(documentRef)
 
   const originalTitle = documentRef.title
@@ -221,7 +268,8 @@ export function showBrijioTabIndicator (documentRef: Document): void {
     }
   }
 
-  tabIndicatorStateMap.set(documentRef, { originalTitle, observer })
+  setIndicatorState(documentRef, { originalTitle, observer })
+  setIndicatorExpiry(documentRef)
 
   // Inject the persistent blue banner
   const banner = documentRef.createElement('div')
@@ -253,11 +301,17 @@ export function showBrijioTabIndicator (documentRef: Document): void {
 }
 
 export function hideBrijioTabIndicator (documentRef: Document): void {
-  const state = tabIndicatorStateMap.get(documentRef)
+  const globalRef = globalThis as Record<string, unknown>
+  const timer = globalRef[indicatorTimerKey] as ReturnType<typeof setTimeout> | undefined
+  if (timer !== undefined) {
+    clearTimeout(timer)
+    globalRef[indicatorTimerKey] = undefined
+  }
+  const state = getIndicatorState(documentRef)
   if (state !== undefined) {
     state.observer.disconnect()
     documentRef.title = state.originalTitle
-    tabIndicatorStateMap.delete(documentRef)
+    clearIndicatorState(documentRef)
   }
 
   const banner = documentRef.getElementById(tabIndicatorBannerId)

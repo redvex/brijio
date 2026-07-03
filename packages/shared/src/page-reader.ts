@@ -76,7 +76,6 @@ async function sendMessageWithTimeout (
     const timer = setTimeout(() => {
       reject(new ContentScriptMessageTimeoutError())
     }, timeoutMs)
-
     deps.tabs.sendMessage(tabId, message).then(
       (response) => {
         clearTimeout(timer)
