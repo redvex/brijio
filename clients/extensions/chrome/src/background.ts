@@ -435,17 +435,18 @@ const controller = new BrijioBackgroundController({
     }
   },
   pageReader: {
-    async getPageContext () {
+    async getPageContext (tabId?: number) {
       return await sharedReadActiveTabPage(
         {
           type: 'extract_page_context',
           previewMaxBytes,
           defaultMaxPayloadBytes: defaultPageContentMaxPayloadBytes
         },
-        chromeDeps
+        chromeDeps,
+        tabId
       )
     },
-    async getPageContent (index) {
+    async getPageContent (index: number, tabId?: number) {
       return await sharedReadActiveTabPage(
         {
           type: 'extract_page_content',
@@ -453,38 +454,39 @@ const controller = new BrijioBackgroundController({
           maxContentBytes,
           maxPayloadBytes: defaultPageContentMaxPayloadBytes
         },
-        chromeDeps
+        chromeDeps,
+        tabId
       )
     }
   },
   pageActions: {
-    async click (target, pageContextId) {
-      return await performActiveTabClick(target, pageContextId)
+    async click (target, pageContextId, visibleContextId, tabId) {
+      return await performActiveTabClick(target, pageContextId, visibleContextId, tabId)
     },
-    async writeText (target, text, pageContextId) {
-      return await performActiveTabWriteText(target, text, pageContextId)
+    async writeText (target, text, pageContextId, visibleContextId, tabId) {
+      return await performActiveTabWriteText(target, text, pageContextId, visibleContextId, tabId)
     },
-    async setChecked (target, checked, pageContextId) {
-      return await performActiveTabSetChecked(target, checked, pageContextId)
+    async setChecked (target, checked, pageContextId, visibleContextId, tabId) {
+      return await performActiveTabSetChecked(target, checked, pageContextId, visibleContextId, tabId)
     },
-    async selectOptions (target, values, pageContextId) {
-      return await performActiveTabSelectOptions(target, values, pageContextId)
+    async selectOptions (target, values, pageContextId, visibleContextId, tabId) {
+      return await performActiveTabSelectOptions(target, values, pageContextId, visibleContextId, tabId)
     },
-    async submitForm (target, pageContextId) {
-      return await performActiveTabSubmitForm(target, pageContextId)
+    async submitForm (target, pageContextId, visibleContextId, tabId) {
+      return await performActiveTabSubmitForm(target, pageContextId, visibleContextId, tabId)
     },
-    async uploadFile (target, file, pageContextId) {
-      return await performActiveTabUploadFile(target, file, pageContextId)
+    async uploadFile (target, file, pageContextId, visibleContextId, tabId) {
+      return await performActiveTabUploadFile(target, file, pageContextId, visibleContextId, tabId)
     }
   },
   pageBatch: {
-    async performBatch (message: ContentBatchRequest): Promise<BatchResult> {
-      return await sharedPerformActiveTabBatch(message, chromeDeps)
+    async performBatch (message: ContentBatchRequest, tabId?: number): Promise<BatchResult> {
+      return await sharedPerformActiveTabBatch(message, chromeDeps, tabId)
     }
   },
   pageNavigation: {
-    async navigateToUrl (url) {
-      return await navigateActiveTabToUrl(url)
+    async navigateToUrl (url: string, tabId?: number) {
+      return await navigateActiveTabToUrl(url, tabId)
     }
   },
   tabLister,
@@ -493,7 +495,9 @@ const controller = new BrijioBackgroundController({
 
 async function performActiveTabClick (
   target: ClickActionTarget,
-  pageContextId?: number
+  pageContextId?: number,
+  _visibleContextId?: string,
+  tabId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
@@ -501,14 +505,17 @@ async function performActiveTabClick (
       target,
       ...(pageContextId !== undefined ? { pageContextId } : {})
     },
-    chromeDeps
+    chromeDeps,
+    tabId
   )
 }
 
 async function performActiveTabWriteText (
   target: WriteTextActionTarget | WriteTextEditableTarget,
   text: string,
-  pageContextId?: number
+  pageContextId?: number,
+  _visibleContextId?: string,
+  tabId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
@@ -517,14 +524,17 @@ async function performActiveTabWriteText (
       text,
       ...(pageContextId !== undefined ? { pageContextId } : {})
     },
-    chromeDeps
+    chromeDeps,
+    tabId
   )
 }
 
 async function performActiveTabSetChecked (
   target: WriteTextActionTarget,
   checked: boolean,
-  pageContextId?: number
+  pageContextId?: number,
+  _visibleContextId?: string,
+  tabId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
@@ -533,14 +543,17 @@ async function performActiveTabSetChecked (
       checked,
       ...(pageContextId !== undefined ? { pageContextId } : {})
     },
-    chromeDeps
+    chromeDeps,
+    tabId
   )
 }
 
 async function performActiveTabSelectOptions (
   target: WriteTextActionTarget,
   values: string[],
-  pageContextId?: number
+  pageContextId?: number,
+  _visibleContextId?: string,
+  tabId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
@@ -549,14 +562,17 @@ async function performActiveTabSelectOptions (
       values,
       ...(pageContextId !== undefined ? { pageContextId } : {})
     },
-    chromeDeps
+    chromeDeps,
+    tabId
   )
 }
 
 async function performActiveTabUploadFile (
   target: WriteTextActionTarget,
   file: FileUploadPayload,
-  pageContextId?: number
+  pageContextId?: number,
+  _visibleContextId?: string,
+  tabId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
@@ -565,13 +581,16 @@ async function performActiveTabUploadFile (
       file,
       ...(pageContextId !== undefined ? { pageContextId } : {})
     },
-    chromeDeps
+    chromeDeps,
+    tabId
   )
 }
 
 async function performActiveTabSubmitForm (
   target: FormSubmitTarget,
-  pageContextId?: number
+  pageContextId?: number,
+  _visibleContextId?: string,
+  tabId?: number
 ): Promise<PageActionResult> {
   return await sharedPerformActiveTabAction(
     {
@@ -579,34 +598,42 @@ async function performActiveTabSubmitForm (
       target,
       ...(pageContextId !== undefined ? { pageContextId } : {})
     },
-    chromeDeps
+    chromeDeps,
+    tabId
   )
 }
 
-export async function navigateActiveTabToUrl (url: string): Promise<PageNavigationResult> {
+export async function navigateActiveTabToUrl (url: string, tabId?: number): Promise<PageNavigationResult> {
   const NAVIGATION_TIMEOUT_MS = 10000
 
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+    let targetTabId: number
 
-    if (tabs.length === 0 || tabs[0].id === undefined) {
-      return {
-        ok: false,
-        error: {
-          code: 'no_active_tab',
-          message: 'No active tab is available.'
+    if (tabId !== undefined) {
+      targetTabId = tabId
+    } else {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+
+      if (tabs.length === 0 || tabs[0].id === undefined) {
+        return {
+          ok: false,
+          error: {
+            code: 'no_active_tab',
+            message: 'No active tab is available.'
+          }
         }
       }
+
+      targetTabId = tabs[0].id
     }
 
-    const tabId = tabs[0].id
     const startTime = Date.now()
 
     // Chrome's chrome.tabs.update() usually resolves quickly with the tab
     // object, but in edge-cases (restricted pages, permission prompts) it may
     // hang. Wrap in a timeout so the MCP client always gets a response.
     const updatedTab = await withTabTimeout(
-      chrome.tabs.update(tabId, { url }),
+      chrome.tabs.update(targetTabId, { url }),
       NAVIGATION_TIMEOUT_MS,
       `Navigation to ${url} timed out.`
     )
