@@ -46,24 +46,25 @@ skill://brijio/{skill_name}
 
 ### Discovery
 
-| Tool                | Purpose                                                           |
-| ------------------- | ----------------------------------------------------------------- |
-| `list_browsers`     | Check which browsers are connected. **Always call this first.**   |
-| `read_current_page` | Get the current page context (URL, title, forms, links, actions). |
-| `read_resource`     | Read Brijio content chunks for large pages (paginated).           |
+| Tool                | Purpose                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------ |
+| `list_browsers`     | Check which browsers are connected. **Always call this first.**                                        |
+| `list_tabs`         | List all open tabs in a browser, including background tabs. Returns a `tabId` per tab.                 |
+| `read_current_page` | Get the current page context (URL, title, forms, links, actions). Pass `tabId` to read a specific tab. |
+| `read_resource`     | Read Brijio content chunks for large pages (paginated).                                                |
 
 ### Interaction
 
-| Tool              | Purpose                                 | Key Parameters                                      |
-| ----------------- | --------------------------------------- | --------------------------------------------------- |
-| `navigate_to_url` | Navigate the browser to an HTTP(S) URL  | `url` (required), `browserInstanceId` (optional)    |
-| `click_element`   | Click a link or button-like action      | `kind` (\"link\" or \"action\"), `id` (short-lived) |
-| `fill_input`      | Write text into a form control          | `formId`, `controlId`, `text`                       |
-| `fill_editable`   | Write text into a contenteditable area  | `id`, `text`                                        |
-| `set_checked`     | Check/uncheck a checkbox or radio       | `formId`, `controlId`, `checked` (boolean)          |
-| `select_options`  | Select option values in a `<select>`    | `formId`, `controlId`, `values` (string array)      |
-| `submit_form`     | Submit a form                           | `formId`                                            |
-| `perform_batch`   | Execute up to 20 explicit write actions | `actions`, `continueOnError`, `readAfterActions`    |
+| Tool              | Purpose                                 | Key Parameters                                                       |
+| ----------------- | --------------------------------------- | -------------------------------------------------------------------- |
+| `navigate_to_url` | Navigate the browser to an HTTP(S) URL  | `url` (required), `browserInstanceId` (optional), `tabId` (optional) |
+| `click_element`   | Click a link or button-like action      | `kind` ("link" or "action"), `id` (short-lived), `tabId` (optional)  |
+| `fill_input`      | Write text into a form control          | `formId`, `controlId`, `text`, `tabId` (optional)                    |
+| `fill_editable`   | Write text into a contenteditable area  | `id`, `text`, `tabId` (optional)                                     |
+| `set_checked`     | Check/uncheck a checkbox or radio       | `formId`, `controlId`, `checked` (boolean), `tabId` (optional)       |
+| `select_options`  | Select option values in a `<select>`    | `formId`, `controlId`, `values` (string array), `tabId` (optional)   |
+| `submit_form`     | Submit a form                           | `formId`, `tabId` (optional)                                         |
+| `perform_batch`   | Execute up to 20 explicit write actions | `actions`, `continueOnError`, `readAfterActions`, `tabId` (optional) |
 
 Use `perform_batch` only after reading the current page and choosing valid
 short-lived IDs from that page context. It is for compact sequences of write
@@ -154,3 +155,56 @@ always take precedence**. If the user explicitly says \"skip the skill\" or
 When more than one browser instance is connected, **always** specify
 `browserInstanceId` in tool calls. Omitting it when multiple browsers are
 available will return an `ambiguous_browser_target` error.
+
+## Multi-Tab Targeting
+
+By default, all tools operate on the **active foreground tab**. When the user
+refers to a specific tab (especially a background one), use `tabId` to target it:
+
+### 1. Discover Tabs
+
+Call `list_tabs` to get all open tabs in the connected browser:
+
+```
+→ list_tabs(browserInstanceId: "chrome-abc123")
+← { tabs: [
+    { tabId: "97212078", title: "Brijio Demo", url: "https://brijio.dev/demo", active: false, supported: true },
+    { tabId: "58193042", title: "Google", url: "https://google.com", active: true, supported: true }
+  ] }
+```
+
+Each tab has a `tabId` (string), `title`, `url`, `active` flag, and `supported`
+flag (only HTTP/HTTPS tabs are supported).
+
+### 2. Pass tabId to Every Call
+
+Once you have a `tabId`, pass it to every tool that should act on that tab:
+
+```
+→ read_current_page(tabId: "97212078")
+→ click_element(kind: "link", id: "e5", tabId: "97212078")
+→ navigate_to_url(url: "https://example.com", tabId: "97212078")
+```
+
+**Important**: The `tabId` is a string (e.g. `"97212078"`), not a number.
+Pass the exact value returned by `list_tabs`.
+
+### 3. Re-Read After Navigation
+
+After `navigate_to_url` on a specific tab, re-read that same tab to get fresh
+element IDs:
+
+```
+→ navigate_to_url(url: "https://example.com", tabId: "97212078")
+→ read_current_page(tabId: "97212078")
+```
+
+### When to Use tabId
+
+| Scenario                                                             | Use `tabId`?                                           |
+| -------------------------------------------------------------------- | ------------------------------------------------------ |
+| User says "read the Brijio tab" (not the active tab)                 | Yes                                                    |
+| User refers to a background tab by name or URL                       | Yes                                                    |
+| User says "do X on the tab I have open"                              | Yes — call `list_tabs` first to find the right `tabId` |
+| User says "do X on this page" (no tab ambiguity)                     | No — active tab is fine                                |
+| Agent opened a tab via `navigate_to_url` and wants to continue on it | Yes — the tab may not be active                        |

@@ -109,15 +109,22 @@ are available and you need a specific one, note the `browserInstanceId`.
 
 Call `navigate_to_url` with:
 
-| Parameter           | Required | Description                                           |
-| ------------------- | -------- | ----------------------------------------------------- |
-| `url`               | Yes      | The HTTP or HTTPS URL to navigate to                  |
-| `browserInstanceId` | No       | Target a specific browser when multiple are connected |
+| Parameter           | Required | Description                                                        |
+| ------------------- | -------- | ------------------------------------------------------------------ |
+| `url`               | Yes      | The HTTP or HTTPS URL to navigate to                               |
+| `browserInstanceId` | No       | Target a specific browser when multiple are connected              |
+| `tabId`             | No       | Target a specific tab (from `list_tabs`) instead of the active tab |
 
 Example:
 
 ```
 navigate_to_url(url: "https://example.com/dashboard")
+```
+
+To navigate a specific background tab without switching focus:
+
+```
+navigate_to_url(url: "https://example.com/dashboard", tabId: "97212078")
 ```
 
 ### 3. Check the Result
