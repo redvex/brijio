@@ -62,14 +62,14 @@ Add an optional `tabId?: string` parameter to `readActiveTabPage`,
 When `tabId` is provided:
 
 ```ts
-const tab = await deps.tabs.get(Number(tabId))
+const tab = await deps.tabs.get(Number(tabId));
 ```
 
 When `tabId` is absent, fall back to the existing behaviour:
 
 ```ts
-const tabs = await deps.tabs.query({ active: true, currentWindow: true })
-const tab = tabs[0]
+const tabs = await deps.tabs.query({ active: true, currentWindow: true });
+const tab = tabs[0];
 ```
 
 Add `get: (tabId: number) => Promise<TabHandle>` to the `TabsApi` interface in
@@ -86,7 +86,7 @@ functions.
 `message.target?.tabId` and pass it through to the handler methods:
 
 ```ts
-const tabId = (message as { target?: { tabId?: string } }).target?.tabId
+const tabId = (message as { target?: { tabId?: string } }).target?.tabId;
 ```
 
 Then forward `tabId` to each handler:
@@ -100,19 +100,19 @@ Update the adapter interfaces to accept `tabId?: string`:
 
 ```ts
 interface PageReaderAdapter {
-  readPage (message: ContentRequest, tabId?: string): Promise<ContentResponse>
+  readPage(message: ContentRequest, tabId?: string): Promise<ContentResponse>;
 }
 
 interface PageActionAdapter {
-  performAction (message: ActionRequest, tabId?: string): Promise<ActionResult>
+  performAction(message: ActionRequest, tabId?: string): Promise<ActionResult>;
 }
 
 interface PageBatchAdapter {
-  performBatch (message: BatchRequest, tabId?: string): Promise<BatchResult>
+  performBatch(message: BatchRequest, tabId?: string): Promise<BatchResult>;
 }
 
 interface PageNavigationAdapter {
-  navigateToUrl (url: string, tabId?: string): Promise<PageNavigationResult>
+  navigateToUrl(url: string, tabId?: string): Promise<PageNavigationResult>;
 }
 ```
 
@@ -123,10 +123,13 @@ Add `tabs.get` to the `ChromeApi` interface:
 ```ts
 interface ChromeApi {
   tabs: {
-    query: (info: chrome.tabs.QueryInfo) => Promise<chrome.tabs.Tab[]>
-    get: (tabId: number) => Promise<chrome.tabs.Tab>
-    update: (tabId: number, props: chrome.tabs.UpdateProperties) => Promise<chrome.tabs.Tab>
-  }
+    query: (info: chrome.tabs.QueryInfo) => Promise<chrome.tabs.Tab[]>;
+    get: (tabId: number) => Promise<chrome.tabs.Tab>;
+    update: (
+      tabId: number,
+      props: chrome.tabs.UpdateProperties,
+    ) => Promise<chrome.tabs.Tab>;
+  };
   // ... other existing members
 }
 ```
@@ -134,20 +137,20 @@ interface ChromeApi {
 Update `navigateActiveTabToUrl` to accept an optional `tabId`:
 
 ```ts
-export async function navigateActiveTabToUrl (
+export async function navigateActiveTabToUrl(
   url: string,
-  tabId?: string
+  tabId?: string,
 ): Promise<PageNavigationResult> {
   // ...
   if (tabId !== undefined) {
-    const tab = await chrome.tabs.get(Number(tabId))
-    await chrome.tabs.update(tab.id!, { url })
+    const tab = await chrome.tabs.get(Number(tabId));
+    await chrome.tabs.update(tab.id!, { url });
   } else {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tabs.length === 0 || tabs[0].id === undefined) {
-      return { ok: false, error: { code: 'no_active_tab', message: '...' } }
+      return { ok: false, error: { code: "no_active_tab", message: "..." } };
     }
-    await chrome.tabs.update(tabs[0].id, { url })
+    await chrome.tabs.update(tabs[0].id, { url });
   }
   // ... wait for navigation, return result
 }
@@ -158,8 +161,9 @@ The Chrome adapter functions that wrap `readActiveTabPage`,
 
 ```ts
 const pageReader: PageReaderAdapter = {
-  readPage: (message, tabId) => sharedReadActiveTabPage(message, deps, options, tabId)
-}
+  readPage: (message, tabId) =>
+    sharedReadActiveTabPage(message, deps, options, tabId),
+};
 ```
 
 #### 4. Safari `background.ts` — mirror Chrome changes
@@ -190,15 +194,30 @@ corresponding `page-actions.ts` function.
 Example (click-element-tool.ts):
 
 ```ts
-const { kind, id, expectedText, expectedHref, expectedRole,
-        pageContextId, visibleContextId, tabId } = input
+const {
+  kind,
+  id,
+  expectedText,
+  expectedHref,
+  expectedRole,
+  pageContextId,
+  visibleContextId,
+  tabId,
+} = input;
 
 const result = await clickCurrentPageElement(
-  { kind, id, expectedText, expectedHref, expectedRole,
-    pageContextId, visibleContextId },
+  {
+    kind,
+    id,
+    expectedText,
+    expectedHref,
+    expectedRole,
+    pageContextId,
+    visibleContextId,
+  },
   config,
-  tabId
-)
+  tabId,
+);
 ```
 
 #### 7. Backward compatibility — fallback to active tab
@@ -299,7 +318,6 @@ sequenceDiagram
 1. **`page-reader.ts` — `TabsApi.get` and tabId-targeted reads**
 
    Write tests in `packages/shared/src/page-reader.test.ts`:
-
    - Test that `readActiveTabPage` calls `deps.tabs.get(Number(tabId))` when
      `tabId` is provided, and does NOT call `deps.tabs.query`.
    - Test that `readActiveTabPage` falls back to
@@ -313,7 +331,6 @@ sequenceDiagram
 2. **`background-controller.ts` — tabId extraction**
 
    Write tests in `packages/shared/src/background-controller.test.ts`:
-
    - Test that `handleSocketMessage` extracts `target.tabId` from the incoming
      envelope and passes it to `pageReader.readPage`.
    - Test that `handleSocketMessage` passes `tabId` to `pageAction.performAction`.
@@ -326,7 +343,6 @@ sequenceDiagram
 3. **Chrome `background.ts` — `navigateActiveTabToUrl` with tabId**
 
    Write tests in `clients/extensions/chrome/src/background.test.ts`:
-
    - Test that `navigateActiveTabToUrl(url, "42")` calls
      `chrome.tabs.get(42)` and `chrome.tabs.update(42, { url })`.
    - Test that `navigateActiveTabToUrl(url)` (no tabId) calls

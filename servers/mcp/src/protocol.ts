@@ -1783,26 +1783,6 @@ function isTabInfo (value: unknown): value is TabInfo {
   )
 }
 
-function isBrijioErrorCode (value: unknown): value is BrijioErrorCode {
-  return (
-    value === 'auth_required' ||
-    value === 'auth_failed' ||
-    value === 'invalid_auth_message' ||
-    value === 'browser_unavailable' ||
-    value === 'ambiguous_browser_target' ||
-    value === 'invalid_browser_target' ||
-    value === 'connection_failed' ||
-    value === 'timeout' ||
-    value === 'invalid_response' ||
-    value === 'browser_error' ||
-    value === 'batch_failed' ||
-    value === 'stale_context' ||
-    value === 'page_navigated' ||
-    value === 'invalid_resource_uri' ||
-    value === 'unsupported_scheme'
-  )
-}
-
 function isStaleContextDetail (value: unknown): value is StaleContextDetail {
   if (!isRecord(value)) {
     return false

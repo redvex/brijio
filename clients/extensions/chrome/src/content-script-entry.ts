@@ -226,6 +226,10 @@ function setIndicatorExpiry (documentRef: Document): void {
   const timer = setTimeout(() => {
     hideBrijioTabIndicator(documentRef)
   }, indicatorInactivityTimeoutMs)
+  // Allow Node.js test process to exit without waiting for the 60s timer.
+  if (typeof timer.unref === 'function') {
+    timer.unref()
+  }
   globalRef[indicatorTimerKey] = timer
 }
 
