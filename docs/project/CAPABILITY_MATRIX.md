@@ -188,6 +188,7 @@ This section clarifies the boundary between what is a product limitation (a cons
 
 - **Short-lived element IDs**: Target IDs (e5, f2, a1) expire when the page changes. This is intentional for safety — agents must re-read page context after any navigation or DOM mutation. Not a bug.
 - **No continuous streaming**: Brijio does not push page updates to agents. Agents must poll via `read_current_page`. This is a privacy feature, not a missing capability.
+- **Page-change awareness is agent-driven**: Page-change awareness is deferred as a product surface (P2.4). Agents should snapshot URL/title before an action, then re-read after and diff. No dedicated Brijio tool is required.
 - **No file uploads yet**: File input controls cannot be filled. Planned but not yet implemented.
 - **No multi-tab switching yet**: Agents can see which browsers are connected but cannot switch between tabs. Planned but not yet implemented.
 - **No screenshot capture yet**: Screenshots are planned but not yet available.
@@ -206,36 +207,36 @@ Report bugs at [github.com/redvex/brijio/issues](https://github.com/redvex/briji
 
 These capabilities are on the roadmap but not yet implemented. Details may change before release.
 
-| Capability                               | Status     | Brief                                                                                            |
-| ---------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------ |
-| Stale-target handling (snapshot IDs)     | 📋 Planned | Generation IDs on page context; actions against stale snapshots are rejected.                    |
-| Improved click/action model              | 📋 Planned | Expand action discovery to ARIA buttons, menu items, tabs, disclosure controls.                  |
-| Keyboard interaction (`press_key`)       | 📋 Planned | Constrained keyboard actions: Enter, Escape, Tab, arrow keys for modal dismissal and navigation. |
-| Better form model                        | 📋 Planned | Structured form summaries with required fields, validation state, submit buttons.                |
-| File uploads                             | 📋 Planned | Upload local files to visible file input controls.                                               |
-| Download awareness                       | 📋 Planned | Detect and report download metadata without exposing file contents.                              |
-| Tab listing and selection                | 📋 Planned | List open tabs; select a tab as the active context for reads and actions.                        |
-| New tab and close tab actions            | 📋 Planned | Open and close browser tabs with ownership tracking.                                             |
-| Workflow session state                   | 📋 Planned | Local session object tracking connected browser, selected tab, latest snapshot, and last action. |
-| Page-change awareness                    | 📋 Planned | Lightweight change signals after actions; optional `wait_for_page_change` / `wait_for_element`.  |
-| Accessibility-first page snapshot        | 📋 Planned | Structured accessibility snapshot focused on interactive and semantic nodes.                     |
-| Readable content extraction quality pass | 📋 Planned | Stable chunking, content metadata, reduced boilerplate for article/docs/tables.                  |
-| Screenshot capture                       | 📋 Planned | Explicit screenshot of the selected tab; logged, not automatic.                                  |
-| Element detail lookup                    | 📋 Planned | Inspect a specific element by target ID without re-reading the whole page.                       |
-| Console log inspection                   | 📋 Planned | Request recent console logs for the selected tab; bounded and explicit.                          |
-| Network request metadata                 | 📋 Planned | Recent network request metadata: method, URL, status, timing; no request/response bodies.        |
-| Page health summary                      | 📋 Planned | Concise health summary: URL/title, load timing, console error count, failed request count.       |
-| Local trace bundle                       | 📋 Planned | Optional local trace recording for a single workflow; stored locally only.                       |
-| Chrome Web Store distribution            | 📋 Planned | Published Chrome extension for easy installation without local builds.                           |
-| Safari parity hardening                  | 📋 Planned | Document Safari limitations; verify parity for every implemented feature.                        |
-| Firefox implementation decision          | 📋 Planned | Spike Firefox feasibility; ADR to decide implement, defer, or drop.                              |
-| Versioned protocol compatibility         | 📋 Planned | Protocol version in presence/auth; compatibility checks for mismatched versions.                 |
-| End-to-end encryption                    | 📋 Planned | Relay cannot inspect payloads; encrypted between extension and agent.                            |
-| Fine-grained permissions                 | 📋 Planned | Per-capability approvals before an agent can use a tool.                                         |
-| User approval workflows                  | 📋 Planned | Explicit confirmation for sensitive actions (payments, deletions, data exports).                 |
-| File vault integration                   | 📋 Planned | User-owned document repository for agent file access.                                            |
-| Team relay support                       | 📋 Planned | Shared infrastructure for multiple agents and users.                                             |
-| Audit trails                             | 📋 Planned | Structured audit logs for enterprise compliance workflows.                                       |
+| Capability                               | Status      | Brief                                                                                                                      |
+| ---------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Stale-target handling (snapshot IDs)     | 📋 Planned  | Generation IDs on page context; actions against stale snapshots are rejected.                                              |
+| Improved click/action model              | 📋 Planned  | Expand action discovery to ARIA buttons, menu items, tabs, disclosure controls.                                            |
+| Keyboard interaction (`press_key`)       | 📋 Planned  | Constrained keyboard actions: Enter, Escape, Tab, arrow keys for modal dismissal and navigation.                           |
+| Better form model                        | 📋 Planned  | Structured form summaries with required fields, validation state, submit buttons.                                          |
+| File uploads                             | 📋 Planned  | Upload local files to visible file input controls.                                                                         |
+| Download awareness                       | 📋 Planned  | Detect and report download metadata without exposing file contents.                                                        |
+| Tab listing and selection                | 📋 Planned  | List open tabs; select a tab as the active context for reads and actions.                                                  |
+| New tab and close tab actions            | 📋 Planned  | Open and close browser tabs with ownership tracking.                                                                       |
+| Workflow session state                   | 📋 Planned  | Local session object tracking connected browser, selected tab, latest snapshot, and last action.                           |
+| Page-change awareness                    | 🚫 Deferred | Use agent-driven re-read pattern instead: snapshot URL/title before action, re-read after, diff. See deferred ticket P2.4. |
+| Accessibility-first page snapshot        | 📋 Planned  | Structured accessibility snapshot focused on interactive and semantic nodes.                                               |
+| Readable content extraction quality pass | 📋 Planned  | Stable chunking, content metadata, reduced boilerplate for article/docs/tables.                                            |
+| Screenshot capture                       | 📋 Planned  | Explicit screenshot of the selected tab; logged, not automatic.                                                            |
+| Element detail lookup                    | 📋 Planned  | Inspect a specific element by target ID without re-reading the whole page.                                                 |
+| Console log inspection                   | 📋 Planned  | Request recent console logs for the selected tab; bounded and explicit.                                                    |
+| Network request metadata                 | 📋 Planned  | Recent network request metadata: method, URL, status, timing; no request/response bodies.                                  |
+| Page health summary                      | 📋 Planned  | Concise health summary: URL/title, load timing, console error count, failed request count.                                 |
+| Local trace bundle                       | 📋 Planned  | Optional local trace recording for a single workflow; stored locally only.                                                 |
+| Chrome Web Store distribution            | 📋 Planned  | Published Chrome extension for easy installation without local builds.                                                     |
+| Safari parity hardening                  | 📋 Planned  | Document Safari limitations; verify parity for every implemented feature.                                                  |
+| Firefox implementation decision          | 📋 Planned  | Spike Firefox feasibility; ADR to decide implement, defer, or drop.                                                        |
+| Versioned protocol compatibility         | 📋 Planned  | Protocol version in presence/auth; compatibility checks for mismatched versions.                                           |
+| End-to-end encryption                    | 📋 Planned  | Relay cannot inspect payloads; encrypted between extension and agent.                                                      |
+| Fine-grained permissions                 | 📋 Planned  | Per-capability approvals before an agent can use a tool.                                                                   |
+| User approval workflows                  | 📋 Planned  | Explicit confirmation for sensitive actions (payments, deletions, data exports).                                           |
+| File vault integration                   | 📋 Planned  | User-owned document repository for agent file access.                                                                      |
+| Team relay support                       | 📋 Planned  | Shared infrastructure for multiple agents and users.                                                                       |
+| Audit trails                             | 📋 Planned  | Structured audit logs for enterprise compliance workflows.                                                                 |
 
 ---
 
@@ -250,3 +251,9 @@ If the answer is no, the feature likely does not belong in Brijio.
 ---
 
 _This capability matrix is the single source of truth for what Brijio can and cannot do. Extension READMEs, the MCP surface, and roadmap documents should use the same capability names defined here. When capabilities change, update this document first, then update linked references._
+
+---
+
+## Backlog / Deferred
+
+- P2.4 — Page-change awareness without continuous streaming. Deferred. Rationale: this is agent-level workflow logic, not a protocol surface. Agents can snapshot URL/title before an action, re-read after, and diff. Preferred reporting path: roll this guidance into the `navigation` or `using-brijio` skill instead.
