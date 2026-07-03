@@ -165,6 +165,10 @@ export async function readActiveTabPage<T> (
       files: ['content.js']
     })
 
+    await deps.tabs.sendMessage(resolvedTabId, { type: 'show_brijio_tab_indicator' }).catch(
+      () => {}
+    )
+
     const response = await deps.tabs.sendMessage(resolvedTabId, message)
 
     if (!isContentResponse(response)) {
@@ -247,6 +251,10 @@ export async function performActiveTabAction (
       target: { tabId: resolvedTabId },
       files: ['content.js']
     })
+
+    await deps.tabs.sendMessage(resolvedTabId, { type: 'show_brijio_tab_indicator' }).catch(
+      () => {}
+    )
 
     const response = await deps.tabs.sendMessage(resolvedTabId, message)
 
@@ -509,6 +517,10 @@ export async function performActiveTabBatch (
       target: { tabId: resolvedTabId },
       files: ['content.js']
     })
+
+    await deps.tabs.sendMessage(resolvedTabId, { type: 'show_brijio_tab_indicator' }).catch(
+      () => {}
+    )
 
     const response = await sendMessageWithTimeout(deps, resolvedTabId, message)
 
