@@ -34,7 +34,7 @@ jobs:
           OPENWIKI_MODEL_ID: z-ai/glm-5.2
 
       - name: Lint Markdown files
-        run: npx markdownlint-cli2 "openwiki/**/*.md"
+        run: npx prettier "openwiki/**/*.md" --write
       - name: Create OpenWiki update pull request
         uses: peter-evans/create-pull-request@v7
         with:
