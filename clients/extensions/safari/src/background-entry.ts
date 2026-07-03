@@ -58,59 +58,71 @@ const safariDeps: ActiveTabDeps = {
 }
 
 const pageActions = {
-  async click (target: ClickActionTarget, pageContextId?: number): Promise<PageActionResult> {
+  async click (target: ClickActionTarget, pageContextId?: number, _visibleContextId?: string, tabId?: number): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
       { type: 'perform_click', target, ...(pageContextId !== undefined ? { pageContextId } : {}) },
-      safariDeps
+      safariDeps,
+      tabId
     )
   },
   async writeText (
     target: WriteTextActionTarget | WriteTextEditableTarget,
     text: string,
-    pageContextId?: number
+    pageContextId?: number,
+    _visibleContextId?: string,
+    tabId?: number
   ): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
       { type: 'perform_write_text', target, text, ...(pageContextId !== undefined ? { pageContextId } : {}) },
-      safariDeps
+      safariDeps,
+      tabId
     )
   },
   async setChecked (
     target: WriteTextActionTarget,
     checked: boolean,
-    pageContextId?: number
+    pageContextId?: number,
+    _visibleContextId?: string,
+    tabId?: number
   ): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
       { type: 'perform_set_checked', target, checked, ...(pageContextId !== undefined ? { pageContextId } : {}) },
-      safariDeps
+      safariDeps,
+      tabId
     )
   },
   async selectOptions (
     target: WriteTextActionTarget,
     values: string[],
-    pageContextId?: number
+    pageContextId?: number,
+    _visibleContextId?: string,
+    tabId?: number
   ): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
       { type: 'perform_select_options', target, values, ...(pageContextId !== undefined ? { pageContextId } : {}) },
-      safariDeps
+      safariDeps,
+      tabId
     )
   },
-  async submitForm (target: FormSubmitTarget, pageContextId?: number): Promise<PageActionResult> {
+  async submitForm (target: FormSubmitTarget, pageContextId?: number, _visibleContextId?: string, tabId?: number): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
       { type: 'perform_submit_form', target, ...(pageContextId !== undefined ? { pageContextId } : {}) },
-      safariDeps
+      safariDeps,
+      tabId
     )
   },
-  async uploadFile (target: WriteTextActionTarget, file: FileUploadPayload, pageContextId?: number): Promise<PageActionResult> {
+  async uploadFile (target: WriteTextActionTarget, file: FileUploadPayload, pageContextId?: number, _visibleContextId?: string, tabId?: number): Promise<PageActionResult> {
     return await sharedPerformActiveTabAction(
       { type: 'perform_upload_file', target, file, ...(pageContextId !== undefined ? { pageContextId } : {}) },
-      safariDeps
+      safariDeps,
+      tabId
     )
   }
 }
 
 const pageBatch = {
-  async performBatch (message: ContentBatchRequest): Promise<BatchResult> {
-    return await sharedPerformActiveTabBatch(message, safariDeps)
+  async performBatch (message: ContentBatchRequest, tabId?: number): Promise<BatchResult> {
+    return await sharedPerformActiveTabBatch(message, safariDeps, tabId)
   }
 }
 
