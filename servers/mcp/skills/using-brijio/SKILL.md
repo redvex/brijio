@@ -55,16 +55,17 @@ skill://brijio/{skill_name}
 
 ### Interaction
 
-| Tool              | Purpose                                 | Key Parameters                                                       |
-| ----------------- | --------------------------------------- | -------------------------------------------------------------------- |
-| `navigate_to_url` | Navigate the browser to an HTTP(S) URL  | `url` (required), `browserInstanceId` (optional), `tabId` (optional) |
-| `click_element`   | Click a link or button-like action      | `kind` ("link" or "action"), `id` (short-lived), `tabId` (optional)  |
-| `fill_input`      | Write text into a form control          | `formId`, `controlId`, `text`, `tabId` (optional)                    |
-| `fill_editable`   | Write text into a contenteditable area  | `id`, `text`, `tabId` (optional)                                     |
-| `set_checked`     | Check/uncheck a checkbox or radio       | `formId`, `controlId`, `checked` (boolean), `tabId` (optional)       |
-| `select_options`  | Select option values in a `<select>`    | `formId`, `controlId`, `values` (string array), `tabId` (optional)   |
-| `submit_form`     | Submit a form                           | `formId`, `tabId` (optional)                                         |
-| `perform_batch`   | Execute up to 20 explicit write actions | `actions`, `continueOnError`, `readAfterActions`, `tabId` (optional) |
+| Tool              | Purpose                                                              | Key Parameters                                                       |
+| ----------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `navigate_to_url` | Navigate the browser to an HTTP(S) URL                               | `url` (required), `browserInstanceId` (optional), `tabId` (optional) |
+| `open_tab`        | Open a new browser tab with an HTTP(S) URL. Returns the new `tabId`. | `url` (required), `browserInstanceId` (optional)                     |
+| `click_element`   | Click a link or button-like action                                   | `kind` ("link" or "action"), `id` (short-lived), `tabId` (optional)  |
+| `fill_input`      | Write text into a form control                                       | `formId`, `controlId`, `text`, `tabId` (optional)                    |
+| `fill_editable`   | Write text into a contenteditable area                               | `id`, `text`, `tabId` (optional)                                     |
+| `set_checked`     | Check/uncheck a checkbox or radio                                    | `formId`, `controlId`, `checked` (boolean), `tabId` (optional)       |
+| `select_options`  | Select option values in a `<select>`                                 | `formId`, `controlId`, `values` (string array), `tabId` (optional)   |
+| `submit_form`     | Submit a form                                                        | `formId`, `tabId` (optional)                                         |
+| `perform_batch`   | Execute up to 20 explicit write actions                              | `actions`, `continueOnError`, `readAfterActions`, `tabId` (optional) |
 
 Use `perform_batch` only after reading the current page and choosing valid
 short-lived IDs from that page context. It is for compact sequences of write
@@ -201,10 +202,45 @@ element IDs:
 
 ### When to Use tabId
 
-| Scenario                                                             | Use `tabId`?                                           |
-| -------------------------------------------------------------------- | ------------------------------------------------------ |
-| User says "read the Brijio tab" (not the active tab)                 | Yes                                                    |
-| User refers to a background tab by name or URL                       | Yes                                                    |
-| User says "do X on the tab I have open"                              | Yes — call `list_tabs` first to find the right `tabId` |
-| User says "do X on this page" (no tab ambiguity)                     | No — active tab is fine                                |
-| Agent opened a tab via `navigate_to_url` and wants to continue on it | Yes — the tab may not be active                        |
+| Scenario                                                      | Use `tabId`?                                           |
+| ------------------------------------------------------------- | ------------------------------------------------------ |
+| User says "read the Brijio tab" (not the active tab)          | Yes                                                    |
+| User refers to a background tab by name or URL                | Yes                                                    |
+| User says "do X on the tab I have open"                       | Yes — call `list_tabs` first to find the right `tabId` |
+| User says "do X on this page" (no tab ambiguity)              | No — active tab is fine                                |
+| Agent opened a tab via `open_tab` and wants to continue on it | Yes — pass the returned `tabId` to subsequent calls    |
+
+## Opening New Tabs
+
+Use `open_tab` when you need to work with a page **without disrupting the
+user's current tab**. The tool opens a new browser tab, navigates it to the
+given URL, and returns the new `tabId` for subsequent reads and actions.
+
+### When to use `open_tab`
+
+- The user asks to "open" a page in a new tab rather than navigate the
+  current one
+- You need to read or interact with a second page while keeping the current
+  tab intact (e.g., comparison tasks, cross-referencing data)
+- A skill workflow (e.g., comparison) requires two pages side by side in the
+  same browser
+
+### When NOT to use `open_tab`
+
+- The user just wants to go to a URL — use `navigate_to_url` instead (it
+  navigates the current tab, which is simpler and less intrusive)
+- The user is already on the page you need — just `read_current_page`
+- You need an auth-gated page that requires click-through navigation — open
+  the tab, then use `click_element` to navigate within it
+
+### Workflow
+
+```
+1. open_tab(url: "https://example.com")       → returns { tabId: "12345", url, title }
+2. read_current_page(tabId: "12345")           → get page context with fresh element IDs
+3. Interact with the page using tabId: "12345" → click_element, fill_input, etc.
+```
+
+**Important**: Always pass the returned `tabId` to subsequent calls. The new
+tab may not be the active tab, so omitting `tabId` could target the wrong
+page.
