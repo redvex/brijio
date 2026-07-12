@@ -163,6 +163,76 @@ need page context to interact with elements.
   behind a login wall or requires cookie-based auth that click-through preserves.
 - **Prefer click navigation** when you need to follow menu paths, breadcrumbs,
   or when direct URL access would fail (e.g., SPA hash routes, auth-gated pages).
+- **Prefer `open_tab`** when you need to open a URL in a new tab without
+  navigating away from the current page. See "Opening a New Tab" below.
+
+---
+
+## Opening a New Tab
+
+Use the `open_tab` tool to open a new browser tab at a given HTTP(S) URL
+without disrupting the current tab. The tool returns the new tab's `tabId`,
+which you pass to subsequent reads and actions on that tab.
+
+### When to Use `open_tab`
+
+- The user asks to "open this in a new tab" or "open a new tab to …"
+- You need to keep the current page intact while working on a second page
+  (e.g., comparing two pages, cross-referencing data from two sources)
+- A workflow requires two pages open simultaneously in the same browser
+
+### When NOT to Use `open_tab`
+
+- You just need to navigate the current tab — use `navigate_to_url` instead
+- The user is already on the target page — just `read_current_page`
+- You need to follow a click path on the current page — use `click_element`
+
+### Workflow
+
+#### 1. Check Connection
+
+Call `list_browsers` to confirm a browser is connected.
+
+#### 2. Open the Tab
+
+Call `open_tab` with the URL:
+
+```
+open_tab(url: "https://example.com/dashboard")
+```
+
+The response includes:
+
+| Field   | Type   | Description                                      |
+| ------- | ------ | ------------------------------------------------ |
+| `tabId` | string | The new tab's ID — pass to subsequent tool calls |
+| `url`   | string | The URL the tab was opened to                    |
+| `title` | string | The page title (may be empty until it loads)     |
+
+#### 3. Read and Interact
+
+Pass the returned `tabId` to `read_current_page` and all subsequent calls
+on that tab:
+
+```
+open_tab(url: "https://example.com")          → { tabId: "12345", ... }
+read_current_page(tabId: "12345")              → page context with fresh IDs
+click_element(kind: "link", id: "e5", tabId: "12345")
+```
+
+**Important**: The new tab may not be the active foreground tab. Always pass
+the returned `tabId` — omitting it will target the active tab, which may be
+a different page.
+
+#### 4. Handle Errors
+
+| Error Code            | Cause                                                      |
+| --------------------- | ---------------------------------------------------------- |
+| `unsupported_scheme`  | URL is not http: or https:                                 |
+| `open_tab_failed`     | Browser reported an error creating the tab                 |
+| `not_supported`       | The connected browser extension doesn't support `open_tab` |
+| `browser_unavailable` | No browser extension connected                             |
+| `connection_failed`   | Could not reach the Brijio WebSocket server                |
 
 ---
 

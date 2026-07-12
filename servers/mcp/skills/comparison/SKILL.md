@@ -114,13 +114,24 @@ When both Chrome and Safari are connected:
 
 If only one browser is connected:
 
-1. Read Page A (first URL/state)
-2. Ask the user to navigate to Page B
-3. Read Page B
+1. Read Page A (first URL/state) on the current tab
+2. Open Page B in a new tab using `open_tab`:
+
+   ```
+   open_tab(url: "https://example.com/page-b")  → { tabId: "12345", ... }
+   ```
+
+3. Read Page B using the returned `tabId`:
+
+   ```
+   read_current_page(tabId: "12345", includeContent: true)  → Page B
+   ```
+
 4. Compare the two results
 
 This works well for before/after comparison (e.g., before and after a settings
-change, before and after form submission).
+change, before and after form submission). The original tab stays intact so
+you can switch back to it with `read_current_page` (no `tabId`) if needed.
 
 ## Pitfalls
 
