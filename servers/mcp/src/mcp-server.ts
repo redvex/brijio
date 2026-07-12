@@ -28,6 +28,7 @@ import { performBatchTool } from './batch-tool.js'
 import { downloadStatus } from './download-status-tool.js'
 import { downloadFile } from './download-file-tool.js'
 import { fetchResource } from './fetch-resource-tool.js'
+import { captureScreenshot } from './capture-screenshot-tool.js'
 import {
   buildContextMessage,
   loadSkills,
@@ -783,6 +784,58 @@ export async function createBrijioMcpServer (
           {
             type: 'text',
             text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  // ── Capture Screenshot Tool (ADR 0064) ────────────────────────────────
+
+  server.registerTool(
+    'capture_screenshot',
+    {
+      title: 'Capture Screenshot',
+      description:
+        'Capture a viewport screenshot of the current browser tab. ' +
+        'Returns JPEG image (quality 80) as base64 data. ' +
+        'Requires a vision-model capable agent to interpret.',
+      inputSchema: {
+        browserInstanceId: browserInstanceIdInput,
+        tabId: tabIdInput
+      }
+    },
+    async (input) => {
+      logToolCall('capture_screenshot', input as Record<string, unknown>)
+      const result = await captureScreenshot(pageContextConfig, input)
+
+      if (!result.ok) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(result)
+            }
+          ],
+          isError: true
+        }
+      }
+
+      return {
+        content: [
+          {
+            type: 'image',
+            data: result.data.dataBase64,
+            mimeType: 'image/jpeg'
+          },
+          {
+            type: 'text',
+            text: JSON.stringify({
+              width: result.data.width,
+              height: result.data.height,
+              tabId: result.data.tabId,
+              capturedAt: result.data.capturedAt
+            })
           }
         ]
       }
