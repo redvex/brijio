@@ -8,7 +8,6 @@ import {
   type PageNavigationResult,
   type PageReadResult,
   type TabListerAdapter,
-  type ScreenshotResult,
   normalizeBridgeSettings,
   readActiveTabPage as sharedReadActiveTabPage,
   type ActiveTabDeps,

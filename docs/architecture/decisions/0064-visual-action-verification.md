@@ -106,10 +106,10 @@ export interface CaptureScreenshotErrorResponse {
 ```ts
 export type ScreenshotResult =
   | { ok: true; data: { dataBase64: string; width: number; height: number } }
-  | { ok: false; error: { code: string; message: string } }
+  | { ok: false; error: { code: string; message: string } };
 
 export interface PageScreenshotAdapter {
-  captureScreenshot: () => Promise<ScreenshotResult>
+  captureScreenshot: () => Promise<ScreenshotResult>;
 }
 ```
 
@@ -117,22 +117,23 @@ export interface PageScreenshotAdapter {
 
 ```ts
 export interface CaptureScreenshotInput {
-  browserInstanceId?: unknown
-  tabId?: unknown  // Optional - must be the active tab if provided
+  browserInstanceId?: unknown;
+  tabId?: unknown; // Optional - must be the active tab if provided
 }
 
 export async function captureScreenshot(
   config: BrijioPageActionsConfig,
-  input: CaptureScreenshotInput
+  input: CaptureScreenshotInput,
 ): Promise<{
   content: Array<
-    | { type: 'image'; data: string; mimeType: 'image/jpeg' }
-    | { type: 'text'; text: string }
-  >
-}>
+    | { type: "image"; data: string; mimeType: "image/jpeg" }
+    | { type: "text"; text: string }
+  >;
+}>;
 ```
 
 **tabId handling logic:**
+
 - If `tabId` is provided: query for active tab, validate it matches the provided `tabId`, error with `invalid_browser_target` if not
 - If no `tabId`: use `captureVisibleTab()` on the active tab in the current window
 
@@ -174,8 +175,11 @@ export interface BrowserApi {
   // ... existing properties
   tabs: {
     // ... existing methods
-    captureVisibleTab: (windowId: number | undefined, options: { format?: string; quality?: number }) => Promise<string>
-  }
+    captureVisibleTab: (
+      windowId: number | undefined,
+      options: { format?: string; quality?: number },
+    ) => Promise<string>;
+  };
 }
 ```
 

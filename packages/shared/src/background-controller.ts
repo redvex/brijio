@@ -277,8 +277,8 @@ export interface ApprovalAdapter {
 
 export interface TabListerAdapter {
   listTabs: () => Promise<
-    | { ok: true, data: { tabs: TabInfo[] } }
-    | { ok: false, error: { code: string, message: string } }
+  | { ok: true, data: { tabs: TabInfo[] } }
+  | { ok: false, error: { code: string, message: string } }
   >
 }
 
@@ -717,7 +717,6 @@ export class BrijioBackgroundController {
       } finally {
         this.pendingRequestCount--
       }
-      return
     }
   }
 
@@ -1229,7 +1228,7 @@ export class BrijioBackgroundController {
         JSON.stringify(
           createScreenshotErrorResponse(
             requestId,
-            result.error.code as ScreenshotErrorCode,
+            result.error.code,
             result.error.message
           )
         )
