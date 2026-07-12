@@ -413,6 +413,17 @@ export type NavigateToUrlParseResult =
   | BrijioNavigateToUrlResult
   | { ok: false, ignored: true }
 
+// --- Open tab types (ADR 0063) ---
+
+import { type OpenTabResult } from '@brijio/shared'
+
+export type BrijioOpenTabResult =
+  BrijioResourceResult<OpenTabResult>
+
+export type OpenTabParseResult =
+  | BrijioOpenTabResult
+  | { ok: false, ignored: true }
+
 // --- Batch result types (ADR 0044) ---
 
 export interface BatchActionError {
@@ -484,6 +495,20 @@ export function createNavigateToUrlEnvelope (
     id: requestId,
     payload: {
       type: 'navigate_to_url',
+      url
+    }
+  }
+}
+
+export function createOpenTabEnvelope (
+  requestId: string,
+  url: string
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'open_tab',
       url
     }
   }
@@ -1136,6 +1161,58 @@ export function parseNavigateToUrlEnvelope (
   }
 
   return invalidResponse()
+}
+
+export function parseOpenTabEnvelope (
+  value: unknown,
+  requestId: string
+): OpenTabParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  if (value.payload.type !== 'open_tab_response') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok === true) {
+    if (!isOpenTabResultData(value.payload.data)) {
+      return invalidResponse()
+    }
+
+    return {
+      ok: true,
+      data: value.payload.data
+    }
+  }
+
+  if (value.payload.ok === false) {
+    return parseErrorPayload(value.payload, invalidResponse())
+  }
+
+  return invalidResponse()
+}
+
+export function isOpenTabResultData (
+  value: unknown
+): value is OpenTabResult {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    typeof value.tabId === 'string' &&
+    typeof value.url === 'string' &&
+    typeof value.title === 'string'
+  )
 }
 
 export function parseDownloadStatusEnvelope (
