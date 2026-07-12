@@ -32,6 +32,9 @@ safari-ios-xcode:
 		--no-open \
 		--bundle-identifier uk.co.redvex.Brijio \
 		--project-location clients/extensions/safari/Brijio-iOS \
+		CODE_SIGN_STYLE="Manual" \
+		CODE_SIGN_IDENTITY="Developer ID Application: GIOVANNI MAZZA (C932AF9CU7)" \
+		DEVELOPMENT_TEAM="C932AF9CU7" \
 		clients/extensions/safari/dist-ios
 
 safari-macos-xcode:
