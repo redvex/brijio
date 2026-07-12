@@ -14,11 +14,14 @@ import {
   createActionResultResponse,
   createNavigateToUrlResponse,
   createNavigateToUrlErrorResponse,
+  createOpenTabResponse,
+  createOpenTabErrorResponse,
   isListTabsEnvelope,
   isPerformActionEnvelope,
   isGetPageContentEnvelope,
   isGetPageContextEnvelope,
   isNavigateToUrlEnvelope,
+  isOpenTabEnvelope,
   isTabListResponsePayload,
   parseBrijioEnvelope
 } from './protocol.js'
@@ -825,6 +828,123 @@ void describe('navigate_to_url protocol helpers', () => {
     assert.equal(response.payload.type, 'tab_list_response')
     assert.equal(response.id, 'tabs-4')
     assert.deepEqual(response.payload.data.tabs, tabs)
+  })
+})
+
+void describe('open_tab protocol helpers', () => {
+  void it('recognizes open_tab message envelopes', () => {
+    assert.equal(
+      isOpenTabEnvelope({
+        type: 'message',
+        id: 'request-1',
+        payload: {
+          type: 'open_tab',
+          url: 'https://example.com/'
+        }
+      }),
+      true
+    )
+  })
+
+  void it('recognizes open_tab envelopes without id', () => {
+    assert.equal(
+      isOpenTabEnvelope({
+        type: 'message',
+        payload: {
+          type: 'open_tab',
+          url: 'https://example.com/'
+        }
+      }),
+      true
+    )
+  })
+
+  void it('rejects open_tab envelopes with invalid url', () => {
+    assert.equal(
+      isOpenTabEnvelope({
+        type: 'message',
+        id: 'request-2',
+        payload: {
+          type: 'open_tab',
+          url: 42
+        }
+      }),
+      false
+    )
+  })
+
+  void it('rejects envelopes with wrong payload type', () => {
+    assert.equal(
+      isOpenTabEnvelope({
+        type: 'message',
+        id: 'request-3',
+        payload: {
+          type: 'get_page_context'
+        }
+      }),
+      false
+    )
+  })
+
+  void it('builds open_tab success responses', () => {
+    assert.deepEqual(
+      createOpenTabResponse('open-1', {
+        tabId: '42',
+        url: 'https://example.com/',
+        title: 'Example Domain'
+      }),
+      {
+        type: 'message',
+        id: 'open-1',
+        payload: {
+          type: 'open_tab_response',
+          ok: true,
+          data: {
+            tabId: '42',
+            url: 'https://example.com/',
+            title: 'Example Domain'
+          }
+        }
+      }
+    )
+  })
+
+  void it('builds open_tab error responses', () => {
+    assert.deepEqual(
+      createOpenTabErrorResponse(
+        'open-2',
+        'open_tab_failed',
+        'Failed to open tab: browser blocked the request.'
+      ),
+      {
+        type: 'message',
+        id: 'open-2',
+        payload: {
+          type: 'open_tab_response',
+          ok: false,
+          error: {
+            code: 'open_tab_failed',
+            message: 'Failed to open tab: browser blocked the request.'
+          }
+        }
+      }
+    )
+  })
+
+  void it('parses open_tab envelopes through parseBrijioEnvelope', () => {
+    const envelope: { type: 'message', id: string, payload: { type: 'open_tab', url: string } } = {
+      type: 'message',
+      id: 'open-3',
+      payload: {
+        type: 'open_tab',
+        url: 'https://example.com/'
+      }
+    }
+
+    assert.deepEqual(parseBrijioEnvelope(JSON.stringify(envelope)), {
+      ok: true,
+      message: envelope
+    })
   })
 })
 

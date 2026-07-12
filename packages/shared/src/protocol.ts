@@ -847,6 +847,42 @@ export type NavigateToUrlErrorCode =
   | 'timeout'
   | 'content_script_unavailable'
 
+// --- Open tab types (ADR 0063) ---
+
+export interface OpenTabRequest {
+  type: 'open_tab'
+  url: string
+}
+
+export interface OpenTabResult {
+  /** New tab ID (raw Chrome/Safari tab ID as string) */
+  tabId: string
+  /** The URL the tab was opened with */
+  url: string
+  /** Page title (may be empty until the page loads) */
+  title: string
+}
+
+export interface OpenTabResponse {
+  type: 'open_tab_response'
+  ok: true
+  data: OpenTabResult
+}
+
+export interface OpenTabErrorResponse {
+  type: 'open_tab_response'
+  ok: false
+  error: {
+    code: OpenTabErrorCode
+    message: string
+  }
+}
+
+export type OpenTabErrorCode =
+  | 'unsupported_scheme'
+  | 'open_tab_failed'
+  | 'timeout'
+
 export type ExtensionResponse =
   | PageContextResponse
   | PageContextErrorResponse
@@ -856,6 +892,8 @@ export type ExtensionResponse =
   | ActionResultErrorResponse
   | NavigateToUrlResponse
   | NavigateToUrlErrorResponse
+  | OpenTabResponse
+  | OpenTabErrorResponse
   | BatchResultResponse
   | BatchResultErrorResponse
   | DownloadStatusResponse
@@ -1245,6 +1283,58 @@ export function createNavigateToUrlErrorResponse (
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'navigate_to_url_response',
+    ok: false,
+    error: {
+      code,
+      message
+    }
+  })
+}
+
+export function isOpenTabEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: OpenTabRequest } {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  if (value.type !== 'message') {
+    return false
+  }
+
+  if (Object.hasOwn(value, 'id') && typeof value.id !== 'string') {
+    return false
+  }
+
+  if (!isRecord(value.payload)) {
+    return false
+  }
+
+  if (value.payload.type !== 'open_tab') {
+    return false
+  }
+
+  return typeof value.payload.url === 'string'
+}
+
+export function createOpenTabResponse (
+  id: string | undefined,
+  result: OpenTabResult
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'open_tab_response',
+    ok: true,
+    data: result
+  })
+}
+
+export function createOpenTabErrorResponse (
+  id: string | undefined,
+  code: OpenTabErrorCode,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'open_tab_response',
     ok: false,
     error: {
       code,
