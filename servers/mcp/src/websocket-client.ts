@@ -7,6 +7,7 @@ import {
   type BrijioTabListResult,
   type BrijioFillInputResult,
   type BrijioNavigateToUrlResult,
+  type BrijioOpenTabResult,
   type BrijioPageContentResult,
   type BrijioPageContextResult,
   type BrijioResourceResult,
@@ -22,6 +23,7 @@ import {
   createClickElementEnvelope,
   createFillInputEnvelope,
   createNavigateToUrlEnvelope,
+  createOpenTabEnvelope,
   createPerformBatchEnvelope,
   createSelectOptionsEnvelope,
   createSetCheckedEnvelope,
@@ -49,6 +51,7 @@ import {
   parseDownloadFileEnvelope,
   parseFetchResourceEnvelope,
   parseNavigateToUrlEnvelope,
+  parseOpenTabEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
   parseRouterErrorEnvelope,
@@ -346,6 +349,26 @@ export async function requestNavigateToUrl (
     requestEnvelope: createNavigateToUrlEnvelope(requestId, options.url),
     parseEnvelope: (value) => parseNavigateToUrlEnvelope(value, requestId),
     timeoutMessage: 'Timed out waiting for a browser navigation response.'
+  })
+}
+
+export interface OpenTabRequestOptions extends PageContextRequestOptions {
+  url: string
+}
+
+export async function requestOpenTab (
+  options: OpenTabRequestOptions
+): Promise<BrijioOpenTabResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    requestEnvelope: createOpenTabEnvelope(requestId, options.url),
+    parseEnvelope: (value) => parseOpenTabEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for an open tab response.'
   })
 }
 
