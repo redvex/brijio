@@ -1,3 +1,5 @@
+import { type OpenTabResult } from '@brijio/shared'
+
 export interface TabInfo {
   tabId: string
   windowId: string
@@ -414,8 +416,6 @@ export type NavigateToUrlParseResult =
   | { ok: false, ignored: true }
 
 // --- Open tab types (ADR 0063) ---
-
-import { type OpenTabResult } from '@brijio/shared'
 
 export type BrijioOpenTabResult =
   BrijioResourceResult<OpenTabResult>

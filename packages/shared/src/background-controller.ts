@@ -37,6 +37,7 @@ import {
   type ClickActionTarget,
   type NavigateToUrlErrorCode,
   type NavigateToUrlResult,
+  type OpenTabErrorCode,
   type SelectOptionsActionResultData,
   type SetCheckedActionResultData,
   type SubmitFormActionResultData,
@@ -193,12 +194,12 @@ export interface PageNavigationAdapter {
   navigateToUrl: (url: string, tabId?: number) => Promise<PageNavigationResult>
 }
 
-export type OpenTabResult =
+export type PageOpenTabResult =
   | { ok: true, data: { tabId: string, url: string, title: string } }
   | { ok: false, error: { code: string, message: string } }
 
 export interface PageOpenTabAdapter {
-  openTab: (url: string) => Promise<OpenTabResult>
+  openTab: (url: string) => Promise<PageOpenTabResult>
 }
 
 export type DownloadStatusResult =
@@ -966,7 +967,7 @@ export class BrijioBackgroundController {
       return
     }
 
-    let result: OpenTabResult
+    let result: PageOpenTabResult
     try {
       result = await this.options.pageOpenTab.openTab(url)
     } catch (error: unknown) {
@@ -985,7 +986,7 @@ export class BrijioBackgroundController {
         JSON.stringify(
           createOpenTabErrorResponse(
             requestId,
-            result.error.code,
+            result.error.code as OpenTabErrorCode,
             result.error.message
           )
         )

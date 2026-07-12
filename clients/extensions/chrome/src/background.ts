@@ -7,6 +7,7 @@ import {
   type PageActionResult,
   type BrijioSocket,
   type PageNavigationResult,
+  type PageOpenTabResult,
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
   type FileUploadPayload,
@@ -487,6 +488,33 @@ const controller = new BrijioBackgroundController({
   pageNavigation: {
     async navigateToUrl (url: string, tabId?: number) {
       return await navigateActiveTabToUrl(url, tabId)
+    }
+  },
+  pageOpenTab: {
+    async openTab (url: string): Promise<PageOpenTabResult> {
+      try {
+        const tab = await chrome.tabs.create({ url }) as {
+          id?: number
+          url?: string
+          title?: string
+        }
+        return {
+          ok: true,
+          data: {
+            tabId: String(tab.id),
+            url: tab.url ?? url,
+            title: tab.title ?? ''
+          }
+        }
+      } catch (error: unknown) {
+        return {
+          ok: false,
+          error: {
+            code: 'open_tab_failed',
+            message: error instanceof Error ? error.message : 'Failed to open tab.'
+          }
+        }
+      }
     }
   },
   tabLister,
