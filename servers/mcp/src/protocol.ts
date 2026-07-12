@@ -486,6 +486,23 @@ export type FetchResourceParseResult =
   | BrijioFetchResourceResult
   | { ok: false, ignored: true }
 
+// --- Screenshot types (ADR 0064) ---
+
+export interface ScreenshotResultData {
+  dataBase64: string
+  width: number
+  height: number
+  tabId: string
+  capturedAt: string
+}
+
+export type BrijioScreenshotResult =
+  BrijioResourceResult<ScreenshotResultData>
+
+export type ScreenshotParseResult =
+  | { ok: true, data: ScreenshotResultData }
+  | { ok: false, ignored: true }
+
 export function createNavigateToUrlEnvelope (
   requestId: string,
   url: string
@@ -522,6 +539,18 @@ export function createGetPageContextEnvelope (
     id: requestId,
     payload: {
       type: 'get_page_context'
+    }
+  }
+}
+
+export function createCaptureScreenshotEnvelope (
+  requestId: string
+): WebSocketEnvelope {
+  return {
+    type: 'message',
+    id: requestId,
+    payload: {
+      type: 'capture_screenshot'
     }
   }
 }
@@ -1212,6 +1241,62 @@ export function isOpenTabResultData (
     typeof value.tabId === 'string' &&
     typeof value.url === 'string' &&
     typeof value.title === 'string'
+  )
+}
+
+// --- Screenshot parsing (ADR 0064) ---
+
+export function parseScreenshotEnvelope (
+  value: unknown,
+  requestId: string
+): ScreenshotParseResult {
+  if (!isRecord(value) || value.type !== 'message') {
+    return invalidResponse()
+  }
+
+  if (value.id !== requestId) {
+    return { ok: false, ignored: true }
+  }
+
+  if (!isRecord(value.payload)) {
+    return invalidResponse()
+  }
+
+  if (value.payload.type !== 'screenshot_response') {
+    return invalidResponse()
+  }
+
+  if (value.payload.ok === true) {
+    if (!isScreenshotResultData(value.payload.data)) {
+      return invalidResponse()
+    }
+
+    return {
+      ok: true,
+      data: value.payload.data
+    }
+  }
+
+  if (value.payload.ok === false) {
+    return parseErrorPayload(value.payload, invalidResponse())
+  }
+
+  return invalidResponse()
+}
+
+export function isScreenshotResultData (
+  value: unknown
+): value is ScreenshotResultData {
+  if (!isRecord(value)) {
+    return false
+  }
+
+  return (
+    typeof value.dataBase64 === 'string' &&
+    typeof value.width === 'number' &&
+    typeof value.height === 'number' &&
+    typeof value.tabId === 'string' &&
+    typeof value.capturedAt === 'string'
   )
 }
 
