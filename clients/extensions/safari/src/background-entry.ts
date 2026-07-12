@@ -18,6 +18,7 @@ import {
   type FileUploadPayload,
   type FormSubmitTarget,
   type PageActionResult,
+  type PageOpenTabResult,
   stringValue,
   requireString,
   createBrowserInstanceId,
@@ -127,6 +128,33 @@ const pageBatch = {
 }
 
 const pageNavigation = new SafariPageNavigationAdapter(browser.tabs)
+const pageOpenTab = {
+  async openTab (url: string): Promise<PageOpenTabResult> {
+    try {
+      const result = await browser.tabs.create({ url }) as {
+        id?: number
+        url?: string
+        title?: string
+      }
+      return {
+        ok: true,
+        data: {
+          tabId: String(result.id),
+          url: result.url ?? url,
+          title: result.title ?? ''
+        }
+      }
+    } catch (error: unknown) {
+      return {
+        ok: false,
+        error: {
+          code: 'open_tab_failed',
+          message: error instanceof Error ? error.message : 'Failed to open tab.'
+        }
+      }
+    }
+  }
+}
 const download = new SafariDownloadAdapter(browser.tabs)
 const approval = createSafariApprovalAdapter(browser)
 
@@ -144,6 +172,7 @@ const controller = new BrijioBackgroundController({
   pageActions,
   pageBatch,
   pageNavigation,
+  pageOpenTab,
   tabLister,
   approval,
   timers: createGlobalTimers()
