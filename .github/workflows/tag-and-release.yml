@@ -265,6 +265,140 @@ jobs:
             --project-location "${GITHUB_WORKSPACE}/safari-macos-release" \
             clients/extensions/safari/dist-macos
 
+      # ── Signed macOS app build (requires Apple Developer ID secrets) ──────
+      # The following steps build a signed, notarized, stapled .app bundle
+      # and upload it as a release asset. When the Apple secrets are not
+      # configured, these steps are skipped and only the unsigned Xcode
+      # project ZIP is uploaded (backward-compatible with v0.2.0 behaviour).
+      #
+      # Required GitHub secrets / variables:
+      #   APPLE_DEVID_CERTIFICATE_P12       – base64-encoded .p12 (cert + private key) [secret]
+      #   APPLE_DEVID_CERTIFICATE_PASSWORD  – password used when exporting the .p12 [secret]
+      #   APPLE_DEVID_IDENTITY_NAME         – "Developer ID Application: Your Name (TEAMID)" [var]
+      #   APPLE_TEAM_ID                     – Apple Developer Team ID [secret]
+      #   APPLE_ID                          – Apple ID email (for notarization) [secret]
+      #   APPLE_ID_APP_PASSWORD             – app-specific password (appleid.apple.com) [secret]
+
+      - name: Check Apple signing secrets
+        id: check-signing
+        if: steps.convert-safari-macos.outcome == 'success'
+        env:
+          HAS_CERT: ${{ secrets.APPLE_DEVID_CERTIFICATE_P12 }}
+        run: |
+          if [ -n "$HAS_CERT" ]; then
+            echo "can_sign=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "can_sign=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Import Developer ID certificate
+        id: import-cert
+        if: steps.check-signing.outputs.can_sign == 'true'
+        env:
+          APPLE_DEVID_CERTIFICATE_P12: ${{ secrets.APPLE_DEVID_CERTIFICATE_P12 }}
+          APPLE_DEVID_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_DEVID_CERTIFICATE_PASSWORD }}
+        run: |
+          # Create a temporary keychain for the signing certificate.
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 32)"
+          KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+          # Import the .p12 certificate into the temporary keychain.
+          CERT_PATH="$RUNNER_TEMP/developer-id.p12"
+          echo "$APPLE_DEVID_CERTIFICATE_P12" | base64 --decode > "$CERT_PATH"
+          security import "$CERT_PATH" \
+            -P "$APPLE_DEVID_CERTIFICATE_PASSWORD" \
+            -k "$KEYCHAIN_PATH" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/xcodebuild \
+            -T /usr/bin/security
+
+          # Add the temporary keychain to the search list so xcodebuild can find it.
+          security list-keychains -d user -s "$KEYCHAIN_PATH" "$(security list-keychains -d user | tr -d '"')"
+
+          # Persist keychain path for later steps.
+          echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
+          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD" >> "$GITHUB_ENV"
+
+      - name: Build signed macOS app
+        id: build-signed-app
+        if: steps.import-cert.outcome == 'success'
+        env:
+          APPLE_DEVID_IDENTITY_NAME: ${{ vars.APPLE_DEVID_IDENTITY_NAME }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+
+          # The safari-web-extension-converter creates a project at
+          # safari-macos-release/Brijio/Brijio.xcodeproj with scheme "Brijio".
+          xcodebuild \
+            -project safari-macos-release/Brijio/Brijio.xcodeproj \
+            -scheme Brijio \
+            -configuration Release \
+            -derivedDataPath "$RUNNER_TEMP/build" \
+            CODE_SIGN_STYLE="Manual" \
+            CODE_SIGN_IDENTITY="$APPLE_DEVID_IDENTITY_NAME" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            build
+
+          # Locate the built .app bundle.
+          APP_PATH="$RUNNER_TEMP/build/Build/Products/Release/Brijio.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "::error::Brijio.app not found at $APP_PATH"
+            exit 1
+          fi
+
+          echo "APP_PATH=$APP_PATH" >> "$GITHUB_ENV"
+
+      - name: Notarize macOS app
+        id: notarize-app
+        if: steps.build-signed-app.outcome == 'success'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_APP_PASSWORD: ${{ secrets.APPLE_ID_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # Submit the .app for notarization and wait for the result.
+          xcrun notarytool submit "$APP_PATH" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_APP_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+      - name: Staple notarization ticket
+        if: steps.notarize-app.outcome == 'success'
+        run: |
+          xcrun stapler staple "$APP_PATH"
+          # Verify the staple.
+          xcrun stapler validate "$APP_PATH"
+
+      - name: Create signed macOS app ZIP
+        id: signed-app-zip
+        if: steps.notarize-app.outcome == 'success'
+        run: |
+          VERSION="${{ needs.release.outputs.version }}"
+          cd "$(dirname "$APP_PATH")"
+          ditto -c -k --keepParent "$(basename "$APP_PATH")" \
+            "${GITHUB_WORKSPACE}/brijio-safari-macos-${VERSION}.zip"
+          echo "SIGNED_ASSET=brijio-safari-macos-${VERSION}.zip" >> "$GITHUB_OUTPUT"
+
+      - name: Cleanup signing keychain
+        if: always() && env.KEYCHAIN_PATH != ''
+        run: |
+          security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
+
+      - name: Upload signed macOS app asset
+        if: steps.signed-app-zip.outcome == 'success'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.release.outputs.version }}
+          files: brijio-safari-macos-${{ needs.release.outputs.version }}.zip
+
+      # ── Unsigned Xcode project ZIPs (fallback when no signing secrets) ────
+
       - name: Create iOS Safari Xcode project ZIP
         if: steps.convert-safari-ios.outcome == 'success'
         run: |
