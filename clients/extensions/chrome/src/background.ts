@@ -16,7 +16,6 @@ import {
   type ContentBatchRequest,
   type BatchResult,
   type DownloadAdapter,
-  type PageScreenshotAdapter,
   stringValue,
   requireString,
   createBrowserInstanceId,
