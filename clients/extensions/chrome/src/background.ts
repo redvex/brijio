@@ -8,6 +8,7 @@ import {
   type BrijioSocket,
   type PageNavigationResult,
   type PageOpenTabResult,
+  type ScreenshotResult,
   type WriteTextEditableTarget,
   type WriteTextActionTarget,
   type FileUploadPayload,
@@ -15,6 +16,7 @@ import {
   type ContentBatchRequest,
   type BatchResult,
   type DownloadAdapter,
+  type PageScreenshotAdapter,
   stringValue,
   requireString,
   createBrowserInstanceId,
@@ -106,6 +108,10 @@ export interface ChromeApi {
     update: (tabId: number, updateProperties: { url: string }) => Promise<
     { id?: number, title?: string, url?: string }
     >
+    captureVisibleTab: (
+      windowId?: number,
+      options?: { format?: string, quality?: number }
+    ) => Promise<string>
   }
 }
 
@@ -514,6 +520,42 @@ const controller = new BrijioBackgroundController({
             message: error instanceof Error ? error.message : 'Failed to open tab.'
           }
         }
+      }
+    }
+  },
+  // Screenshot adapter (ADR 0064)
+  pageScreenshot: {
+    async captureScreenshot (): Promise<ScreenshotResult> {
+      try {
+        const activeTab = await chrome.tabs.query({ active: true, currentWindow: true })
+        const tabId = activeTab[0]?.id
+        const dataUrl = await chrome.tabs.captureVisibleTab(undefined, {
+          format: 'jpeg',
+          quality: 80
+        })
+        // Strip the "data:image/jpeg;base64," prefix
+        const dataBase64 = dataUrl.startsWith('data:image')
+          ? dataUrl.split(',')[1] ?? ''
+          : dataUrl
+        // Chrome doesn't provide dimensions directly; we'd need to decode the image.
+        // For now, return 0s and get real dimensions via image decode in the response handler.
+        return {
+          ok: true,
+          data: {
+            dataBase64,
+            width: 0,
+            height: 0,
+            tabId: tabId !== undefined ? String(tabId) : undefined,
+            capturedAt: new Date().toISOString()
+          }
+        }
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Screenshot capture failed.'
+        // Permission errors indicate the capability isn't supported
+        if (message.toLowerCase().includes('permission')) {
+          return { ok: false, error: { code: 'capability_not_supported', message } }
+        }
+        return { ok: false, error: { code: 'capture_failed', message } }
       }
     }
   },

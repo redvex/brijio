@@ -19,6 +19,7 @@ import {
   type FormSubmitTarget,
   type PageActionResult,
   type PageOpenTabResult,
+  type ScreenshotResult,
   stringValue,
   requireString,
   createBrowserInstanceId,
@@ -155,6 +156,48 @@ const pageOpenTab = {
     }
   }
 }
+
+// Screenshot adapter (ADR 0064)
+// Safari supports browser.tabs.captureVisibleTab() — same WebExtensions API as Chrome.
+const pageScreenshot: {
+  captureScreenshot: () => Promise<ScreenshotResult>
+} = {
+  async captureScreenshot (): Promise<ScreenshotResult> {
+    try {
+      const activeTab = await browser.tabs.query({ active: true, currentWindow: true })
+      const tabId = activeTab[0]?.id
+
+      const dataUrl = await browser.tabs.captureVisibleTab(undefined, {
+        format: 'jpeg',
+        quality: 80
+      })
+
+      // Strip the "data:image/jpeg;base64," prefix
+      const dataBase64 = dataUrl.startsWith('data:image')
+        ? dataUrl.split(',')[1] ?? ''
+        : dataUrl
+
+      return {
+        ok: true,
+        data: {
+          dataBase64,
+          width: 0,
+          height: 0,
+          tabId: tabId !== undefined ? String(tabId) : undefined,
+          capturedAt: new Date().toISOString()
+        }
+      }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Screenshot capture failed.'
+      // Permission errors indicate the capability isn't supported
+      if (message.toLowerCase().includes('permission')) {
+        return { ok: false, error: { code: 'capability_not_supported', message } }
+      }
+      return { ok: false, error: { code: 'capture_failed', message } }
+    }
+  }
+}
+
 const download = new SafariDownloadAdapter(browser.tabs)
 const approval = createSafariApprovalAdapter(browser)
 
@@ -173,6 +216,7 @@ const controller = new BrijioBackgroundController({
   pageBatch,
   pageNavigation,
   pageOpenTab,
+  pageScreenshot,
   tabLister,
   approval,
   timers: createGlobalTimers()

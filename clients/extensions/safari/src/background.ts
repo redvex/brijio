@@ -8,6 +8,7 @@ import {
   type PageNavigationResult,
   type PageReadResult,
   type TabListerAdapter,
+  type ScreenshotResult,
   normalizeBridgeSettings,
   readActiveTabPage as sharedReadActiveTabPage,
   type ActiveTabDeps,
@@ -88,6 +89,10 @@ export interface BrowserApi {
     update: (tabId: number, updateProperties: { url: string }) => Promise<
     { id?: number, title?: string, url?: string }
     >
+    captureVisibleTab: (
+      windowId?: number,
+      options?: { format?: 'jpeg' | 'png', quality?: number }
+    ) => Promise<string>
   }
 }
 
