@@ -10,14 +10,17 @@ import {
   createSubmitFormEnvelope,
   createWriteEditableEnvelope,
   createNavigateToUrlEnvelope,
+  createOpenTabEnvelope,
   createDownloadFileEnvelope,
   createFetchResourceEnvelope,
   parseActionResultEnvelope,
   parsePageContentEnvelope,
   parsePageContextEnvelope,
   parseNavigateToUrlEnvelope,
+  parseOpenTabEnvelope,
   parseRouterErrorEnvelope,
   isNavigateToUrlResultData,
+  isOpenTabResultData,
   unsupportedSchemeResponse
 } from './protocol.js'
 
@@ -1148,5 +1151,140 @@ void describe('parseErrorPayload extension-specific codes', () => {
       assert.equal(result.error.message, 'Page has navigated since last context read.')
       assert.ok('detail' in result.error)
     }
+  })
+})
+
+void describe('MCP open_tab protocol helpers', () => {
+  void it('creates an open_tab envelope with the request ID and url', () => {
+    assert.deepEqual(
+      createOpenTabEnvelope('request-open-1', 'https://example.com/'),
+      {
+        type: 'message',
+        id: 'request-open-1',
+        payload: {
+          type: 'open_tab',
+          url: 'https://example.com/'
+        }
+      }
+    )
+  })
+
+  void it('parses a successful matching open_tab response', () => {
+    const result = parseOpenTabEnvelope(
+      {
+        type: 'message',
+        id: 'open-1',
+        payload: {
+          type: 'open_tab_response',
+          ok: true,
+          data: {
+            tabId: 'tab-123',
+            url: 'https://example.com/',
+            title: 'Example Domain'
+          }
+        }
+      },
+      'open-1'
+    )
+
+    assert.deepEqual(result, {
+      ok: true,
+      data: {
+        tabId: 'tab-123',
+        url: 'https://example.com/',
+        title: 'Example Domain'
+      }
+    })
+  })
+
+  void it('forwards the original error code for open_tab error responses', () => {
+    const result = parseOpenTabEnvelope(
+      {
+        type: 'message',
+        id: 'open-2',
+        payload: {
+          type: 'open_tab_response',
+          ok: false,
+          error: {
+            code: 'open_tab_failed',
+            message: 'Could not open tab.'
+          }
+        }
+      },
+      'open-2'
+    )
+
+    assert.deepEqual(result, {
+      ok: false,
+      error: {
+        code: 'open_tab_failed',
+        message: 'Could not open tab.'
+      }
+    })
+  })
+
+  void it('ignores envelopes for a different request ID', () => {
+    const result = parseOpenTabEnvelope(
+      {
+        type: 'message',
+        id: 'open-3',
+        payload: {
+          type: 'open_tab_response',
+          ok: true,
+          data: {
+            tabId: 'tab-999',
+            url: 'https://example.com/',
+            title: 'Example'
+          }
+        }
+      },
+      'open-different'
+    )
+
+    assert.deepEqual(result, { ok: false, ignored: true })
+  })
+
+  void it('returns invalid_response for malformed open_tab responses', () => {
+    const result = parseOpenTabEnvelope(
+      {
+        type: 'message',
+        id: 'open-4',
+        payload: {
+          type: 'open_tab_response',
+          ok: true,
+          data: {
+            tabId: 'tab-1',
+            url: 'https://example.com/'
+          }
+        }
+      },
+      'open-4'
+    )
+
+    assert.equal(result.ok, false)
+    if (!result.ok) {
+      assert.equal(result.error.code, 'invalid_response')
+    }
+  })
+
+  void it('isOpenTabResultData validates correct shape', () => {
+    assert.equal(
+      isOpenTabResultData({
+        tabId: '42',
+        url: 'https://example.com/',
+        title: 'Example'
+      }),
+      true
+    )
+  })
+
+  void it('isOpenTabResultData rejects missing title', () => {
+    assert.equal(
+      isOpenTabResultData({
+        tabId: '42',
+        url: 'https://example.com/'
+      }),
+      false
+    )
   })
 })
