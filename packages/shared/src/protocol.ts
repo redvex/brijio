@@ -29,6 +29,7 @@ export type BrowserCapability =
   | 'download_status'
   | 'download_file'
   | 'fetch_resource'
+  | 'screenshot'
 
 export interface BrowserPresence {
   browserInstanceId: string
@@ -171,6 +172,47 @@ export interface StageFileUploadErrorEnvelope {
   payload: StageFileUploadErrorPayload
 }
 
+// --- Screenshot types (ADR 0064) ---
+
+export type ScreenshotErrorCode =
+  | 'capability_not_supported'
+  | 'capture_failed'
+  | 'no_visible_tab'
+  | 'timeout'
+
+export interface CaptureScreenshotRequest {
+  type: 'capture_screenshot'
+}
+
+export interface CaptureScreenshotResponse {
+  type: 'screenshot_response'
+  ok: true
+  data: {
+    dataBase64: string
+    width: number
+    height: number
+    tabId: string
+    capturedAt: string
+  }
+}
+
+export interface CaptureScreenshotErrorResponse {
+  type: 'screenshot_response'
+  ok: false
+  error: {
+    code: ScreenshotErrorCode
+    message: string
+  }
+}
+
+export type CaptureScreenshotResult =
+  | { ok: true, data: CaptureScreenshotResponse['data'] }
+  | { ok: false, error: { code: ScreenshotErrorCode, message: string } }
+
+export type CaptureScreenshotStreamMessage =
+  | CaptureScreenshotResponse
+  | CaptureScreenshotErrorResponse
+
 // --- Download & Fetch types (ADR 0047) ---
 
 export type DownloadState = 'in_progress' | 'complete' | 'interrupted'
@@ -292,6 +334,8 @@ export type FetchResourceStreamMessage =
   | FetchResourceChunkResponse
   | FetchResourceCompleteResponse
   | FetchResourceErrorResponse
+
+// --- Brijio error type (ADR 0047) ---
 
 export type BrijioErrorCode =
   | 'invalid_json'
@@ -901,6 +945,8 @@ export type ExtensionResponse =
   | DownloadFileResponse
   | DownloadFileErrorResponse
   | FetchResourceStreamMessage
+  | CaptureScreenshotResponse
+  | CaptureScreenshotErrorResponse
 
 export function createAuthEnvelope (input: {
   requestId?: string
@@ -1283,6 +1329,44 @@ export function createNavigateToUrlErrorResponse (
 ): WebSocketEnvelope {
   return createEnvelope(id, {
     type: 'navigate_to_url_response',
+    ok: false,
+    error: {
+      code,
+      message
+    }
+  })
+}
+
+export function isCaptureScreenshotEnvelope (
+  value: unknown
+): value is WebSocketEnvelope & { payload: CaptureScreenshotRequest } {
+  return hasPayloadType(value, 'capture_screenshot')
+}
+
+export function createScreenshotResponse (
+  id: string | undefined,
+  data: {
+    dataBase64: string
+    width: number
+    height: number
+    tabId: string
+    capturedAt: string
+  }
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'screenshot_response',
+    ok: true,
+    data
+  })
+}
+
+export function createScreenshotErrorResponse (
+  id: string | undefined,
+  code: ScreenshotErrorCode,
+  message: string
+): WebSocketEnvelope {
+  return createEnvelope(id, {
+    type: 'screenshot_response',
     ok: false,
     error: {
       code,
@@ -1954,7 +2038,8 @@ function isBrowserCapability (value: unknown): value is BrowserCapability {
     value === 'upload_file' ||
     value === 'download_status' ||
     value === 'download_file' ||
-    value === 'fetch_resource'
+    value === 'fetch_resource' ||
+    value === 'screenshot'
   )
 }
 

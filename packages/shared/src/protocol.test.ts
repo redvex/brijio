@@ -23,7 +23,10 @@ import {
   isNavigateToUrlEnvelope,
   isOpenTabEnvelope,
   isTabListResponsePayload,
-  parseBrijioEnvelope
+  parseBrijioEnvelope,
+  isCaptureScreenshotEnvelope,
+  createScreenshotResponse,
+  createScreenshotErrorResponse
 } from './protocol.js'
 import type { PageContext, TabInfo } from './protocol.js'
 
@@ -976,3 +979,78 @@ function createPageContextFixture (): PageContext {
     }
   }
 }
+
+// --- Screenshot types tests (ADR 0064) ---
+
+void describe('Screenshot protocol helpers', () => {
+  void it('recognizes capture_screenshot message envelopes', () => {
+    assert.equal(
+      isCaptureScreenshotEnvelope({
+        type: 'message',
+        id: 'screenshot-1',
+        payload: {
+          type: 'capture_screenshot'
+        }
+      }),
+      true
+    )
+  })
+
+  void it('rejects invalid capture_screenshot envelopes', () => {
+    assert.equal(
+      isCaptureScreenshotEnvelope({
+        type: 'message',
+        id: 'screenshot-2',
+        payload: {
+          type: 'screenshot_response'
+        }
+      }),
+      false
+    )
+  })
+
+  void it('builds screenshot responses with dimensions', () => {
+    assert.deepEqual(
+      createScreenshotResponse('screenshot-3', {
+        dataBase64: 'aGlzdG9y',
+        width: 1280,
+        height: 720,
+        tabId: '42',
+        capturedAt: '2026-07-12T10:00:00.000Z'
+      }),
+      {
+        type: 'message',
+        id: 'screenshot-3',
+        payload: {
+          type: 'screenshot_response',
+          ok: true,
+          data: {
+            dataBase64: 'aGlzdG9y',
+            width: 1280,
+            height: 720,
+            tabId: '42',
+            capturedAt: '2026-07-12T10:00:00.000Z'
+          }
+        }
+      }
+    )
+  })
+
+  void it('builds screenshot error responses', () => {
+    assert.deepEqual(
+      createScreenshotErrorResponse('screenshot-4', 'capability_not_supported', 'Screenshots not supported'),
+      {
+        type: 'message',
+        id: 'screenshot-4',
+        payload: {
+          type: 'screenshot_response',
+          ok: false,
+          error: {
+            code: 'capability_not_supported',
+            message: 'Screenshots not supported'
+          }
+        }
+      }
+    )
+  })
+})
