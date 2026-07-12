@@ -500,7 +500,7 @@ export type BrijioScreenshotResult =
   BrijioResourceResult<ScreenshotResultData>
 
 export type ScreenshotParseResult =
-  | { ok: true, data: ScreenshotResultData }
+  | BrijioScreenshotResult
   | { ok: false, ignored: true }
 
 export function createNavigateToUrlEnvelope (
