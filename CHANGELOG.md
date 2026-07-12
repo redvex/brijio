@@ -10,6 +10,50 @@ tags. Historical extension-only tags remain valid for older releases.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-12
+
+### Added
+
+- Added `list_tabs` tool, protocol types, and tabId targeting so agents can
+  list open browser tabs and direct actions at a specific tab (ADR 0060).
+- Added Chrome and Safari `tabLister` adapters with a tab indicator banner that
+  shows which tab is active (ADR 0060).
+- Threaded `tabId` through the entire action stack — MCP tools, page actions,
+  shared background controller, and Chrome/Safari extension adapters (ADR 0062).
+- Added `open_tab` tool and protocol types so agents can open new browser tabs
+  or navigate existing ones to a URL (ADR 0063).
+- Added `capture_screenshot` tool with WebSocket client and MCP integration,
+  including screenshot adapters for Chrome and Safari extensions (ADR 0064).
+- Added `PageScreenshotAdapter` and `handleScreenshotRequest` in the shared
+  package for cross-browser screenshot capture.
+- Added automatic signing and notarization for the macOS Safari extension in
+  the release CI workflow, producing a signed `Brijio.app` release asset.
+- Added a GitHub Pages marketing site with markdown-driven routes and a demo
+  page with responsive layout.
+- Added `serve:test-pages` script and pages-site assembly pipeline for local
+  preview and CI deployment.
+
+### Fixed
+
+- Fixed tab indicator auto-hide with `globalThis`-persisted state so the banner
+  disappears after 60 seconds.
+- Fixed `browserInstanceId` threading through `listTabs` and added
+  `defaultTabId` to config.
+- Fixed Safari extension to thread `tabId` and `visibleContextId` through all
+  adapters.
+- Fixed Chrome extension to thread `tabId` through all adapters.
+- Forwarded original error codes and messages from the WebSocket server and
+  extension through the MCP server (ADR 0061).
+- Fixed missing imports for `capture_screenshot` runtime.
+- Corrected Safari `captureVisibleTab` support documentation in ADR 0064.
+
+### Changed
+
+- Updated skills and OpenWiki documentation for `open_tab` action and
+  multi-tab `tabId` usage.
+
+[0.3.0]: https://github.com/redvex/brijio/releases/tag/v0.3.0
+
 ## [0.2.0] - 2026-06-18
 
 ### Added
@@ -167,3 +211,4 @@ browser extensions and AI agents via the Model Context Protocol.
 
 [0.1.0]: https://github.com/brijio/mcp/releases/tag/v0.1.0
 [0.1.2]: https://github.com/redvex/brijio/releases/tag/v0.1.2
+[0.2.0]: https://github.com/redvex/brijio/releases/tag/v0.2.0
