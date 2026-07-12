@@ -41,7 +41,7 @@ Viewport-only keeps this MEDIUM scope. Full-page scroll-stitch (lazy loading, fi
 
 ### Safari considerations
 
-Safari MV2's `captureVisibleTab` support is limited. The extension already has `*://*/*` host permissions. If Safari does not support viewport capture, the tool returns `capability_not_supported` error (matching `download_status` pattern in P1.7).
+Safari 14+ supports `browser.tabs.captureVisibleTab()` via the WebExtensions API (same as Chrome). The extension already has `*://*/*` host permissions and `activeTab`, which covers the requirement. Permission errors at runtime still return `capability_not_supported` as a defensive fallback.
 
 ### Protocol messages
 
@@ -174,16 +174,16 @@ export interface BrowserApi {
   // ... existing properties
   tabs: {
     // ... existing methods
-    captureVisibleTab?: (windowId: number | undefined, options: { format?: string; quality?: number }) => Promise<string>
+    captureVisibleTab: (windowId: number | undefined, options: { format?: string; quality?: number }) => Promise<string>
   }
 }
 ```
 
-Safari MV2's `captureVisibleTab` support is limited. If the API is unavailable or throws a permission error, return `capability_not_supported`. This matches the pattern used in P1.7 for Safari download limitations.
+Safari 14+ supports `browser.tabs.captureVisibleTab()` natively. Permission errors at runtime return `capability_not_supported` as a defensive fallback.
 
 ### Capability announcement
 
-Extension includes `'screenshot'` in its `BrowserPresence.capabilities` array when the browser supports it. Safari may omit this capability.
+Extension includes `'screenshot'` in its `BrowserPresence.capabilities` array.
 
 ## Consequences
 
@@ -196,7 +196,6 @@ Extension includes `'screenshot'` in its `BrowserPresence.capabilities` array wh
 
 ### Negative
 
-- Safari may not support screenshots (returns `capability_not_supported`)
 - Only viewport — content below the fold is missed
 - Agent cannot screenshot background tabs
 
