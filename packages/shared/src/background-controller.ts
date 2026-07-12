@@ -13,6 +13,8 @@ import {
   createFetchResourceErrorResponse,
   createNavigateToUrlErrorResponse,
   createNavigateToUrlResponse,
+  createOpenTabErrorResponse,
+  createOpenTabResponse,
   createPageContentErrorResponse,
   createPageContentResponse,
   createPageContextErrorResponse,
@@ -27,6 +29,7 @@ import {
   isGetPageContextEnvelope,
   isListTabsEnvelope,
   isNavigateToUrlEnvelope,
+  isOpenTabEnvelope,
   isPerformActionEnvelope,
   isPerformBatchEnvelope,
   type ActionResultData,
@@ -190,6 +193,14 @@ export interface PageNavigationAdapter {
   navigateToUrl: (url: string, tabId?: number) => Promise<PageNavigationResult>
 }
 
+export type OpenTabResult =
+  | { ok: true, data: { tabId: string, url: string, title: string } }
+  | { ok: false, error: { code: string, message: string } }
+
+export interface PageOpenTabAdapter {
+  openTab: (url: string) => Promise<OpenTabResult>
+}
+
 export type DownloadStatusResult =
   | {
     ok: true
@@ -297,6 +308,7 @@ export interface BrijioBackgroundControllerOptions {
   pageActions: PageActionAdapter
   pageBatch: PageBatchAdapter
   pageNavigation: PageNavigationAdapter
+  pageOpenTab?: PageOpenTabAdapter
   pageReader: PageReaderAdapter
   setup: SetupAdapter
   storage: StorageAdapter
@@ -600,6 +612,16 @@ export class BrijioBackgroundController {
       this.pendingRequestCount++
       try {
         await this.handleNavigateToUrlRequest(message.id, message.payload.url, tabId)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
+    }
+
+    if (isOpenTabEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handleOpenTabRequest(message.id, message.payload.url)
       } finally {
         this.pendingRequestCount--
       }
@@ -919,6 +941,60 @@ export class BrijioBackgroundController {
 
     this.socket?.send(
       JSON.stringify(createNavigateToUrlResponse(requestId, result.data))
+    )
+  }
+
+  private async handleOpenTabRequest (
+    requestId: string | undefined,
+    url: string
+  ): Promise<void> {
+    if (this.options.pageOpenTab === undefined) {
+      this.socket?.send(
+        JSON.stringify({
+          type: 'message',
+          id: requestId,
+          payload: {
+            type: 'open_tab_response',
+            ok: false,
+            error: {
+              code: 'not_supported',
+              message: 'Open tab is not supported by this browser.'
+            }
+          }
+        })
+      )
+      return
+    }
+
+    let result: OpenTabResult
+    try {
+      result = await this.options.pageOpenTab.openTab(url)
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'Unexpected open tab error.'
+      this.socket?.send(
+        JSON.stringify(
+          createOpenTabErrorResponse(requestId, 'open_tab_failed', message)
+        )
+      )
+      return
+    }
+
+    if (!result.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createOpenTabErrorResponse(
+            requestId,
+            result.error.code,
+            result.error.message
+          )
+        )
+      )
+      return
+    }
+
+    this.socket?.send(
+      JSON.stringify(createOpenTabResponse(requestId, result.data))
     )
   }
 
