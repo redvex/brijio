@@ -15,6 +15,7 @@ import { listTabs } from './list-tabs-tool.js'
 import { clickElement } from './click-element-tool.js'
 import { fillInput } from './fill-input-tool.js'
 import { navigateToUrl } from './navigate-to-url-tool.js'
+import { openTab } from './open-tab-tool.js'
 import {
   fillEditable,
   selectOptions,
@@ -546,6 +547,34 @@ export async function createBrijioMcpServer (
     async (input) => {
       logToolCall('navigate_to_url', input as Record<string, unknown>)
       const result = await navigateToUrl(pageContextConfig, input)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result)
+          }
+        ]
+      }
+    }
+  )
+
+  server.registerTool(
+    'open_tab',
+    {
+      title: 'Open Tab',
+      description:
+        'Open a new browser tab with the specified HTTP or HTTPS URL. Returns the new tab ID for subsequent targeting with read_current_page or other tools.',
+      inputSchema: {
+        url: z
+          .string()
+          .describe('The HTTP or HTTPS URL to open in a new tab.'),
+        browserInstanceId: browserInstanceIdInput
+      }
+    },
+    async (input: { url?: string, browserInstanceId?: string }) => {
+      logToolCall('open_tab', input as Record<string, unknown>)
+      const result = await openTab(pageContextConfig, input)
 
       return {
         content: [
