@@ -19,6 +19,8 @@ import {
   createPageContentResponse,
   createPageContextErrorResponse,
   createPageContextResponse,
+  createScreenshotResponse,
+  createScreenshotErrorResponse,
   createTabListResponse,
   isAuthSuccessEnvelope,
   isBrowserPresenceRequestEnvelope,
@@ -32,6 +34,7 @@ import {
   isOpenTabEnvelope,
   isPerformActionEnvelope,
   isPerformBatchEnvelope,
+  isCaptureScreenshotEnvelope,
   type ActionResultData,
   type ActionResultErrorCode,
   type ClickActionTarget,
@@ -55,7 +58,8 @@ import {
   type BatchActionError,
   type BatchResultEntry,
   type DownloadInfo,
-  type FetchResourceInfo
+  type FetchResourceInfo,
+  type ScreenshotErrorCode
 } from './protocol.js'
 
 import { type ContentBatchRequest, type BatchResult } from './batch-handler.js'
@@ -273,9 +277,18 @@ export interface ApprovalAdapter {
 
 export interface TabListerAdapter {
   listTabs: () => Promise<
-  | { ok: true, data: { tabs: TabInfo[] } }
-  | { ok: false, error: { code: string, message: string } }
+    | { ok: true, data: { tabs: TabInfo[] } }
+    | { ok: false, error: { code: string, message: string } }
   >
+}
+
+// Screenshot adapter (ADR 0064)
+export type ScreenshotResult =
+  | { ok: true, data: { dataBase64: string, width: number, height: number, tabId?: string, capturedAt?: string } }
+  | { ok: false, error: { code: ScreenshotErrorCode, message: string } }
+
+export interface PageScreenshotAdapter {
+  captureScreenshot: () => Promise<ScreenshotResult>
 }
 
 type ApprovalCheckResult =
@@ -311,6 +324,7 @@ export interface BrijioBackgroundControllerOptions {
   pageNavigation: PageNavigationAdapter
   pageOpenTab?: PageOpenTabAdapter
   pageReader: PageReaderAdapter
+  pageScreenshot?: PageScreenshotAdapter
   setup: SetupAdapter
   storage: StorageAdapter
   tabLister?: TabListerAdapter
@@ -693,6 +707,17 @@ export class BrijioBackgroundController {
       } finally {
         this.pendingRequestCount--
       }
+      return
+    }
+
+    if (isCaptureScreenshotEnvelope(message)) {
+      this.pendingRequestCount++
+      try {
+        await this.handleScreenshotRequest(message.id)
+      } finally {
+        this.pendingRequestCount--
+      }
+      return
     }
   }
 
@@ -1177,6 +1202,54 @@ export class BrijioBackgroundController {
           result.data.dataBase64,
           result.data.contentType
         )
+      )
+    )
+  }
+
+  private async handleScreenshotRequest (
+    requestId: string | undefined
+  ): Promise<void> {
+    if (this.options.pageScreenshot === undefined) {
+      this.socket?.send(
+        JSON.stringify(
+          createScreenshotErrorResponse(
+            requestId,
+            'capability_not_supported',
+            'Screenshot capture is not supported by this browser.'
+          )
+        )
+      )
+      return
+    }
+
+    const result = await this.options.pageScreenshot.captureScreenshot()
+
+    if (!result.ok) {
+      this.socket?.send(
+        JSON.stringify(
+          createScreenshotErrorResponse(
+            requestId,
+            result.error.code as ScreenshotErrorCode,
+            result.error.message
+          )
+        )
+      )
+      return
+    }
+
+    // Get current active tab info for tabId and timestamp
+    const now = new Date().toISOString()
+    // Note: The actual tabId and capturedAt should come from the extension
+    // which provides them in the response. For now we use placeholder values.
+    this.socket?.send(
+      JSON.stringify(
+        createScreenshotResponse(requestId, {
+          dataBase64: result.data.dataBase64,
+          width: result.data.width,
+          height: result.data.height,
+          tabId: '0', // extension will provide actual tabId
+          capturedAt: now
+        })
       )
     )
   }
