@@ -286,6 +286,12 @@ void describe('Brijio MCP HTTP server', () => {
               'Navigate the browser to an HTTP or HTTPS URL and wait for the page to load.'
           },
           {
+            name: 'open_tab',
+            title: 'Open Tab',
+            description:
+              'Open a new browser tab with the specified HTTP or HTTPS URL. Returns the new tab ID for subsequent targeting with read_current_page or other tools.'
+          },
+          {
             name: 'perform_batch',
             title: 'Perform Batch Actions',
             description:
@@ -707,6 +713,24 @@ void describe('Brijio MCP HTTP server', () => {
           tabId: {
             type: 'string',
             description: 'Optional Brijio tab ID to target.'
+          }
+        },
+        required: ['url'],
+        additionalProperties: false,
+        $schema: 'http://json-schema.org/draft-07/schema#'
+      })
+      assert.deepEqual(tools.tools[11].inputSchema, {
+        type: 'object',
+        properties: {
+          url: {
+            type: 'string',
+            description:
+              'The HTTP or HTTPS URL to open in a new tab.'
+          },
+          browserInstanceId: {
+            type: 'string',
+            description:
+              'Optional Brijio browser instance ID to target.'
           }
         },
         required: ['url'],
