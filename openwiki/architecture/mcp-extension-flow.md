@@ -8,6 +8,7 @@ This page describes the runtime path Brijio uses to move an agent request from t
 - `servers/mcp/src/page-actions.ts`
 - `servers/mcp/src/page-reading-tool.ts`
 - `servers/mcp/src/navigate-to-url-tool.ts`
+- `servers/mcp/src/open-tab-tool.ts`
 - `servers/mcp/src/batch-tool.ts`
 - `servers/mcp/src/form-action-tools.ts`
 - `servers/websocket/src/server.ts`
