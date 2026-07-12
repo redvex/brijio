@@ -81,35 +81,32 @@ New types in `packages/shared/src/protocol.ts`:
 
 ```ts
 interface OpenTabRequestPayload {
-  type: 'open_tab'
-  url: string
+  type: "open_tab";
+  url: string;
 }
 
 interface OpenTabResult {
   /** New tab ID (raw Chrome/Safari tab ID as string) */
-  tabId: string
+  tabId: string;
   /** The URL the tab was opened with */
-  url: string
+  url: string;
   /** Page title (may be empty until the page loads) */
-  title: string
+  title: string;
 }
 
 interface OpenTabResponse {
-  type: 'open_tab_response'
-  ok: true
-  data: OpenTabResult
+  type: "open_tab_response";
+  ok: true;
+  data: OpenTabResult;
 }
 
 interface OpenTabErrorResponse {
-  type: 'open_tab_response'
-  ok: false
-  error: { code: OpenTabErrorCode, message: string }
+  type: "open_tab_response";
+  ok: false;
+  error: { code: OpenTabErrorCode; message: string };
 }
 
-type OpenTabErrorCode =
-  | 'unsupported_scheme'
-  | 'open_tab_failed'
-  | 'timeout'
+type OpenTabErrorCode = "unsupported_scheme" | "open_tab_failed" | "timeout";
 ```
 
 New envelope creators and type guards:
@@ -156,8 +153,10 @@ New files:
 New types in `servers/mcp/src/protocol.ts`:
 
 ```ts
-export type BrijioOpenTabResult = BrijioResourceResult<OpenTabResult>
-export type OpenTabParseResult = BrijioOpenTabResult | { ok: false, ignored: true }
+export type BrijioOpenTabResult = BrijioResourceResult<OpenTabResult>;
+export type OpenTabParseResult =
+  | BrijioOpenTabResult
+  | { ok: false; ignored: true };
 ```
 
 New parser `parseOpenTabEnvelope(value, requestId)` — mirrors
@@ -169,12 +168,12 @@ New function in `servers/mcp/src/websocket-client.ts`:
 
 ```ts
 export interface OpenTabRequestOptions extends PageContextRequestOptions {
-  url: string
+  url: string;
 }
 
 export async function requestOpenTab(
-  options: OpenTabRequestOptions
-): Promise<BrijioOpenTabResult>
+  options: OpenTabRequestOptions,
+): Promise<BrijioOpenTabResult>;
 ```
 
 Mirrors `requestNavigateToUrl`. Uses `createOpenTabEnvelope` and
@@ -188,8 +187,8 @@ New function in `servers/mcp/src/page-actions.ts`:
 export async function openNewTab(
   config: BrijioPageActionsConfig,
   url: string,
-  browserInstanceId?: string
-): Promise<BrijioOpenTabResult>
+  browserInstanceId?: string,
+): Promise<BrijioOpenTabResult>;
 ```
 
 Mirrors `navigateToCurrentPageUrl`. Calls `requestOpenTab` with config defaults.
@@ -200,11 +199,11 @@ New adapter interface in `packages/shared/src/background-controller.ts`:
 
 ```ts
 export type OpenTabResult =
-  | { ok: true, data: { tabId: string, url: string, title: string } }
-  | { ok: false, error: { code: string, message: string } }
+  | { ok: true; data: { tabId: string; url: string; title: string } }
+  | { ok: false; error: { code: string; message: string } };
 
 export interface PageOpenTabAdapter {
-  openTab: (url: string) => Promise<OpenTabResult>
+  openTab: (url: string) => Promise<OpenTabResult>;
 }
 ```
 
@@ -212,20 +211,22 @@ New optional field on `BrijioBackgroundControllerOptions`:
 `pageOpenTab?: PageOpenTabAdapter`.
 
 New handler method `handleOpenTabRequest(requestId, url)`:
+
 - If `pageOpenTab` is undefined, return `not_supported` error (same pattern as
   `tabLister`).
 - Otherwise call `pageOpenTab.openTab(url)`, send response or error back.
 
 New dispatch in `handleSocketMessage`:
+
 ```ts
 if (isOpenTabEnvelope(message)) {
-  this.pendingRequestCount++
+  this.pendingRequestCount++;
   try {
-    await this.handleOpenTabRequest(message.id, message.payload.url)
+    await this.handleOpenTabRequest(message.id, message.payload.url);
   } finally {
-    this.pendingRequestCount--
+    this.pendingRequestCount--;
   }
-  return
+  return;
 }
 ```
 
@@ -275,9 +276,9 @@ interception needed — it goes through the standard forwarding flow).
 ## Cross-Browser Capability Matrix
 
 | Browser | `open_tab` | Returns new `tabId` | URL validation |
-| ------- | --------- | ------------------- | -------------- |
-| Chrome  | ✅ Full   | ✅ Full             | ✅ HTTP/HTTPS  |
-| Safari  | ✅ Full   | ✅ Full             | ✅ HTTP/HTTPS  |
+| ------- | ---------- | ------------------- | -------------- |
+| Chrome  | ✅ Full    | ✅ Full             | ✅ HTTP/HTTPS  |
+| Safari  | ✅ Full    | ✅ Full             | ✅ HTTP/HTTPS  |
 
 Both extensions use the same `PageOpenTabAdapter` interface. The
 `browser.tabs.create({ url })` / `chrome.tabs.create({ url })` API is standard
@@ -285,10 +286,10 @@ WebExtensions and works identically on both browsers.
 
 ## Internal WebSocket Messages
 
-| Direction         | Message Type        | Purpose                                         |
-| ----------------- | ------------------- | ----------------------------------------------- |
-| Agent → Extension | `open_tab`          | Request to open a new tab with the given URL    |
-| Extension → Agent | `open_tab_response` | New tab info (tabId, url, title) or error       |
+| Direction         | Message Type        | Purpose                                      |
+| ----------------- | ------------------- | -------------------------------------------- |
+| Agent → Extension | `open_tab`          | Request to open a new tab with the given URL |
+| Extension → Agent | `open_tab_response` | New tab info (tabId, url, title) or error    |
 
 ## Consequences
 
