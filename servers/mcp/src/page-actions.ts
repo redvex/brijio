@@ -12,6 +12,7 @@ import {
   type BrijioDownloadStatusResult,
   type BrijioDownloadFileResult,
   type BrijioFetchResourceResult,
+  type BrijioScreenshotResult,
   type ClickElementTarget,
   type EditableTarget,
   type FileUploadPayload,
@@ -44,7 +45,9 @@ import {
   type FetchResourceRequestOptions,
   requestDownloadStatus as defaultRequestDownloadStatus,
   requestDownloadFile as defaultRequestDownloadFile,
-  requestFetchResource as defaultRequestFetchResource
+  requestFetchResource as defaultRequestFetchResource,
+  requestCaptureScreenshot as defaultRequestCaptureScreenshot,
+  type CaptureScreenshotRequestOptions
 } from './websocket-client.js'
 
 export interface BrijioPageActionsConfig {
@@ -93,6 +96,9 @@ export interface BrijioPageActionsConfig {
   requestFetchResource?: (
     options: FetchResourceRequestOptions,
   ) => Promise<BrijioFetchResourceResult>
+  requestCaptureScreenshot?: (
+    options: CaptureScreenshotRequestOptions,
+  ) => Promise<BrijioScreenshotResult>
 }
 
 export async function clickCurrentPageElement (
@@ -405,5 +411,23 @@ export async function fetchResource (
     url,
     maxSizeBytes,
     fetchTimeout
+  })
+}
+
+export async function captureScreenshot (
+  config: BrijioPageActionsConfig,
+  browserInstanceId?: string,
+  tabId?: string
+): Promise<BrijioScreenshotResult> {
+  const requestCaptureScreenshot =
+    config.requestCaptureScreenshot ?? defaultRequestCaptureScreenshot
+
+  return await requestCaptureScreenshot({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    approvalTimeoutMs: config.approvalTimeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
+    tabId: tabId ?? config.defaultTabId
   })
 }

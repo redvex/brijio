@@ -1,7 +1,7 @@
 import {
   type BrijioPageActionsConfig,
-  requestCaptureScreenshot as defaultRequestCaptureScreenshot
-} from './websocket-client.js'
+  captureScreenshot as captureScreenshotAction
+} from './page-actions.js'
 import { type BrijioToolResult } from './page-reading-tool.js'
 
 export interface CaptureScreenshotInput {
@@ -31,16 +31,11 @@ export async function captureScreenshot (
     return normalizedInput
   }
 
-  const result = await defaultRequestCaptureScreenshot({
-    websocketUrl: config.websocketUrl,
-    pairingToken: config.pairingToken ?? '',
-    timeoutMs: config.timeoutMs,
-    browserInstanceId: normalizedInput.data.browserInstanceId,
-    tabId: normalizedInput.data.tabId,
-    ...(config.defaultBrowserInstanceId !== undefined
-      ? { defaultBrowserInstanceId: config.defaultBrowserInstanceId }
-      : {})
-  })
+  const result = await captureScreenshotAction(
+    config,
+    normalizedInput.data.browserInstanceId,
+    normalizedInput.data.tabId
+  )
 
   if (!result.ok) {
     return result
