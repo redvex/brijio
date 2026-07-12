@@ -544,6 +544,27 @@ export async function requestFetchResource (
   })
 }
 
+// --- Screenshot request (ADR 0064) ---
+
+export interface CaptureScreenshotRequestOptions extends PageContextRequestOptions {}
+
+export async function requestCaptureScreenshot (
+  options: CaptureScreenshotRequestOptions
+): Promise<BrijioScreenshotResult> {
+  const requestId = options.createRequestId?.() ?? createRequestId()
+
+  return await requestBrijio({
+    websocketUrl: options.websocketUrl,
+    pairingToken: options.pairingToken,
+    timeoutMs: options.timeoutMs,
+    browserInstanceId: options.browserInstanceId,
+    tabId: options.tabId,
+    requestEnvelope: createCaptureScreenshotEnvelope(requestId),
+    parseEnvelope: (value) => parseScreenshotEnvelope(value, requestId),
+    timeoutMessage: 'Timed out waiting for a screenshot response.'
+  })
+}
+
 function parseClickActionResultEnvelope (
   value: unknown,
   requestId: string

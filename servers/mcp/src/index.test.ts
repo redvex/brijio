@@ -314,6 +314,12 @@ void describe('Brijio MCP HTTP server', () => {
             title: 'Fetch Resource',
             description:
               "Fetch a resource URL using the browser's session (cookies, auth). The browser performs a fetch with credentials included and streams the response back. On Safari or when CORS blocks the request, returns error \"cors_blocked\". This is a high-risk tool that exposes session-protected content to the agent."
+          },
+          {
+            name: 'capture_screenshot',
+            title: 'Capture Screenshot',
+            description:
+              'Capture a viewport screenshot of the current browser tab. Returns JPEG image (quality 80) as base64 data. Requires a vision-model capable agent to interpret.'
           }
         ]
       )
