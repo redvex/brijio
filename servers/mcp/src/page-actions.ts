@@ -3,6 +3,7 @@ import {
   type BrijioClickElementResult,
   type BrijioFillInputResult,
   type BrijioNavigateToUrlResult,
+  type BrijioOpenTabResult,
   type BrijioResourceResult,
   type BrijioSelectOptionsResult,
   type BrijioSetCheckedResult,
@@ -24,6 +25,8 @@ import {
   type FillInputRequestOptions,
   requestNavigateToUrl as defaultRequestNavigateToUrl,
   type NavigateToUrlRequestOptions,
+  requestOpenTab as defaultRequestOpenTab,
+  type OpenTabRequestOptions,
   requestPerformBatch as defaultRequestPerformBatch,
   type PerformBatchRequestOptions,
   requestSelectOptions as defaultRequestSelectOptions,
@@ -75,6 +78,9 @@ export interface BrijioPageActionsConfig {
   requestNavigateToUrl?: (
     options: NavigateToUrlRequestOptions,
   ) => Promise<BrijioNavigateToUrlResult>
+  requestOpenTab?: (
+    options: OpenTabRequestOptions,
+  ) => Promise<BrijioOpenTabResult>
   requestPerformBatch?: (
     options: PerformBatchRequestOptions,
   ) => Promise<BrijioResourceResult<BrijioBatchResult>>
@@ -282,6 +288,23 @@ export async function navigateToCurrentPageUrl (
     approvalTimeoutMs: config.approvalTimeoutMs,
     browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     tabId: tabId ?? config.defaultTabId,
+    url
+  })
+}
+
+export async function openNewTab (
+  config: BrijioPageActionsConfig,
+  url: string,
+  browserInstanceId?: string
+): Promise<BrijioOpenTabResult> {
+  const requestOpenTab =
+    config.requestOpenTab ?? defaultRequestOpenTab
+
+  return await requestOpenTab({
+    websocketUrl: config.websocketUrl,
+    pairingToken: config.pairingToken ?? '',
+    timeoutMs: config.timeoutMs,
+    browserInstanceId: browserInstanceId ?? config.defaultBrowserInstanceId,
     url
   })
 }
