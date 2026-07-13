@@ -369,11 +369,50 @@ jobs:
           ditto -c -k --keepParent "$APP_PATH" "$APP_ZIP"
 
           # Submit the zip for notarization and wait for the result.
-          xcrun notarytool submit "$APP_ZIP" \
+          # Capture the submission ID so we can verify the final status —
+          # `--wait` returns exit 0 even when the notarization result is
+          # "Invalid" or "Rejected", which leads to a "Record not found"
+          # error from stapler later (the ticket was never created).
+          SUBMIT_OUTPUT="$(xcrun notarytool submit "$APP_ZIP" \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_ID_APP_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
-            --wait
+            --wait \
+            --output-format json 2>&1)"
+
+          echo "$SUBMIT_OUTPUT"
+
+          # Extract the submission ID from the JSON output.
+          SUBMISSION_ID="$(printf '%s' "$SUBMIT_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])" 2>/dev/null || true)"
+
+          if [ -z "$SUBMISSION_ID" ]; then
+            echo "::error::Failed to extract submission ID from notarytool output."
+            exit 1
+          fi
+
+          echo "Submission ID: $SUBMISSION_ID"
+
+          # Check the actual notarization status.
+          STATUS="$(xcrun notarytool info "$SUBMISSION_ID" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_APP_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --output-format json | python3 -c "import sys,json; print(json.load(sys.stdin).get('status',''))" 2>/dev/null || true)"
+
+          echo "Notarization status: $STATUS"
+
+          if [ "$STATUS" != "Accepted" ]; then
+            echo "::error::Notarization failed with status: $STATUS"
+            # Fetch the full log for debugging.
+            xcrun notarytool log "$SUBMISSION_ID" \
+              --apple-id "$APPLE_ID" \
+              --password "$APPLE_ID_APP_PASSWORD" \
+              --team-id "$APPLE_TEAM_ID" \
+              || true
+            exit 1
+          fi
+
+          echo "Notarization accepted."
 
       - name: Staple notarization ticket
         if: steps.notarize-app.outcome == 'success'
