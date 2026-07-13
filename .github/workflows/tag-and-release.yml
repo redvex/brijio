@@ -361,8 +361,15 @@ jobs:
           APPLE_ID_APP_PASSWORD: ${{ secrets.APPLE_ID_APP_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          # Submit the .app for notarization and wait for the result.
-          xcrun notarytool submit "$APP_PATH" \
+          # notarytool requires a .zip, .pkg, or .dmg — not a bare .app bundle.
+          # Use ditto to create a zip that preserves resource forks, extended
+          # attributes, and symlinks (--keepParent keeps Brijio.app/ as the
+          # top-level directory inside the archive).
+          APP_ZIP="$RUNNER_TEMP/Brijio-notarization.zip"
+          ditto -c -k --keepParent "$APP_PATH" "$APP_ZIP"
+
+          # Submit the zip for notarization and wait for the result.
+          xcrun notarytool submit "$APP_ZIP" \
             --apple-id "$APPLE_ID" \
             --password "$APPLE_ID_APP_PASSWORD" \
             --team-id "$APPLE_TEAM_ID" \
