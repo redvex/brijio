@@ -47,10 +47,13 @@ void describe('release workflows', () => {
     assert.match(workflow, /brijio-chrome-extension-\$\{\{ needs\.release\.outputs\.version \}\}\.zip/)
     assert.match(workflow, /safari-web-extension-converter/)
     assert.match(workflow, /continue-on-error: true/)
-    assert.match(workflow, /brijio-safari-ios-web-extension-\$\{\{ needs\.release\.outputs\.version \}\}\.zip/)
-    assert.match(workflow, /brijio-safari-macos-web-extension-\$\{\{ needs\.release\.outputs\.version \}\}\.zip/)
-    assert.match(workflow, /brijio-safari-ios-xcode-project-\$\{\{ needs\.release\.outputs\.version \}\}\.zip/)
-    assert.match(workflow, /brijio-safari-macos-xcode-project-\$\{\{ needs\.release\.outputs\.version \}\}\.zip/)
+    // Only the signed macOS app is shipped — raw web extensions and Xcode
+    // project zips are intermediate build artifacts, not user-facing.
+    assert.match(workflow, /brijio-safari-macos-\$\{\{ needs\.release\.outputs\.version \}\}\.zip/)
+    assert.doesNotMatch(workflow, /brijio-safari-ios-web-extension/)
+    assert.doesNotMatch(workflow, /brijio-safari-macos-web-extension/)
+    assert.doesNotMatch(workflow, /brijio-safari-ios-xcode-project/)
+    assert.doesNotMatch(workflow, /brijio-safari-macos-xcode-project/)
     assert.match(workflow, /softprops\/action-gh-release@v2/)
     assert.match(workflow, /files:/)
   })
