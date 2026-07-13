@@ -219,37 +219,6 @@ jobs:
             fi
           done
 
-      - name: Create Safari web extension ZIPs
-        run: |
-          VERSION="${{ needs.release.outputs.version }}"
-          cd clients/extensions/safari/dist-ios
-          zip -r "${GITHUB_WORKSPACE}/brijio-safari-ios-web-extension-${VERSION}.zip" .
-          cd "${GITHUB_WORKSPACE}/clients/extensions/safari/dist-macos"
-          zip -r "${GITHUB_WORKSPACE}/brijio-safari-macos-web-extension-${VERSION}.zip" .
-
-      - name: Upload Safari web extension assets
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.release.outputs.version }}
-          files: |
-            brijio-safari-ios-web-extension-${{ needs.release.outputs.version }}.zip
-            brijio-safari-macos-web-extension-${{ needs.release.outputs.version }}.zip
-
-      - name: Convert iOS Safari web extension to Xcode project
-        id: convert-safari-ios
-        continue-on-error: true
-        run: |
-          xcrun --find safari-web-extension-converter
-          xcrun safari-web-extension-converter \
-            --force \
-            --ios-only \
-            --no-prompt \
-            --no-open \
-            --copy-resources \
-            --bundle-identifier uk.co.redvex.Brijio \
-            --project-location "${GITHUB_WORKSPACE}/safari-ios-release" \
-            clients/extensions/safari/dist-ios
-
       - name: Convert macOS Safari web extension to Xcode project
         id: convert-safari-macos
         continue-on-error: true
@@ -268,8 +237,7 @@ jobs:
       # ── Signed macOS app build (requires Apple Developer ID secrets) ──────
       # The following steps build a signed, notarized, stapled .app bundle
       # and upload it as a release asset. When the Apple secrets are not
-      # configured, these steps are skipped and only the unsigned Xcode
-      # project ZIP is uploaded (backward-compatible with v0.2.0 behaviour).
+      # configured, these steps are skipped.
       #
       # Required GitHub secrets / variables:
       #   APPLE_DEVID_CERTIFICATE_P12       – base64-encoded .p12 (cert + private key) [secret]
@@ -465,34 +433,6 @@ jobs:
         with:
           tag_name: v${{ needs.release.outputs.version }}
           files: brijio-safari-macos-${{ needs.release.outputs.version }}.zip
-
-      # ── Unsigned Xcode project ZIPs (fallback when no signing secrets) ────
-
-      - name: Create iOS Safari Xcode project ZIP
-        if: steps.convert-safari-ios.outcome == 'success'
-        run: |
-          VERSION="${{ needs.release.outputs.version }}"
-          zip -r "brijio-safari-ios-xcode-project-${VERSION}.zip" safari-ios-release
-
-      - name: Create macOS Safari Xcode project ZIP
-        if: steps.convert-safari-macos.outcome == 'success'
-        run: |
-          VERSION="${{ needs.release.outputs.version }}"
-          zip -r "brijio-safari-macos-xcode-project-${VERSION}.zip" safari-macos-release
-
-      - name: Upload iOS Safari Xcode project asset
-        if: steps.convert-safari-ios.outcome == 'success'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.release.outputs.version }}
-          files: brijio-safari-ios-xcode-project-${{ needs.release.outputs.version }}.zip
-
-      - name: Upload macOS Safari Xcode project asset
-        if: steps.convert-safari-macos.outcome == 'success'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.release.outputs.version }}
-          files: brijio-safari-macos-xcode-project-${{ needs.release.outputs.version }}.zip
 
   publish-npm:
     name: Publish npm package
