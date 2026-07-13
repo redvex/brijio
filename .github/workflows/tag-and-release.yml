@@ -334,6 +334,11 @@ jobs:
 
           # The safari-web-extension-converter creates a project at
           # safari-macos-release/Brijio/Brijio.xcodeproj with scheme "Brijio".
+          #
+          # Notarization requires:
+          #   - Secure timestamp (--timestamp flag via OTHER_CODE_SIGN_FLAGS)
+          #   - No get-task-allow entitlement (hardened runtime strips it)
+          # Without these, notarization fails with "Invalid" status.
           xcodebuild \
             -project safari-macos-release/Brijio/Brijio.xcodeproj \
             -scheme Brijio \
@@ -342,6 +347,8 @@ jobs:
             CODE_SIGN_STYLE="Manual" \
             CODE_SIGN_IDENTITY="$APPLE_DEVID_IDENTITY_NAME" \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            OTHER_CODE_SIGN_FLAGS="--timestamp" \
+            CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
             build
 
           # Locate the built .app bundle.
