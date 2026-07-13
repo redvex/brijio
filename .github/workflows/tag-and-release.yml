@@ -378,7 +378,23 @@ jobs:
       - name: Staple notarization ticket
         if: steps.notarize-app.outcome == 'success'
         run: |
-          xcrun stapler staple "$APP_PATH"
+          # Apple's notarization ticket can take a few minutes to propagate to
+          # CloudKit after notarytool reports success.  Retry the staple with
+          # increasing backoff to avoid "Record not found" (Error 65).
+          for attempt in 1 2 3 4 5; do
+            echo "Staple attempt $attempt…"
+            if xcrun stapler staple "$APP_PATH"; then
+              echo "Staple succeeded on attempt $attempt."
+              break
+            fi
+            if [ "$attempt" -eq 5 ]; then
+              echo "::error::Staple failed after 5 attempts."
+              exit 1
+            fi
+            echo "Staple failed (attempt $attempt); retrying in 60s…"
+            sleep 60
+          done
+
           # Verify the staple.
           xcrun stapler validate "$APP_PATH"
 
