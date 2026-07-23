@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Architecture Overview"
+description: "Brijio runtime architecture: MCP server, WebSocket relay, shared package, and browser extensions. Covers the explicit request/response chain and change guidance by layer."
+---
+
 # Architecture Overview
 
 Brijio’s runtime architecture is a simple explicit chain:

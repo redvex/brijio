@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "MCP ↔ WebSocket ↔ Extension Flow"
+description: "End-to-end runtime path from MCP tool call through the WebSocket relay to the browser extension and back. Covers tab targeting, canonical source files, and editing guidance."
+---
+
 # MCP ↔ WebSocket ↔ Extension Flow
 
 This page describes the runtime path Brijio uses to move an agent request from the MCP server to a browser tab and back.

@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Multi-tab Workflow"
+description: "How agents use explicit per-call tabId targeting for reads, actions, batch operations, and navigation. Covers list_tabs, open_tab, and the recommended multi-tab workflow."
+---
+
 # Multi-tab Workflow
 
 Brijio now supports explicit per-call tab targeting through `tabId` for the main browser interaction path.

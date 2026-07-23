@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "OpenWiki Quickstart"
+description: "Entry point for the Brijio OpenWiki knowledge base. Covers what the repository is, how the MCP-WebSocket-extension pieces fit together, and where to go next."
+---
+
 # OpenWiki Quickstart
 
 Brijio connects remote AI agents to the browser session the user already controls. The system is intentionally reactive: the browser extension connects only after explicit user action, and agents must ask for browser state or perform actions through the MCP server.

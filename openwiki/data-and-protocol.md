@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Protocol and Data Model Guide"
+description: "Canonical reference for shared data structures and protocol shapes: WebSocket envelope, browser presence and capabilities, tab listing, file uploads, and download/fetch status."
+---
+
 # Protocol and Data Model Guide
 
 This page is the canonical OpenWiki home for the main shared data structures and protocol shapes.

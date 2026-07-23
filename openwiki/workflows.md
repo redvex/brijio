@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Workflows"
+description: "Repo-level development workflows: common pnpm commands, verification patterns per domain, protocol and browser-targeting change patterns, and AGENTS.md conventions."
+---
+
 # Workflows
 
 This page captures the repo-level workflows that matter most when editing Brijio.
