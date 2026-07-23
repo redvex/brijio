@@ -1,305 +1,219 @@
 # Brijio Agent Instructions
 
-Brijio is a user-controlled bridge between browser extensions and AI
-agents. The browser extension connects to a WebSocket server only when the user
-explicitly starts it. The MCP server can then request browser state and perform
-approved browser actions through that WebSocket channel.
+Brijio is a user-controlled bridge between AI agents and browser sessions the
+user already controls. Keep changes small, explicit, privacy-preserving, and
+easy to review.
 
-The project must support both local development and a future cloud deployment
-model. Keep the first implementation intentionally small and readable.
+## Start Here
 
-## Core Principles
+Before changing the repository:
 
-- The user controls when the bridge is active.
-- Browser state is available only while the user has explicitly connected the
-  extension.
-- Do not implement silent background surveillance.
-- Do not continuously stream browser data by default.
-- Browser data requests must be initiated through explicit MCP tool calls.
-- Design cloud behavior around private user/session/channel routing.
-- Prefer simple TypeScript code, clear boundaries, and structured message
-  schemas over heavy abstractions.
+1. Read [OpenWiki quickstart](openwiki/quickstart.md).
+2. Follow only the architecture, workflow, domain, security, or testing links
+   relevant to the task.
+3. Inspect the working tree and preserve unrelated user changes.
+4. Read the package manifest and tests for the area being changed.
 
-## Required Workflow
+Use `package.json` and workspace package manifests as the authority for runtime
+versions, package-manager versions, and available commands. Do not copy mutable
+tool inventories or repository trees into this file.
 
-When asked to implement a feature or behavioral change:
+## Sources of Truth
 
-1. Write an ADR first in `docs/architecture/decisions`.
-2. Include technical diagrams using Mermaid where architecture or flow is
-   relevant.
-3. Wait for user approval before implementing.
-4. Use TDD: write failing tests first, implement the smallest change, then
-   verify the tests pass.
-5. When a project area is complete, write full documentation in
-   `docs/artifacts`.
+Use these sources according to the question being answered:
 
-When creating a PR:
+- Executable behavior: source code and tests.
+- Current product contract and support status:
+  `docs/project/CAPABILITY_MATRIX.md`.
+- Architectural decisions and design history:
+  `docs/architecture/decisions`.
+- Repository navigation and cross-component workflows: `openwiki`.
+- Security intent and trust boundaries: `docs/security`.
+- Public setup and usage: the root and package `README.md` files.
 
-- Use atomic commits.
-- Keep commits small and reviewable; each commit should represent one coherent
-  step such as an ADR, test coverage, implementation, documentation, or
-  tooling update.
-- Stage files explicitly for each commit. Avoid broad `git add .` or
-  `git add -A` unless the whole working tree has been reviewed and confirmed as
-  PR scope.
-- Do not mix unrelated cleanup, formatting, dependency changes, or documentation
-  rewrites into a behavior commit.
-- Write meaningful commit messages.
-- Use a PR title and description that match the actual goal and scope.
-- Keep unrelated refactors out of the PR.
+If these sources disagree, do not silently choose one. Determine whether the
+code or documentation is stale, update the discrepancy when it is in scope,
+and otherwise report it.
 
-## OpenWiki
+## Non-Negotiable Product Invariants
 
-This repository has documentation located in the /openwiki directory.
+- The user explicitly starts and stops the browser bridge.
+- Browser state is available only while the user-controlled extension is
+  connected.
+- Every browser read or action is initiated by an explicit MCP tool or resource
+  request.
+- Do not add continuous page, DOM, screenshot, history, or browser-state
+  streaming.
+- Do not implement silent background surveillance, cookie export, credential
+  extraction, session cloning, or MFA interception.
+- Do not persist page content unless an accepted ADR explicitly requires it.
+- Preserve authenticated, private browser and tab routing with explicit request
+  IDs, structured errors, and timeouts.
+- Preserve user-visible connection state and configured client-side action
+  approval. Do not bypass approval checks.
+- Keep permissions minimal and document why each browser permission is needed.
+- Prefer progressive disclosure: return structured context before larger page
+  content or visual data.
 
-Start here:
+The extension is reactive. It answers explicit requests and returns structured
+results; it does not publish ambient browser state.
 
-- [OpenWiki quickstart](openwiki/quickstart.md)
+## Change Workflow
 
-OpenWiki includes repository overview, architecture notes, workflows, domain concepts, operations, integrations, testing guidance, and source maps.
+Classify the change before editing.
 
-When working in this repository, read the OpenWiki quickstart first, then follow its links to the relevant architecture, workflow, domain, operation, and testing notes.
+### ADR Required
 
-## Repository Shape
+Write an ADR before implementation when a change introduces or alters:
 
-Use a pnpm TypeScript monorepo.
+- a product capability or intentional user-visible behavior;
+- a cross-package protocol or schema;
+- an architectural boundary or ownership decision;
+- authentication, authorization, privacy, storage, or a trust boundary;
+- browser routing, targeting, or lifecycle semantics;
+- a dependency or framework that materially changes the architecture.
+
+Create the ADR as `Proposed`, include Mermaid diagrams when architecture or
+message flow is relevant, and wait for explicit user approval before
+implementing it. A request to implement a feature does not by itself approve
+the ADR written for that feature.
+
+Before assigning a number, list existing ADRs and use the next unused number.
+Never reuse an ADR number. After approval, mark the ADR `Accepted`. If a
+decision is replaced, record its superseding or superseded relationship. Do
+not leave an implemented decision marked `Proposed`.
+
+### ADR Usually Not Required
+
+An ADR is normally unnecessary for:
+
+- a bug fix that restores documented or tested behavior;
+- tests for existing behavior;
+- documentation-only corrections;
+- a behavior-preserving refactor;
+- narrowly scoped tooling or dependency maintenance;
+- implementation already covered by an accepted ADR.
+
+If a supposedly narrow change requires a new design decision, stop and follow
+the ADR workflow.
+
+### Implementation
+
+For behavior changes, use TDD:
+
+1. Write or adjust a test that fails for the expected reason.
+2. Implement the smallest change that makes it pass.
+3. Refactor only when necessary and keep the test green.
+4. Run the relevant verification commands.
+
+For documentation, configuration, or tooling changes where a failing test is
+not meaningful, validate with the narrowest applicable formatter, linter,
+build, or direct inspection.
+
+## Ownership and Cross-Layer Changes
+
+- Shared protocol shapes and browser-agnostic behavior belong in
+  `packages/shared`.
+- Relay authentication, presence, and routing belong in `servers/websocket`.
+- Agent-facing tools, resources, prompts, and skills belong in `servers/mcp`.
+- Browser-specific integration belongs in `clients/extensions/chrome` and
+  `clients/extensions/safari`; keep adapters thin and shared behavior shared.
+
+When changing a protocol or browser capability, check the full path:
 
 ```text
-/package.json
-/pnpm-workspace.yaml
-/README.md
-/.env.example
-/docker-compose.yml
-/packages
-  /shared
-    /src
-      messages.ts
-      types.ts
-/servers
-  /websocket
-    /src
-      index.ts
-      sessions.ts
-      messages.ts
-    package.json
-    README.md
-  /mcp
-    /src
-      index.ts
-      integration.test.ts
-      tools.ts
-      websocket-client.ts
-    package.json
-    README.md
-/Dockerfile.test
-/clients
-  /extensions
-    /chrome
-      /src
-        background.ts
-        content.ts
-        popup.ts
-      manifest.json
-      package.json
-      README.md
-    /safari
-      README.md
-    /firefox
-      README.md
-  /apps
-    README.md
+shared protocol -> WebSocket relay -> MCP surface -> shared controller
+                -> Chrome adapter -> Safari adapter -> integration tests
 ```
 
-Shared schemas and types should live in `packages/shared` when more than one
-package needs them. Do not duplicate protocol definitions across servers and
-clients.
+Additional rules:
 
-## Architecture
-
-The intended local flow is:
-
-```mermaid
-sequenceDiagram
-  participant Agent as AI Agent
-  participant MCP as MCP Server
-  participant WS as WebSocket Server
-  participant Ext as Browser Extension
-  participant Browser as Browser Tab
-
-  Ext->>WS: User starts bridge and connects
-  Agent->>MCP: Calls MCP tool
-  MCP->>WS: Sends request to session/channel
-  WS->>Ext: Forwards request
-  Ext->>Browser: Reads state or performs approved action
-  Browser-->>Ext: Result
-  Ext-->>WS: Structured response
-  WS-->>MCP: Structured response
-  MCP-->>Agent: Tool result
-```
-
-The extension is reactive. It should answer requests and return results, not
-publish continuous page snapshots.
-
-## WebSocket Server Requirements
-
-The WebSocket server lives in `servers/websocket`.
-
-It should:
-
-- Manage live browser extension connections.
-- Support user, session, and channel identification.
-- Allow the MCP server to send requests to a connected extension.
-- Allow extensions to respond with browser status, page context, or action
-  results.
-- Include basic authentication or token handling, even if minimal initially.
-- Return clear errors for missing sessions, invalid messages, auth failures,
-  timeouts, and unsupported actions.
-
-Required protocol message names:
-
-- `extension_connected`
-- `get_status`
-- `status_response`
-- `get_page_context`
-- `page_context_response`
-- `perform_action`
-- `action_result`
-- `error`
-
-## MCP Server Requirements
-
-The MCP server lives in `servers/mcp`.
-
-It should:
-
-- Expose MCP tools for AI agents.
-- Connect to the WebSocket server.
-- Route tool calls to the appropriate browser extension session.
-- Return clear structured results.
-
-Initial tools:
-
-- `get_browser_status`
-- `get_current_page_context`
-- `navigate_to_url`
-- `click_element`
-- `fill_input`
-- `submit_form`
-
-Tool responses should be structured and predictable. Prefer typed result objects
-with explicit `ok`, `data`, and `error` fields over loosely shaped responses.
-
-## Browser Extension Requirements
-
-Start with Chrome in `clients/extensions/chrome`.
-
-The Chrome extension should:
-
-- Connect and disconnect manually through popup UI.
-- Establish a WebSocket connection to the server only after user action.
-- Respond to MCP-originated requests.
-- Read the current tab URL and title.
-- Extract basic page text and context.
-- Support simple DOM actions where possible.
-- Show enough UI state for the user to know whether the bridge is connected.
-
-Safari and Firefox folders should exist as placeholders with README files until
-their implementations are planned.
-
-## Apps Placeholder
-
-Create `clients/apps` as a placeholder for future desktop, mobile, or web apps.
-Its README should explain future intent without implying current support.
-
-## First Milestone
-
-The first working milestone is intentionally narrow:
-
-1. A local Chrome extension can manually connect to the WebSocket server.
-2. The MCP server can request browser status.
-3. The extension can respond with the current tab URL and title.
-
-Do not expand beyond this milestone without an approved ADR.
-
-## Documentation Requirements
-
-The root `README.md` should explain:
-
-- Project purpose.
-- Architecture.
-- Local setup.
-- How the WebSocket server, MCP server, and extension communicate.
-- Security model.
-- Future roadmap.
-
-Each package or app should have its own README with local commands, environment
-variables, and package-specific behavior.
-
-Use Mermaid diagrams for architecture, message flow, and deployment flow when
-they help clarify behavior.
-
-## Environment And Docker
-
-Include `.env.example` files or documented variables for local development.
-Never commit real secrets or user-specific tokens.
-
-Include Docker support for local development. Docker should make it easy to run
-the WebSocket server and MCP server together, while still allowing package-level
-development through pnpm.
-
-Run `docker compose --profile test` to validate the full test suite in a
-container. This builds from `Dockerfile.test`, installs dependencies for both
-the `websocket` and `mcp` workspaces, and runs `pnpm test`.
+- Keep protocol definitions in `packages/shared`; do not duplicate them.
+- Preserve explicit per-call browser and `tabId` targeting. Do not introduce
+  hidden selected-browser or selected-tab session state.
+- When `tabId` is optional, preserve the documented active-tab fallback unless
+  an accepted ADR changes it.
+- Re-read page context after navigation or a mutation that can invalidate
+  short-lived target IDs.
+- When tool behavior changes, update its tests, MCP registration, relevant
+  skills under `servers/mcp/skills`, the capability matrix, and relevant
+  OpenWiki workflow pages.
+- Consider both Chrome and Safari for shared browser behavior. Document and
+  test intentional platform differences.
 
 ## Coding Standards
 
-- Use TypeScript everywhere.
-- Use pnpm workspaces.
-- Keep code readable and explicit.
-- Prefer structured parsers and schemas over ad hoc string handling.
-- Keep shared protocol definitions in `packages/shared`.
-- Avoid unnecessary frameworks until the problem calls for them.
-- Add tests around protocol handling, routing, and tool behavior.
-- Integration tests (`servers/mcp/src/integration.test.ts`) exercise the full
-  WS → WS server → MCP HTTP server → MCP SDK client stack. They start a real
-  WebSocket server and MCP HTTP server, connect a mock browser extension over
-  raw WebSocket, and make real MCP tool calls. Run them as part of `pnpm test`.
-- Docker CI validation uses `docker compose --profile test` which builds a
-  test image from `Dockerfile.test` and runs the full test suite in a container.
-- Keep browser permissions minimal and document why each permission is needed.
+- Use TypeScript for JavaScript runtime code and follow the existing language
+  and format of platform, build, and documentation files.
+- Prefer readable, explicit code and structured parsers or schemas over ad hoc
+  string handling.
+- Avoid unnecessary frameworks, abstractions, and unrelated refactors.
+- Return predictable structured results with explicit success data or error
+  codes.
+- Add tests around protocol handling, routing, tool behavior, browser adapters,
+  and failure paths.
+- Never commit secrets, real tokens, user data, generated credentials, or
+  user-specific configuration.
 
-## Security Model
+## Verification
 
-Brijio is not an ambient monitoring system. Agents may only access browser
-state through explicit requests while the user-controlled extension connection is
-active.
+Run the smallest verification set that covers the change:
 
-Design every request path around these constraints:
+- Shared package:
+  `pnpm --filter @brijio/shared test` and
+  `pnpm --filter @brijio/shared check`.
+- WebSocket relay:
+  `pnpm --filter @brijio/websocket test` and
+  `pnpm --filter @brijio/websocket check`.
+- MCP server:
+  `pnpm --filter @brijio/mcp test` and
+  `pnpm --filter @brijio/mcp check`.
+- Chrome extension:
+  `pnpm --filter @brijio/chrome-extension test` and
+  `pnpm --filter @brijio/chrome-extension check`.
+- Safari extension:
+  `pnpm --filter @brijio/safari-extension test` and
+  `pnpm --filter @brijio/safari-extension check`.
 
-- Authenticated WebSocket and MCP-to-WebSocket communication.
-- Private user/session/channel routing.
-- Explicit request and response IDs.
-- Timeouts for pending requests.
-- Clear user-facing connection state.
-- No storage of page content unless an approved feature explicitly requires it.
+For cross-package changes, run `pnpm test` and `pnpm check`. Before a PR is
+ready, match CI with:
 
-## Agent Notes
+```sh
+pnpm lint
+pnpm build
+pnpm test
+```
 
-- Read this file before making project changes.
-- Respect user changes in the working tree.
-- Do not revert unrelated edits.
-- Before modifying project behavior, create the ADR and wait for approval.
-- Before claiming work is complete, run the relevant verification commands and
-  report what passed or why verification could not run.
+Use Docker validation only when container or runtime behavior changes, and
+derive the current profiles and commands from `docker-compose.yml`. Do not
+assume a profile exists.
 
-## OpenWiki
+Before claiming completion, report exactly what passed and what could not be
+run.
 
-This repository has documentation located in the /openwiki directory.
+## Documentation
 
-Start here:
+Update documentation according to what changed:
 
-- [OpenWiki quickstart](openwiki/quickstart.md)
+- Capability or support status: `docs/project/CAPABILITY_MATRIX.md`.
+- Architectural decision: `docs/architecture/decisions`.
+- Repository navigation or cross-layer workflow: `openwiki`.
+- Public setup, commands, or configuration: root or package `README.md`.
+- Completed feature or operational explanation: `docs/artifacts`.
+- Security boundary or guarantee: `docs/security`.
 
-OpenWiki includes repository overview, architecture notes, workflows, domain concepts, operations, integrations, testing guidance, and source maps.
+Keep documentation linked rather than copying large mutable inventories between
+files.
 
-When working in this repository, read the OpenWiki quickstart first, then follow its links to the relevant architecture, workflow, domain, operation, and testing notes.
+## Git and Pull Requests
+
+- Preserve unrelated changes and never revert user work.
+- Keep changes focused; do not mix cleanup, formatting, dependencies, or
+  documentation rewrites into an unrelated behavior change.
+- Use small, atomic commits with meaningful messages.
+- Stage files explicitly. Avoid `git add .` and `git add -A` unless the entire
+  working tree has been reviewed and confirmed as PR scope.
+- A commit should represent one coherent step, such as an ADR, tests,
+  implementation, documentation, or tooling.
+- Use a PR title and description that match the actual goal and scope.
+- Report verification results and any known limitations in the PR description.
