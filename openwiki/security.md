@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Security and Trust Model"
+description: "Brijio security posture: core trust assumptions, security goals, threat classes, explicit non-goals, and change guidance for authentication, routing, and browser-state exposure."
+---
+
 # Security and Trust Model
 
 Brijio is built around explicit control and minimal trust.

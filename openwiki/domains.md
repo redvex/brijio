@@ -1,3 +1,9 @@
+---
+type: "Reference"
+title: "Major Domains"
+description: "The seven major source domains in the Brijio monorepo: shared protocol, WebSocket relay, MCP server, browser extensions, product framing, security, and docs/history."
+---
+
 # Major Domains
 
 This repository has a few clear domains that future agents should keep separate when making changes.
