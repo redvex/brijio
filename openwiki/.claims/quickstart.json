@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:82ce368325e7c169f8e6918135a02b54bdb49c283e1ca15e05e893ae99f4b344",
+  "claims": [
+    {
+      "id": "claim_7cfd27e41ed2452eab9fb181231959bb",
+      "statement": "The MCP server registers 17 tools in servers/mcp/src/mcp-server.ts: list_browsers, list_tabs, read_current_page, click_element, fill_input, fill_editable, set_checked, select_options, upload_file, submit_form, perform_batch, navigate_to_url, open_tab, download_status, download_file, fetch_resource, and capture_screenshot.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L74-L810",
+          "version": "repo-lines-v1:sha256:e9c623c933f86a4d9d64917bc7e22d91feea27414fb8842ad779e56798a78133:eyJzZWxlY3RlZExpbmVDb3VudCI6NzM3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwODk0ZjkyMjExMjMzZTIxMThkOThiZjJjZTFhYmNiMzEyNWJkNTEwMDNlMzhiMTI0YzhkNmE3MWQ2YmViNTM3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0YmNjMWNlMDYzYjE5NGI5NzgwMzU1YTE5ODMxMDBkYWQ5MWEyOWUyMTM3MTgyOTRjZWY4ZDMxOTZmYWYxYmJlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiYWQxNzhjYzM2YjJjMmQ0YjZmOWZmNTlmNDc5NDNlMzQyYTM2N2ZlOWM1ZTBmN2NhMTM3NWYwNTczNjM2ZGUyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjNTU5M2ZiNzQxNmMzMDJkYmNmNmMwNTJjOTVhMmVmOGVhNjIyMzQ5ZGYwM2Y2MGE1OTFiNGE1NjY4ZTc0YzVkIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_1ee8caf726874f629e44e973f970938a",
+      "statement": "The Firefox extension (clients/extensions/firefox) is a placeholder that is planned but not yet implemented, while Chrome and Safari are the implemented browser-side bridges.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L91-L110",
+          "version": "repo-lines-v1:sha256:0140fe685feab2a34739bed9cecb22fffa2fd77e74923a21fb8747bbb059fa9c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE0NzBlMTY3YmJkOGZmZDAwZjBlODc1ODE5N2M5YjRhYjczN2YyYmFlYjFhNDhlMDRlZTBhMzU1ZjY5NzBkODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiMDFjODMyOWIxNjUxOWEzNGQ0NDAwYTJlODk0NmExOTkwZGFiZGY4MGFhZDhjYzFiMWM0YjdjM2Y3NDJhMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZmZTY0NDRiZGY3MGFmY2M3OTlmZmM2NjY3NjA2YTNjNjA2MjA4YmE1ZDFjZWIxNTI4ODI5ZjgxZTZlNTExZDUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1eb99d9a63554cd59225829c8f028b98",
+      "statement": "Brijio's runtime is a single explicit request/response chain: Agent → MCP Server → WebSocket Relay → Browser Extension → Browser Session, with no data flowing without an explicit MCP tool call and no continuous streaming of screenshots, DOM, or history.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L39-L59",
+          "version": "repo-lines-v1:sha256:1b20c5b1cc6b925785eb953f5f9551d378f0c077f32a53236e1f2abf16c3d702:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjMWFlY2QwMDhhYzE0ZTk3NjU4MzA2ZmY4MzUyNjhmMDVjOTdiMDczM2QwMzg3ZTRjNmY4YWI4YzY1NDBjZTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5MTliMGRiZTQ3NjhhMmE3MjE1Y2YxMWEzNjUwNTY5YjlhN2ZiOTgzMzNhMGRiMWJiYTAyNjJhYjI5MjkyZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZhOGFlYzljNGY0NzVlNmJjZjhkNjViMjJmN2ZkZTkyOWZmNjg4YmRmNmQyZGZhOGMwYWVlY2YyMWJjYjI5N2UifQ"
+        },
+        {
+          "resource": "repo://README.md#L97-L122",
+          "version": "repo-lines-v1:sha256:1e8ed677c4300bce0f8e370280c8a629ef5767a3ccc658ee482470f4d3e82e9e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2ZjFmYTdiNTczMzdhZmJiNjY3NTRmMmVkMWU3ZWI3YzFhZmI4MzBlOWVmZWY1MGIzMzgxMDViZjk0OGJhYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE3YTc1Nzk5NzNmYjA2ZGRhM2Y3MGMyMjM4YzQyMWExZTAwZGYxNjIxMGRlMzI2N2RiYWE4MmQ0YWU2ZjYyZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8a99245231c141afa653b6e1fc51a553",
+      "statement": "tabId is threaded through the MCP action wrappers (resolved as tabId ?? config.defaultTabId) and read by the extension's extractTabId for per-call tab targeting; when omitted, the system falls back to the active tab. open_tab is the exception — it creates a tab and returns the new tabId rather than targeting one.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L564-L1793",
+          "version": "repo-lines-v1:sha256:9170955c80278b49a8a385f165d292cab48478c1ad7153f8a50b4ab9310585c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIzMCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDc4ODViN2VhNGRlNDJkMzdiMWJjYWI2YzM2ZWQyNWU0YzI2M2I5Y2M5MDM1YmIyNTJkMzg1NjZhOTMyZjBjOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjkwNTcxNjYyZTUwNDNhZmFlNDA5YTY2ZDkyOTZkZDNlODA2YTY0NWU3MTZlMzExYTNkMGM4Y2YwZmFhYTI0NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ5N2ZmYTA3YjcwOTFjOTE4N2RlYjQxMDJjYmEyY2Q5MjNlYjUwYjY4MDQ5NDc3MTE3ZDk3MWM4YmNhMTlkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDJlYTdiMGM4MTFmNDFiODY4ZWNmMGExYjljNDRhNzc5OWM1NTkxNGNhOGU3YWNjOTMwYzgxN2Y3ZDM2NjUxOCJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L59-L121",
+          "version": "repo-lines-v1:sha256:91187d12d3d4df29411280978d9200ea93187ae25259cbb00d65b88d470bda48:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhYmU3NTM3NzJkYTZlYjlhMDgzNjA2NWJlZDE1YWVmMDUxYmUxMzBjMWY5M2Y0NGU3NWJmNmY1YWVmYzhmYTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzMjNiY2MxMzdkOTVjOTE3MDgxYTgwNzdkYWQ2OWJkMmM3MjE0ZDc0MzAzMTFmMjFjZmNjYzQ2OGM4MDI2MDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzNWI3NTRiNmU2NDZmOWI1MzlkZThlNDFlMTkxZjkzZmNiYWViMDJiMTFhZGIyNGU5NzI4YzlmNzRkOTk1NGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZhYTRmY2Y5OGMwNzIwZGZhY2U0NjMzOTk3NTQ0M2RkZmVmY2ZkNjE3ZDI5M2U5Nzg5MTNlN2Y1YTQ1ZmExZDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1f67359c6ed64f78af913fad2e04748a",
+      "statement": "The most recent ADRs are 0063 (open-tab action, adds the open_tab tool so the agent can create a new tab without destroying current page state) and 0064 (visual action verification / screenshot, adds capture_screenshot returning a viewport JPEG).",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md#L1-L10",
+          "version": "repo-lines-v1:sha256:7cc63c897f5ac9184cb4db78c7d7b2786062a0f1cfd53f84ed57f8f1a4210e27:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwYmZlY2UwYTVlYzE3NmIwMjNlYTQxNDc5ODc0NDNkMTI4MzM1M2Q5NjY0ZGZhMTVlZjZjZjFjOWI4NzUwZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5MzhlMjdkYmM2MDkyMDM3NmYyZDRlNmU3NDJlNDZhNzYwNDY2YTJkMTdlYWJhODFlMTM4MzdkMjkxYzlhNWYifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md#L1-L20",
+          "version": "repo-lines-v1:sha256:158b3dd89ab66a7b2c457f5f0ceebc80bd9639ba40e3db14a3e66a9346b08a51:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmY2Y3ZTc3ZmU3NGU4NzAzZjFkNzk0YjUyNzcyZWE2NjBlMjFmYWY1YmQ0MzMyYWVmNDBhN2MzMjFlNGI5YTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmZWJiOTQ1NTAzNTM5ZmU3OWRmOTUyYWYxNDYxMzQ0OGM4NmMyN2UzZWM3NTIyY2MwNDc4ZGU0MDA3ZmQ1MDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiMTU3YTZkMjc2N2ZmN2Y0MTMzZWUyNzY1MTM2N2M2ZmRmZjdhYjRmZDliYTNjYjQyNjJlMmFhNDQ5MGNjYTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_50cc5d498e5f4f4591d60fd648e1e7ed",
+      "statement": "AGENTS.md is the canonical agent-instructions file (ADR workflow, ownership, verification, coding standards), and CLAUDE.md points to it.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L1-L19",
+          "version": "repo-lines-v1:sha256:f0d6d86e0158e4d6a56935811168dfe12e9809c508a88c0d4455189ebc348a84:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3NDQxZDEyMjA1OWE5NDJiYWQzZWQyZjhlMDQzODM1NzAwNjY1YzY1YzkwYjdkYmQ2MGNiYTk0MWU3OGE2NDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyNTY4ZTM2ODkyNDY0YjdlMjc1MGM2ZTcwZTdlN2Q3MDE5YzcyM2NlM2FiZGEwZjIyNmFjZTBkYTEwNDQ2OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhYjc0OWI5NGQ1Zjk1NWE5Y2Q5NTVkYmM5NGQ0YWU5ZTFjMjMwOWJiODNkY2EwOGRiN2IyNjM4NzlhMjljOTgifQ"
+        },
+        {
+          "resource": "repo://CLAUDE.md#L1-L5",
+          "version": "repo-lines-v1:sha256:126571e2d26b3461099a4b892b7a0894edd98bff19f9459a164281ccdbfe19a6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWYxODBmOWMxMjY5MDNiY2MzMzFhYTk1NDU2ZTQ5NDQ0YTdkNGQwMTFlOGEyYTgzZjVkYzg3MDIzOTE4MTJkMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzFlNDAxMGQ5ODNmOWFhODQ0MTY4ZWEyYjE3NTFmMzFhYTYxNzM2MzgyN2I4ODA5MzNjNjMyN2Q1Mzc1ZDY0ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjIsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzA4OWRmOTNmOGJhNTdhNGRkYmZkOGYwMTM5NjJjMzk3OGNlNGRiNjgxOTljNGRhNjY2NjQ5YjA5OTZjZWRhOSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9914db8de55a497ca7fbfec5c298182a",
+      "statement": "The canonical product contract and support status is captured in docs/project/CAPABILITY_MATRIX.md, and the design history is in docs/architecture/decisions.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L22-L34",
+          "version": "repo-lines-v1:sha256:393da84283574fa53c53db65e2cdd6cf782ee5a82be9b8ecdc952e3dda238f93:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjZDc5MDAyNmU4MTRmYTJhMmQxZGNlZmJlZGI2ZWRmODQ0ZmYyY2ExODdiMmJjNTFhY2I2YmMzMjQ4MGE1YzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlNmY3NGRjNzAwZTE4ZDkyNDJhMTMwZTM2NTllYzQwZDdiZjdhYzFhNTA5ZGIxNDg1NDMxNWQ2YTVhZTI0NDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1MGFmOWJlNWI5OGI4ZDAxZmE3NmI1NDk5NTE0MDAxYWZjOGRhY2FlY2ZjZTA5YjIzMzg4ZTQ3Y2M3MTk1ZmYifQ"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L1-L14",
+          "version": "repo-lines-v1:sha256:50cf8f10246705244630088024884b242b3e6432ce29e82c33c83774ffb38d4f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ZmQ3ZmM4ZjgxMzBjMTYxMDMyOWMxOTdmNzY5NTlkOTNiNTg5MDBhZTAyZTg3YzdmYjRiY2VhYzE3NjgxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MmQ3MTExMDNkNTBhNDM3ODMwYzZmYmNkMDRmYjRiYWI0OWEwZjgyZjZkMjZkMWM3OTFjNmU4NDg4ZGQwOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4Y2Q4OWZiMDJlZjkwYWU1YmZmNjJhNDM0NmY3NTAxYjk2ZWUxYmVhNmJhYzU5ODQ2YjNhZDc4MjRiM2Y5ZDUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.1",
+    "at": "2026-09-12T11:58:23.018Z"
+  }
+}

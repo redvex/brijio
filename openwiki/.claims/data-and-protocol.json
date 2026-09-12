@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:f97cfbd2ae2ddc98fe73c4c155ebde46adf3f5a8d6e0ca3eee1d5b146f7a696f",
+  "claims": [
+    {
+      "id": "claim_97392c25291e4fa5ade205a0785fe231",
+      "statement": "Every relayed message is wrapped in a WebSocketEnvelope (aliased BrijioEnvelope) with type 'message', an optional correlation id, an optional target of { browserInstanceId, tabId } for explicit per-call routing, and a typed payload; targeting is stateless with no hidden session-level selected-tab state.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L29-L32",
+          "version": "repo-lines-v1:sha256:5f3506b64023824a3a6ec668492bdf4c2741d062cb98acd256c4ef70e98b7a46:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDVlMGQxYTJiYjBmMzkwMjdmODQyMzA2MzM0NzdlMDg4YzBhYTk3ZTA5OWFhMWE1MWE0ZWFmNTY4YTYzNThjYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2RkNGNiNjI3ZjM5MTBlNTYwMTg0NmQ1ODRhZDljYTlhNmY2Yzk0ZjY0OWMzNzVhMzllNTRjNmVhZjllZTAyNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDhjNmI1MDdjOTg5ODM5YjAwMjc4ZDhkYWI0ZjM5OTgxMmRiMTMyNjUxYWI0ZWQ2Y2YwMGU2YzRmOGFlODA4ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTJmZWZhYzgxOTc1M2FjNWIyMzlhYjQxYWI5NDc2MzJkYTRiNzc5ZTYzMzFiODdjYWFhM2JkODFlYWU4ZWI3YiJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L1-L13",
+          "version": "repo-lines-v1:sha256:e709562b63c26f55e3e13ec2ae87d9fa0bd39ccf359b72352bc7c5f83a0903e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMzM2OGUzODZlNWYwNTE4M2EwYzRkNzE1NGE5NzAxMjU5OGEyZThkOTJhMWJjZmI3MGRjZmJmZjkxODRhNjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3MjA4YTQ2ZjFiODhjZDlmODBmNWRkODE4NDM0YmY5NjUwM2RhMzY1OTMyMGRlNmI2OTA3MTNmOWRkODE5NjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzYWJkNDJhOTY4OTg4ZmZlODRmNDZiMDZmYjcxODc5NzRiZDhiYzRkOGZmMTM2OGM4NDRmZDAyNmMyNWM0NjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2ad82341a6a247728cb92fb13f36d2db",
+      "statement": "Response parsers compare value.id === requestId and return { ok: false, ignored: true } for non-matching messages, and the MCP client additionally checks parseRouterErrorEnvelope to surface relay-level errors while forwarding the original error code.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1498-L1524",
+          "version": "repo-lines-v1:sha256:ed70a09aa0b7503b823d47981f16ae1b38df3cb24ef2e06cebc7dbaf327405c2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhM2E3MjVhZDdkODJlNzcwY2I1YjZjNDFlYmY4MjhjYmI5NzE4NjU3YzZmOTIwODAxZTY0OGM2YjliYjNhYWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzY2EzZWMxYmEzZjcyM2ZmYzNlMmZkNDFmNDhmMTVmMzhjYTQyNTQxMjE5NmM0ZGM5OGU4ZDM0MGQ3YTMyZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0NGU0OGU1ZmRlZWIxYjA0ODc1ODE0M2E1MDQ3YWRjM2RjYmFlYzk5NmQ2MWNkMzVhYWI4ZmE0MDY3MzFmMjYifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L864-L882",
+          "version": "repo-lines-v1:sha256:1b6e181e5f12169f284b7d4f88194c3914112a73a81b5a154a07e0216f976620:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwN2EzNzhiOGIyNGE3NDQ3Yjc4ODU0ZWVkODVjOTk2YTgxYmE5ZjkxNjg3NzAxODE1ODRmNWU1YTAxMTg3MzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwNjhhZWVmYzk2ZjdlNjAwYmRhOGY4ZWUzZjdlYjMwOTY1MzViYTc3NmIyZmM1OTA3ZWQ0OGU2NzM3M2QzMzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_644095d68838489db90c7fdbe385b845",
+      "statement": "Auth uses an AuthPayload { type 'auth', role 'extension'|'mcp', token } followed by an auth_success reply, after which the extension announces a BrowserPresence carrying browserInstanceId, label, browserName, profileName, timestamps, and a capabilities array; BrowserPresence also appears in BrijioErrorEnvelope.error.browsers for browser_unavailable/ambiguous_browser_target errors.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L15-L60",
+          "version": "repo-lines-v1:sha256:40f86391c5e1df6be316a30cf0152fdc183f140b09e11c2e21d41acd792ba64a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2OTQ0MTE3MGYxNGY5YTM1YjljODlkZjZlM2U3ZDg3NjI1MTViOTdkMmE0YzEwYTk2MTljNWVlY2IyMDMwYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwMTMwYjBhYjYwYWJjYmE3ZGMzOTZmNmM1NmFjYTQyM2U3MzQ2NDE2ZDFlZTlmY2JmN2NhYWYzZGJlMmE5YjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5MDFmMWZkMDNjMTEzYWI3ZGIxZjlhNDU1ZjVhNjJhOWZhOTQ2ZTk5N2ZlNzk1M2NlZWQwMjdmMWIxYzdmOWEifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L364-L371",
+          "version": "repo-lines-v1:sha256:e5702164de153076ab7deab10c4b1ca4460e926aa8af54927b3854835371af63:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTc4ODJiOTY5M2NmNjkwNWE5ZGI3OWFjY2Q2ZWU4MzAyNmM5ZTVlNzk0MjIyMDhmZmMxYjg3NjUwYTcyOWViZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWNkM2NjZmNiMzQwYmRhNmEzMDJmMzQzZjVkNTU3OTU5YTg3MmY1YzdhMmI2MDkyOTQxMTEwNjY4YWFjOTQyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjkxMjI0MGUyZjk3N2VlNTIxMDJkM2Q2ZGFhZmYwZDMzZWZlZTdiNDE0MjBmMzU5NGIyYjRmY2VkNTViZGE4YyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_397b742d24914f398896b6a36e857236",
+      "statement": "BrowserCapability is a closed union (page_context, page_content, click, fill_input, fill_editable, set_checked, select_options, submit_form, navigate, batch, upload_file, download_status, download_file, fetch_resource, screenshot) that extensions advertise and that the controller checks by testing for the corresponding adapter before dispatching, returning not_supported/capability_not_supported when absent.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L713-L720",
+          "version": "repo-lines-v1:sha256:aab603f676d9da25106ab0708e86679ed0a9fec4e4c9edb40d5c22e2f54fe939:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGI5ZDI5YzgzZTY1NDYwMDM2NjE2OTRjMDQwOGEzNTM2YWIzOTdlMDg3ZGI3ODZiZTc3MDZhMDY4YmUxYzM4YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ5N2ZmYTA3YjcwOTFjOTE4N2RlYjQxMDJjYmEyY2Q5MjNlYjUwYjY4MDQ5NDc3MTE3ZDk3MWM4YmNhMTlkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2FhZWI0ZDkzY2NiOWRkZTM2MDI1ZmE0YzUzMGEzZWUzMDc1OTM5M2Y2ZWVkOTJhZTRhMGI1MDA2YjAwZjM0ZSJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L976-L992",
+          "version": "repo-lines-v1:sha256:48d4f1ffe9f4edbb73a1f3d5b8f3d735829bdbf537e8c1352f13f2389ce6a8a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyOGQ0MTEwODMyNWEyMDZhZjI5ZjUwYTk2YjQ1MTNlNDZlZDk3ZmFiNzMxNjNlMmFmNTZjMmIzZmUzYTVmYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBmZDY0OGE2MjdmZTdlYjllZTgxNzA4YWFlNjBmNmJjOTI5NDQ2ODVkMzMxYjY1ODU3NTQ4ZDAzYWMyYTYxMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyOWUwOGIxNjU2MjJkMzM2ZGVjZDc0MTBjNDg3ZDNmOGRlZGQ5NjZkOGFmMWY1MTI5M2IzYWEwNWQ0YWM4YTcifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L17-L42",
+          "version": "repo-lines-v1:sha256:57c89734e7a54c834e3b6b5790a97dd8c24ebbcadd67fd2c4cec53b6c7293b6b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0YzVlYWVkMmI4MDg3ZWY4OTdmOTJiNjRmMzU3NzE0ODFjYzZiYmM1MzYyZDhiM2I5NmQyODM5NmVlMzA2ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzYWJkNDJhOTY4OTg4ZmZlODRmNDZiMDZmYjcxODc5NzRiZDhiYzRkOGZmMTM2OGM4NDRmZDAyNmMyNWM0NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUxZWRjYmEzOWM0NGNmZDA4NzlmOGE5OTMyZDYyNmY0MGU4Yjg5NTU3NWM0OGRiYjMyODljNjJkMDVlNDgwM2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9b941958b51c4dd0af7ea4be715419b0",
+      "statement": "list_tabs returns TabInfo objects (opaque string tabId/windowId, title, HTTP/HTTPS url, active, supported) on demand with no ambient streaming, and the envelope target.tabId is the explicit per-call targeting axis for all subsequent tools, falling back to the active tab when tabId is absent.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1793-L1800",
+          "version": "repo-lines-v1:sha256:e821db89f1235f8f15ac222a7f411904657bcdb7dd9b98aa8b4b04a3a4749b3b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjkwNTcxNjYyZTUwNDNhZmFlNDA5YTY2ZDkyOTZkZDNlODA2YTY0NWU3MTZlMzExYTNkMGM4Y2YwZmFhYTI0NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWM1MjAxZTVmZDc2Y2Q2NDQxYjlhN2MwODFkNzMwOTNkY2FhNDhlY2Y1ZjVhYTM4YzljOGQzZjNhMGUwMzQ5OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L564-L569",
+          "version": "repo-lines-v1:sha256:b1155d1fc9eaee47e8e3a9eb62db5bd695fa6fced75a02b3d9c59d07c6360d82:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDc4ODViN2VhNGRlNDJkMzdiMWJjYWI2YzM2ZWQyNWU0YzI2M2I5Y2M5MDM1YmIyNTJkMzg1NjZhOTMyZjBjOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ5N2ZmYTA3YjcwOTFjOTE4N2RlYjQxMDJjYmEyY2Q5MjNlYjUwYjY4MDQ5NDc3MTE3ZDk3MWM4YmNhMTlkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDZkMDQwYzZlY2FjNDRlMTQ2ZTZkYzYwNTg0ZmFlZWY2ODhmMDQyOWY5ZDZmYWY3YmQ3ODQzMDc1ODBiZGViMyJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L64-L93",
+          "version": "repo-lines-v1:sha256:31fc42157984f48a251ebe011100487e39f3f3882033fcf932abc5c1489cf098:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwNDE1NzU3NTVkMWJjNTczODA4M2ZmYzY5OGQyMTAwOGUzMWRhNjVmZTBmYTE4OTAwYWI3MDZhZWZjNThiZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5MDFmMWZkMDNjMTEzYWI3ZGIxZjlhNDU1ZjVhNjJhOWZhOTQ2ZTk5N2ZlNzk1M2NlZWQwMjdmMWIxYzdmOWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NjA1ZTQ5OWFmNjA4YWFlYTc1NjIzN2ZiNzIwODEwODdhOTdmNGI1NmUwMDY1NWY2YjhkZDI3ZWUxYTYxMDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c4c6c5a40cb4eb09714437528e71d97",
+      "statement": "perform_action and perform_batch carry optional pageContextId (numeric snapshot id) and visibleContextId (string control fingerprint) guards; when the page changed the extension returns stale_context (or page_navigated in batches, mapped to stale_context by the MCP parser) with a structured StaleContextDetail of expected-vs-found values and previous/current context ids.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L468-L508",
+          "version": "repo-lines-v1:sha256:3df8c71b3530ff84e8ea8c89dfc8a89b0f32a61049ab84acd6eeb701603cfa09:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjOGMzNTZjZDE0ZTRmMGE2ZDlkZTAxYzJjMzg0MzljMWZlNjBmODQyOGQxMGMyMGVhYjQ5MjEzOWY0OTVmNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkOWNhYTA0ZGEzMTQ5MmZlMTQ3YjM4MTY4YjY2MWE4MzhhNzc3NjI1NTZkN2YyODJjYTc2Y2YyMTk2NzJiMDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2OGQzYjJhN2M0ZGVmYzM3YjJiZTdkOThlNWQ1MDA3ZTJhZTY3ZDYxNjVkNTViZjFkNGM5ODEwZjc1YWMyMDAifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L825-L856",
+          "version": "repo-lines-v1:sha256:6838b166d511a675f885ecb22c70d6c98582ed3a930c55b62461bb2e749e73cd:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MzNlNDk1N2MyMTY3ZDU2NTk5NDI3MGQ5NzZmZjc1NTFjYjUzOThjMGFmZDllNzYyODQ0ZGMwMmVlZWI1NmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4MGM4MTcwNjkyNzcwZjRkYWUwOTc4ZTkzMjZmMjBhMjUxNGI1NjIyYTdmYTk0N2U0NDc1YmIxNTMwYjVhZTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczNzEyZGIzMjI0MzNkNTBmM2E2MmI0YzczM2QyMmM5MzI0ZjI1NDdhYTFiNGJiMTg5Yzg1OTc4Y2VlYTEzOTQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1618-L1644",
+          "version": "repo-lines-v1:sha256:562a5e384240841d5307bed9161314b06d12df1fad950238d90315680ef06c52:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZWEzYzcwZTVhOGQ5MDgxNTM1NzRkY2Q3MTBjOGZiOWQ5NWU1ZTM1ZjczYzc3OTc1ZDBkZDY5YTUwMzI0YzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0NDA1M2M4YzQyODg0MWI4N2IwODYxMTc4ZjcwZjEyMGQ4OWI1NzAxZGQ3ZGIwODYxYzhlNzUwMjhmOTQxNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhYTc5YWY0ZDg5ZTU4NzFmOThhYWEzMGZkMzM5ZGVhZTZmZDIxM2JkMTBkMDQxNTBkODU1YTBlY2E3ZGE1ZWEifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L997-L1005",
+          "version": "repo-lines-v1:sha256:c03427de3b2d9ccb333c7f32affb19b6240807834e368d92a1438a725518a509:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTI3YmM3MDIwYmZhZTJjNGMwMzQ5NjE1NTEyNzg3OGQ1ZWUyYTA0ZmZmZWU5ZmQ0NmY3NzA4MjA3YWExMDdkNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZDgwMDMyZmRkZWI3MGYxODQ2MGUzYmJkYTIwNGZiODdmZWQyZThlNDU3YWRkYWQ4YWZkNzY1MDU0ZjY0ZGE4MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODBlZGYzZjhiNzg4YWZlMGNlNDZhMDJhODI4NGE4MzQwNWUyZDljYTQxYmNjMWVmMWI5NThjOGNjZjE3ZDkwZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_375742bd51664ed1926fed3c3b346d78",
+      "statement": "perform_batch (ADR 0044) bundles 1 to BATCH_MAX_ACTIONS=20 actions, validated by isPerformBatchEnvelope against that bound, and the MCP parseBatchResultEnvelope treats a results-bearing partial-failure as success-with-data while a batch-level error (no results field) is a hard failure.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L1824-L1845",
+          "version": "repo-lines-v1:sha256:a6ec4e2d7d93a7cac8967152b5ce94675feee14dea4c9e21e1069966cd90e7f7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkZjcyMGI3ZWE5YmU3MDJjZWEzZDU4MTcyNzUyMjJhNTIyOTZiN2E4NDlkNmRiOTE1YjAyNDFmMmI3ZWZjZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjNGM1NDQ5MTE1MzQ0NGNiMThhOTkxM2JmNmU1Yzg1YjQ3NTM0YzBmMDE0MWM4NmQyYzcyYzAzYjJlMTI5NjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkZGU2MWI4NjVjZWZlNjlhZGEzZjI5YTZlNTYxMTQxYzY2ZmFhZjYxZWM5OGFjZTU2MDdmOTllODM0MjQ1MjEifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L481-L534",
+          "version": "repo-lines-v1:sha256:95f4b69b05bba4662515dd158b2b456da58e125e1ff9ac661d90f697724b7d09:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIxM2M1ZGVhYjljNzg4MmU0YzE3ODI3YjdhODc3ZGU2MTU0MDM2NjFlM2ZiNzExNjViZWI2YmYxNjNlYTFhNGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2NGQ2N2UxOWZlZmFmMzkzOTNjYzY1MmRhMjJmYTI3MDJiMjU3ZWMzMDJiODU1MDgyMWQ3NzU3MDFlYTYzMGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkYzdlYTliMWZmMTViODFkMTc1NTBlMWFkNDY1ZDJkNDQ4Yjk0OTRkMGMxYjlhNjQ2NTVjMmRlODhhNDM1OWYifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L884-L963",
+          "version": "repo-lines-v1:sha256:838dc8b27b2fea13ae9352f30d7be0095422bfef060c24095aad4394caa2ad97:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NWNlZWYyMTEzMjI5NzE0NGQyYmM1YzhmY2QwMTBlNmExZDlmYzQ4MTE1MzFlZDViNzM2M2NkNTE5YWU4NGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4NzE2OGUzM2FlZjEyZjFmMzI5YmNkMTFhMDRkZmIzZjk4N2Q1Y2I4ZjQzNGU1ZDExNjYzNjYwZjYyYjQ5YTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmNjM5YThjOGM5NzUyNmY4MjVlMTE3ODBlNDNmODcxNjQzNDgxMDQ3MGY4OTA0NDk3MzAwN2M0ZWUwNjU4ZTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_82d9966458ae4e25bf15a373d06d71d3",
+      "statement": "open_tab (ADR 0063) creates a new tab for an HTTP/HTTPS url and returns OpenTabResult { tabId, url, title } via open_tab_response, with OpenTabErrorCode of unsupported_scheme|open_tab_failed|timeout; the extension dispatches through an optional PageOpenTabAdapter and returns not_supported when absent.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L636-L644",
+          "version": "repo-lines-v1:sha256:465a98189ad4ec1c6b5a271471da7a7df64ad29d5de1c4890c8d1d76b71dc687:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzdiMWYxZDE4OGU4MGEyYjE1YTcxYjEyNTMwYjYwZWI3Yjk3YjU4MjA3ZmE3NGI1YmYxMTBhMzY5ODVjODc1YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmQ5N2ZmYTA3YjcwOTFjOTE4N2RlYjQxMDJjYmEyY2Q5MjNlYjUwYjY4MDQ5NDc3MTE3ZDk3MWM4YmNhMTlkZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGYyZmI2MWU3NzE4YWM0YjQ1NTM0MDk3ZjIzMGQzNmI3ZTE3NTE1MDQyN2MwZGM1Mjc0MDhlYmE4NjQ4NmRiYyJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L972-L1024",
+          "version": "repo-lines-v1:sha256:932abb43a6af0a5355ce107b8442bc87d6751779bde269d9376365e35140bbf6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhZmUzNDlmYmU5MGU1M2I4ZWY5ZjRhOTRhYTFkODMzYjhlMmY5ODZjY2E0NTNjNjZkODMwNmQ3NjI2ODc0MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1OWVkNmI2NTlkYTI2MzEyODZhM2YxM2I4YWYyOTdjZGUxYTMwNmZhNTQ3NjkxM2E3OGY5ZDljYmRmYmQ2NmQifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L894-L928",
+          "version": "repo-lines-v1:sha256:df8a72f70ebb923cac765c713978ea784d0890b8d56c1b677e83735d7c7210af:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkZDk0NDk2NjkzNzkzNDhmOTFkOTI3ZDAyZjRkYzY1NWZjMmNkMTcyMDFiYTcwZTVlNGFjMDdmOGU5ZDEzZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5Y2RkZTU4NzI4MjhhYTRlZDdiNmQ2MjdiNGZkODU3M2ZkMWFlZjU0ZThkYzU3ZjEyODIxNzViZmMzNGUzYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlZWQ0Yjc1MWRhNGQ3ZTc1MTI2OTE2YTYxNjcyMGQ5YTU3ZjkwZTliNTI5NjJkMGRhMzNiMDMwNzIzNWZlMzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2ZDY0MDBhMDYyNjI2NmUyMjdlOTA3OThhNjI1MzRiOTNiOTIwMDQ2YjNmYjc1ZjdlNWMzNDc3YjkzZGUzNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_835706b9fa1d4253970282d97edfb305",
+      "statement": "capture_screenshot (ADR 0064) returns a viewport-only JPEG via screenshot_response with dataBase64, width, height, tabId, capturedAt; it is active-tab only because captureVisibleTab only captures the visible tab, and ScreenshotErrorCode is capability_not_supported|capture_failed|no_visible_tab|timeout.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md#L36-L45",
+          "version": "repo-lines-v1:sha256:503191d210e70af627691c619f2d14f9d45640cb6fc6a766b4b2eefdbf36e42e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNGI3MzExM2Y3YTRhNTIyNzc3OWI2N2FhMTJmMzJhZjE2M2FiMmZmOWEwM2FkZTk3ZDE5NjYwYjliMmY4MDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1Y2VmZTE1MGNjYzA0MDc1Zjc3MDA4MGE2NWIxYzk3Njk5NjVjYjY1M2Q4MjkyYWYxYmMxNGVhMGFlYjM3OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4OTJjMTVmOGJlMzQ5OWVlY2EzZGU3NzNkZTE3YTJlM2FhN2MyMWQ0YmMzYzJmMDMzYjNhNWMxYTlkNWI4MDIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1208-L1254",
+          "version": "repo-lines-v1:sha256:a0cdebf0346b22fc093d32dc8ee314fe2dda56f62c0e59dd384a2cd6cbbac965:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3MzM1MWI5MjE0ZTIyZGI0NjcxNWU1NTQ1NWNjMGFiYmZjNTNkNTE5NGNmMjA4NGVmOGMxMDE2MjhjYmM1ZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhMWM5YTdmZDRmYmIyMzNkYzk0NjAzZmI5NDk1MGJmMzA0YTQ4YjVmMGE4NTNkZjI1MzE4MjViNWRiMjYyMmMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L175-L214",
+          "version": "repo-lines-v1:sha256:ad206006f1da7e9a3447be6a9f3aa58ef04f73e80fc989d4e500ec98cf75a67a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxZDE1ZTJkZmI1NzY0ZjBlNzIxN2VhNDE2ZGViNzk3MmU1MDE1ZGI4MDgzMzgzMWUzMmM2ZWIxYWJhN2M1MmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1ZDUyNTRlZGMyMmU3M2Y5NTMyZmNmN2EyMjdiZTI4NGNlOTcyOTU4N2Q0NGRiYTRhNjM5NjhiYjY0ODgyMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQyMTRiOGIyMDlkNmYxYmMyZGNjNGUwMjVmMmRlMWJiMzkxODM2ZjMyMGNjZDg4ZDRlOTRiYzA5MWMzZTg0N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NjM1ODc0NjNjYjBmMWZhOTdlNGU1OTRjZmI3NjNmZTY5MGEyZjRhN2QwNzA0YjVmMDJjYjY4NWNmZWE3OGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f8606c71562f41729adf202a781d5a72",
+      "statement": "download_file and fetch_resource are approval-gated (carry ApprovalMetadata and use a longer approvalTimeoutMs) and fall back to not_supported when no DownloadAdapter is configured; download_file_response distinguishes initiated from initiated_fire_and_forget status.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1068-L1132",
+          "version": "repo-lines-v1:sha256:d043de67833b21ac741f8e2269a6f48c911c0d95fbd96898cbf40a7cc63695b7:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwZDM5OGQ3MTk5YzdjYTZkMDhkZDBiNWYwNzlmMmFkMGU1MDRiMDU3OTAwMmVmYTIwYmU3ZTM5MjYxY2ViMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MjIwZDFjOTgyNmFiYTNiYzc2MTRjOWQ4MDMyZDY3MDU1M2ZhZmI1ZmE5ZWQyZmU0MzZhMGRlZDQ3YjgzYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1136-L1206",
+          "version": "repo-lines-v1:sha256:7bc83fc3eec41e91f762610c17c9c56370921ad24bbafe2749d4e64fe6e28e8e:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhhNDAyYTY1MTZkYmQ1ZjRjYjhhMWUyMWIwN2NkNzMzM2IyNzk5N2I4OWZlMDU0ZmU1MjYwNjhiM2YzOWFjNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhNmI3ZTBhMmU5ZWIyY2Q5NDQ5MzI3ZGVhODQzMzY2MmVhNjczNWNmZjZjYTA5OGY5YmQ2YjI5NTIxZjJjZDAifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L266-L298",
+          "version": "repo-lines-v1:sha256:027564dfc962f5ed873e081003afa7eb4ae6abef581375c1300d90d39fa93efb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxMWVlNjg2OThjMjhmMWRhNGFiZWRjNmY5MGJhZWViN2NhMWM4MGNmOTc2NTIzNzdmMTlkZTc2NjBhZWM3MGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyMjBlNGQ4YjkxNTY3M2FmMjI1Njc1ZWQxMTJmMDA0NGM4YzJhOWIyZmRhMjlkYTY4MTRhMTRlZjFiZTJhMWQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L494-L547",
+          "version": "repo-lines-v1:sha256:c7d0947d7e6705f4ad4be172101f7fcd7e0a0bcaf50b921d64792dd28d413409:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjODBmMjRiZjg1MmUwYTc5MmRjMTM5NjQ0NWVhOTdhNDhmMjQzZDljYjhkYzU2Zjg0ZTdkODU2NTNlNzlkMDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwMDZlYTUxNTNmNjAyNGRhOTRlMmU4N2M0MjRlNzAzNTY2ZjA0NDYwNGI5NmI0MjlkY2M5YWJhOWNjNTZlZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJlMWUxMjRhYTE2NTY4NGM1MjIxMTFhMTJkOGIxNzdmYzc5MDlmMzlhMjg4OWQ3YzYzNTMwZjQ4NjA0ZDg5NjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ca5ea86b0c8f45d6afffc18ab79798e0",
+      "statement": "download_status returns a capability of 'full' or 'not_supported' plus items that are DownloadInfo (kind 'download', DownloadState in_progress|complete|interrupted) or FetchResourceInfo (kind 'fetch', state may also be 'streaming'), and fetch_resource uses streaming sub-messages (start/chunk/complete/error) with a single-message complete fast path.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1193-L1205",
+          "version": "repo-lines-v1:sha256:ae6f3c8493b0c41dc336df8c34b6ae3451011b60d36f9c93b6b460693e89f267:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiZjc1MGYwNzFjOWVmMGE5MzBkZTljZWViODIyOWQ0YzU2NGQ5YjQwMGVkODE2NzE4YmNiOWQyNWE2NGEyMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyZjY3OWI1ZTJmY2JiZTVjOTQ1ODk5YjBlZGIyMGU5Y2Q3NTM5YzQ1MGYzMDM4NTU3NTUzMWNhODExZTViN2UifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L216-L336",
+          "version": "repo-lines-v1:sha256:ecdb627534dc1c2fdbf1ba6f66731f25049c8c1fe2afd9905a07193f03380493:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2YzkzZTgwYWFjZTg3NjU4NTBlZjkxOTMxNjMwODdjOWMwOTc0ZmQzZTJjZTc4MGE2YmU0MzFiMTVhMDM1YzQwIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NjM1OGQ3YjEwOWNjNjZiMWJlMTdlODJmZDM5Mjc0ZjhkODMyYzAyYjkwNGU5ZGNjMzUwMTE2YjJiZTc0MTdiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0MzAxMjYyYjYzNWU1YjVmZGIyODMyZTI3MGE3NzJjN2QwMGFkOGM2NzQ5MDg3ZmY3ZmZjNmY5OTg5NDQ5YWM1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJhZjEwMmUyNjUxMTcxYjllYTcyODFlZDMzMDdkYjAwODU4MWRmN2Y1Zjc0ODkwOGEzYmI0NTcwZWVjOWY0ZTQ1In0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1432-L1496",
+          "version": "repo-lines-v1:sha256:989641e5868f364ce5019b4fd0ce82800a19702a5cd5d02efbcc3811fc72061d:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJkY2FjY2ZhZDk0ZTM2NjUyNDcwZjhhNTJmZTA5YjkzMjc1N2I0ZDBlOGE4YWVhZmUwMGMyMmZlNWI0MzJkYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE4NzE2OGUzM2FlZjEyZjFmMzI5YmNkMTFhMDRkZmIzZjk4N2Q1Y2I4ZjQzNGU1ZDExNjYzNjYwZjYyYjQ5YTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU1NGI1NDlhYjFlNjI1ZDA4MjA0MDk1NTZkY2Y1YTFlYjExNTU1NjQyZWNmZWQ0ZDMzMmRiMjE5MmQzNDMwN2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1a7adbead4224cb988d269953392e890",
+      "statement": "The MCP-side protocol module servers/mcp/src/protocol.ts (~2195 lines) contains the create*Envelope builders, is*Envelope guards used by the extension dispatcher, and parse*Envelope response parsers plus BrijioResourceResult<T)/*ParseResult families that construct and validate relay messages, aligned with the shared protocol but living on the MCP side.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L555-L721",
+          "version": "repo-lines-v1:sha256:87f7b0af7d953bd9722145266accaa94b6ab81119e7cadcb96a072bd228e9892:eyJzZWxlY3RlZExpbmVDb3VudCI6MTY3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzY2JlODg1NWZmZDQyNTUzOWI1OTE4NWU2N2QzODdhZjBhM2NiNDMyNjM0MWVhMjM2NjFjY2FiMzc3ZTUwMzdmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZmQxM2MyZDVhNWM0MTRiYWJiZTEyMzg2OGE0OTRmMTUwYjZiMjdiODQ1ZGRjNGU4YTFlN2Y4NmU0NGU5ZDAxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyZjY5MjcxZjg2Njk2OWUyZDU0MDQ3Y2NjZGE2YzUwZmU3OWY1NzFkNzk3OTRmNzZkOTFkMTVkZTI3OWIxOWVlIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1007-L1231",
+          "version": "repo-lines-v1:sha256:f87bff09c418e0343077de3a90b2fc87a00fbcdb6c3a7f4b22be8f6798ccf009:eyJzZWxlY3RlZExpbmVDb3VudCI6MjI1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5ZDRjNGFiODQ0NzBjMWY3M2YwMTZmYTVlMTYwODE0NmRmZjUwYWVhMjI2ZmEyOWRiZDAxZTI0NzY5ZjlmMGY0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlZjRmYzRmMzZhNTJmZmEwNGIyNmQzM2NlZjlkMTczNGRjMTEyMzFmM2Y3MWM2YmNlNDM0Y2EyY2RkZGQ0OTM2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwZGM1YTM0OTM4YWExYjYyZjNlODcwMjU0ZWUwZGI0YmVlNmM0MTVjYzM2MTI3Y2U4Mjg2NjE0MGNjMDFmZmExIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L506-L533",
+          "version": "repo-lines-v1:sha256:f6864ca3aaa828e5f5d55c49f8aebb0dad9fe74a011b0a198bf4e7554aea5697:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1YzNlNTBkMzViNzIwOTY1YjcyZjQwMWViOWE3OGVlYmJlYmVkMTNmYmZjODkxYTk2ZDVmOGZjN2RmZDM3ZWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzODY1Y2Y3NGQzZTAwODE5ZjY4NzFkYzE2ZmY2Y2I1Y2UzZjY2ZmU4MTljMTNlODRmY2YyNTM2ZTRhYTNmNDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3ZGYzNGUwY2E5NzlhYzNkNTVkNTY2OWQ1ZGJkMjYyMmE0Mzc2ZGU4OTM2NjgxY2JiNGFhOTYxZWFhNDI3MjAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d50d76532f674322b497d5c12e65f4c4",
+      "statement": "The MCP requestBrijio lifecycle opens a WebSocket, sends createAuthEnvelope(token), sends the targeted request envelope on auth_success, and resolves with the first non-ignored parse result or a timeout/connection error; targetEnvelope stamps target only when browserInstanceId or tabId is provided.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L141-L173",
+          "version": "repo-lines-v1:sha256:43300d09444c8bf4c8c706e4beb4fb87c7b64e9175ed1d99dc3aa8678a2c4be5:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YmVmNTc3OWM2OTkyZmI0MDk2OWUzMGRmZDQwNzQ1M2EzNTFlYzUxMjI5YmVmOTZhMWRhN2NiNWQ4N2FhYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1ZDM4NzEwNGExYzAzODY1OTk1YjRlMGVkNTllMmFjYmVlYTMxNjJlZjU3MjZlNjUyY2QxNjdmYzNjN2NkOGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2ZmJjMDI1YmE5YjgyMjY0MzU5OTQ1NzJlYzgzNmJhMmQ2MDFhYjNjNTVmODgyYzRlZDEyNjdmODQ5NjhlNzgifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L698-L838",
+          "version": "repo-lines-v1:sha256:fe4fa89eedf3446e83bbb31b982d7e75bd6a13a6a2865a25bbe0aa3545721037:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0N2FiYzIzYjY3OTAyOTJlZmQ1ZGYwYzg2MjE5YTU3YWJkNWRlYzVlOTVkNTUwMTJkZTZkYmY0ZGZiMTI0MDM1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjM2NhM2VjMWJhM2Y3MjNmZmMzZTJmZDQxZjQ4ZjE1ZjM4Y2E0MjU0MTIxOTZjNGRjOThlOGQzNDBkN2EzMmYwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0OTg4MmZjYWNhN2VjZGU1YzU5NDdmODc3YWI1YzU4MzNhN2E1NTgxNmQ1MmQwZWRhM2FiYTA4ODEwYjZhMTMzIn0"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.1",
+    "at": "2026-09-12T11:58:23.018Z"
+  }
+}

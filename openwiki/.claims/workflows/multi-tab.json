@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:2fbccc69a40cf8ec9d657dbf5d8756ccbacb30e7d3c49479eae665f0ee76130c",
+  "claims": [
+    {
+      "id": "claim_7069b381d16b41d5b208191c2cb5083a",
+      "statement": "Every tab-aware MCP tool (read_current_page, click_element, fill_input, fill_editable, set_checked, select_options, submit_form, perform_batch, navigate_to_url, list_tabs, capture_screenshot) accepts an optional string tabId via a shared tabIdInput Zod schema. When tabId is omitted, the system falls back to the active foreground tab: extractTabId returns undefined and the extension adapters operate on the active tab via tabs.query({active:true, currentWindow:true}).",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1788-L1800",
+          "version": "repo-lines-v1:sha256:e8f947d829c49a1b0a47927bca2b4051dba0b9c3529a7b7f92436e2518733f38:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJlZWZmZmIxOGY4MzlmYThiNGM5ZmZjMDZjZWM3OGU2ZDY3NzVlZmM2NmRiZjYwZTViZTlkNjY3ZDU3MTYxNzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L63-L66",
+          "version": "repo-lines-v1:sha256:efc30161a94176ade74b487942dac815d4b0039f60b69de7d3ae3ee7022d509c:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjdjZWQxYmRjNjJmZTk5NDkwODE1MDM4MzVkNTU5Y2UyNmM2N2E1MWJiN2Y2OWUyMzQ1ZGY2NGNiYzVjZjI3ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODdhMGE3MjRjMGMwMWFmNzUxNzgwZDVkMjQ3MGE0YzlhYmEzNmQxMjI3ZDFhODM1NDI4NDE5NTEwMmM1NDMyZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjNmZjk5MWM1NjQ1YzBlNDU1MDk5YTQ4ZDI3NTZjMTA5NjQ5OWExZTI0MDJlYjdmNGJhZjhlNDIyZGQxMmIxNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZiMTY0OWIxYjU3MjQzYTQ1MjZlZTk4YWM2ZWU5MmRmZTU1YTQzMmZlMjY1NGM4NTcwMTBmNzViOWJhNmM2MyJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L115-L126",
+          "version": "repo-lines-v1:sha256:e2fa110f273d2955123f0d0f23c1f1cfdda6f224c0554267b4a221db34b6c131:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZjMxNDQ5OWY0NGVhYjkzYTQzMTM1MGUwMDc5MWY0MzZiZjI1MmIyNzU2NzEwZGJhNzcwN2UwYzdjNjQ2NzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNmU5YmI2NmRiNThmYjhiNDU5YTc3NWM5MGNhNzI3NjFiNmRlMWI2NzA5NDEzMzExOTZjZjViMjE0MmI4NzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzYTI5OTc4Y2UxOTBjZjYyMmUwMjhjOThkYzkzN2U3ZmE4NjZhNzgyNzZhNmUwYjYzY2JmNTQ5MjJhMTMwYmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aedd14b9db374e368121eca2d6766e5c",
+      "statement": "tabId flows through three layers: the tool layer normalizes input and rejects non-string/empty tabId with invalid_tool_input; page-actions.ts resolves tabId ?? config.defaultTabId into the WebSocket request options; and websocket-client.ts targetEnvelope only adds a target object to the envelope when browserInstanceId or tabId is present. On the extension side, BrijioBackgroundController.handleSocketMessage calls extractTabId(message) which reads message.target.tabId (string) and parses it to a number for browser APIs, returning undefined when absent.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L564-L644",
+          "version": "repo-lines-v1:sha256:478c4973c56b92ec3f9f569a3178e62ff687d528093704620f4bb9bd5111fada:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3ODg1YjdlYTRkZTQyZDM3YjFiY2FiNmMzNmVkMjVlNGMyNjNiOWNjOTAzNWJiMjUyZDM4NTY2YTkzMmYwYzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRmMmZiNjFlNzcxOGFjNGI0NTUzNDA5N2YyMzBkMzZiN2UxNzUxNTA0MjdjMGRjNTI3NDA4ZWJhODY0ODZkYmMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L115-L126",
+          "version": "repo-lines-v1:sha256:e2fa110f273d2955123f0d0f23c1f1cfdda6f224c0554267b4a221db34b6c131:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZjMxNDQ5OWY0NGVhYjkzYTQzMTM1MGUwMDc5MWY0MzZiZjI1MmIyNzU2NzEwZGJhNzcwN2UwYzdjNjQ2NzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNmU5YmI2NmRiNThmYjhiNDU5YTc3NWM5MGNhNzI3NjFiNmRlMWI2NzA5NDEzMzExOTZjZjViMjE0MmI4NzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzYTI5OTc4Y2UxOTBjZjYyMmUwMjhjOThkYzkzN2U3ZmE4NjZhNzgyNzZhNmUwYjYzY2JmNTQ5MjJhMTMwYmEifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L807-L838",
+          "version": "repo-lines-v1:sha256:0042e190734687b0912c98fcd6ae6e9c4cd9fa5c6cac51b3efaada91579bb028:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1M2E5YzhiNDRiMWVmODcxNDAyMWQ3YTU1ZTM5NzhmNzZkYWQ1YWNhODY1Y2I4YzA2ZmNmMTU3NDAyYTM1OWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5ODgyZmNhY2E3ZWNkZTVjNTk0N2Y4NzdhYjVjNTgzM2E3YTU1ODE2ZDUyZDBlZGEzYWJhMDg4MTBiNmExMzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3cea2ec2b25945b892596a5e3b7583e4",
+      "statement": "The open_tab tool does NOT accept a tabId parameter because it creates a new tab rather than targeting an existing one. It validates the URL scheme (parseUrl rejects non-HTTP/HTTPS with unsupported_scheme) and returns { tabId, url, title } where title may be empty until the page loads. The returned tabId must be passed to subsequent reads/actions because the new tab may not be the active foreground tab. close_tab and ownership tracking are deferred to P2.5.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md",
+          "version": "repo-file-v1:sha256:db79ee600db5a83e31a9fb764b37418f9face30de9f3965f9c9c6b6ca3795252"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L972-L1024",
+          "version": "repo-lines-v1:sha256:932abb43a6af0a5355ce107b8442bc87d6751779bde269d9376365e35140bbf6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhZmUzNDlmYmU5MGU1M2I4ZWY5ZjRhOTRhYTFkODMzYjhlMmY5ODZjY2E0NTNjNjZkODMwNmQ3NjI2ODc0MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY1OWVkNmI2NTlkYTI2MzEyODZhM2YxM2I4YWYyOTdjZGUxYTMwNmZhNTQ3NjkxM2E3OGY5ZDljYmRmYmQ2NmQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L563-L589",
+          "version": "repo-lines-v1:sha256:963dc11cf44679120fa8e65401b316175cfb55e35ab72de7a0a999793e3cc2a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4OTRmOTIyMTEyMzNlMjExOGQ5OGJmMmNlMWFiY2IzMTI1YmQ1MTAwM2UzOGIxMjRjOGQ2YTcxZDZiZWI1MzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNmM2MzcwZTcyMjQ3ZDczYjJlZTBjNjJmZDM4M2E3MWYxYzg3MGIyMDQ5MzliZTVkZWRhMDRjYjQ0MDVjZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3YmYxNjk2ZjYwYWRjMTczODkyYzRkNjE5NGI5YTUxYWJlZTkyOGMzZGUyMGIxYjY2ZmZlMjZhZjI0NTI5MDcifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/open-tab-tool.ts#L24-L89",
+          "version": "repo-lines-v1:sha256:5278769aea54507f2ac78ced05566201c1dd9fdc0804bd67dd914dfbba11750c:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5ZDZmMzdlMGNkMmU4ZDdjYmJjYTFiOTQ0NDQ0NTE0MDk3NGRhYmZlZjNmZmIwOWFiZjc3MTFkOWYwMDcyNjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNTI2M2E1MGUyMTRmODFlMmEwMDY2ZjAwZjE2ZTRmMzJhMWQzZjA2MGMzMDAwNzEyNWE4NzFlNDVmOWViNGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkNDQ0YjM1MWIzN2U5OWYyMmIwOWY4MzgwZTRmNjg1Zjg5MzZjMjBlZmYwZDliODQ2NDQwNjBkZTMyMjI0Y2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e4732f5a1a2b40e2b9f2f3979a807b76",
+      "statement": "capture_screenshot (ADR 0064) is active-tab-only by design because it is built on the browser captureVisibleTab API (chrome.tabs.captureVisibleTab / browser.tabs.captureVisibleTab) which can only capture the visible tab in a window. Although the tool accepts a tabId in its input schema and threads it into requestCaptureScreenshot, the extension adapter pageScreenshot.captureScreenshot() takes no argument and captures the active tab regardless. Capturing a background tab would require switching focus, which is user-disruptive.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L498-L560",
+          "version": "repo-lines-v1:sha256:b0cb94314cfc49ca34adb84bc62295bc0402a1d4a87af94de8d450ee140da995:eyJzZWxlY3RlZExpbmVDb3VudCI6NjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlNDllNzU0M2Y5M2QzZTI2Y2JmNmNhODU5ZjZmZWUxZjEyOWZiMjNhY2U0MmJhNjEzY2NiNWZmYTJjNWNjNDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyZWNlOGNkZDllMTRlNDEwMDJiNjUxNTA4MmMxZmU3NGRlYzFmODI0YmJkZjFiNTg3ODI4NzFmMjM5ODJkMGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU3MjJjYTk2OWYwMmJlM2MxNDE3ZTkyYWE5Mjc0NmM0ZjQzZjNlNGQ2YzQ1MTMzOWM2ZjQwOWIwNjEwMDY4MzYifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L160-L199",
+          "version": "repo-lines-v1:sha256:f4e5ee04bad22b19136f63ebb32fee83090a06a364c8055e7b83ba6bd10cba84:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1NWQ2MTU0YmVlODMwODA3ODI0MmRmMWNlNTcwYmY0MzVlZjM4Njk5MTQyNzkwZmNlNGE2OWUyMTE5NmRjMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2MjMwYzQwNmJhMTIyNWNiZmYxODM0NDdhNDYwZjNhZDY4N2ZjYTIyNDk5YTkzYTQwODRjYTgzZDUwNGM1MTcifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md",
+          "version": "repo-file-v1:sha256:e6a4b9e46e48fb1ec1e7d58bd8f3965a846f5d0d400d79f69ebfe208ce51177b"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1208-L1254",
+          "version": "repo-lines-v1:sha256:a0cdebf0346b22fc093d32dc8ee314fe2dda56f62c0e59dd384a2cd6cbbac965:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3MzM1MWI5MjE0ZTIyZGI0NjcxNWU1NTQ1NWNjMGFiYmZjNTNkNTE5NGNmMjA4NGVmOGMxMDE2MjhjYmM1ZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhMWM5YTdmZDRmYmIyMzNkYzk0NjAzZmI5NDk1MGJmMzA0YTQ4YjVmMGE4NTNkZjI1MzE4MjViNWRiMjYyMmMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/capture-screenshot-tool.ts#L24-L55",
+          "version": "repo-lines-v1:sha256:25644037d15e90810502daa09c7a9db6676a729bccc4b84c9864f5d47a71d885:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxNjI0NjJkODNmZWVkNGZlYzA4MGJjNmYxMGY2MTExZjcyMTU4YWM2ZWYwZTM1MTI2YjIyM2M2YzFmMjg0YWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5ODljZGM5ZGZiNTkyNDk1YjJhMzhkZGY4Nzg1Y2YyODg0OWNhOGVmZjM4ZTQzNWEyNzczZjU3ZTkxNDhhOWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwY2NhMzE2MzFhODcyODQ3N2Y2OWMwNDViMDc5NjhiZjU1N2U0ZWYzOWQ1ZmE4ZTJlNWM4MDQ1MjYxNjhiMTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_132931d82db54732a0207d8dc8b20633",
+      "statement": "On success capture_screenshot returns MCP content with an image block ({type:'image', data:<base64>, mimeType:'image/jpeg'}) and a text block with JSON metadata (width, height, tabId, capturedAt). The extension strips the data:image/jpeg;base64, prefix. Chrome and Safari return width:0/height:0 in the current implementation. When the extension lacks a PageScreenshotAdapter the controller responds with capability_not_supported; runtime permission errors map to capability_not_supported, other failures to capture_failed.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L526-L559",
+          "version": "repo-lines-v1:sha256:24266021f9d55b4173e05e07641b89ca4329a409fe9a8b9bf2c1ce106087ae2f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmMDk4MTBjZDFkYzE4ZTI3YjUyY2ViMjFmYzQxNTUzYzhiMzIwYzU1ZTFjOTQ5ZGUwMGJmN2MyYmFjYzAxYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2NTVhYTdhMzI2YjBjNWI2Njg4NTFmYTUyZWQyMDUxMzE2ZjA2NjE1OGY5ZGVkMTk2ZGIzZTU1MzlmZjc5YWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlY2Y5MzBmNGVhOTgxNzk1NGVjOGNhMjZiYjQ4YTRiNWYyMmUzOTkxYzgyOWQyZjI0ODUzYjY0NTI5NTg4MDUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1208-L1254",
+          "version": "repo-lines-v1:sha256:a0cdebf0346b22fc093d32dc8ee314fe2dda56f62c0e59dd384a2cd6cbbac965:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3MzM1MWI5MjE0ZTIyZGI0NjcxNWU1NTQ1NWNjMGFiYmZjNTNkNTE5NGNmMjA4NGVmOGMxMDE2MjhjYmM1ZDQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVhMWM5YTdmZDRmYmIyMzNkYzk0NjAzZmI5NDk1MGJmMzA0YTQ4YjVmMGE4NTNkZjI1MzE4MjViNWRiMjYyMmMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L795-L843",
+          "version": "repo-lines-v1:sha256:cb4a9cc42f6a4652d9f1ffcf0fb5121490c9823a15fae43976479ad94d6fa77c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4OTRmOTIyMTEyMzNlMjExOGQ5OGJmMmNlMWFiY2IzMTI1YmQ1MTAwM2UzOGIxMjRjOGQ2YTcxZDZiZWI1MzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmZDE3NmQzZDgyN2E1NTkwMzA5ZDBlZjllZjI5MDFhNWM4NjRiNjY5ZjYzZDM1MDQ1OTM3MzdkMzU1MWNkMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFmMTgyYTJmOGFkZjE1NWJlOTRhYjc2MGEwMGEzZDA2Y2UwNWViNTIzNGQ5YjVhZmIwYjEzN2M0ZjIxY2E5M2YifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L489-L500",
+          "version": "repo-lines-v1:sha256:291a957d82db798721bb2d828463cbc3df65ab5f312b00d4b498b7ea537dec39:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxZDE1ZTJkZmI1NzY0ZjBlNzIxN2VhNDE2ZGViNzk3MmU1MDE1ZGI4MDgzMzgzMWUzMmM2ZWIxYWJhN2M1MmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiYjExMTAxZWU0ZDcwNzg5NzU1NDU1NjRjYTg4ZjFkNzQ0ZDU3YzQwZTQ4YzU2M2NhNWQ3MzU5ZjM3OWIzYjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxNjNjODFiNzNjODUwZGEyMTYwNjA1OGIxNjNiMTM1OGE4MmExZmNmMzQ2ZTIwZDhlZmQ5ZGRlM2RkMzNkNTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhYWFiNzkyMDZmNTAzNWVkMWQ0YjJiMzc5MGI0ZDM0ZDVmNTZlNmQzYmNmMjRjMzdmNTNmOWM1NWJjZTQxN2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2bbc0a8ce9dd44e6ad3ac7f9fa7bb5a9",
+      "statement": "capture_screenshot scope is intentionally viewport-only per ADR 0064: full-page scroll-stitch, annotation/highlighting, screencast/video, policy redaction, and background-tab capture are all out of scope and deferred to P4.5 (Visual Evidence). Screenshots are explicit only with no auto-capture or continuous streaming, consistent with Brijio's privacy-by-design model.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md#L213-L230",
+          "version": "repo-lines-v1:sha256:dd463ea501d75454cb234fc6e641fd519faa5402cc8122a267ac3602094c06d1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzYzc1MDgyNjViZTA2NTcwOTQxM2E0YmI3ZGVkMzk3YTg1OWMyYzAzYzZhYTQ1YzE4Mzk5YWFhYjQzYzc5M2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNmYjQ2MmUwNGZjZmNmOTQ4NGY0NzVlZmQ0NDM1NzgzMDkxZjg4MzA3YmZjYjFmNTRkNTFjNzQ5MmRjNjhhOWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L206-L229",
+          "version": "repo-lines-v1:sha256:f5d6a1d6d83dd5b279fd73ba31735fbe76a378762b35029450f98d7ca66e35aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzMWU1Mjc2YjAyNDZlM2IwZDRmMmEzZGJhNjUyMDQ0ODAwZjEyMDM1NDI2OTEyZDMzYzBiMmQ5NjdlM2I4MzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiMDRjNjNjOGQ0M2U1YmY5MmI4ZjhjNjk5MjkwYzBhZDRkMDlmOWMzM2VlZDkzZmI4MDk2Yzc4NDRhN2Y2NWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyNGJjNjZiYjYyYzQxNTg4NTUwM2FjNjYzOGZmMDE2ZmI0YmY3NGVlNTMzMmExZTI5OWFiMTQyNDU4ZjQzYjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eadfc1497622412995412d0c74289b4a",
+      "statement": "list_tabs returns every open tab in the connected browser including background tabs, as TabInfo entries (tabId string, windowId, title, url, active, supported). Only HTTP/HTTPS tabs are listed: the extension filters with isRegularPageUrl before returning, excluding chrome:// and about: tabs. If the extension provides no TabListerAdapter, the controller responds with not_supported. Both Chrome and Safari ship a tabLister adapter built on tabs.query({}).",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L371-L396",
+          "version": "repo-lines-v1:sha256:d4d0931b601f1dbb9a679213f6cd0b4d59735d9ff4dd2b39853764c43c377503:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwNjhjZjMxNzVmMzk5NDNjMjA5ZWE5ODQ4ZjMzNDRlYmFkM2ExN2VjZDNjNDE2N2YzYzA2NzkxNzIzMjVhNWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlZTQ2ZjI3ODJhY2UzOTgxYTE2MjVkYTFmMmU1NDU0NTdiOTFiNGU0OTFiNTk4N2ExMjY4ZmNiNTA2ZmU4ZTUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L747-L788",
+          "version": "repo-lines-v1:sha256:9e4833a1b0016df75978c9fc5ae93ecd216def748e9e72bc50a7f31b96084485:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhYWE5YWQ4OWNhMTFiODMyODFmMmM4ZDRhZDcxMWMxNWU1MTIwN2NkNjEzYWI3ZTUxNDk4MTA5YmNlNjRhZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5ODBiZWRkYzYzMjdkY2ZiNjA5YjNlYjk4ODg0ZjA2NzI5NjU3Y2JmN2RhMDc0ZTI5MzJhZTE4YzhmMWU2NGMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L62-L93",
+          "version": "repo-lines-v1:sha256:dce04c02e51b304699a0b4ecf33d34229f4f26f71a4458d0791011257739d8db:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2Y2VjMTJmMjM3OTA1MjFmYjVmZTc3YTIyYmQxMDQ1MTU5MWMxZjRkYTljZjU4YzBlNjMzYTRmMmRmODE0ZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYTQ5NWMwMjZhNzZhYmVmYThlNmRmYWFjNjUzNTRmYzdhZDczMGIzNjU0ZTM4OTczNmU5ZWU2YjU2YzY5NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NjA1ZTQ5OWFmNjA4YWFlYTc1NjIzN2ZiNzIwODEwODdhOTdmNGI1NmUwMDY1NWY2YjhkZDI3ZWUxYTYxMDgifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/list-tabs-tool.ts",
+          "version": "repo-file-v1:sha256:ba7babfd0da29913d4c33908ae0dad20c3468f69673e93c990683dad65007fa8"
+        }
+      ]
+    },
+    {
+      "id": "claim_6ebcd2f2d5d74780aafedaa603a7e468",
+      "statement": "A server-configured defaultTabId can pin a workflow to one tab without the agent passing tabId each call: every action wrapper in page-actions.ts uses the pattern tabId: tabId ?? config.defaultTabId, so an explicit per-call tabId still overrides the default.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L115-L126",
+          "version": "repo-lines-v1:sha256:e2fa110f273d2955123f0d0f23c1f1cfdda6f224c0554267b4a221db34b6c131:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZjMxNDQ5OWY0NGVhYjkzYTQzMTM1MGUwMDc5MWY0MzZiZjI1MmIyNzU2NzEwZGJhNzcwN2UwYzdjNjQ2NzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExNmU5YmI2NmRiNThmYjhiNDU5YTc3NWM5MGNhNzI3NjFiNmRlMWI2NzA5NDEzMzExOTZjZjViMjE0MmI4NzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQzYTI5OTc4Y2UxOTBjZjYyMmUwMjhjOThkYzkzN2U3ZmE4NjZhNzgyNzZhNmUwYjYzY2JmNTQ5MjJhMTMwYmEifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L59-L59",
+          "version": "repo-lines-v1:sha256:babe753772da6eb9a0836065bed15aef051be130c1f93f44e75bf6f5aefc8fa6:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmFiZTc1Mzc3MmRhNmViOWEwODM2MDY1YmVkMTVhZWYwNTFiZTEzMGMxZjkzZjQ0ZTc1YmY2ZjVhZWZjOGZhNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYmFiZTc1Mzc3MmRhNmViOWEwODM2MDY1YmVkMTVhZWYwNTFiZTEzMGMxZjkzZjQ0ZTc1YmY2ZjVhZWZjOGZhNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzM1Yjc1NGI2ZTY0NmY5YjUzOWRlOGU0MWUxOTFmOTNmY2JhZWIwMmIxMWFkYjI0ZTk3MjhjOWY3NGQ5OTU0ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTk4ZDQzNjgwOWIwNzJkMzQ5ZGE3NmM2YzE3Y2VlN2ZlOTA5ZDk5ZTkxOWZjYTY3NGJkYzMzYjI4ZmE0NjdmZSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.1",
+    "at": "2026-09-12T11:58:23.018Z"
+  }
+}
