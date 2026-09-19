@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:48290747450f4a2d860a63bc1cfa9420e6ae5b9e540bee61b18d10d234f1d85a",
+  "claims": [
+    {
+      "id": "claim_690f9c72cee245ecb617fe885cc0d6fd",
+      "statement": "The workspace comprises five pnpm packages defined by pnpm-workspace.yaml (packages/*, servers/*, clients/extensions/*): @brijio/shared, @brijio/websocket, @brijio/mcp, @brijio/chrome-extension, and @brijio/safari-extension, with dependency edges shared->websocket->mcp and shared->{chrome,safari}; MCP is the only package depending on both shared and websocket.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/package.json#L16-L16",
+          "version": "repo-lines-v1:sha256:c82f14e5e001eca9e9afd7ac38fccd525280709ccd927b366dd2574e57852781:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzgyZjE0ZTVlMDAxZWNhOWU5YWZkN2FjMzhmY2NkNTI1MjgwNzA5Y2NkOTI3YjM2NmRkMjU3NGU1Nzg1Mjc4MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzgyZjE0ZTVlMDAxZWNhOWU5YWZkN2FjMzhmY2NkNTI1MjgwNzA5Y2NkOTI3YjM2NmRkMjU3NGU1Nzg1Mjc4MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjBhZmJlNTljZmFlYTVlMGFmNzBiNjVkMDJlZGZlNmFmYjZhYzQ3NjcwNGQxNzQzOTM0Nzg2MjU3Yzc0MTdkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTI3MDllYzY4NWRlMmM2ZmQyYmVhYWNhNzA2YWFmMjhiMjk0YTVmOWU3MjFlZjJmZGYyMDMzMGVhYTc1YmE5YyJ9"
+        },
+        {
+          "resource": "repo://pnpm-workspace.yaml",
+          "version": "repo-file-v1:sha256:99661f5af286f08d5d66e437f506df6a7e6b191f73541f3a6ce794b9bc204830"
+        },
+        {
+          "resource": "repo://servers/mcp/package.json#L34-L35",
+          "version": "repo-lines-v1:sha256:0a3747d41319afa3a608fa8e2f303a655c15ea31558127580a44715438957772:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTkyMGZjMjY2NDM3YmU0OWQ1NzY1ZWY2MGEzNmViNzU4YWViNWVjY2FjYzY4NDk3MTFjNGRiZDNhN2NkNWU0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzM1OWVhNmZjYjY4ODJmZTY1YTBiMzVkZTkyZDk1MDU3Y2UxZjYxYWZjMTcwNDUyYzNkODk0ZDA4MDQ2ZTE1NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTZmZmIwZGEyOTQ5OGM2MTg5ZWI4MmFlZGMyMGU3ZmJiZmRiMGYwNDhlOTRiYzViNDE0Y2U1ODU3YzRlYmE4YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzUxMWU3OWRhNjEyOTg3ZmMwMDYwNGE4YzM5MTQ3YmViYzAyZGU0YjI1ZmIwOWEyM2ZmODA3ZjMxOTM1NGJiMyJ9"
+        },
+        {
+          "resource": "repo://servers/websocket/package.json#L19-L19",
+          "version": "repo-lines-v1:sha256:a920fc266437be49d5765ef60a36eb758aeb5eccacc6849711c4dbd3a7cd5e47:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTkyMGZjMjY2NDM3YmU0OWQ1NzY1ZWY2MGEzNmViNzU4YWViNWVjY2FjYzY4NDk3MTFjNGRiZDNhN2NkNWU0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTkyMGZjMjY2NDM3YmU0OWQ1NzY1ZWY2MGEzNmViNzU4YWViNWVjY2FjYzY4NDk3MTFjNGRiZDNhN2NkNWU0NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjBhZmJlNTljZmFlYTVlMGFmNzBiNjVkMDJlZGZlNmFmYjZhYzQ3NjcwNGQxNzQzOTM0Nzg2MjU3Yzc0MTdkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmY3OTY5YmM4OWE5MmZhOTRjOGM0OTFjZjE4ZjA5MDdlYTM2MGQ3YTFiMzBlZGIzYTcwMjk4NjcxYTU2OGI1MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba4a665da0d649d4a8d6653c412508c1",
+      "statement": "Top-level commands in package.json are: build (pnpm -r build), test (pnpm -r test then node --test scripts/*.test.mjs), check (pnpm -r check), lint (lint:ts via ts-standard then lint:md via prettier --check), dev (scripts/dev.mjs), dev:ws/dev:mcp (tsx watch on each server entry), token/brijio (scripts/brijio-token.mjs), precommit (scripts/pre-commit), format:md, and serve:test-pages.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L8-L23",
+          "version": "repo-lines-v1:sha256:db62c1d9f33a4a878fbafb0faa9293aa7d81b736ab13369caf92a3a18179f8b2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxMDFmYTE5YmIyMDJiMTg4NDViYWI5ZGYwNWQwMmY4ZTdkMWQ1MjQ1NTZhMjA0MzZiM2E2ZjFiZmEwYjVlYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTY5MTJmNGNhZWQwMzRlNjQyYmY4OWRmMzM5OGIyMzE4YWQwMjkwZDZjMGVjNzlhMTZjNTg0ZDQ2ZjUzOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5cf4c8ef3eae4a3394d1cac5fc29df74",
+      "statement": "The repo is pinned to pnpm@10.32.1 and requires Node >=22.0.0 and pnpm >=9.0.0.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L27-L31",
+          "version": "repo-lines-v1:sha256:cfef1edfc224c976dac2165768d4140548f1e1aee256451e375fe45dc6036a90:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjkxNjkxMmY0Y2FlZDAzNGU2NDJiZjg5ZGYzMzk4YjIzMThhZDAyOTBkNmMwZWM3OWExNmM1ODRkNDZmNTM5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1a86859e11824df3a21ab91be9797f5f",
+      "statement": "scripts/pre-commit runs pnpm lint then pnpm test, which is the pre-PR gate matching CI (pnpm lint, pnpm build, pnpm test).",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L178-L185",
+          "version": "repo-lines-v1:sha256:779410e2b034b00927a06c77ea0111dd7650d683dbf434364a89aa6dfee4d351:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTcwYzhiZTNiNjNiZDY1ZWJiYmI2ZjQyMzk4M2Y4NGMxNTNiNzI1Y2QyMTVjZDc1YmUzYWVjMmUyMGQ4NzcwMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdjMDZjNTYxZDVjMzI3MzQzNjg1MjY4YTQ2YjMzOTFmMzk5OGVlZTg5MGQyYmU1MWYwZDIxY2M0YTUzYWU2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGRiODc5NTQ2ZGUyYTI1NzEzOWVlM2Q5ZjJjNTMzYmI4MzEyM2NkY2IzY2FiMWFhOWFkMzkyYjQ2NTE3OTQwNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODdhYTZlYWQ1ZWY1MjlmNTZlNjVjOGRkOTJhZjk3NWI4OTk0YzAyZDk0ZWQ0NTAzNGExNTMyNzQ5MzliYTNjZSJ9"
+        },
+        {
+          "resource": "repo://scripts/pre-commit",
+          "version": "repo-file-v1:sha256:e5d36e5ee17c495a75d1e2310398f5a798d637689a866f1651a60b09ff25553c"
+        }
+      ]
+    },
+    {
+      "id": "claim_3bcfe889ee75433b82fb514f7cbe2325",
+      "statement": "Per-domain verification uses pnpm --filter with the package name: @brijio/shared, @brijio/websocket, @brijio/mcp, @brijio/chrome-extension, @brijio/safari-extension each with test and check; cross-package changes use pnpm test and pnpm check.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L158-L178",
+          "version": "repo-lines-v1:sha256:f0fda67c67c00f99694c6868528910c1dc7b6130c791c0273666d17425492f67:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2N2EwODQ3MjUyZTNkMWNiYTkxYzU4MzIwNGQxYzk5MWQwZDYyYzM3OGIxMDYyOGQzNTRkYWEzMmY5OWYxMzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3MGM4YmUzYjYzYmQ2NWViYmJiNmY0MjM5ODNmODRjMTUzYjcyNWNkMjE1Y2Q3NWJlM2FlYzJlMjBkODc3MDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNWZmNTI4MDAwYzVmZGYwNjI5NDQ1ODQ0NjJlZDM3MTk0ZGJlMTZhYmEyOTUxYzNkNmI0NWVjMDE4NWRkYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzZjgxZTRhMDJiYjUxNjVjNjBmODMxYWRhYjI1ZGJiMzQwZDA1ZDBjNDg5YjZiMjE5YmMzOTIyZWIzNzBhMmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b892ce2934a04b25a837548c48d35977",
+      "statement": "pnpm dev runs scripts/dev.mjs, which sets up .env from .env.example, classifies token state (placeholders/configured/incomplete), regenerates pairing and MCP auth tokens via token-utils.mjs when needed, applies BRIJIO_*/BROWSERBRIDGE_* compatibility aliases, spawns tsx watch for both WS (8787) and MCP (8788) servers, health-checks /health on both, prints a banner, and supervises children with restart backoff and graceful shutdown.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L12-L14",
+          "version": "repo-lines-v1:sha256:566253d6284758470026809996c3df156981c872f8fc8945798ccc9043903126:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDIyNTU1YmYzNGU1MjY3YzUxZTlmNTk4ODc2M2U0MzRjZWZhMzNmZDkwMWJkZWUzMDQxOTdlNjE3NTI3ZGJmMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWZiYjA3ZjkzY2MwNzY0ZmE4NGZkNDVkODYzNWNlYmFmNzRiNzRhYTBmMjIyOTdlNmIwMTAyNzc0ZTc2ZmJhMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjg2YmE0YmZkMDMwNjNkNTAzNGQwMTkwMTE5NWM4NDdmNDQ4YTZkODA3OWRkZWM3YjUyZGI3OGRiOTAzZjhiMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTNhNjM4NGI1NWMxNWFjN2IzNTYwM2IxMGVkZjM2MWY3YjcxZmQ2Y2FhZjNhYWZlNDliMjk0ZjE5OTlkYzMzOCJ9"
+        },
+        {
+          "resource": "repo://scripts/dev.mjs#L229-L310",
+          "version": "repo-lines-v1:sha256:62eb16d736d9800c94fcac755706ec73343e5b5258aca83603d66c916bc654f7:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmZmQ2MGNkMmNhYzZkMWMxOTVlMWE1M2FlNjZlMDIxM2FjODExODVhNmFmODgxM2ZjNDc1OGRhYzY3NWY2YjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJiMTE0MWY0MWI4ODU0YzI1NmVlN2Y0ODFhZmEzYzViZTdjMDMzY2NjYTA4NDRjZWQ4MWQ1YWMyZmEwMjkxOGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxMzgyNDhhMDc1Mjg2MDYyYmVjNWE2ZGQ1N2UzNzQxNmQ2NmM3NTIzODRkNjMxZTg4ZGU4ZjgwNTM2N2Q5Y2IifQ"
+        },
+        {
+          "resource": "repo://scripts/dev.mjs#L312-L458",
+          "version": "repo-lines-v1:sha256:86888926f011a85b2046305a2ccb4a026e9a08303ac78f650f59e1d491bca568:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2MDc4MmZmOTVhMWU5OTYzZjBkNzVlMjFmZjlkNjhiODZkZTNmYWJlYzk0MWJlZTViZTk1Njk3NTNhZmFlMzRiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlMzdiYTc4YzU4YjQ4NGVhNmI4ZjAzYjUyM2E4MThjZDU0ZWE4OGFlZGNhOGZhOWNmZDAzMjYyNGRhMDNlY2U3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwOGU2YmYzNWVmYmU2N2MwNTIzYTg5M2U4OTExNDRjMjEyZmU4NDljZTUwNzRiYWJlNjQ1ZjgzMWNkZTQxMTgzIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_6fe594873b0d4749a7bdfeab040f4b4a",
+      "statement": "scripts/dev.mjs treats BRIJIO_PAIRING_TOKEN/BROWSERBRIDGE_PAIRING_TOKEN and MCP_HTTP_AUTH_TOKEN as configured only when non-placeholder; placeholder values replace-with-generated-token and replace-with-generated-mcp-token force regeneration, and CI=true or --yes/-y keeps existing configured tokens non-interactively.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/dev.mjs#L231-L282",
+          "version": "repo-lines-v1:sha256:561875c5afe056bc08c8a5d878eec7ee26fee40c0d73a70fb4cb834c36d207ce:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiNGFmYmFjNGNmMmYwODJkNDZmNDNjZDIzZjFkNmU4ZGEwZjA4NzkwNGNiNmJkZmVmNzAyOTQ5MzAyNjY2YWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5MzQ5OThiZmNhNDMzMjBkYzNiMzM5MTkxNzk1ZjljNGE4NDc2ZWEzYTc4YmExNTQ3Y2UyMjRkNjc4OGMzNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU0NmRkZWNiOWJhZjYzN2U4MjAzMTczZDVlZGVmNDI0NjRkMzI5ZDM2MTAyN2UxOTFiNGMyNGM3ZGU2YTEyOTMifQ"
+        },
+        {
+          "resource": "repo://scripts/dev.mjs#L405-L416",
+          "version": "repo-lines-v1:sha256:5b2fc2e69b59c4a72b770d1ec609a3adc72ee3798490885b4984b68e811684c6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmYWUxY2EyNTBhZDhjNTY4ZjRjMTZjYTkxYjJmMTRmZmZhYWUwNWRhZWZhMTRkMjNjMjY1OWQwNzI3MTU3NDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllZjkxOGFhYzhmMWJmM2QyZTg4NGEzMmEyODY4N2FmYjgyNWUwZWRjMzU3MzEwZWEwYzFhZWYzODhhYTI5YzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4NWQzYTRmYWM3YjVlZmQwODAxYzA4M2Q1M2E0OTM2NjA5N2JkZmE2NGZkN2MwNDUzZTBiMDJmY2ZiZTk0NDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVmYzA4ZWFhNTQ5Y2MzNzQ4Nzk0ODZhY2E0NmY1OTYwMzY0NzAwN2I1NDBkM2M4OTU1ZWE5ZTE3MTgyOTVkMDgifQ"
+        },
+        {
+          "resource": "repo://scripts/dev.mjs#L78-L83",
+          "version": "repo-lines-v1:sha256:4efe641e2e5b8c7da1ec7779b67d906a1f395b33e494ef24c4c33f41f56063cc:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjZjZmE0ZDE2NDMyOGViNWRhNGMwMzdmZjE3NTUzNDUzMzljMTBiNmNkMThlYmI0MDJjNmZlZGJjMWNiNDM1NCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDY1YzBhMTJhY2M0OTUzMTgzZjk2N2JlZWY5NDk5M2ExNWZhNjQ2YTRjOGUzM2QyMGMwNTFkMDE4MmVjMTRkYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzZlOTA4YTZkMGI2ZDlmNzZlOWQxYzdiNzc3NTY3MzE1ZjU2OTE3Zjg0MjcwMmNiM2M3OTM4OGU3MTJkNWRiZSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d77fb57b7ad44dd6a7eae404a1b0d959",
+      "statement": "docker-compose.yml defines three profiles: runtime (brijio service from Dockerfile, ports 8787/8788), legacy-runtime (browserbridge extending brijio), and test (test-page nginx serving clients/test-page on 8080).",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yml",
+          "version": "repo-file-v1:sha256:bd2d87c56b9f726afa5de556e8041743e3dd8d05295fd9786f0ce58389ac2367"
+        }
+      ]
+    },
+    {
+      "id": "claim_66611aca05174ae39164da510d516ed0",
+      "statement": "Dockerfile is a two-stage build: builder installs with pnpm install --filter @brijio/mcp... --frozen-lockfile and builds MCP via tsup; runtime copies dist/ into node:22-alpine with s6-overlay, strips workspace:* deps, and installs production deps; Dockerfile.test installs the full workspace and runs pnpm test.",
+      "evidence": [
+        {
+          "resource": "repo://Dockerfile#L23-L91",
+          "version": "repo-lines-v1:sha256:e389f8cb5b8124a65d911270a88f0a1a5c21ea89763c8313b7efbce15ad12435:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlNWEyMWI1ZWE1NTNhMDA3ODkzNDY1MjE4MGY1ODJmMGIyODVkYmYzOGJmMWE4ODAxNjdjMmExMjNmYjYwNmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUwMGQ3NjAzODNmYTdiMTU2ODEwYWM3OGI2NzNhOTAyY2QzMGMzYzAyN2M2MzBhMmM0Yzc3ZGIzNDAzMzQ1YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM2MzkzYjA4NTIwM2ExZTdhMDgxYTA2OTlmMjIxNjc4OWQ3OWQ2MTIxYjkzZGUzNjIxMDhlMjQ2NGU5ZmY0MjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://Dockerfile.test",
+          "version": "repo-file-v1:sha256:2e83b802fc5415839bdae364e5aed973ee8eef4e6d72bc51d1164fb314753264"
+        }
+      ]
+    },
+    {
+      "id": "claim_24f8182b555242abb0f99b31683c619e",
+      "statement": "ADR 0034 established servers/mcp/src/integration.test.ts as the cross-layer test harness exercising MCP SDK Client -> StreamableHTTPClientTransport -> MCP HTTP server -> WS client -> WS relay -> mock extension, covering every tool, auth/error flows, and health endpoints; it is the entrypoint to run after protocol/routing/presence/auth/MCP-tool changes.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0034-integration-test-harness.md#L22-L72",
+          "version": "repo-lines-v1:sha256:d8a4014d5e4410dc784580dccfb6d28559dfd04599db6b367dd750dc5a783e95:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ODUwZmYzMjI3OWYyZWI5ZTQwODc2ZDA5YzQ4YjU1OGNmZmJkNzczNDliNTU3NjExNjA4YTBhM2FiZGZjYWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwNzU4MDFmZTgzZTEzNDg1YmQyMzBlZTY1MGU3MWI1YWRjNzhkMDY5MWJiZjMyY2IxNjJkY2RkZWY5OTE5YjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRkNTcyZGIwYzNlMWQ3NTkyNWZiNjk1NjE2OTIwZDM3OWZjOWU2MWQzNjZjZDc0MmIwZWJmNjA2OTdjYTEzMDUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L1-L100",
+          "version": "repo-lines-v1:sha256:aa3757bb9313c528c7d9b5fe831614468d36ce30abae914e0acb753d57dc1cf9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3YmJlNmFhYWYyMTdmZjJiMDZlYjI3YzE5MGI2OTc0NmU2OTNlNWY4ZDU1Zjg2NTMwODU1MTk1MjM4NmUxMDVjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJlOTgwMjA0YWUyOTNjYmUxYzdlMjI4NzdkODRmNjdiZWVhMDMwMWNmMjRmNTlkZTQ5MTY1OWEwNGVjNDhlM2JhIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkMzM3ZTkwODRlZTRlMzdlMjcyZDk4OWU1YTBjN2JlMzVmNTdhOGM3Nzk0YmI2OTYwZjVmYjg3MmY5NjhjZTVjIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_174d1aa30e0343a08673997243ab9e01",
+      "statement": "AGENTS.md requires an ADR (Proposed, with Mermaid when architectural, awaiting explicit user approval) before changes to product capability, cross-package protocol/schema, architectural boundaries, auth/privacy/storage/trust, browser routing/targeting/lifecycle, or architecture-changing dependencies; ADRs are numbered sequentially and never reused.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L65-L84",
+          "version": "repo-lines-v1:sha256:98fc7085986ce16808da5607fe35003d2549d063393906eacbc1cce2ec850678:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMzJiNzg4ZTc3ZjU2NTA3ZGI2NzQyYWViMzk4NWU2MGY1MDAyZTc0MDBiZmVmMTcyZmI4NDhkZTI1OTE3Y2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxOWM1YzdhMDZiMDEwZWU3MzE4NDg0NGRhOTlkNjRjMTQyNzk5YmY1NzEzY2VjODQ5YzA3MWFjZmFmY2E4MTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1Y2FjZTVjM2FlMWE5NGZhOGY3ZTBlNjU3MTIxYTI2NjQ5NGVlMGFkOThlYWY4NDE5OWEyNmQzYjNjNzMyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzMTg3YTNmYmY2MjJiNjRhZDVkMjgyMjBlZWZkYTJjMGMzYzQ5MjY2NjY4N2FkZjgzZTBkN2U4MmNjMzBmODAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cc757e5d39364b7a84c6187c17c2ba73",
+      "statement": "AGENTS.md mandates TDD for behavior changes (failing test, smallest passing change, refactor only when green, then verification) and narrowest applicable formatter/linter/build/inspection for docs/config/tooling where a failing test is not meaningful.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L100-L111",
+          "version": "repo-lines-v1:sha256:193fa5f4ee8ed37f99cb0dc7977ec9481df488005dac3f23288d4e70706f593a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2MjI2YTM1OTE2ZGYyMzhiZmI1ODgyY2RhOWY1NjJmMmZhYzhmODY3OWM3NDg2NDc3NWJmODcxNzc3MjVkNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYjAxMDU0ODA4MTQzY2UzY2RkMDY5MGM0MGI0MTEwYzVhNDY1MWZiNjk3ZDc4ZjY5NTU4NWQ5ZGNhYWU5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxNGIzMGYyZjk5YmU5ZWViZjc1OThjMzVlMWVmZDNkYzU5MzI3YWIwYWI0YjA3ODM1NzkwMzc1NjgwMGU4NDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4ZTI3ZDFlODBiZDIzOTY2ZmIyYWY3NmE0ZjU3YzBlYTRmMjExZmUwNDQwMTFkNjgyNTI1MWJhNjE5YTdiYzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_28a93a26df6b40b4a7dc0a1dc825e90d",
+      "statement": "Protocol/schema changes must start in packages/shared and propagate shared protocol -> WebSocket relay -> MCP surface -> shared controller -> Chrome adapter -> Safari adapter -> integration tests; protocol definitions must not be duplicated outside packages/shared.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L113-L143",
+          "version": "repo-lines-v1:sha256:88603cc99df57c39d07d8e68e75a600946755e1359f26792b797432bdcd78839:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MTk2NGE5OTFmNzY1MDhkNmQxMDAxZmI0ODA1OWJkMjc3MzNlYzVmNTU1ZTQwMTAxNTdiZDQwNDM4ZmEwZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYzdjNTg2Yzg4ODI5NjczNDBjNWI1N2VlNzUxNDJlMTI0MGZjNzE0ZDgzZDAwNTYwMDg1YWNlNDdiYzQ1ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4N2FjMTM0NDgyYTYxNDdjMDc5ZTVlMWVlNzgxZmFjNDkxY2MwMjQxOTg1ZjIxYzhhOTYwNjYxOWYwZjNmNjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0920ff02291741c5b4bf2586c381c2aa",
+      "statement": "Browser-targeting changes must preserve explicit per-call browser and tabId targeting with no hidden selected-browser/selected-tab session state, preserve the documented active-tab fallback when tabId is optional, and re-read page context after navigation or target-invalidating mutations; relevant ADRs are 0060, 0062, and 0063.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L131-L137",
+          "version": "repo-lines-v1:sha256:6cefd99f121c64b8ab7d73db091293bd86ada9315e0b00194d6b894db032f5ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNiNmIzMWU2NmU3NDk5Njk1NWZhZTg1NjExNDZmM2E3Yjk0M2Q3ZDQ5MjY3ZWU4MWVmZGYzMWM3ODVkODZiOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjc5NWIwOTMyMTZjYjVlOWMyYWQ3ODczY2NjNGExNTU4NzNlOTVjZmU1ZWVhMTA3YTBkYTE2YmFjMWYyOTU3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzM0NmEzN2NlYWIwYmEzYWRjZTBmMDNiNWY4YTZhMjQ1MTQ1NTkzNzdiYTVlNmYyMjFmN2VhOGI4ZmNhMTIyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ1ODMzZjlhMWIzNTQ2ZGU5NDQ5MDllMzdhNjkyODM0Y2U4NDEzNzk1YzIyYWMxYTA2NzZiMzY4YWM0MjQ2MyJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md#L1-L49",
+          "version": "repo-lines-v1:sha256:34d83d1f4af093f8c8c0c34d2adba796e65321b3fe8c2ac1a3d2d4021778867e:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwYmZlY2UwYTVlYzE3NmIwMjNlYTQxNDc5ODc0NDNkMTI4MzM1M2Q5NjY0ZGZhMTVlZjZjZjFjOWI4NzUwZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzNDhhZmRhOTdmZjFlNzhjNGNmNjY3NTc1Mzk3NTJjYmRkYWFhYmM3NmFiZDU2NTBjZGY2OTkzMmVlYTI1MzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2cc53ab5167c4311bc038d6a882d4c35",
+      "statement": "Chrome and Safari extension builds differ: Chrome targets chrome116 and copies a single manifest.json; Safari targets safari17, emits separate dist-ios/dist-macos trees with platform manifests via create-platform-manifest.mjs and --external:browser, and the Makefile exposes safari-web-extension-converter Xcode targets plus a chrome target and clean.",
+      "evidence": [
+        {
+          "resource": "repo://Makefile#L17-L62",
+          "version": "repo-lines-v1:sha256:8a51f2293e0e26c9da6a3a7eebad09f690aa86ee1dac63e43b6c799fca50729c:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlNjc1ZjM4MzBlYTM4MzgyMDFiNzQ2N2ZkNzhkOGMyNWQ3YTc3Nzg1MWYxZDAxNTg2ZTYzYjk5MmZkYTIwODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJiZjU2NGE3NTc4MDYxNTAwYjRhZGY0N2U1OWI2MGY5OTM5MmYxODM0ZTgyYjMzMjUyOWFkYWQzNTgzNWFlMmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlODcyZTkxYmUwNjU5NGNhMTM3Yzc5ZWM2ZWRhYjAwNTY3MDgzY2VjYjYyNzhjNzdlNzVlMjQ2NWZlM2Q5NGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/package.json#L9-L10",
+          "version": "repo-lines-v1:sha256:1353fc16e21179966107c945d2588b5be35024919b8ed3b44de107977c0a32cb:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWE2MWUyNTgxNTc2MTVhMGYzNGFhYTQzOTY1NWE2MDUxMDVmMWU1MjVkNzEwYzljODlhZGExZjFjNzc5Mjg2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjljNmI0MDY4YzlhZjcxYTlhM2ExNTI0Mzc0ZmFjZjJiMmRlMmU3ODMwN2QzY2M2NjhhYmM4M2I3MmI1MGE2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTFlNjlmYWI3ZmVkODdlNjMxZDU3NGE0MTBlNjI4ZDQ0MjlmNTNlMmMwMWI1YTlhZDRiMjAwYTI0NDliZjliNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjEwMjY0ZDFhMGU3NTgwMGEzYjllMGEzM2UwZjkyNDE4ODAxMTUyMjFiZDM4Njc3MjEyNWFjZTA4OGNkNDJjYiJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/package.json#L9-L12",
+          "version": "repo-lines-v1:sha256:820a8e6102c8ff6eb3ee1c73bb11577eec2dfaa171fe0591f4975996dcda667a:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2ZjNDcyZmZjZDAyZjNkNzliZDA3MTdlMjgxYTBkNGE2OGFjOGY1YmRhMjQwMjRhZDI1OTlmN2E5ZDA5YjMxNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5ZmQzODY4MTJjM2U5NTgwNTE3MTliM2NjNTIzZDg5MWJjZWQzZDQwMzRkZjNiZGIzZDQ0ZGM1MDdjM2NkZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTFlNjlmYWI3ZmVkODdlNjMxZDU3NGE0MTBlNjI4ZDQ0MjlmNTNlMmMwMWI1YTlhZDRiMjAwYTI0NDliZjliNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjVkOTY4NzY0YzRhZmNmZGQ5ZTkyNmQ3N2E5MzgyNTZhNmQ2OTRmOWYyZTE5ZWNkYzFjYTYyZTAxNGM3YzU1OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_b9b55aeb13fb456aa4f0c0b37dee6624",
+      "statement": "MCP package build uses tsup and is the only non-private workspace package exposing bin.brijio/bin.browserbridge with a prepublishOnly hook running pnpm build; websocket build/check are both tsc --noEmit (no emitted artifact).",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/package.json#L21-L27",
+          "version": "repo-lines-v1:sha256:57a2336564cf2d95f8d56f35aa02b147ab973fb0c371e8d96262caadd35db6ea:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmZhNGI2ODRlM2YwNzZhMGQzZWMwM2RlMzQyZmVkODM2MWQwZGQ3NzQ1OTJiOTk2ZTU1YWViMDA0NDQ2MjBhZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGZiNTM4NGM3ZWY2MmI3OTIyNjY3NTEyNDUwMGFjYzIwYjA5OTk5ODk5OTQxMWQxMTViMzExMmRhZjNjYTYwZiJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/package.json#L4-L11",
+          "version": "repo-lines-v1:sha256:e09fbba9e92cf2312bac292441ef7f9c67cef0f050efe771ab51950f835911b7:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTc4MzNhN2VhOTE2YmU5OTEyMDNmNjAwMTRjMTc3MjQ2NTRlYTllZGZkNjM2N2U3MDM2Y2YwNjMzZDkzYjljOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWMxZmYyMTRmMjljNjBkZWFmNGFlNjBmYzBjYmYyMDE1OWZiZWYyNWY2NGI4NTk0MzcwMmNjNDAzZTBhZDRjOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTFhYjIyN2Y0YzIyZmMyYjljNDEyNTRiMGNlNDg0ZTE3OGViYWZmMzlmZWUwN2Q0ZmM4MTJhYTY5M2UwYjFlMSJ9"
+        },
+        {
+          "resource": "repo://servers/websocket/package.json#L12-L16",
+          "version": "repo-lines-v1:sha256:37f6dfe8bb1bb0db2007884d99246054f73d71433513cade3de41229054e6547:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQ2NDMwM2EwZjllODIwMDAxZjEyNzczNTU1ZWYxZjc5MDEyYWUxM2MzNjVkODU4Nzc5Njc5MDhiYWIzMmYwMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjhjODgyOWY0MjlkMzZiYzU4ZjRlMDVlNTI3MzYyODI3YmU1YzdjMGMxMjdmN2Q5YjJlYjNiNmJkZmJkMjc0MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODUxNGU5ZWQwMzM4YzRkMGZlZjJmMjVlNDExYmRkYzdmY2M0MzlmNWIxZGUzNjJmMGZmMTQ3NDdmNzY2M2Y5NSJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.5.2",
+    "at": "2026-09-19T12:17:06.598Z"
+  }
+}
