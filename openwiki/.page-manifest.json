@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture.md": {
+      "pageVersion": "sha256:2a9b318e7beff9440a943c9f4183532efd811fe0b5cce90b4e2d42afca58ca12",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/architecture/mcp-extension-flow.md": {
+      "pageVersion": "sha256:ed773b662fdee0aa405d471cab4a6e3e4d2a3e193d7c2dc81bc14fe420404d9f",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/architecture/mcp-tools-and-skills.md": {
+      "pageVersion": "sha256:5e8069388618a0f94feb3e3caeb288a02032b20147e2fc826153fe2442a8cee9",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/data-and-protocol.md": {
+      "pageVersion": "sha256:51cb62ee137fbe8ea2e296e8df237b9403bfd8922e40c3718d267ec1c2854816",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/domains.md": {
+      "pageVersion": "sha256:801f8acdf8c8747ea97d439960879a3a40c4cca3f47079910781202f5689ecd3",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/operations/runtime-and-deployment.md": {
+      "pageVersion": "sha256:0017f3d6232915fb140cbfbf07b07ad544793a812e53498c0df684462ec5ff9e",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/quickstart.md": {
+      "pageVersion": "sha256:ac5b4a47a4698b32016ba02a99a6e7342d817dd36aae4fd6bcf5f2b9ef864b41",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/security.md": {
+      "pageVersion": "sha256:5733319a14c35e12170c80cb0766039705f343fdeaa80994b566f4176ad29568",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/workflows.md": {
+      "pageVersion": "sha256:240b535cd11cbc8c23107bc3d13b272806ddb9a2d2e0d733504a18fb25173af0",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/workflows/action-approval.md": {
+      "pageVersion": "sha256:de6a063c355964ba97cab2c3748030c9f24535b5e0cb4b85107fb6d193d80d4a",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    },
+    "/openwiki/workflows/multi-tab.md": {
+      "pageVersion": "sha256:3e27f95335f65841da57420de77c880fa5cd32bb7a5b293dbff1978c4ae4279b",
+      "completedBy": "openwiki/0.6.0",
+      "completedRunId": "3cac858e-5207-4efe-a1ab-422fa3d0f13e",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:273b634989df8badb8cba56e6edd39f276dcbac902f03733a2d23ffdc803cc51"
+    }
+  }
+}
