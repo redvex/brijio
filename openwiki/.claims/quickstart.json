@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:0aeaa94ae18293b6d541130234baee33eaeefe3219579957093161080a538a21",
+  "claims": [
+    {
+      "id": "claim_4eae0f38b8aa4c2e93813478e47976d4",
+      "statement": "Brijio is a pnpm TypeScript workspace connecting remote AI agents to the user's own browser session via the explicit chain MCP server -> WebSocket relay -> browser extension, with the shared protocol and browser-agnostic logic in packages/shared; it is intentionally reactive and privacy-first with no continuous streaming, mirroring, cookie export, or background surveillance.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L38-L60",
+          "version": "repo-lines-v1:sha256:04ca3080466731e8f9b61dfb7de334f59f0e1af72138e5e9c570f2c25a692657:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMDY3OTUyM2ZhZGE0MTEzOWM2ZTY1YjQxNzQyYjIxZDQ4OTc5OTg3ZmIwNDMxNjc2MGVmYTUzYWQ2NjMyNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA1MGFmOWJlNWI5OGI4ZDAxZmE3NmI1NDk5NTE0MDAxYWZjOGRhY2FlY2ZjZTA5YjIzMzg4ZTQ3Y2M3MTk1ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YzIyOTlkOGMzNzI3OGU4MjU3NDVmMDQwZWFkZTcxMmQyMzIxYWE2ZDhlMmU5MjJiZDg1M2RmYWQyNDJlY2YifQ"
+        },
+        {
+          "resource": "repo://package.json#L1-L23",
+          "version": "repo-lines-v1:sha256:8c38c8b02bc11ba4c704967370f8fa25ada9693ec61c5b13718d36d54ff9138e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTY5MTJmNGNhZWQwMzRlNjQyYmY4OWRmMzM5OGIyMzE4YWQwMjkwZDZjMGVjNzlhMTZjNTg0ZDQ2ZjUzOTYifQ"
+        },
+        {
+          "resource": "repo://pnpm-workspace.yaml#L1-L3",
+          "version": "repo-lines-v1:sha256:65f98dae9610ff812aa202888a8699df7b1b7e08c008909c2af83b25f7c41fd6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRiMDc2ZWI4MGFkZTE5ZmVhM2UwYTQzMTk4NmI2NTVmNWZhNTllZDYyNjdlMTA3ZDY4OGI2MWMzZjQyMTc5NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjljZmM0NjM3NjdiYmI0NmIyNWFlODE1ODhlMjcwZWMyNzU0YTRjYjE4ZmE5YjNjMWJlMWI3ZDkxMWM0NmU5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGM1MzRlZTJhZmViNGMzZjc1OGM1NGU1YjY1Y2JmOWVkYWE5ODdmY2FhODZhZmQ4ZDQwZDNiY2MxZWNkMzIxMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e51719ecc6f94554a0127bd38ce50b25",
+      "statement": "The monorepo's major domains are servers/mcp (agent-facing tools/resources/prompts/skills), servers/websocket (state-light relay for pairing-token auth, presence, and routing), clients/extensions/chrome and clients/extensions/safari (thin browser adapters around the shared controller), and packages/shared (the single shared protocol and browser-agnostic logic all layers import).",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L113-L142",
+          "version": "repo-lines-v1:sha256:542df33fcb8406891447587bb09533e39d45f05a930ac7eea52a8f6a0e0728a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MTk2NGE5OTFmNzY1MDhkNmQxMDAxZmI0ODA1OWJkMjc3MzNlYzVmNTU1ZTQwMTAxNTdiZDQwNDM4ZmEwZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxMzJjN2E1MjJhYzhiNzlhMzYxOTFlZTY4NTg5NTA3NmRlNzkwNDllN2M0YTdjYzcxODQ3MDFjMTE3YzVhNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYzdjNTg2Yzg4ODI5NjczNDBjNWI1N2VlNzUxNDJlMTI0MGZjNzE0ZDgzZDAwNTYwMDg1YWNlNDdiYzQ1ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1YmQ1ZGY0NmE3NmRlZjllY2ZkZTI3ZjRlZGEzMzNlYWEwMDk1NGRhMjkyNWE3YmQ1OTkyZTk2MTE5ZGVlYzYifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts",
+          "version": "repo-file-v1:sha256:7dd235fd469699b3eef4cefe68a51a7a5ac8bcc9ac9dc3549ffc34bb19e009da"
+        },
+        {
+          "resource": "repo://pnpm-workspace.yaml#L1-L3",
+          "version": "repo-lines-v1:sha256:65f98dae9610ff812aa202888a8699df7b1b7e08c008909c2af83b25f7c41fd6:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZWRiMDc2ZWI4MGFkZTE5ZmVhM2UwYTQzMTk4NmI2NTVmNWZhNTllZDYyNjdlMTA3ZDY4OGI2MWMzZjQyMTc5NiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjljZmM0NjM3NjdiYmI0NmIyNWFlODE1ODhlMjcwZWMyNzU0YTRjYjE4ZmE5YjNjMWJlMWI3ZDkxMWM0NmU5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGM1MzRlZTJhZmViNGMzZjc1OGM1NGU1YjY1Y2JmOWVkYWE5ODdmY2FhODZhZmQ4ZDQwZDNiY2MxZWNkMzIxMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_9744f1f4d6a54454bf6aa908ae454ade",
+      "statement": "Every request is an explicit request/response chain: the user manually connects the extension (which authenticates with a pairing token and announces presence), the agent calls an MCP tool, the MCP server opens a throwaway WebSocket to the relay authenticating as role mcp and sends one request envelope carrying explicit target browserInstanceId/tabId, the relay selects a connected browser from its presence table and forwards the envelope unchanged, the shared background controller dispatches to the matching adapter threading tabId with an active-tab fallback, and the structured result or error relays back by message id.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts",
+          "version": "repo-file-v1:sha256:59770e90cdb08753ea087d409ec6067e35aeeee9c34f20b4a1e18b4a09afa167"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts",
+          "version": "repo-file-v1:sha256:4d8526d5a6f9e384b2878f54096cd833c7c82662fa4270421bbef9e00fcccd4c"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts",
+          "version": "repo-file-v1:sha256:9885af31b32811f6ec7297b1f98ed6d10c2c7d6015b056e9890830591bb78337"
+        }
+      ]
+    },
+    {
+      "id": "claim_edf1ba11d65d437db07a12093baab2cb",
+      "statement": "The MCP server registers exactly 17 tools spanning reads, actions, navigation, tabs, batch, downloads, fetch, and screenshot: list_browsers, list_tabs, read_current_page, click_element, fill_input, fill_editable, set_checked, select_options, upload_file, submit_form, navigate_to_url, open_tab, perform_batch, download_status, download_file, fetch_resource, capture_screenshot; each tab-operating tool accepts optional browserInstanceId and tabId for per-call targeting except open_tab which creates a tab and has no tabId input.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/index.test.ts#L216-L325",
+          "version": "repo-lines-v1:sha256:2ff9b5c0288bb7ddf0de8964ff0e37b43c7178fc39e9535d3c82b80cfd06c184:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxMzgxMmEyYzVhZWIzOWZiY2M3Y2Y0MDJiOTE5YTlmODU0ZWRhZWRmMjEwOGZjMzUyMDU4ZDBiYWMzNjM0YjY2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0NjIyMGQxYzk4MjZhYmEzYmM3NjE0YzlkODAzMmQ2NzA1NTNmYWZiNWZhOWVkMmZlNDM2YTBkZWQ0N2I4M2I5IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyMGQwM2U5ZTIxZDE5MTVkNzcxM2I5OWFlNzZkZmVhOTU1ZGZjNTgxNmIwODhlYmY1M2E5OTJhZjBmOTVlZTQ5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4YzQ3NDc0MDllNWQwMGMxNTQ4YjBlNWMzZmFmNmVhNjdhNTg4NzZjNTExMDMzNTRhZmRiNGRlZjMxNWM1ZDA4In0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L74-L795",
+          "version": "repo-lines-v1:sha256:75f21d4d471d4ff36f5c90c8d486a728761f079ac15b9ae58a4223c1ba998972:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwODk0ZjkyMjExMjMzZTIxMThkOThiZjJjZTFhYmNiMzEyNWJkNTEwMDNlMzhiMTI0YzhkNmE3MWQ2YmViNTM3IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwODk0ZjkyMjExMjMzZTIxMThkOThiZjJjZTFhYmNiMzEyNWJkNTEwMDNlMzhiMTI0YzhkNmE3MWQ2YmViNTM3IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiYWQxNzhjYzM2YjJjMmQ0YjZmOWZmNTlmNDc5NDNlMzQyYTM2N2ZlOWM1ZTBmN2NhMTM3NWYwNTczNjM2ZGUyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkNjI4N2Y2YmUxZDY4N2NmNzA3OTAyNGIwY2EzMmIyOGI2OGNjYjQ4NmU2Njg5NmM4OGUwNzhmZGFkZThiM2RmIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_6c0c31c5864848f9a5e4d5ef66da9753",
+      "statement": "The client-side action-approval gate enforces explicit user approval for the three browser-mutating operations submit_form, download_file, and fetch_resource; other actions need no approval, and approval state is in-memory only and cleared on disconnect.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L38-L60",
+          "version": "repo-lines-v1:sha256:04ca3080466731e8f9b61dfb7de334f59f0e1af72138e5e9c570f2c25a692657:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMDY3OTUyM2ZhZGE0MTEzOWM2ZTY1YjQxNzQyYjIxZDQ4OTc5OTg3ZmIwNDMxNjc2MGVmYTUzYWQ2NjMyNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA1MGFmOWJlNWI5OGI4ZDAxZmE3NmI1NDk5NTE0MDAxYWZjOGRhY2FlY2ZjZTA5YjIzMzg4ZTQ3Y2M3MTk1ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YzIyOTlkOGMzNzI3OGU4MjU3NDVmMDQwZWFkZTcxMmQyMzIxYWE2ZDhlMmU5MjJiZDg1M2RmYWQyNDJlY2YifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts",
+          "version": "repo-file-v1:sha256:59770e90cdb08753ea087d409ec6067e35aeeee9c34f20b4a1e18b4a09afa167"
+        }
+      ]
+    },
+    {
+      "id": "claim_31196f6968b34fbb8941a390a1d8303a",
+      "statement": "Changes are classified by task type before editing and routed to the relevant page: routing/relay/protocol or data-shape changes to architecture and data-and-protocol, tool or flow changes to mcp-extension-flow, tab targeting to the multi-tab workflow, auth/approval/trust to security, dev/verification/daemon ops to workflows, and package ownership to major-domains.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L113-L142",
+          "version": "repo-lines-v1:sha256:542df33fcb8406891447587bb09533e39d45f05a930ac7eea52a8f6a0e0728a1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MTk2NGE5OTFmNzY1MDhkNmQxMDAxZmI0ODA1OWJkMjc3MzNlYzVmNTU1ZTQwMTAxNTdiZDQwNDM4ZmEwZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxMzJjN2E1MjJhYzhiNzlhMzYxOTFlZTY4NTg5NTA3NmRlNzkwNDllN2M0YTdjYzcxODQ3MDFjMTE3YzVhNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYzdjNTg2Yzg4ODI5NjczNDBjNWI1N2VlNzUxNDJlMTI0MGZjNzE0ZDgzZDAwNTYwMDg1YWNlNDdiYzQ1ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1YmQ1ZGY0NmE3NmRlZjllY2ZkZTI3ZjRlZGEzMzNlYWEwMDk1NGRhMjkyNWE3YmQ1OTkyZTk2MTE5ZGVlYzYifQ"
+        },
+        {
+          "resource": "repo://AGENTS.md#L7-L19",
+          "version": "repo-lines-v1:sha256:51aae5be91191d3f5eaff16ea0428a4224f98568b1644f3889faf8e48ed7aaec:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljZDgwNzY1NTliNDVmMDUxZTFkZDg5MjRhMGRmZGNhOGZhNWVmZGM1NWE4YjRhZTUyMjIzNjYxZTU1MDcwNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyNTY4ZTM2ODkyNDY0YjdlMjc1MGM2ZTcwZTdlN2Q3MDE5YzcyM2NlM2FiZGEwZjIyNmFjZTBkYTEwNDQ2OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA2MjMxYzdhNGM1MjliMzYwNmQ3MjM3ZTNmN2IzY2YzNTMwOTI3ZDFhYWQ3MDdhOTMyMjdmYzBlZGZiZmQxYmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhYjc0OWI5NGQ1Zjk1NWE5Y2Q5NTVkYmM5NGQ0YWU5ZTFjMjMwOWJiODNkY2EwOGRiN2IyNjM4NzlhMjljOTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a193659a28e845689fc35573c01c9248",
+      "statement": "Most cross-layer changes require an ADR before implementation when they introduce or alter a product capability, a cross-package protocol/schema, an architectural ownership boundary, authentication/authorization/privacy/storage/trust, browser routing/targeting/lifecycle semantics, or a materially changing dependency; ADRs live in docs/architecture/decisions, are written as Proposed, and need explicit user approval before implementation.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L65-L84",
+          "version": "repo-lines-v1:sha256:98fc7085986ce16808da5607fe35003d2549d063393906eacbc1cce2ec850678:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMzJiNzg4ZTc3ZjU2NTA3ZGI2NzQyYWViMzk4NWU2MGY1MDAyZTc0MDBiZmVmMTcyZmI4NDhkZTI1OTE3Y2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxOWM1YzdhMDZiMDEwZWU3MzE4NDg0NGRhOTlkNjRjMTQyNzk5YmY1NzEzY2VjODQ5YzA3MWFjZmFmY2E4MTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1Y2FjZTVjM2FlMWE5NGZhOGY3ZTBlNjU3MTIxYTI2NjQ5NGVlMGFkOThlYWY4NDE5OWEyNmQzYjNjNzMyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzMTg3YTNmYmY2MjJiNjRhZDVkMjgyMjBlZWZkYTJjMGMzYzQ5MjY2NjY4N2FkZjgzZTBkN2U4MmNjMzBmODAifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/ARCHITECTURE.md",
+          "version": "repo-file-v1:sha256:3cf6f6f3591cf3f6436cd4639c9d2596ee99709b516ef169a91252f1dff40d0f"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-03T13:02:39.597Z"
+  }
+}

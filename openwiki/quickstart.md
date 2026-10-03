@@ -1,53 +1,89 @@
 ---
-type: "Reference"
+type: "Guide"
 title: "OpenWiki Quickstart"
-description: "Entry point for the Brijio OpenWiki knowledge base. Covers what the repository is, how the MCP-WebSocket-extension pieces fit together, and where to go next."
+description: "Entry point for the Brijio OpenWiki knowledge base. States what the repository is, how the MCP-WebSocket-extension pieces fit, and routes readers to the architecture, workflow, domain, and security pages by task type."
+tags:
+  ["quickstart", "routing", "overview", "brijio", "mcp", "browser-extension"]
+verified:
+  - by: openwiki/0.7.0
+    at: 2026-10-03T13:02:39.597Z
+sources:
+  - id: openwiki-source-8037e2358a2c4f9b2c722a11
+    resource: repo://AGENTS.md
+  - id: openwiki-source-0f5d8a945cabdf67f37b9ad7
+    resource: repo://clients/extensions/chrome/src/background.ts
+  - id: openwiki-source-0ea792c19cab7fadee891dba
+    resource: repo://docs/architecture/ARCHITECTURE.md
+  - id: openwiki-source-5b54a58d1b51cd490b0e7162
+    resource: repo://package.json
+  - id: openwiki-source-5524638d57e96598fd8e40d4
+    resource: repo://packages/shared/src/background-controller.ts
+  - id: openwiki-source-40275cb92c3610938f16ade3
+    resource: repo://pnpm-workspace.yaml
+  - id: openwiki-source-241af4ebfa670c22ce047622
+    resource: repo://servers/mcp/src/index.test.ts
+  - id: openwiki-source-36c61251055ea6d2f82f0b4e
+    resource: repo://servers/mcp/src/mcp-server.ts
+  - id: openwiki-source-fc4b25ba659ae4c102750c8d
+    resource: repo://servers/mcp/src/websocket-client.ts
+  - id: openwiki-source-875036d8e83469fa1fc3f8e3
+    resource: repo://servers/websocket/src/server.ts
+generated: { by: "openwiki/0.7.0", at: "2026-10-03T13:02:39.597Z" }
 ---
 
 # OpenWiki Quickstart
 
-Brijio connects remote AI agents to the browser session the user already controls. The system is intentionally reactive: the browser extension connects only after explicit user action, and agents must ask for browser state or perform actions through the MCP server.
+Brijio connects remote AI agents to the browser session the user already controls. It is intentionally reactive and privacy-first: the user explicitly starts the bridge, agents must ask for browser state or perform actions through MCP tools, and there is no continuous streaming, mirroring, cookie export, or background surveillance. These invariants are non-negotiable and are spelled out in [AGENTS.md](../AGENTS.md).
 
-Start here if you want to understand the repo quickly:
+This is the Brijio browser-bridge monorepo: a pnpm TypeScript workspace (`pnpm@10`, Node `>=22`) connecting remote AI agents to the user's own browser session via **MCP server → WebSocket relay → browser extension**, with the shared protocol in `packages/shared`:
 
-- [Architecture: MCP ↔ WebSocket ↔ extension flow](architecture/mcp-extension-flow.md)
-- [Workflow: multi-tab and `tabId` targeting](workflows/multi-tab.md)
-- [Capability matrix](../docs/project/CAPABILITY_MATRIX.md)
-- [Roadmap](../docs/project/ROADMAP.md)
-- [Root README](../README.md)
-- [OpenWiki reference in AGENTS.md](../AGENTS.md)
+- `servers/mcp` — agent-facing MCP tools, resources, prompts, and skills.
+- `servers/websocket` — state-light relay: pairing-token auth, browser presence, request routing.
+- `clients/extensions/chrome` and `clients/extensions/safari` — thin browser adapters around the shared controller. (Firefox is a placeholder only.)
+- `packages/shared` — the one shared protocol and browser-agnostic logic everyone imports.
 
-## What this repository is
+See [Major Domains](domains.md) for ownership boundaries.
 
-This is a pnpm TypeScript monorepo for a browser-bridge product:
+## The runtime path in one glance
 
-- `servers/mcp` exposes MCP tools and skills for agents.
-- `servers/websocket` relays requests between the MCP server and connected browser extensions.
-- `clients/extensions/chrome` and `clients/extensions/safari` implement the browser-side bridge.
-- `packages/shared` holds shared protocol and page-reading logic.
+Every request is an explicit request/response chain, never an ambient stream. The browser stays local and remains the source of truth.
 
-The repository’s current direction is captured in the product docs and recent ADRs. The core design is still user-controlled and privacy-first, with no continuous browser streaming or background surveillance.
+1. The user manually connects the browser extension, which authenticates with a pairing token and announces presence.
+2. An agent calls an MCP tool.
+3. The MCP server opens a throwaway WebSocket to the relay, authenticates as role `mcp`, and sends one request envelope with explicit `target: { browserInstanceId?, tabId? }`.
+4. The relay selects a connected browser from its presence table and forwards the envelope unchanged.
+5. The extension's shared background controller dispatches to the matching adapter, threads `tabId` to the tab (active-tab fallback when omitted), and enforces the client-side approval gate for `submit_form`, `download_file`, and `fetch_resource`.
+6. The structured result or error relays back by `message.id`; the MCP server forwards original error codes to the agent.
 
-## How the pieces fit together
+The full chain is detailed in [MCP ↔ WebSocket ↔ Extension Flow](architecture/mcp-extension-flow.md); the protocol shapes in [Protocol and Data Model](data-and-protocol.md).
 
-The basic runtime path is:
+## The MCP tool surface
 
-1. The user manually connects the browser extension.
-2. The MCP server receives a tool call from an agent.
-3. The MCP server forwards the request to the WebSocket relay.
-4. The relay delivers the request to the connected extension.
-5. The extension reads or acts on the browser tab and returns a structured result.
+The MCP server registers exactly **17 tools**, each accepting optional `browserInstanceId` and `tabId` for per-call targeting (except `open_tab`, which creates a tab and has no `tabId` input):
 
-Recent changes added explicit multi-tab targeting through `tabId` for reads, actions, batch operations, and navigation. When a `tabId` is provided, it is threaded through the MCP tool wrappers, relay protocol, background controller, and browser adapters; when omitted, the system falls back to the active tab.
+`list_browsers`, `list_tabs`, `read_current_page`, `click_element`, `fill_input`, `fill_editable`, `set_checked`, `select_options`, `upload_file`, `submit_form`, `navigate_to_url`, `open_tab`, `perform_batch`, `download_status`, `download_file`, `fetch_resource`, `capture_screenshot`.
 
-## Where to go next
+The surface spans reads, actions, navigation, tabs, batch, downloads, fetch, and screenshot. The current capability contract (implemented, experimental, planned, and intentionally unsupported) is the authority in [docs/project/CAPABILITY_MATRIX.md](../docs/project/CAPABILITY_MATRIX.md); the direction is in [docs/project/ROADMAP.md](../docs/project/ROADMAP.md).
 
-- Read [architecture/mcp-extension-flow.md](architecture/mcp-extension-flow.md) for the end-to-end request path and the main source files.
-- Read [workflows/multi-tab.md](workflows/multi-tab.md) before changing tab-aware tools or skills.
-- Use the capability matrix and roadmap to understand what is implemented, planned, or intentionally unsupported.
+## Task-routing map
 
-## Notes for future changes
+Before editing, classify the change and read the matching page first:
 
-- The source of truth for recent multi-tab behavior is ADR 0062 in `docs/architecture/decisions/`.
-- If you change tool inputs or the extension request path, update the architecture page and the multi-tab workflow page together.
-- Keep this page short; it is the entrypoint, not the canonical home for every detail.
+| If your task is about...                                     | Read first                                                                          |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Routing, relay, protocol or data-shape changes               | [Architecture](architecture.md) and [Protocol and Data Model](data-and-protocol.md) |
+| MCP tool or request/response flow changes                    | [MCP ↔ WebSocket ↔ Extension Flow](architecture/mcp-extension-flow.md)              |
+| Tab targeting (`tabId`, multi-tab, `list_tabs` / `open_tab`) | [Multi-tab Workflow](workflows/multi-tab.md)                                        |
+| Auth, approval, trust, privacy boundaries                    | [Security and Trust Model](security.md)                                             |
+| Dev commands, verification, daemon / operations lifecycle    | [Workflows](workflows.md)                                                           |
+| Package ownership — which layer owns what                    | [Major Domains](domains.md)                                                         |
+
+<!-- openwiki: broken internal link [../docs/architecture/decisions] file "../docs/architecture/decisions" does not exist. Fix the href or restore the target, then delete this comment. -->
+
+Most cross-layer changes require an ADR before implementation (a capability, protocol, ownership, auth/routing, browser-lifecycle, or material dependency change). ADRs live in [docs/architecture/decisions](../docs/architecture/decisions); write them as `Proposed` and wait for explicit user approval before implementing.
+
+## Notes for changes
+
+- Keep this page short — it is the routing entry point, not the canonical home for detail. Linked pages hold the depth.
+- When tool behavior changes, update its tests, MCP registration, relevant skills, the capability matrix, and the relevant OpenWiki page together.
+- If the sources disagree, do not silently choose one — determine what is stale, update it when in scope, and otherwise report it.

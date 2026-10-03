@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:59fa507f177d68a1fa407b3de885de153c3afbe40d887b489b3f9d5defad9f2d",
+  "claims": [
+    {
+      "id": "claim_016fd61d40404ef6b5549fc5d460fa53",
+      "statement": "Brijio's security design rests on four core trust assumptions: the user explicitly starts and controls the browser connection, authentication tokens (pairing token for browser identity, separate MCP auth token for agent authorization) are held only by authorized parties, the browser session belongs to the user, and the relay transports messages without needing to inspect content.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L58-L63",
+          "version": "repo-lines-v1:sha256:f631d289d658d40bca434b52ed9ebf9309f2fba350ff5bc3b1f30ff4c54bab9a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjM2NjJmMTgzODMwMGU3MTkyZGE2M2EzNzk5ZmZjNzVlZTQ0ZjcxZjZkZThhODgzODQwOTBkZGVhZDNlNDg5YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWNmZWJhZGJlYWIxZmUyMjczNTMwZDlkYzMzNTUwMjMzMjM2ZWU2YzRiNzViZWEyZTA3NjY2ZThlYTEzZWFhMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjViYWQ3YTNkYjBiYmRjM2Q4NTA2MjJjODRkNTNmZTE2MGU4MmIxNGRlMDkwNmRiY2Q2YjZhYjQ2YjMyYzQwNCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md#L17-L27",
+          "version": "repo-lines-v1:sha256:7e982e6f7088b4d7432fc02d14b0acd6cbe87243e0203d673d9c25be930f0202:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4ZjJhNDBlNTJhNmU5NTFhOWIwNTQzMjRiODVjOTg2ZmJhMDYxYTcwZDZhNGFmYzJlOWZlZTA0ODllMDQyMmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMTdhYWNmY2FiMmI2Njc0MjAyNDk1ODEyNWRjYzZmZjkyYzEyNTZhODJkYjI5OTVmYTI0MTA1ZjYyOTdmNjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4NzQzOWVjNGI0N2NmYmNiMGQ0ZjhmNTI4NDcxYzA4Nzg2NzQ5MjRkZTk5MjQyYzczNDg0MTlkMmI3ZmMzZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFiOTFiMDc0YzhjNjU1ODcwOWM0ZWNhZTdkZmNkZWEyMDliYjZiYzdlODc1MTkwMDQyOGZlZTNlY2EzNWNlMGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0b4d503a9bc844e5a73ac8050092791e",
+      "statement": "The threat model names five security goals — protect browser sessions, avoid credential exposure, minimize unnecessary data transfer, reduce trust in relay infrastructure, and maintain user control — enforced architecturally via explicit request/response, no continuous streaming, user-controlled connections, and progressive disclosure rather than defensive code patterns alone.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L21-L26",
+          "version": "repo-lines-v1:sha256:7a05b8f03dfbc2b8dfcacb736e19171b62d5713ecc8054a14c06da6e95d475f6:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWMwMThkMGI2Y2I0ODU5NTlmZThmYzhhZDliODdlMjU2OGMwZTkxNzhlNzhlM2FiMmNhZDllZmM1ZGJmNmFhNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzJhODQ5NjU5NzEwNDhkNTUwN2FhNmVmYWVjYjJkOTI2NDU1MDJmNDYwZWYzMzU1Yjk2MjFhOTM4MTE1MTkwOCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjY1YjY3YjdmODExMjE5MzQ0NDM5ZmNjNGNlOTBlMmQxNTFhMmVhNWI4MzhjY2VmZmM5YjdkZTBlZjM3YTNhMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjNmNjE1YTBkMTg0MzVmNWQ0NDUzZTZmODVhNzg1ZWY0OTNjMTg5NTRlMzNmZGI1MzZlMjMyZjcwMjA5N2IzNSJ9"
+        },
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L7-L13",
+          "version": "repo-lines-v1:sha256:ae2af8bccd451a1ce47cb2ac604e5a8c6679cd4281da97a25b15051e9b0dc85f:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJjYmFhNjM2Y2YxNjUxOTMyNDkwNjc0YTczNjliNTMwZjM0YzMxZjBhZmFiMTIzNGFhZjg3NGVlZjQ1YjhjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzYyNzFmNWVmOGY4MDVjMjBhZWVkMzBkZGRlNGZmNTkyYTdhOTRiODdhMjE1MmVjZTQwYWY2MTk4NjM2ZWIzNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjc2NGFkMmU1MDE4MjQ2N2Q2ZmIyYWI5NmE2NzZmYWRkYzMyOWExODg2Mjg3NGY1ZjZlY2U5OWQ0OWMwMGU2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGE4YjU5ODk5ZDE2ZDJiYTE1MGQ0MjZjZTQwNGE2NmU3NjI4NjJkYjg5NTc4OTBhNDVmMjk5MzkxMGY4M2YyMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3200802bb1b44636808c28ef62e09a3b",
+      "statement": "The threat model defines four attacker classes — malicious agent, compromised relay, network attacker, and malicious website — each mitigated architecturally: the agent is constrained by explicit request/response with no continuous streaming and progressive disclosure; the relay routes without content access (E2E planned); the network is protected by TLS plus auth tokens (E2E planned as defense in depth); and websites are handled by least-privilege permissions, a structured protocol preventing arbitrary code execution, and content read-not-evaluated.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L15-L57",
+          "version": "repo-lines-v1:sha256:d30cb2ebd88254777583c69bfd36cef7638f1e59523257b7d98b629ff5a823da:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4ZDE4ZGNmMGVhYWQzNmI1NDM5ODJjZjk3OGI3ZTQxNGM5YWFkNTllZDUyN2ZhYjBmYTIxNzkzMGFlNDdkOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjNzc1OGIyNjVlY2VkNWQ0MTM4Y2Y0Njc5ZGI2YjMxNjQ2MDM3MDk0NmYwNDNkMGFiYWJiNDQwOTIyMmJjNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMWJjNjk3ODY5MTJiM2RlMjE5NjAyZDA1NTJkNzQ2ZTBhYjFkNWU5NmEwYjliNzEwZjQyZjJlZmFmZmQ3ZmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_393a85443e5441409fc9dd11f06a87ac",
+      "statement": "Client-side action approval (ADR 0048) requires explicit browser-side approval for exactly three operations — submit_form, fetch_resource, and download_file — via a hardcoded local policy; all other actions execute without an approval prompt, and the system deliberately does not require approval for every action.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L41-L47",
+          "version": "repo-lines-v1:sha256:7f9292415c0e61282aafdd226e025827964408f87567895f7eb4e4b6280fbd53:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTJmYzMyZDczOTVjNGIyOTdlNTYwMzQ0YTZkNzgzZDU5NjAzMTBkMWQ2Y2UzMjFiYjNhODNlODhiOTllMTY5MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE0YTQ1YjI0ZjZjYjE2OTg4YTVlN2I4YjUwMzhjZDk1NzBjYWY1MDI0MTM0YjFiZmVmMTk2ODBlM2U4ZDE5YSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzFiZmY0ZjFkMWQ2MDUyZGZmYjliNjVmNDA0NGNlMDBlYTZhZDM2NzgwOGQyYjJhODc2NjE2M2I3ZDAzZjgzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWU3YzRhYzJlNzQ2NDEzNTlkOWRlYzMxODhjOWJkZWUwMmEzMmQxNDkxM2JiZTQzZDkxMDJhOTFjM2VkODJiOCJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1696-L1706",
+          "version": "repo-lines-v1:sha256:5b17367141470f7cc3ed9cc00c2733227df91cfc8f22247a36d4ddae8b251830:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4YzBhNTc3NDYwZTkxMzEyZmQ0MmU3YWM4Njk0OWQ3NWFmNzRhZGI1NTNkZWU0NDMzMDZjNzlhMzE2MzAxMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MGM1ZDNkYzNhNzczMDc5M2M4OTI3OTQ4YjU1OTY2NDIwN2Y3OWJhODc3NzNjMjE1MDA0NDMxOTYyZmQ0ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUyMjU1ZjJmM2U3ZGRjNjViMTVlYzk1Mzk4NDgwODZiMjcxMTdlZTc3M2EzNzViMmNiOGYxOGYwMTE5MDM5YzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9711ba84920648ffbbddca8cad027765",
+      "statement": "The MCP server assigns a unique actionUUID and sets approvalRequest true when building request envelopes for submit_form, fetch_resource, and download_file; inside perform_batch every batch action receives an actionUUID and submit_form items additionally get approvalRequest true. The relay forwards these envelopes unchanged to the extension.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L292-L314",
+          "version": "repo-lines-v1:sha256:6e76921033d7d81b507989b750f7cbcd1c444b182fb70ed7d0d583e4be4a4b1e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0NTU4OTY0YTY2NjJiOThkMDY3ZGZmMTJjNDMxMTZiOTYxZjBiMzMxMGNmYWZhZDIzZDRhNzM2MmRhMjVhNjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFkYTBhZTEyNjczNGZhNDZlZDRlZjVhYWRmNmIzMjJkODhiNDVhOTg5NzEwMzhmNThkNjAxZDc0NTFlYmM5YjUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L860-L889",
+          "version": "repo-lines-v1:sha256:7a9406dd5d7d94c957157484ea3cc23afc81a97d795e05103bd241359ac34938:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkOWM4MTg4NDM5ZGY1NjU1M2I0YmE5NWZlNTZhODg5NDY0MDFhMmZmYzM0MWI0MTIzOGY4OGI4MDQ1MzAzYzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmNTI1Yjc0M2QxZmQ3YmNiYWE3MTQ1OTZlNjkwNDNmNDJkMThkNmI3YjkwYWYxYTg3OTdkODgxMDJkYmFmNDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEyMTg3YzMxODU2ZTk3OWMyZjA3Y2RiNWIwMjRlYmNiZTcxMjNmYmMyMzc5YzQ1MTczZTQ1YzdlMGE1ZTRiNDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L379-L390",
+          "version": "repo-lines-v1:sha256:d890c5993efdda47c2057299d544ca75a053c9e7b50a99252f0253f0dfabe7a2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiNTNhZmVjOTg3MzI3YzdlY2JlNjQxZWE0ZDI3YjQwYzM3Y2Q4NGFlZjIyNGY4OGQ4MGI4ODJmMWEyZjNmMmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhMzMxMDYzMjI3M2VmOTM5MzA2OGFiNTEzYzViOTgxMGI5OThjNDg4OTc3ZTVjN2Y2YzFkYzc0ZTIwY2VhMTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMTkwZjg1MzBjZjNlNzEwYzA5Y2UyMDg5MDA0NDIwMzQzMjhjMGM4Mzc3ZjE3ZjdhMTYzNzI3ODRmZDgzMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NGJhY2ZkMjM4NDc3OGYwZmFhMGY1OTE5MGQzNWJmYTAwMzNlZDMyMmE0MTUzODA5YzY5ZjhkY2JkNDE0NDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c51403c32d54db9972871da6f10f1fa",
+      "statement": "The extension's BrijioBackgroundController is the approval gate: ensureApprovedAction checks getApprovalActionType (only submit_form/fetch_resource/download_file qualify), requires a non-empty actionUUID and an active tab origin, reuses an existing in-memory session grant keyed by origin+actionType, otherwise renders an approval banner and waits for approve/approve_session/deny or timeout, and re-verifies the active origin after the decision before executing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1339-L1433",
+          "version": "repo-lines-v1:sha256:5f5edb695d5c21f5e6f852dd2a5f15a244ed127707d7839f449766b25b9a7539:eyJzZWxlY3RlZExpbmVDb3VudCI6OTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyN2NhODIwOWE3MTY1ZWZmYWQzN2UwNjc0ZDhlMmNmY2M0NDA4YjUzY2RjNmU1MjVkNDU2MzYzYzQ5NzE3YzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4YjlhYTZjYjU4MzBkNTk3ZmZmZDQ2MjAxZTBkYzI2NmNkMWU5ZWRiYTNmYmI0NDRiZTlkNjUyYWU3NzhmZjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dd5982adeed2434fb3870f640becae96",
+      "statement": "Approval state is held in memory only in the extension background (a Set of session-grant keys plus pending actions, timers, and batch sequencing); pending actions and grants are never written to page localStorage, extension storage, IndexedDB, or other persistent stores, and grants are cleared on disconnect via approvalSessionGrants.clear().",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L48-L58",
+          "version": "repo-lines-v1:sha256:a9d5e9d7929df1bb18e21fe5e3d554975bcddb19079cefcd7be607e1fcb437fa:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxNjllZjZhMDBhNmJhNGYyMWIwNzVjYzQyMDJlNDg4MWFlNmQyYjUxZmFlMjMyNjcwYWU3NDg5MDU5ZDAxYzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhNDhlNTI2MmZhODczZTI4MTJiOWY1ZDk0MDczMTJlNGU4NjBhYmE3ZjZmYmY3ZmViOGUyYTczNDMwNzU4MmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5Zjg5YjU3MjE3MTA1OTIzMmU3ZDE0YzVmZTZjOTUxNjVlZjcwYjQ1ZjY2OTU2Zjc0YmFiMzlhYmJjMGE3YWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQwOWExYTE1N2ZmZjk3YzU4NTRhODc2MzZiNmM2MDg3MWQyYTJjZjZhNzg2ZGE2Y2M4MWRiNWNlMzY1OTk4MzUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L385-L385",
+          "version": "repo-lines-v1:sha256:aa97494556d368d093880dea77aaee651375cd9671959d24b94a946cd7405bfd:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE5NzQ5NDU1NmQzNjhkMDkzODgwZGVhNzdhYWVlNjUxMzc1Y2Q5NjcxOTU5ZDI0Yjk0YTk0NmNkNzQwNWJmZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWE5NzQ5NDU1NmQzNjhkMDkzODgwZGVhNzdhYWVlNjUxMzc1Y2Q5NjcxOTU5ZDI0Yjk0YTk0NmNkNzQwNWJmZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzdmMzUzYTFmM2I2OTA3NDFmODJmZjI0YTNiYzE4ZDU0MGFlMzEzYzcwMmQyMjI4NzdjYzRhZTg5YTRkZjM4YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjcwYmQ2ZGY5ZDViOTk2MWYxMzYwZjAxYzYzYTQxOGM1YzkxZTI3ZGUzNzA5N2FlM2MxNmY1ZmNjMWM1ZmY0OCJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L508-L518",
+          "version": "repo-lines-v1:sha256:c5f4db24cd7e45b2b4c58feba5a256b01b50222e78ce46e9904bf122aca92f74:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmZjNkN2UzYWJlYmEyMjE1OTY4MjAxMTYyODcyYTVhOWU1ZDg3NzQyNTczYTA0OTY2N2VkMjczODVhMTlkYWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5ZDAyZTkyMzhmZDRjY2U1ZmJiY2M4YWVkNzc5OGY5ODcyZTM3MzVmNDRkNzJmNjFhY2ExMGExYmUyNGY3NTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImViMmRlZDRhMTdmYzQ5NjNlNDEwYjc1M2EyZDdlMDI2Y2U2NDQ2NThkMmQyZTdhNmEyY2ZkZjU2ZDk4ODgyNjgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUxNGQzMjA5YWE5OTRjMjRjM2MyYjJiMGFhYWNjNzM0NWUyMzZkZTIxNDU5NmMyMmY5NzAwZjE3NTBjZGM3OGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dc31032716c84fbb96dbcb5dce84d1f0",
+      "statement": "Because the MCP server is commonly instantiated per tool invocation, it is deliberately not the long-lived holder of approval state; continuity (pending actions, timers, session grants, batch sequencing) belongs to the extension background and relay, keeping the MCP server stateless across per-invocation processes.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L25-L29",
+          "version": "repo-lines-v1:sha256:6162c774a957994f474ddb14323f70fc8f649a5180c40d97cc4657a2e128d1fd:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTdjYmZkNzNjZWY3Yjc2Mzk3NGJlM2IxMmYxMGYyYzZiZjg3NTY2ZjBmYjZkOTY5Y2Q3OTExNjVjYjg1NjIwOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDY0ZDdlZDIxMTRhYThiMjIwNjhjZDYwYmI5YjA2OTU0MTAzY2M3MWQ3ODU0MTUyZmRkODQ4MzMwNTRlYjYxMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiY2IxNTdhNmQyNzY3ZmY3ZjQxMzNlZTI3NjUxMzY3YzZmZGZmN2FiNGZkOWJhM2NiNDI2MmUyYWE0NDkwY2NhMyJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L459-L462",
+          "version": "repo-lines-v1:sha256:879d03f37b49ea8f95516075cdde84283dd60a1a83176d1e7ecfa2277e16bad5:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGU0ZTUxNDY0OWExZjIzNTIzZTcyMjg4NmE1MjZiMTQwNjJiMGMyZTkyNmZjMDFiOTU2MTM2NWZhMzI2MmUyYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjYwNWEyMGRhNTNmZDk4MDc4MTZkMWU3N2RjYWRlNjZjMzhkOTYxZGI2ZTJkMDNiYjc5ZDFkMmU4NDY1MTQ5YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjkwZTQ0OWI4NDI1YzY1MTQ5ZTQzYmIyYmEzYzQyMDg3NjcxMmVlMzg3ZWQ3ZTg5Mzc4N2UzMTk1MTRlYTQzMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGRjY2JiYjU1MzQ1N2FkNDc0MjYxZjczYWY1ZGJhMjc2NzdiODY4OTk4ZjBjOTBlNTIzOWQ4M2QwMDdmZDY1MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c850c1ed77e447b38ea8573309c94b66",
+      "statement": "approve_session is scoped to a { origin, actionType } pair where origin is the active tab URL at approval time; before executing an approved action the extension re-reads the active origin and returns approval_origin_changed if it changed, so a grant cannot be silently reused after the page navigates.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L148-L160",
+          "version": "repo-lines-v1:sha256:3c67b0fa12859d01c382b3299b2639676fcbdff71bd2d8e33677e0703aa54834:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYyMTNhMzkwNzc3MjQ5ZjQ4OTE0Mzg3YzQwZDkwNzFmN2JmOWRkYTFlZWQ0MzdhMzBlODY3MTA2YTFlNTg1ZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkNWY2ODBjM2M5Zjc5ZTc0MDRhZDQyMTdkNjBkZmNmZmJjYjIyZmVjN2VlNWQxZmY2NmQ1NjNmYzZlMGZmMzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExMzZmYWQyNzg5ZmNiMjA4ZTZlMzVhMTg4Zjc5ZTUwNTBiNGQ2YmEzMWFlYWY0ODBiOTNlNGUyODlkYTRkOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlYjA2MjE0ZGIxNzBmNTJjYWRjODk2NDMwZDdlYTIxMWQxNjEzNTg1MTdkYThmNjUxMWQ1YTI0OGUyOWM0ZDAifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1416-L1430",
+          "version": "repo-lines-v1:sha256:0941292f800954adbb9c1401e15e85a8e76dafbdc42d6b00e96d6426e1a87568:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1YTE2MTc1MmE0YjQyZDliOTA5M2U5MDExZDVmZjEzODU1ZTRiZWUwYzczMmVhOGYzNDE0NWU3YWY2MWY2N2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0YjlhMGIxNmI5OTEwYmFhNWQwYTRkY2FmZjhhNjBjNDI5NjMzYmYyYWUzY2JhY2M4MjAyOTA3NTgwZDEwY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJhZWRhYWU4OTAyN2IyNGE2ZTdjY2M3YjE3NDhkZTQ2MzdiODQxZTQ4OGNkODk1MWE0NTFmMWM0ZTMyZWVmZjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_dfd7bfac01814b6bb81101434398931d",
+      "statement": "The approval timeout is derived from the local MCP HTTP timeout so Brijio returns a structured approval error before the HTTP server times out: approvalTimeoutMs = max(1000, BRIJIO_MCP_HTTP_TIMEOUT_MS - BRIJIO_APPROVAL_TIMEOUT_BUFFER_MS), defaulting to 55000ms (60000 HTTP minus 5000 buffer); the controller also falls back to 55000ms when no timeout is configured.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1387-L1393",
+          "version": "repo-lines-v1:sha256:75549369ecfe30b22a040bc5ee6116ce933e99435f85558f4ff33d8128f35e22:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDZlMjFiN2NjMTM4NjQ4ZmVjMGM1ZTZmNzMxZWE4ZTM1ZTVjZDk4YWU0NjE5ODE0M2IzNGEwZGUzMzk5MDUxMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ3NWU5NGE5MDRhYzQ5YjMxNTRkNDY3MmE2NmU4NjI5Yjg2ZGFjNzRlM2UyOTM3YmU2OTI3YWUzZGExMWM1MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjk4OGJlZDFmMmFhZWM4Y2Q5ZDljMDAwZWRlY2M1OTJkZmYzMjQ1Y2FmOTIyMGFiODg2NmZkYTg0ZWU1M2EwNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTg3YTc3Y2Q2NDhlZThiNDhhMzcxYTA2ZmQ1MjllODFiN2NkYTdhYWEzYzc1ODZiNmY0ZTUyN2I1OThjOTExZiJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/http-server.ts#L62-L73",
+          "version": "repo-lines-v1:sha256:6b68f91d1467dac78e37bd2b08610ceb7f73449055f84d1b594e4495c6eb8811:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmNzUzZTBiZTRmOGZiMWI2MjlkNGY2ZDFkMzNkMDQyNDQwOTg2MzFmYTA1MWE0N2M1MTk4MGIwMDQxNjZlNzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYxMzI5ZGJkNzlhODA1N2IyMjk4MjM3NjdiMjkwNjM2NTM0NjU3NTk0NDJjNDI3YTk2ZTc4MGQyZjM0ODU1ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEyZDZjNzRjYWU2NjdjMjFmNmQzNGIxNTExZWIxNjRhOWVlN2Q4ZDAzODgwYTYwNDU4OTI0ZTg2YTE5MmIzMzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_294295b380ea494d956e98bd54c9a614",
+      "statement": "Approval failures return focused structured error codes — approval_denied, approval_timeout, approval_unavailable, and approval_origin_changed — each including the actionUUID when available; inside perform_batch each action is treated independently so a denied or timed-out action returns its own error and the batch continues to later actions unless page navigation aborts the remainder, and a timed-out batch returns a partial batch_result with focused errors for the timed-out and unexecuted actions.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L296-L309",
+          "version": "repo-lines-v1:sha256:e85cfb7555224f3513a2b733b3beb3215b11c4595778aa046fd9829a4d43fa57:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyNDBkYjUzYjZlZjc3ZjQ5NWY2ODYxMGRiNGNlNjZmMzEwZWMzNDY0MWZmNDJmNDI1OGMyOTAwNTBjN2EwMTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVmNTFlNDI4NzI0OTZiYzc1NmJhNDhmOGQ3NDViMzYwOWMwZTMzZWNmZTE4YTgyMjQ5ZWUxMTIwMTI0MDZhMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiMTg4NWE2ZWM0OWNhNjY0YjU4ZGQ2YzcxNTAyNjZhMjQxYjg0NWZlYzcyNzkzYjQ3NWU5ZTliODI0ZDBkNDcifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L357-L368",
+          "version": "repo-lines-v1:sha256:104d9bd3e0b4b746a4fdfdfc6598f1dc98289be9d1d14786149ff4f6a7105c63:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzZTE3ODk4ZmM2NDk2OWNkYTk3YzFhOTg5MjE2NjBiYzQ2NDFjNGE5MDlkN2YzZWRlY2NjMzIxMDc1ZTJhZDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzMzcxMDk1OGJlMDYzMDlhZDQ3MGFkM2JlYzE2MmRmMzU3M2JmNWVlYjI1ZmMwYmI4ODAyMmMxNDYzMjFlNzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxZTZlM2YyMGRkY2JmNzQwNjUxZTIwYTI3ZTc3OGI1MTkzOTMwNDUxMDczMDdmOTBjNTIzMWMzOGNlMWEyYzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_48b546ebde9b4cdfb0554bce2f95a27b",
+      "statement": "The approval policy has a three-stage evolution path — hardcoded local list (current), configurable local policy, and enterprise policy API — with policy evaluation kept behind a small local function so the action-execution pipeline does not change as policy evolves; agent polling for approval status and a WebSocket-server approval status registry are explicitly out of scope for the ADR.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L369-L381",
+          "version": "repo-lines-v1:sha256:1aa435d75dac566a4257d2c704edad5c9a73fb0e5dca7069dd31d652f2134c75:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExYzYwNzIxNDk5ZGE3NzUzMmY5NDViZTg1M2Q4MGI5NzgwZjk0YWZkYmQzMWNmNGVjNmE5MDQzNGNlMzFkYjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5MzBiM2NkZDc0N2E2OWQ2YjYxNmNjMmRkNjU4NTlmYzdiNzZlNWNjY2QwOGMwOTBjNTk2MGUwNzMxYzUxODciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY0MzdjOWU4MWMyNmU2MWNlMTQyMTc2MzczMzBhMzljNjFlODY0MTUzZWE2YWIxOGQ2YWNkNDI0MmE1MTkzYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcyZmE2NjFlZjk0ZDcwOTdhYjFlYzc3YTI3OGJlZWExMmMxNWY3NmNjYzI5NmJhM2YwNWIwMWZjMWViMGY2NjIifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L62-L74",
+          "version": "repo-lines-v1:sha256:f8f9358e5dc2e3ee70ea7c2c8cc78da9feaec93613fe21b4c0892295608f76c6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU1MmRiN2UzZGJhNmNkMDllYjZiY2RlYTdmYTBkZDc2ZjE3ODQyMGMzNjRkODIwYjdmMmYxZmY1NjQ2YmNkY2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4YTJkZDMzNjIxNGMyODg2MDg0NTVjODBmYmJiZjhhYTAyZTNkMThmYmU2MDAwMzlkOWM1ZGYyNTE1OGNjMmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQwOWExYTE1N2ZmZjk3YzU4NTRhODc2MzZiNmM2MDg3MWQyYTJjZjZhNzg2ZGE2Y2M4MWRiNWNlMzY1OTk4MzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5OWRhNDkwOGU0MTI3ZDc4MzkzMDJhZjRjNjgwODI3MjE1ZTAwMTA0OWJiZmMwMGJhMDhhMDM0MTU4NTIyYzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_116de2ee11e044f689a0d6e43f589343",
+      "statement": "Brijio intentionally does not provide cookie export, session cloning, browser mirroring/remote desktop, continuous screenshots, continuous DOM streaming, background surveillance, browser history collection, credential extraction, or MFA interception; these are deliberate product boundaries (intentionally unsupported), not missing features, and several are security guarantees part of the project's identity.",
+      "evidence": [
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L163-L180",
+          "version": "repo-lines-v1:sha256:053e044117e8c53b4997f4f6d0048619b187e70b7eea44913876006924a1adea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5NGMzNzFhZjM2NjlmNmJmNmMyOGQwZjIxOWFhMWU5NmVkNzJiZjdiNDA2NGE4ODgxOTg3NGNhOGQzMTU2YTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZhMWQ3M2ZkNDg2NGFhMjMzOGU4YzY5ZTgzNGNjYjY5NWZhYmI4YjlkZmMzMDkyNDJlMTBhYWQ1MDBmMDFmNDIifQ"
+        },
+        {
+          "resource": "repo://docs/security/SECURITY_GUARANTEES.md#L11-L72",
+          "version": "repo-lines-v1:sha256:95cf21eb08c9f3cf463b626949f3048c916eede8ecf2823ad62b8c4c9680f746:eyJzZWxlY3RlZExpbmVDb3VudCI6NjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMGQ5YTBiMDFkYWM0NmE2MzdjODM1ZjkyOTUxMDBiY2VlYTNlMTNmNWQyMzVkNzZiNmJlMzVhMzBhOGZhZTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBkNjBhOGZlN2Y1MjE4ZGMyMjQxNTY3OWRiZmU4YTczNzQ3YTE2MThlODA0N2Y0ZDViNzM4YjJkN2UzMzNiMDUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c32652231d8047969348aa74e595d863",
+      "statement": "As a concrete credential-extraction boundary, fill_input returns browser_error for type=password fields (and for readonly or disabled inputs), preventing agents from writing password fields; page content is read as structured context and never executed or evaluated.",
+      "evidence": [
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L174-L174",
+          "version": "repo-lines-v1:sha256:e8681958ba09ad5635e73f5b19e45a293d84421fc1d25b40104afdd934cd0b16:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTg2ODE5NThiYTA5YWQ1NjM1ZTczZjViMTllNDVhMjkzZDg0NDIxZmMxZDI1YjQwMTA0YWZkZDkzNGNkMGIxNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZTg2ODE5NThiYTA5YWQ1NjM1ZTczZjViMTllNDVhMjkzZDg0NDIxZmMxZDI1YjQwMTA0YWZkZDkzNGNkMGIxNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzBhOTgwYWQ3YjQ2YTI3OWM5NDAwMDQ3M2QxNzM3OWZmMWY2ZDgwNGUzM2E5Y2RhNTVjZDI4ZWNlOGYzNTc1ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmI3MzE1NGUyMjZkNjE4OGQwNDc2YjQ4ZWI1Mzk3OThkOGRjNmU3ODcyMDNkY2NhY2RhOGY2NDRkZTUxNWVmYyJ9"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L196-L198",
+          "version": "repo-lines-v1:sha256:ded4dd2d174cef103a96758452a8f219005115c728b91a79c875f226be5e572d:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGMxMjRjMjIwM2I1NzYwZjgwNDIxZjk3NDJkMWRiOTFkOTc0NGVmNmRjMzlhZjhkN2IyNGYwYjUwNzhlOWU2YSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjM2OGIzNTU2YjA3Mjg0ZDNhZGUwMWNiZTcwMThkYjY1M2Q2MDQzYjkzN2Y1MmE3NGFmZjRjOTNjYWFkYWE4NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmE4MDI2ZTMwMzZjYTM0Njk1ODMyYmQzZjE2ZTIzMTc1OThmYTZlZmQ5MzNhMTY0Y2I2YmVlOGUzOTgxODNkMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWI3YWQ0YWIzNDFkZDU1ZmJkNTkwM2U0MjkwYmQwZWU1M2Y2ODhhM2M1YTM1OGUyZmM5ZjYzNzA3OTI3ZDk4OSJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/skills.ts#L146-L146",
+          "version": "repo-lines-v1:sha256:2e80ab5c5fe78bf029036996c61f4b7e44978197826da8c3780b58447ffbe26f:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmU4MGFiNWM1ZmU3OGJmMDI5MDM2OTk2YzYxZjRiN2U0NDk3ODE5NzgyNmRhOGMzNzgwYjU4NDQ3ZmZiZTI2ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmU4MGFiNWM1ZmU3OGJmMDI5MDM2OTk2YzYxZjRiN2U0NDk3ODE5NzgyNmRhOGMzNzgwYjU4NDQ3ZmZiZTI2ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjlhNTkwOGYyYzg0OGIwZDMyZDFjNDg0ODIwMTYyZTE0MDkxNjUyY2Q3NDNmMmEzZDU0Mjc1YzIyZTY2ZDQ4NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMmI4ZTM0NTM5OTRmNWEwNmRmODRhMzhhMDFmZDU1NTc2NDljN2NhNTJmNGI4M2QwNzkwMDEwMzBkMTViOWU3NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_aa9b4c28f41b48418135bb1bb9f666eb",
+      "statement": "AGENTS.md defines non-negotiable product invariants that any change must preserve, including user start/stop of the bridge, browser state available only while the extension is connected, explicit per-request reads/actions, no continuous streaming or background surveillance or cookie/credential/MFA extraction, preserving user-visible connection state and client-side action approval (do not bypass approval checks), and keeping permissions minimal with documented justification.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L38-L60",
+          "version": "repo-lines-v1:sha256:04ca3080466731e8f9b61dfb7de334f59f0e1af72138e5e9c570f2c25a692657:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMDY3OTUyM2ZhZGE0MTEzOWM2ZTY1YjQxNzQyYjIxZDQ4OTc5OTg3ZmIwNDMxNjc2MGVmYTUzYWQ2NjMyNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA1MGFmOWJlNWI5OGI4ZDAxZmE3NmI1NDk5NTE0MDAxYWZjOGRhY2FlY2ZjZTA5YjIzMzg4ZTQ3Y2M3MTk1ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YzIyOTlkOGMzNzI3OGU4MjU3NDVmMDQwZWFkZTcxMmQyMzIxYWE2ZDhlMmU5MjJiZDg1M2RmYWQyNDJlY2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c4dd311ade3344d2b26afe90b61045da",
+      "statement": "An ADR is required before implementation when a change introduces or alters authentication, authorization, privacy, storage, or a trust boundary, or browser routing/targeting/lifecycle semantics; changes to authentication, routing, browser-state exposure, page-reading, or the approval-gated set must re-check the security docs first, and the guiding rule is to reject features that expand trust in any party that should not be trusted.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L66-L74",
+          "version": "repo-lines-v1:sha256:33a6c8cd298be8963d6dc0740eefc41e393348972a265f259fd03c62bce3244b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDE0ZGRhNTI5Y2JkYzg2YzU5YWJiMWY2ZGNlMTBlMDUzMDY5ZGU5NWM2NzkwZDFmZWY2ZTUyM2I0NzcxNjNiNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGRlZDM2N2Q4ZmY4NDMyMzJkZWI3YmJiZDg2OWU4YTdkOGQ2YjIxMzgxMjhjNTIzMTcyYzNlZWRlYzNkZWY0NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTIxNjMwMTM5NzQwNWJkYzIwZjU0ODZiNzNiNjcwNWYyOWYzMGY0ODAwYzQ0MmMzODUzMzNmODA1Mzk1NGQ0NCJ9"
+        },
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md#L67-L73",
+          "version": "repo-lines-v1:sha256:3c03afb9dec1a030c96ff573ed8bea1de17b571266942001de6a16b63cb2cf5b:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmQ5NjNhMWIwMjVhZjRmNmFmMzYxYmQwZDk1ZDIzYmE4MGUwMzE2NDI2YTMwNGE5MWU5MDIzYmIwMzM1MzJiNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzYwZmQ1ZTBjYTljNzFkYjg1ZTA5NTMzMzhmZmRlMGUyOWVlZDUyMzg3MzU4NmZmMmQzMTJjNWI1N2NmNTM2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_3d173db157af41fc8043b6c657c62f01",
+      "statement": "The relay routes envelopes content-blind: for MCP-to-extension requests it records the pending request by scopeKey:requestId and forwards the full message unchanged to the extension socket, and routes the extension response back to the waiting MCP socket by message.id, logging only scope/type/label rather than payload contents.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L286-L303",
+          "version": "repo-lines-v1:sha256:96f52cfb215d8452a9a377f5dc6af2bd5d78ef271b0886c0d7ca994b289a27d4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3NmFlNDYxNjUwNTUwMTU4ODY4NzUwMzNlOTFhZTIwNWM5N2ZhOWRlNmQ3N2VjZjYyNWI2NzIxNzRhNTNiNDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0NGY3YjQ5YTUxYzdhMGRhNmMxOGRmOGVhYWMyNjhlZmRkMmRhNTYzZWE3ZjhmMTBkMjYxOTYzZTJhOGE5MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0MGM1ZDNkYzNhNzczMDc5M2M4OTI3OTQ4YjU1OTY2NDIwN2Y3OWJhODc3NzNjMjE1MDA0NDMxOTYyZmQ0ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkZGU2MWI4NjVjZWZlNjlhZGEzZjI5YTZlNTYxMTQxYzY2ZmFhZjYxZWM5OGFjZTU2MDdmOTllODM0MjQ1MjEifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L379-L390",
+          "version": "repo-lines-v1:sha256:d890c5993efdda47c2057299d544ca75a053c9e7b50a99252f0253f0dfabe7a2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiNTNhZmVjOTg3MzI3YzdlY2JlNjQxZWE0ZDI3YjQwYzM3Y2Q4NGFlZjIyNGY4OGQ4MGI4ODJmMWEyZjNmMmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhMzMxMDYzMjI3M2VmOTM5MzA2OGFiNTEzYzViOTgxMGI5OThjNDg4OTc3ZTVjN2Y2YzFkYzc0ZTIwY2VhMTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMTkwZjg1MzBjZjNlNzEwYzA5Y2UyMDg5MDA0NDIwMzQzMjhjMGM4Mzc3ZjE3ZjdhMTYzNzI3ODRmZDgzMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0NGJhY2ZkMjM4NDc3OGYwZmFhMGY1OTE5MGQzNWJmYTAwMzNlZDMyMmE0MTUzODA5YzY5ZjhkY2JkNDE0NDYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.0",
+    "at": "2026-10-03T13:02:39.597Z"
+  }
+}
