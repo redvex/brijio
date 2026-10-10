@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:78372a09e15558d324bfe45c7c114cade304d2554c0e287220cbd3db10c2d6ba",
+  "claims": [
+    {
+      "id": "claim_0f5b2564d4c34028b32bd5a549aecded",
+      "statement": "packages/shared/src/protocol.ts defines WebSocketEnvelope with an optional target carrying both browserInstanceId and tabId; targeting is explicit and per-call, and there is no hidden selected-browser or selected-tab session state. When tabId is absent the extension falls back to the active foreground tab.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L129-L135",
+          "version": "repo-lines-v1:sha256:45521f1ee749f17d2a697b31698d7a321ded338d324c2c3bc246b6bb7fbacd1d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGY5Yzg1YTgyMjQ2MGYzYzYxYmNiZjdkNTc2MzViNTdjZjI3NGVjMmI2NjAxMmE5ZjY0MGJmMWU1OWZmY2NlNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWZmOTQxZGRhM2E4YjdjZThhOGRmNzQ3MTEzNzMyMzU5OTc3YTAwNzc2YmVmMGUyNjhlZGZkYzg1YTIxZGM2ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmY3NTM1YjZiNjc4ZjE4YmFhYmRlNDZhMjdkODQ4ZTE5YTdhNzU4NDc1ZTRmZjNiOTdlMWNiMGNmMTBmMzQ2MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2M0Y2U3MWI2YjUwY2YyNGNlODk0MjMyZjI2NWE3YjM2MTljZjk0YjdjODI5NDVjNWZhMWM3ZmQzYjYyYTBkOSJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md#L48-L73",
+          "version": "repo-lines-v1:sha256:e554e5a962acff1e3a770e83f3634c91ca1c5940ca549aac6ff0c11b45d0e0ea:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkM2RiYzRlN2U3Y2JlNWRkYzg5MWIwODA3MTJmNjM1MWM5NGI3MjhlYzhiZDg1NTZmNDYxMmIwNzBkMjdiNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjODk3MWJhMDUxMmMxYTc2ZDE2NzZkYWUxNjMwMGM2Njc5ZDBlMjc4YzI0OWMxMGJkYTAzZDBmNDM3MmYzMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmNzg4NDUzNzVmNGUyMzcyNjg0Y2FhMjhlYjA1OTBiYzVhMDU2NWY5NzQ0MDFhYmVlZTBiY2QyYWIxNWJmN2MifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L1-L9",
+          "version": "repo-lines-v1:sha256:c9fb1e4cd894affcdecc4553117783ac2c2770cc4460941a1bd42260086a4201:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzIzMzY4ZTM4NmU1ZjA1MTgzYTBjNGQ3MTU0YTk3MDEyNTk4YTJlOGQ5MmExYmNmYjcwZGNmYmZmOTE4NGE2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjkyYmNlMmZmYzBjNWEzODRjYjQxZTFiODgwYTA4YTFhOTVhNDBjMjJiOTQ5MjFjMjUzMDA3NzE1ZWMwMWNiYyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d76afb2b0a374879ae84932fc60ac731",
+      "statement": "Protocol definitions live in packages/shared only and must not be duplicated; the MCP server keeps its own envelope builders, parsers, and result types in servers/mcp/src/protocol.ts but imports canonical types from @brijio/shared. Changing a shape without updating the relay, MCP server, and both extensions breaks interoperability.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L113-L131",
+          "version": "repo-lines-v1:sha256:9ae7320ad8bc011703475324728a2dcf3438bf63a98b0e3063d3a4c8ba9ffc08:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MTk2NGE5OTFmNzY1MDhkNmQxMDAxZmI0ODA1OWJkMjc3MzNlYzVmNTU1ZTQwMTAxNTdiZDQwNDM4ZmEwZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzYjZiMzFlNjZlNzQ5OTY5NTVmYWU4NTYxMTQ2ZjNhN2I5NDNkN2Q0OTI2N2VlODFlZmRmMzFjNzg1ZDg2YjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYzdjNTg2Yzg4ODI5NjczNDBjNWI1N2VlNzUxNDJlMTI0MGZjNzE0ZDgzZDAwNTYwMDg1YWNlNDdiYzQ1ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJmZTZlMjJmYjQ4NzZkM2JlNWZlNzJlNzIxNzViN2VhMTYyYWIwMzhiZTc0MmNmNzhmYjQwYjM2Mjk3YmUzNWMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1-L1",
+          "version": "repo-lines-v1:sha256:fa0354a02f5fee9436428dd5757425b1af4065ade0ac662abbefd11d6fd6ac5c:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmEwMzU0YTAyZjVmZWU5NDM2NDI4ZGQ1NzU3NDI1YjFhZjQwNjVhZGUwYWM2NjJhYmJlZmQxMWQ2ZmQ2YWM1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmEwMzU0YTAyZjVmZWU5NDM2NDI4ZGQ1NzU3NDI1YjFhZjQwNjVhZGUwYWM2NjJhYmJlZmQxMWQ2ZmQ2YWM1YyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDZmMzJiYzI4NmQzMzhlNjc1YzU3MTQ4OTY5N2I2N2ExZjllNTc1Y2U1MjU3NTMzNDA2NjEzZGY2Y2QwYzVhYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_50c34334119e468c8f5a57003fbb39d4",
+      "statement": "BrowserCapability is the named feature-flag union the extension advertises, including page_context, page_content, click, fill_input, fill_editable, set_checked, select_options, submit_form, navigate, batch, upload_file, download_status, download_file, fetch_resource, and screenshot (the most recent addition from ADR 0064).",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md#L66-L71",
+          "version": "repo-lines-v1:sha256:c338eadd4f4bb49c2c5dd0d900f7016a1d74e4998397d26720510381b8799512:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTMzYmU3ZDllM2ViZDNkMDE2NjZiMTE4NDcyYjkwZTNiNGYwZmJiOWE3ODkyOTA2YWQ5NWIzMjRjMzk5ZjcxZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWZiZTgwOTMwZjdmYjFlN2YxMzE5MWJmMTFmM2U1MmUxN2FkYzI4ZWE5NDgwNDc4NTZmMzYyNDBhMTBlZDkyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDRkNzdkNmVhNzk5YjI3Yjg1MWViZjIzMzU4NDY1NDA1MzZjODQxNjc3MTE4MDhiNTliNmE5ZTQ4OGM4OGI1NyJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L17-L32",
+          "version": "repo-lines-v1:sha256:1d8ca3c32946fcf2b0be7cd0c04ea8d5bae3724aeeee06247fdcb912eed7ad1d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0YzVlYWVkMmI4MDg3ZWY4OTdmOTJiNjRmMzU3NzE0ODFjYzZiYmM1MzYyZDhiM2I5NmQyODM5NmVlMzA2ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwNjY1MGM5NTdjOTUyYmQ0MDg0MTAxNWRlYWZkNzUxNTVlNjhiN2JjNGFlOTBmMTY2ODg2NTNiMmQ1NzM3ZGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzYWJkNDJhOTY4OTg4ZmZlODRmNDZiMDZmYjcxODc5NzRiZDhiYzRkOGZmMTM2OGM4NDRmZDAyNmMyNWM0NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlYTQxMDAzYmFjNjEwNWM2NDVhMzVlNzdhNTJhNDEzOWQzYzJmNmM5MTQ1MTk0YjUyOTZmMjU4MGQ0YWQ0ZDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_784a98e879964f9c8f8cd1bc772388f6",
+      "statement": "ADR 0060 added on-demand tab listing via list_tabs/tab_list_response using TabInfo (opaque tabId/windowId, title, HTTP/HTTPS url, active, supported); listing is fetched on demand and the extension does not continuously stream tab updates.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L26-L41",
+          "version": "repo-lines-v1:sha256:87d940beec669485e094bc5b9aacf1ef57eb26001475a225c9ad23cc3adaefc4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0YjNhZjUwNDY5NjhmOGQ0ODFkNTE2OTc2OGUyZWQ2NzdmYzgyMDE2ZTAwYzdkODVkMTlkZDFlODBlYTc0NDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg2NDBiMGUxNzFjZWFmYzQ3ZDcwYjUzNmRmOTYyYTc1MjBkNjEzMWZjNjQwOWU3ZjVhOGY3ZWMyOGRjZDA1ZWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiMTU3YTZkMjc2N2ZmN2Y0MTMzZWUyNzY1MTM2N2M2ZmRmZjdhYjRmZDliYTNjYjQyNjJlMmFhNDQ5MGNjYTMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L62-L93",
+          "version": "repo-lines-v1:sha256:dce04c02e51b304699a0b4ecf33d34229f4f26f71a4458d0791011257739d8db:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2Y2VjMTJmMjM3OTA1MjFmYjVmZTc3YTIyYmQxMDQ1MTU5MWMxZjRkYTljZjU4YzBlNjMzYTRmMmRmODE0ZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYTQ5NWMwMjZhNzZhYmVmYThlNmRmYWFjNjUzNTRmYzdhZDczMGIzNjU0ZTM4OTczNmU5ZWU2YjU2YzY5NzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2NjA1ZTQ5OWFmNjA4YWFlYTc1NjIzN2ZiNzIwODEwODdhOTdmNGI1NmUwMDY1NWY2YjhkZDI3ZWUxYTYxMDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ed941c2f9e524925b074d4d0219bdcda",
+      "statement": "ADR 0062 threaded tabId from MCP tool input through envelope.target.tabId and the shared background controller down to chrome.tabs.sendMessage/update in the extension, fixing a prior no-op where the accepted tabId parameter was silently dropped at the extension layer and every action operated on the active foreground tab.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L93-L100",
+          "version": "repo-lines-v1:sha256:19226b021dcc0d6c4bc7e8725c66c85b125766e4dad0947179cc4f3ca0d775b5:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTc1N2ZhZmRjZWI0MTJiODAzMmQ0MDE1YWU2OWY2MmVhZjBjOGMwNjc0YjVhNDYyZTRhODJhYTRmMWMzOWEwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWY3OTBjMzlkZjM5YjQzMTQzNDVmOTE3NjIyMTk0MTI1ZDVkNDEyZmU3YjdhMmJlYTc4MWZhMTg2NTU3ZjcwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzEyYTY0NTBmOTUyMWE4ZjY4ZDM0ZWI1Y2IzOWY2NDlkNDk1ZjM1YzVjNjZkZjA4Y2Y0MmExOGFlMzAzOGE3ZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzRlZDQ0YWYyYjEzOTU2NjhmNjQwMDg0OWJhNjE3ZWE1MTBkZTcyOTE3Njk4ODc1MzYwOWQyYWNjYTg4ZTgxYiJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md#L11-L52",
+          "version": "repo-lines-v1:sha256:334edfba10e455120cbbfc1f8c23f514d3db8f2c6c0b107ccc82177a93d917af:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlMzYzNGRiYjgwMWE3M2I3MGU4OWVkNzc1NDZjNzdiMTA5M2JiODhjOWU0NzkxOGU5NjY1OTRkYTQ5OTRhZjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkODRjZDlkZjgwYTY0ODcyZTlmZWE3MmJjYWNmNDMzODVjMDUzNDc0NDAyMWVlZGZkNTJhNmZlNTA4OTIxMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjNWFlYTAxZjk3MzE1NzRmNjY5MThhNGJhZjA1Y2EwNzZhMTZjNzc4ZTQzOTI2OTEyMGI1ZTcxMjAwZTAzMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhNTA5MzM0ODE4YmRhZGI5MWZlMDdmMTk3ZThmNjQ3ZDM2YTAyMGFkZGUwODIyMTIyZDM1NTdhMTdjZGUxNzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5735375abe4d420a8a5e2e2b983cefec",
+      "statement": "ADR 0063 added open_tab/open_tab_response protocol types in packages/shared (OpenTabRequest with url, OpenTabResult with tabId/url/title, OpenTabResponse, OpenTabErrorResponse) with error codes unsupported_scheme, open_tab_failed, timeout; only HTTP/HTTPS URLs are allowed. The new tabId is returned so the agent can target it subsequently; close_tab and ownership tracking are deferred.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md#L52-L109",
+          "version": "repo-lines-v1:sha256:14d94c4c6111e4c27bd7a379dd69bb7d721f8e0da7064c2a1963c53a489c9f0c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlOWMzNjE5MzdkM2MwYmFjMWUyOWQxMmY1YzQ5NzlmOGZmY2M5NGIyODE3NmM2ODk0MGI2MDM4NmM5MTk0NGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMjlkYTQ4OGNkYmQxMmI3ZDBiMDgxOTk5YTljNmIwYTJkNjFkZDlhMzY5M2RlNjhiZjE5NzJlZjJhOWRmYTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiMTU3YTZkMjc2N2ZmN2Y0MTMzZWUyNzY1MTM2N2M2ZmRmZjdhYjRmZDliYTNjYjQyNjJlMmFhNDQ5MGNjYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3ZmNjMmZhNzZmMmRiNzFiODNjNDA2NjNhNDAxYWI3NTM5ODA2MWIyMzJiMjEwYjU1MmZhNjA3MDFhZjk1ZjAifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L1378-L1428",
+          "version": "repo-lines-v1:sha256:515db8bb3abfcd57cbb629523a5602e6f9441613a4c034dbf33fa9db43c86f7b:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhYjQ5NjU4OTFkMjkyZmZlMmQ4NzdkMzFjZjA4Y2U0NWI3MzE1MjFiYWI4ODg0MTIxN2JiYTE5M2ViMTkwYWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExY2FiYmI2NDVkODA4Yzk2MTVlMzM2Mjk4MTEzZjY2OTYzNWJlYTA2NjhlYzhhNDU2ZGM4YmFmYTBjODdmYzcifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L894-L928",
+          "version": "repo-lines-v1:sha256:df8a72f70ebb923cac765c713978ea784d0890b8d56c1b677e83735d7c7210af:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkZDk0NDk2NjkzNzkzNDhmOTFkOTI3ZDAyZjRkYzY1NWZjMmNkMTcyMDFiYTcwZTVlNGFjMDdmOGU5ZDEzZDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5Y2RkZTU4NzI4MjhhYTRlZDdiNmQ2MjdiNGZkODU3M2ZkMWFlZjU0ZThkYzU3ZjEyODIxNzViZmMzNGUzYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlZWQ0Yjc1MWRhNGQ3ZTc1MTI2OTE2YTYxNjcyMGQ5YTU3ZjkwZTliNTI5NjJkMGRhMzNiMDMwNzIzNWZlMzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2ZDY0MDBhMDYyNjI2NmUyMjdlOTA3OThhNjI1MzRiOTNiOTIwMDQ2YjNmYjc1ZjdlNWMzNDc3YjkzZGUzNzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f40060b509bd408c9393812c0e51aade",
+      "statement": "ADR 0064 added capture_screenshot/screenshot_response protocol types in packages/shared (CaptureScreenshotRequest, CaptureScreenshotResponse with dataBase64/width/height/tabId/capturedAt, CaptureScreenshotErrorResponse) with error codes capability_not_supported, capture_failed, no_visible_tab, timeout. It captures the active visible tab only using captureVisibleTab returning JPEG.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md#L24-L100",
+          "version": "repo-lines-v1:sha256:623b3e641ef62a0e8765041e5fe0fcff356467931e135527125190e6e61a17c6:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkNzMyM2M0YzI2Njc4ZTFmNmQ5ZjBmN2Y0ZDBhN2I0YTkyMGRhODFmZDlmMWFkN2YxODk2ZWQxNjY3YzVhOWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiMTU3YTZkMjc2N2ZmN2Y0MTMzZWUyNzY1MTM2N2M2ZmRmZjdhYjRmZDliYTNjYjQyNjJlMmFhNDQ5MGNjYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4MDkxOGFjNjQzMDcwNDAzMDA0MzI3OGFiYjE2NzAwMWM2ODM0M2ZjNWEzYWRmN2Y4MmI2MTY5NTI5Yjg0YWYifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L1340-L1376",
+          "version": "repo-lines-v1:sha256:3c6209621481a5bab1cd7545a69917d1835a3a1288ea5c26cb2cc55cff48559e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4Yzg5OGJjNzM3YjFjYjYwNzBkMDM4MWU1YTU3OGFkZGYyOGFhNzc3OWYyZDRlNjFkMDFmZmMxYmU4YzRkNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyZThmNDUxNzk1Yjc4YjYyYzk0OTA2MmMxN2QxZGYwNGM1M2EwMDYxOTdlYjUxZDBkM2QyMmQyYmY0ZWU0ZTMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L175-L214",
+          "version": "repo-lines-v1:sha256:ad206006f1da7e9a3447be6a9f3aa58ef04f73e80fc989d4e500ec98cf75a67a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxZDE1ZTJkZmI1NzY0ZjBlNzIxN2VhNDE2ZGViNzk3MmU1MDE1ZGI4MDgzMzgzMWUzMmM2ZWIxYWJhN2M1MmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1ZDUyNTRlZGMyMmU3M2Y5NTMyZmNmN2EyMjdiZTI4NGNlOTcyOTU4N2Q0NGRiYTRhNjM5NjhiYjY0ODgyMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQyMTRiOGIyMDlkNmYxYmMyZGNjNGUwMjVmMmRlMWJiMzkxODM2ZjMyMGNjZDg4ZDRlOTRiYzA5MWMzZTg0N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NjM1ODc0NjNjYjBmMWZhOTdlNGU1OTRjZmI3NjNmZTY5MGEyZjRhN2QwNzA0YjVmMDJjYjY4NWNmZWE3OGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c8d44826ffb8448bac41f773e16acd85",
+      "statement": "The staged file-upload protocol transfers file bytes from MCP to the extension in chunks (stage_file_upload_start/chunk/complete, then stage_file_upload_staged/ack/error) with sha256 integrity; error codes include invalid_file_payload, checksum_mismatch, file_too_large, invalid_file_name, invalid_file_type, upload_expired.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L95-L173",
+          "version": "repo-lines-v1:sha256:eb5e16bd9ca08ba1b46257e2223dd5dba37edcb79bd1ea8d12ad0aad53bbe179:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkNDI3ZDFlYWY1NTc2NjVkZDVmMjVlYjMwMjI2ZGFkZTc5ZjQ4NzZiNWFiOTk5Mzk3OGQ1Y2U3YjZmNzJhOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1NGRlYmJkZTUzZmQzYmMxMzc5ZTE2MDU5YWFhMjM1ZDRhMmNjOWYxOWRjZTI3Mzc1Y2FiMjNiYzFjOThjZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzYTBjN2MyODkzNzY3YWU3MTcxMzJjOGMyYmY3MmQxZjA3NGYwOGI3NjY1OGY0M2VmMzZjMDUwYjBiZDMyZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_db6a19dcf3824528a79128849e5a0367",
+      "statement": "DownloadStatusRequest/Response/Error and DownloadInfo/FetchResourceInfo (sharing DownloadState) form the download/fetch status surface; download_file and fetch_resource are separate tools with separate risk profiles built on the same protocol foundation, and fetch_resource streams content back via the chunked staging protocol in reverse using the browser session cookies.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0047-download-awareness.md#L34-L60",
+          "version": "repo-lines-v1:sha256:8ad94fc92192fc4a2f9daa39c795b0497b7f434ddcad4a64ad16375051ca3984:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1MWVmMjU2Mjk5NGRlZTcxZTIyMDAzOWNhZjZjYTdkMjM0NTAzODMzMGM4ZjhiNTYyYjJmMjY2YTFhMGIwMjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwMzhiYTEwN2I3YTNkZjYxMDQ5MTRjMDQ5YTIzZjk5NzVjMzBlZmJkODZjNGI0NDYzNTk4MWQ5OTg2NTVkOWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNiMTU3YTZkMjc2N2ZmN2Y0MTMzZWUyNzY1MTM2N2M2ZmRmZjdhYjRmZDliYTNjYjQyNjJlMmFhNDQ5MGNjYTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUwZjI3MzAxMzk5YTUxYjI0NTczYjMyMDkzYWQ3MzYwZjQ2Y2YyN2VkYjIxNjE2NmRhYjI4Njc2ZjI3YmQ2ODYifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L216-L264",
+          "version": "repo-lines-v1:sha256:c232edff21ab9b06b74e1a276c89bff130a72ff40b19f36a1889a4d7b3bbbea1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjOTNlODBhYWNlODc2NTg1MGVmOTE5MzE2MzA4N2M5YzA5NzRmZDNlMmNlNzgwYTZiZTQzMWIxNWEwMzVjNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQzMDEyNjJiNjM1ZTViNWZkYjI4MzJlMjcwYTc3MmM3ZDAwYWQ4YzY3NDkwODdmZjdmZmM2Zjk5ODk0NDlhYzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViODk0YjE1YTAxOWQxNWJmMDNiZWRmZDExOGVjYjUwMGU1MWU0NGI2ZTk1ZmU5MTE5OTYxNTVlMTJhMzRlNGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_04fc2cecdd304b57be6b36e1aa95c87e",
+      "statement": "MCP tools return a structured discriminated union: BrijioToolResult<T> = {ok:true,data} | {ok:false,error:{code,message,detail?}} defined in page-reading-tool.ts, and BrijioResourceResult<T> is the parallel parsed-response type in servers/mcp/src/protocol.ts whose error may also carry browsers and StaleContextDetail. BrijioErrorCode enumerates cross-tool codes and helper constructors build common error shapes.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L148-L152",
+          "version": "repo-lines-v1:sha256:689c136b122904619d3a3a8726d8c96688a218ba791acb8ad199d5f3e8eeeac5:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTNlYThhNzY2N2Q3YWY2NzRlNjU3MGI1ZDEyNzdlYmVjNWMyMWJkMzUyZDE5ZTEwMjc3MDgyOWM3MzBiMTU0NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzE0MzA5Y2ExZDc5MjU0YWU3OWU3ZmU5ZjA4MjA3OTY5NTMxY2JkNDFiOTdlNTE4ZTIyMDQwNGZlN2MwODJhNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNGI0ZGZmOGU2NGYyNjhkYWM0OTBhNjQzMzE0MjJhYWE1MDc1NmM2ZmUxZThhMDg0N2E5N2Q1Y2IxNzY2NDExMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTRlYmI1MmRmZGVkZDE0MDliNzdjZmU5YWNjMDkxYjE1MWE5MWVjMmI3Yzg0YTdiNGNiOGRiN2RmY2EwMWY4ZSJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-reading-tool.ts#L16-L30",
+          "version": "repo-lines-v1:sha256:9223b95efb1aa6558bfacd2cb1086a9b5988f664e8bcdf5633901726efd8adc2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmOTAxYTE3NDAzMGYxOTY1ZGFjZGUxYmIwYjVlYjE0NTdiMTVkOTY3N2UwZDk0MjVmNDE4OWJjNjcyZGVkODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY1YjVjMDc1OThlOWQ4YTdlOGZiNzU1YmY0NjdiNDhjNjExZDE3ODI1NzRiN2VlZjE0MThlYzM4YWY5MmRhN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwZTk3NmIzNThiNDhmYmVkMDA5MmQ5ODFiNzhjMmVhNDZlNzZlM2ZjOWIyYWJmNTBlMzYwOWMxMzFhODFhMGUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L257-L308",
+          "version": "repo-lines-v1:sha256:13175047384dc0ffbaa65ca7f2c0d2e863ab2fac4ac992ac526c4146b31182d9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzMTU5MGRkNTliMWI3MTJhYzIwOTVlYTRjMDA5Y2Y4OTUxYTk0ZDcxNjk5NzY2YTA3ZmUyOGRiM2FhZDk2NjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNkOWZjYTQwMWJlOGM0ZWVmZjM3ZTg3MDQ1MjRkYzk2MzM5ODk2NWViZDE1MGUwZmFhN2IxMWU1MWVlNTJmY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxMGQyNGNmMTVhN2Q3NWY1Y2JiZWVhZTgzOGM0NTllMDU4NDRjN2FmNjZmYTQyZjhlYzE0NjAwM2I5YTc0NDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3bb7bfff4d394fa6a6538db5df187b53",
+      "statement": "The ExtensionResponse union in packages/shared/src/protocol.ts includes all response types the extension can return, including OpenTabResponse, OpenTabErrorResponse, CaptureScreenshotResponse, and CaptureScreenshotErrorResponse, which the internal createEnvelope helper wraps into WebSocketEnvelope payloads.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L1904-L1920",
+          "version": "repo-lines-v1:sha256:33a01b1872a2f22fb786488a9a14d1d326024c494ea50d52bb929c28a8d6dd1c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4ODE1ZTJlYWViNGQ2YzNiNGZjY2QwZmIyYmMzZmY4MzIzZjU2MzdhODg1NzQ5ZmI2NDQ2MzJjYjNhYmE3MTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmYjdkNzhkZGM0M2U5YTAwYmMzNzUwZTIxYjAzOTVmYTA4NzRiZDUwYzVjZTJjM2M3Nzc4NjIzZDRjZmY3ODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmYzgxNjRhYzhiNWU4NjM2Y2ZhNmQzMTgwODc2OTZkNzdjNDFiZmE4YTJmM2QyZTI5MTE2MjNiZjk5ODMxY2YifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L930-L950",
+          "version": "repo-lines-v1:sha256:5933b435b1737c557bc85a76377f402cebecd3933e82b83737f0bb9be491396c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2MjAwODQxZGEyODlkZmQwNTBmZGNmNzNiNWVjZDg3Y2QwMjE5OTc3MTczZGYxMzUzYjFiZjA4ZTQ0ODI2ZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAyNjZhY2UxYWJjYmE4NjUzMTQ4NDgyMTM2Y2VmYzZlMWEyN2RjZWM3MTkzMDYwZTgyMjhiNDNjN2RjM2NlZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyM2JmNjYyYTllYjM3NWE0YWVhODE5NTNkM2M0ZDBhYWFlYzBlOWRkZDJlNTJiZDk1ZThlYzc5YTUxZTMxODEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-10T14:14:23.130Z"
+  }
+}

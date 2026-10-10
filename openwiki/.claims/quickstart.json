@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:13744c6281779a48c423e5cee07632944a9e26bf1973a7d85f391977c83f2f8a",
+  "claims": [
+    {
+      "id": "claim_135b90d81f9742449cf08aacf1349fb3",
+      "statement": "AGENTS.md mandates that contributors read openwiki/quickstart.md first before changing the repository and then follow only the architecture, workflow, domain, security, or testing links relevant to the task, establishing the quickstart as the wiki entry point that routes readers to topic pages by task rather than duplicating their detail.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L8-L19",
+          "version": "repo-lines-v1:sha256:03f62773d2e5456cc7d4f9a525a4d7f5ecf76dba273bd92c2952d09e9f3cf7c2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyNTY4ZTM2ODkyNDY0YjdlMjc1MGM2ZTcwZTdlN2Q3MDE5YzcyM2NlM2FiZGEwZjIyNmFjZTBkYTEwNDQ2OWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNhZWM1YzVkYjMzNzEwMWY4NjM5MjVjYWJiNDFlMmEyMzQ1OTgxYWNlZjYzZjU0MTIxMjUxMDk2YmFkZjY5NGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhYjc0OWI5NGQ1Zjk1NWE5Y2Q5NTVkYmM5NGQ0YWU5ZTFjMjMwOWJiODNkY2EwOGRiN2IyNjM4NzlhMjljOTgifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-10T14:14:23.130Z"
+  }
+}
