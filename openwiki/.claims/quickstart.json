@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:2fd61b8e3880f787de60ef734d58626066d805b776786954b7895e7569b3cc35",
+  "claims": [
+    {
+      "id": "claim_9709ca4ff68f4c6f83f1881e6e095c76",
+      "statement": "Brijio is a pnpm TypeScript monorepo with four owned components: packages/shared (shared protocol and browser-agnostic logic), servers/websocket (relay with auth/presence/routing), servers/mcp (agent-facing tools/resources/prompts/skills), and clients/extensions/chrome plus clients/extensions/safari (browser-side bridge); protocol definitions belong in packages/shared and must not be duplicated.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L114-L120",
+          "version": "repo-lines-v1:sha256:46dc3f8de210440a882977c4a0a34a886497b67376ab5cc33ea1ede9e4632bbf:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTQxZmE0YmZlOTZkNTk3MDgyNzU0YWIzNzBhMjZhN2U3Y2Y2NDBlYWIwOTcxYjFmNmY4MjU5MjMzYmJhYWJlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjgzMTY5ODdhNDM3NjY3YjM2MDNhOGY2N2U2ZDZiMWE5YmMzNzJmNTBhODViNjQwZWQyOTIxODEwYWRhNGE5NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZiOWNkZTBhYzdiNGIwYTE4NmEwMjk0ZjRjYmFhZGJlZjBmMWVmOTMwZjY3YzhlZDI5OTE4ZDAzZDliNDMxOCJ9"
+        },
+        {
+          "resource": "repo://package.json#L1-L23",
+          "version": "repo-lines-v1:sha256:8c38c8b02bc11ba4c704967370f8fa25ada9693ec61c5b13718d36d54ff9138e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTY5MTJmNGNhZWQwMzRlNjQyYmY4OWRmMzM5OGIyMzE4YWQwMjkwZDZjMGVjNzlhMTZjNTg0ZDQ2ZjUzOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a1b5bd1af0124063ad6145dbc5b6183a",
+      "statement": "AGENTS.md binds changes to non-negotiable invariants: the user explicitly starts/stops the bridge and browser state is available only while the extension is connected; every browser read or action is an explicit MCP tool/resource request with no continuous streaming or surveillance; requests carry explicit IDs, structured errors, and timeouts with no page-content persistence unless an accepted ADR requires it; client-side action approval must not be bypassed; per-call browser and tabId targeting must stay explicit with the active-tab fallback preserved.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L132-L137",
+          "version": "repo-lines-v1:sha256:ccc8b40394f24061cc6e424c816995b4a0cf44a8aff32f78af83255b1f38faf4:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWE5MDNjMDE2M2M1MDZkYjNjMjQxZWQzMTFjYjA3NzUyYmQ5ZjkxMjk0MzU3MmEyMmJkZGEwNWMwODEzZjlmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjc5NWIwOTMyMTZjYjVlOWMyYWQ3ODczY2NjNGExNTU4NzNlOTVjZmU1ZWVhMTA3YTBkYTE2YmFjMWYyOTU3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjFlNDRlYzFkMWIzZmM0YzNmNjhkMTkxYThkYTRiMWQ0YjA5OWI4ODA1NDYxMzk4NThlYzk1ZjUzZjE4OTdmOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ1ODMzZjlhMWIzNTQ2ZGU5NDQ5MDllMzdhNjkyODM0Y2U4NDEzNzk1YzIyYWMxYTA2NzZiMzY4YWM0MjQ2MyJ9"
+        },
+        {
+          "resource": "repo://AGENTS.md#L38-L60",
+          "version": "repo-lines-v1:sha256:04ca3080466731e8f9b61dfb7de334f59f0e1af72138e5e9c570f2c25a692657:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMDY3OTUyM2ZhZGE0MTEzOWM2ZTY1YjQxNzQyYjIxZDQ4OTc5OTg3ZmIwNDMxNjc2MGVmYTUzYWQ2NjMyNGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA1MGFmOWJlNWI5OGI4ZDAxZmE3NmI1NDk5NTE0MDAxYWZjOGRhY2FlY2ZjZTA5YjIzMzg4ZTQ3Y2M3MTk1ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YzIyOTlkOGMzNzI3OGU4MjU3NDVmMDQwZWFkZTcxMmQyMzIxYWE2ZDhlMmU5MjJiZDg1M2RmYWQyNDJlY2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ee86314140064cf69bd1cb7498e11b3a",
+      "statement": "docs/project/CAPABILITY_MATRIX.md is the canonical product contract and the source of truth for capability support status (implemented, experimental, planned, intentionally unsupported); docs/architecture/decisions/ holds design history.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L22-L31",
+          "version": "repo-lines-v1:sha256:4471e9eb388792cde3b3fba43a7e6bb3c611b1793286ca890ae8901ba42248d8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkNTI5MGM4MTZjZWM1NmE0MGQxZGEyYzdmODdhYWZjNWZkYmIxYjYwM2I5ZTliM2JlZTFlMTU4MThjOGM2MmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFlNmY3NGRjNzAwZTE4ZDkyNDJhMTMwZTM2NTllYzQwZDdiZjdhYzFhNTA5ZGIxNDg1NDMxNWQ2YTVhZTI0NDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2Yzg3NjI3MjY4ODEyOGQzYmVlNTk0NWQ5NzNlZTI3MzY5MzE1ZjAyZjU4MDQ3MDYzOWViZDk4Y2Y0NjhiOWMifQ"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L1-L13",
+          "version": "repo-lines-v1:sha256:b0da76f886c61a99f731c2cb53129d967822605ffcd7b717072ca94d4513f1b6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ZmQ3ZmM4ZjgxMzBjMTYxMDMyOWMxOTdmNzY5NTlkOTNiNTg5MDBhZTAyZTg3YzdmYjRiY2VhYzE3NjgxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5YmE1ZjRlODQ0ZjVlYWVhZDI3MDUwZDlmMzY3NjBmMTU4OGJhY2JkYzQ2OWZjMDI5NWZlMzBlOTNlYjBmZTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_806072727527479faf6dd8eaee4ba024",
+      "statement": "The Brijio runtime is a single explicit Agent -> MCP Server -> WebSocket Relay -> Browser Extension -> Browser Session chain where the browser remains the source of truth and results flow back along the same path.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L97-L122",
+          "version": "repo-lines-v1:sha256:1e8ed677c4300bce0f8e370280c8a629ef5767a3ccc658ee482470f4d3e82e9e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2ZjFmYTdiNTczMzdhZmJiNjY3NTRmMmVkMWU3ZWI3YzFhZmI4MzBlOWVmZWY1MGIzMzgxMDViZjk0OGJhYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE3YTc1Nzk5NzNmYjA2ZGRhM2Y3MGMyMjM4YzQyMWExZTAwZGYxNjIxMGRlMzI2N2RiYWE4MmQ0YWU2ZjYyZGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_230affb9a65e474fa8a27882b4a18f28",
+      "statement": "package.json and the workspace package manifests are the authority for runtime versions, the package-manager version (pnpm), and available commands; mutable tool inventories and repository trees should not be copied into documentation.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L16-L19",
+          "version": "repo-lines-v1:sha256:29a3f64ecbb8d2ec60a493456bc2cf9148569b64129fe75f680cfa1d4c29dadc:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzI1NjhlMzY4OTI0NjRiN2UyNzUwYzZlNzBlN2U3ZDcwMTljNzIzY2UzYWJkYTBmMjI2YWNlMGRhMTA0NDY5ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzllMDkwM2FjZWJmOWIyMTdjYzFlNGYyYTIwM2ExODBjYmJmZDVmZDg3ZDNiY2NlYWE2Zjk5NmU4YzE3M2ViZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYWFiNzQ5Yjk0ZDVmOTU1YTljZDk1NWRiYzk0ZDRhZTllMWMyMzA5YmI4M2RjYTA4ZGI3YjI2Mzg3OWEyOWM5OCJ9"
+        },
+        {
+          "resource": "repo://package.json#L1-L23",
+          "version": "repo-lines-v1:sha256:8c38c8b02bc11ba4c704967370f8fa25ada9693ec61c5b13718d36d54ff9138e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTY5MTJmNGNhZWQwMzRlNjQyYmY4OWRmMzM5OGIyMzE4YWQwMjkwZDZjMGVjNzlhMTZjNTg0ZDQ2ZjUzOTYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-17T11:58:52.754Z"
+  }
+}
