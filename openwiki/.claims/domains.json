@@ -1,0 +1,236 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:526198607c878cc9c0add65be37cfc8323ef64a56254b6891d12df26f8e22fcf",
+  "claims": [
+    {
+      "id": "claim_c0bb03f901c049028d27c2d86b62be41",
+      "statement": "packages/shared/src/protocol.ts is the single origin of the WebSocket envelope, roles, capability names, presence metadata, tab-listing, upload, and download/fetch status shapes, and is consumed by all other domains through the packages/shared/src/index.ts barrel.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/index.ts#L1-L14",
+          "version": "repo-lines-v1:sha256:d77b9a3749a19ded81f80482377b5b0bba2345a7350c90d61c357b00ef42ee6e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmZTg1MjU4Njk4Zjk5NTg0NGU1MTJiOTE4NGVjZTk0OGU0NzQ0OWMyNTFkM2Q0N2Y3NzVlZDZjNjNmNTA4MDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMWY0YmI3NTgwZTg0NjA1NjQxNjgyZTU2NjUyM2M1ZjE1Y2ZhZDZmODkzZjAwOTg0YzRhZTZhOGUyODQyOTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L1-L90",
+          "version": "repo-lines-v1:sha256:673b4b570f5d4c7f4b631323f41c99093731bd409c0cfc0ab94dd0c8482a3ca1:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMzM2OGUzODZlNWYwNTE4M2EwYzRkNzE1NGE5NzAxMjU5OGEyZThkOTJhMWJjZmI3MGRjZmJmZjkxODRhNjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwYjE0YjY3M2NlNzUwNGQ3ZGUzMTgxMzMwNjVlNGEzYzAxZTM1YjE0NGEzYzY3MzJhYzMyNGM0MmE5OGZiMmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxYmQwNjI5ZjVhMGIxN2M5ZDYxNzg4ZDcyMzlmZTIwOWM2ZWNkMzBiYjRiZGU4Y2U2YTNhZTNiOTk2YzBhMDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_53e5790337f94a4dbfe3a300a5e14fec",
+      "statement": "The shared package owns browser-agnostic implementation reused by both extension adapters: page-context extraction, paginated page-content chunking/reading, background controller logic, content-script message handling, batch handling, bridge settings, popup helpers, timers, and logger.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/index.ts#L1-L14",
+          "version": "repo-lines-v1:sha256:d77b9a3749a19ded81f80482377b5b0bba2345a7350c90d61c357b00ef42ee6e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmZTg1MjU4Njk4Zjk5NTg0NGU1MTJiOTE4NGVjZTk0OGU0NzQ0OWMyNTFkM2Q0N2Y3NzVlZDZjNjNmNTA4MDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxMWY0YmI3NTgwZTg0NjA1NjQxNjgyZTU2NjUyM2M1ZjE1Y2ZhZDZmODkzZjAwOTg0YzRhZTZhOGUyODQyOTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_860995b51dc74e13bc0608dbae7660bd",
+      "statement": "The WebSocket relay authenticates clients with the pairing token, scopes connections by a key derived from the token, routes messages between mcp and extension roles, and holds presence/pending-request state only in runtime maps that are cleared when a socket closes; it does not durably persist state or require content inspection.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L203-L260",
+          "version": "repo-lines-v1:sha256:16a5a405b1eae10372dd2bde3d08409748a0dbb61ef68c65a37382b95cf48a8e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU0MmY3NjkwNTYzYzMyNzVjNWQ3NzQ3N2ZjMGEzOGQ1NTRjY2JhMjljMTFmMjQ0ZjZiNmRmY2IyYjU0NDcyNjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmMDgyOGIzYTVhNjU3OGM5YWEzMjFiOGMxMTdjYzhkMGYzODZiYTc1OWUyZmQ5ZTYyYmE1OGQ3YmI0M2ZjMDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMzMmZkMGM0MDg2OTBlZGRlOTJiNThlN2ZjMzliZDBkNzU3ODAzMjdlYzI0OWU5ODgyODllZWFkY2RlMjViYTkifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L59-L149",
+          "version": "repo-lines-v1:sha256:581187c89345691e16a205c2bdcd2998d6783d55b24b1fbd9c9a3cf6b1aee8f0:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ4ZTAzMzAxOWMxMWYwMmRkMDk0YTJhZDQwYWQyMTU3NGI1NmM0ZGRhYWUzZDUxMTM3MDZmM2NjYmVmODA3ZTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2YTA5ZTllYjM4MWNjODg3ZTkzNGZhMzczNjUzNTVhNTljMjQ4Nzg3MTMyMjliMzllZGE4YTNhMjQ0NjM5MjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIwMzVhMjM5NTkzYWVmMTU5ZTUyZTM5YzgwZDAwOTk1ZDVhYjU0ODFkMDMxNjQxMjhkNzhmZDIyYWE5MjYzOTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f110d2024aa54caebaf9b2317ae652e0",
+      "statement": "mcp-server.ts builds the McpServer that exposes browser resources (current page and paginated content templates), tool calls, skill resources, and the brijio-context session-start prompt; tools delegate to tool modules that reach browsers via websocket-client.ts through the relay.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L1-L90",
+          "version": "repo-lines-v1:sha256:a45f9ce6c447cede02a3aa3d155b235fec632997d5a668bb9a463847b54f3107:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4MjAwOTY0YTk3ODYzNTUyMmIyYWIwOTBjNjUwNjVkOGVmOGU4NWM0NzMwYmIyZWIwNDYwZDM0YzY3N2RkYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyZjM4OWJlNDk2NGY1ZTcxYWJkM2M0YTUwYWQ2MjUxNTBhNjRlMWUwMWY4NzJmY2I5NTI5MzkyMWI5NTA4MGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmMmRiNTgwOWM0YzhlMTAzNzJmZWI1NWJjZjJkNWQyMTQxZmMzYjg4NGQ3OThlNTI4ZDhlOTEzOTM4YzA2NTUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L880-L975",
+          "version": "repo-lines-v1:sha256:50f255aba75ada8355d32e33f39de6fada2005c825ab825e2b5cb1a15bb83414:eyJzZWxlY3RlZExpbmVDb3VudCI6OTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZDgwMzIyYjUyY2FlNDcxOTNiMGJhZTdkYTAyNTc2YzAxNTVmMjlkNWEyNjY0ZTgyZWVhMWZmZjQ2ZTAwZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjljNDQzOWU0NzI3NTk4M2QwZDBmODZkYWQ3NjM1ODdiNWY4MTcxYWMzM2NjZDM5MDA2OGZhYTk3NGEzYmEwOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5bd3bfa8393d4fb483d5005a5ea322d7",
+      "statement": "http-server.ts serves the MCP server over HTTP via StreamableHTTPServerTransport, enforces MCP_HTTP_AUTH_TOKEN, exposes /health, and configures request/approval timeouts from env.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/http-server.ts#L1-L80",
+          "version": "repo-lines-v1:sha256:036691b52f1c02c175a0aa2287f444a1a92ba2b25d43c304bebb952869976f6b:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4MjAwOTY0YTk3ODYzNTUyMmIyYWIwOTBjNjUwNjVkOGVmOGU4NWM0NzMwYmIyZWIwNDYwZDM0YzY3N2RkYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI4YjgzYjcxZTU4NWY3MWYyZTc3YWQ1YTEwZmMyYjk5OWY3NDk5ODQ3NzM1ZjMyMjBkODNkMTM5YzY5ZGU5N2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkzYzFmYjc1OWNiOGU5MzE3NjA1ODk0ZmQ4Y2FiZTYxOWQ4MjM5ZTEwZjExYjIwZmRmMDc3NWYwMmQxZjY2Y2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_68b327559beb467fbe465258c44f4252",
+      "statement": "Chrome and Safari extensions differ in API surface and packaging but share logic from packages/shared and follow the same product rules: user-controlled activation, explicit request/response, no continuous streaming, page context before page content, and short-lived ID targeting.",
+      "evidence": [
+        {
+          "resource": "repo://docs/project/POSITIONING.md#L57-L70",
+          "version": "repo-lines-v1:sha256:f88e82224698ab923410edf429e36522298941131edf9786d5c5f3056afaa7d0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZmFjZjNhNmFhZDg5ZWVjMjg5MjIzNWI0ZjNkMWRlMjc0OTFhYTA3NDBiMWI5NWU0NTE0YTY1YjdjOWIzNzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYxNWY2YzE4ZDY2ODUyZGEzZTcwNGU3MDE2YmUwMjM3ZTI2Nzc4ZDBiMTQxMWJhZmRhZjZhNmI2OTZiNTY2NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc3NWNjNGYyYzcxNGYwMzdjNjYyMmZlNGUwZTAwMzRlNGI1Mzg4N2NmMmU0YjQ3YmRlOWE5OWVjZGEzMjUxYjMifQ"
+        },
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L15-L27",
+          "version": "repo-lines-v1:sha256:62a7e5649e3f1ad5116e05353631e4622559626053b787ca88980a6c0a18306a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4ZDE4ZGNmMGVhYWQzNmI1NDM5ODJjZjk3OGI3ZTQxNGM5YWFkNTllZDUyN2ZhYjBmYTIxNzkzMGFlNDdkOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjNzc1OGIyNjVlY2VkNWQ0MTM4Y2Y0Njc5ZGI2YjMxNjQ2MDM3MDk0NmYwNDNkMGFiYWJiNDQwOTIyMmJjNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMyNTI1YTlhMGEyOTJhYzEzZmU1ZWZhYWI4MWM4NTZjZTY0YWFkZGI3MDM3YzEwNzY0Yjk3MmZiZGNhYzQ3MzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_750ad17aa9824e1fa36733dc9d117eb7",
+      "statement": "A clients/extensions/firefox directory reserves the client boundary for a future Firefox extension, but Firefox support is intentionally unimplemented and must be designed in a separate ADR before implementation.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md#L1-L9",
+          "version": "repo-lines-v1:sha256:d7053aa8a7cc461ae5e3b43f2bbb0c74952899e9b11a1ab3190e54bb1935ef1b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODY1ZDA4OTIxNjg5YmNjYmM1ZmVhOTE4ZGY2ZWMzZDkzZDZkMGY1NGQxMzAyMWQ3ZmQzODAwZjZiMzU1Y2QwYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTEyZGQ1Y2Q1M2ExZjU1MWVhYmY5NzIxYThlM2M2NzNjNDYwZjgxYzcwMzg5Y2JhZTIzZjE5OTllZWY2NGY1NiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTFkMmYyMmU3MjI4OTE0MmUzZjdkNmQxMzkxZDU2OGMxOGU4OTY5ZTdmYzhmNzQ4NGZlOGM3ODI4OTg3NjQ2OCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_4e43c0a2f0734f1889e2476c3cab3de7",
+      "statement": "CAPABILITY_MATRIX.md is the canonical product contract enumerating every capability, its status, browser support, and explicit out-of-scope boundaries; POSITIONING.md frames Brijio around authenticated browser sessions the user controls rather than generic browser automation.",
+      "evidence": [
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L1-L27",
+          "version": "repo-lines-v1:sha256:36157f8199c6199a082b3af5cb245e87a03f119483cce2cae5b4b3532c1dd55f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ZmQ3ZmM4ZjgxMzBjMTYxMDMyOWMxOTdmNzY5NTlkOTNiNTg5MDBhZTAyZTg3YzdmYjRiY2VhYzE3NjgxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE4N2YxZjUzZjIwMWVmZjkyM2NiMTY5YWY2OGJjYTk1ZWE5OGEzZjYxYWNmN2VlZDE3ZDY1YjgyMjhiMjViYjYifQ"
+        },
+        {
+          "resource": "repo://docs/project/POSITIONING.md#L33-L40",
+          "version": "repo-lines-v1:sha256:04f6f16a11c501098ccc8c514604cd7842354c0bf4dca55c461922cbe06ddc7a:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDIwYmY2NWQzMjc3OTI1MjQ5ZGViMThmMzJkNDdmZTcxYTdlY2ZjMzc2NDZlYzM3Yjc0MGU3MzE0YzA4NzlhMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDAxZjJlYzE3NTkzYzEwNTRlYjQ2MzY3ZDg0NTNlZjI0YTE3M2NlOTZiNzExN2Q5MWY5YTY4ZDQ0ZmVmOGIwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmJhZjIzMzY1MTUwZjE0Zjc5Y2QxZGEwMjkxZTkwZDJiODAwYjU2YzM5ZDBhNmZlZjJhZGViYWNjZjU4MTg5MSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_acb3cee00eaf438f8cc2e554ad600238",
+      "statement": "The security docs define trust assumptions and mitigations that constrain other domains: explicit request/response, no streaming, user-controlled connection, progressive disclosure, least-privilege permissions, read-not-evaluated content, token auth on all transports, and self-hostable relay.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L7-L63",
+          "version": "repo-lines-v1:sha256:209abc448ef808c5ff3951e7024218a2877077dfa5bd08af55856890f86e029a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyY2JhYTYzNmNmMTY1MTkzMjQ5MDY3NGE3MzY5YjUzMGYzNGMzMWYwYWZhYjEyMzRhYWY4NzRlZWY0NWI4YzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjZmViYWRiZWFiMWZlMjI3MzUzMGQ5ZGMzMzU1MDIzMzIzNmVlNmM0Yjc1YmVhMmUwNzY2NmU4ZWExM2VhYTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3NjRhZDJlNTAxODI0NjdkNmZiMmFiOTZhNjc2ZmFkZGMzMjlhMTg4NjI4NzRmNWY2ZWNlOTlkNDljMDBlNjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_43cb480889744934883e899d646fd52f",
+      "statement": "ADRs under docs/architecture/decisions record the rationale for protocol shapes, browser actions, connection behavior, transport, and daemon/install design, and several are referenced directly from source comments tying code back to design history.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0021-local-pairing-presence-routing.md",
+          "version": "repo-file-v1:sha256:3b91e264495651d40d47c48f0ba382d1e69964525c5f4eb9accb8b3e08d409e5"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md",
+          "version": "repo-file-v1:sha256:0e14b1ec7626ee25a7cdf57a45c4bd4f9a26e11986504072a4ce80ccec3bbfe2"
+        }
+      ]
+    },
+    {
+      "id": "claim_fb8cab1095074a8db953046319d290d6",
+      "statement": "servers/mcp/bin/brijio.mjs is the combined brijio (and legacy browserbridge alias) entry point: it loads env, auto-generates pairing/auth tokens when unset, mirrors renamed legacy env vars, parses the command via parseDaemonCommand, and dynamically imports server modules only in run/demo mode so --doctor and --print-config never trigger the server cascade.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L1-L53",
+          "version": "repo-lines-v1:sha256:dafc2bfff04699e228ce7f1b36936078e085a9c3085b559c5d94c274bf7f3a53:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1OWM0Nzg3MmI3MWYxMjU4OTk0Mjg5MjQ2NGU3NjRjMGRiMzUwYzIwYjcyMjI4NjQ1NjE1Y2MzNmUwYTA3MjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2M2FhZTM5YWQ1OWZhZjMyZDNhMDQ1OGI4OTM0NmU4ZTg4ZTkxZmRkNDA0NTQwM2E4OGEwNjdlYjU2Mjk5NjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxNWZmOWMzOTY5Mjg0ZmRhYzRiZjJiZWE3NzY4MDlmNzI0NWJlZjRiZDM3OWYyM2NjOThkMTJkZThlNzg2NGMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L118-L211",
+          "version": "repo-lines-v1:sha256:1fd33375d913e3f0ec2a2efa65474c6a3e9d095fc79de2e12ad117c40381ff5a:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZGM3MjBkYzEyZTk0NTQwNTRhZGIyYWQ5NDM4MzMzYzc0NDc2OGQ2ZDA0ZDlhMWMyNGJkNDA4OTRlNDJjM2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxOTNhMDJkYzAyYmE5N2JmZWZhOWRmNGJlYjY5ZTZiZmMwZTZkNTUwNTZkMzVlN2Y3NjQ3NzQxMmRhM2ZjODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlNWFiZDRhMzk5Mzc4ZTM4YjM0Mjc2ZDA2NzViMjkzMjdiNDE2ODZkNDk4MzgxYTgxMWJlOWFlM2VmYTMwMjQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L251-L291",
+          "version": "repo-lines-v1:sha256:b7dd00610cdf4885168344881728c248e0a4eb6bf465d40ddebdb594576c1342:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiN2QzYjI2OWRkNGRjODA5MmNjNjY5OTU0OTEzOGE4ZWU2MDhiYzQzNzY5N2I0MWY2ZjkzY2MyMmU1NGExYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyZWRlYzYyODVhNjFiYjg3ZmY1OWRjZjQwNzEyYTVmZGUxNjFlMDcyZDEwN2VkNGY3YjNkZmQwNTE2ZGU2YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBiOTIwYWUzNWFlODIxMzY2N2FlNWRlMjdmY2FmMjBmNTI5NTliNDIwNTVhMjNlNTk4NWE5MGFmYWNkMDJiMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0MjU5NjFiMjIzMDk1OTk2MGM0YzFmYjY1Y2ViNDM5NjE1NTI4ZjA2ZWY0ZjAxOWQ1NGUyMTdmZTdiYmRhZDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cb9a979da58d4a49b35f51f801659485",
+      "statement": "daemon.ts implements install/uninstall/start/stop/restart/status/logs for darwin (launchd plist com.redvex.brijio) and linux (systemd user unit brijio.service), generating tokens, writing ~/.brijio/.env at mode 0600, a bin wrapper, and the service definition; other platforms are explicitly unsupported.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L211-L276",
+          "version": "repo-lines-v1:sha256:8cbe5c302729fa8a03c1ffcf9d5524162516636e1b0a677f0559156f088acab5:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0NzBkY2NmNjc0Zjg5YzBmN2JjZjEyM2Q1YTk5MzM3ODUyNDE2MzIxYzM3NDk5NDliMzM5Yjg3OGU0ZDdjNzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5ZjBhM2JkZjY1NGNkMTQ5MDA2NTE1MTMwMmNhMmQ3OGE3YzdkODhlNDZhZjE2OGE0MDc5Y2ZkN2MxNjI3NWUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L328-L356",
+          "version": "repo-lines-v1:sha256:8bc0930fff6cd3f72fdd211c25b92ef9f6e33b7a12a9838a16ec62f53edd2c9b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2Nzc0NWFkZjUyMmJmYzNmYTljZDc1M2M3NWM0MDJmNjdhNDk4Njk0YWFiODBiMjdkMGIzNDYwZDIzZDdlYmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY5ZTQ2ZDcyNjcyNWEwNmNkY2NlNWI3OGY3ZTM4ODQ4NjcwN2FmYmEwYTAzNjZjNGEwNTcwY2ViMGMyOTJmZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjM2YwODE5OGVjZWFiYjQ2OGQ0MjY0MWM1NjgzYjEwOGM1YTIwYTdiY2M2NTU0MzYyZDZlZWNlNmM1MjNlMGQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L690-L696",
+          "version": "repo-lines-v1:sha256:36a443b582f09c2537cee8837dd57754101589cc13d825ebc5ef183983c975ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGI2YTRkMWYwYjUyOWE5NWY4NzJmMzdiY2NhMDAxYjkyMTA2NDU1OTYxMWMzYzU2MmQzM2Y3NGZkZjI0YzY4MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTE5MDEwNWE5MWI1MDdkNTU1YWIzYzk5OTE0NzMxODAzMmZlZjM3OTFkMDVkMmI4YzlhYzNhYzI1YmEwOGQzOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGZmYjZhMzBjZWVhMTYxODgwZjNlZjQwNjMzYjEyM2M1ZTQ5Nzk4ZDUwZGQ0MjE5ZmE1YzdjYmUwYjEwZDAxYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8cde2b1ba40f41e4b9cfac61d32650c0",
+      "statement": "doctor.ts runs preflight checks (config presence, MCP/WebSocket port availability, network detection, Node version) for --doctor and exits non-zero on failures; network.ts detects Tailscale (100.64.0.0/10 CGNAT range), mDNS, and localhost to pick the most reachable host.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/doctor.ts#L17-L38",
+          "version": "repo-lines-v1:sha256:ac84719e36951969d9cbb21db162f4fdb57c78d5b5e421219e6e2c214b53fdba:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmMDBkZDAwMWMxYzY2ZThkZWFkZjI3MjkwNmViYzZiM2NjZDcyYWQwMWQxMWVlYTg3ZjFhMDJlNGE5YjYwOTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0YjlhNTZhNzhhNzM1ODMyNzIxODRjZDhlY2Y3ZGUxZjYxYTgwMTZjOWExNjk2MGE4N2UwZDA2ZGY4ODlkYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNmYjc2ZWQ0YzBjMTc4YjM2MjljZDMwMmQwZWVkOGU2ZWVjNTQ4NzBiY2RhODU5M2I2MWEzOTUzMTc3YjViZTUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/network.ts#L24-L50",
+          "version": "repo-lines-v1:sha256:09dfc30218f27d989d9211b1026fe8ae4f9740cbacb736eb940632f49b259273:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3YjdiMTE2ZGE1ZDNjYmI1YmE2MDM3ZTY5NzNmYzA2YmJlZmFiMTdlOWIwNTU4ODQwMmU5ZmY1ZjcyOGI0NTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlZGFjOTk1NWM0NmQwYzkyZDQ4M2ExZjE5NjFlNTRjNzk5YTQ3MjQ0MDZkNjUxZjIyYzM2MDEyNjEyMGE5ZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhZDY2YzcxOWMwYjg5YTFkYjMzOTJhOWY5Nzc0YjM3NDkyYzkyNTIwNTJmODg0OTVhZWY2ZGY4NzIzNzA5NmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3e6748e849264f6495bbcac517e145b5",
+      "statement": "print-config.ts and print-config-commands.ts implement --print-config [agent], emitting ready-to-paste MCP client config for known agents (interactive when a TTY is present, JSON otherwise) using detected network paths to choose the best MCP/WS URL.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L370-L449",
+          "version": "repo-lines-v1:sha256:c2d6d3ddc70e1afae0b085ca80c0532e4ce49d36c8bab3702ea7e91bbd2ed542:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4Nzk4OGE5Zjk4YTZhNTEwODhjMTEwNDJiMzQwNWI3ZjZjODQ1MjNhY2I0N2JjYTlmYjgyZGEwYjg3ZWRhNjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1NGM3ZDk3MGY5ZGJlMDE1MzU2NmVmYTU0ODMxOTRhNjhkOWE5MjM3MjUwMDA4YWQyNjEzZWJkMWRiZmY1YTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzMWZkODJlMDgwNzczMGUwMjgzMjBjMjFhZDQwYmQ4ZjhlMjJiYTA0YjRjMzkwNThlNWM5ZGI0MjU3NDg0N2MifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/print-config.ts#L1-L75",
+          "version": "repo-lines-v1:sha256:2b8977e15209717c2c4a7e52e86fde13cc416ab577b1070a0a648f8513e621ce:eyJzZWxlY3RlZExpbmVDb3VudCI6NzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImExODM3MzgxNjUzOTZjNDQ0MWViZDJjMTEwMTNkMTg0MjBlYzMyNjRhZTNiOGIxMTg5MmMwOTY3YjM3OWU0NTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b7870abdf794993ba4e422ebcd8b06a",
+      "statement": "startup-banner.ts formats the Brijio ready banner with reachable URLs and token provenance to stderr so stdout stays clean; in --dev mode it forces 127.0.0.1 and skips network detection.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L313-L332",
+          "version": "repo-lines-v1:sha256:82b6ab9029d81f23742a6a80dbf381c5a592c5654dba96bcc68b0ef4d17fda3e:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkNmVkMTA2OWE1ZGVkY2ZiMmM0MDQ5ZDlmNDlmOWM4YmFkYTZmZTVjNjUyOThlYzM5NjNkMzdmMDUzZTY4NDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmNWRlZTQ2NTY4NTRkZTUzM2NkZTViNDFkYjliYWI5NmZjZDg5YTkwNTQ5Y2QwZjcxZDQ0NGE3ZjI3YWI3MGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU2NmY5ODU4OWUyMjdhNjYwMWQwOTYwNjg3YzBmZGRlNjA0NzUzYzg4OTJiYTMzYzA0ZTkxNDAzMGI1ZWQ3ZGYifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/startup-banner.ts#L1-L61",
+          "version": "repo-lines-v1:sha256:07fda76c6333e27eff83de1dd2d41fe9af46885d32644d9b308b5bebdadce90a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZjIyY2YwNzMyNTkyYzI0NzE0MWNiZTYxZWZhMTEwMTI2MTJmNWEzMTIyYjlhZjliYmFmNTJmNTcyNGQxOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiMDdjMzVmMTliNTA3MjAwNGRhZjlhNWQ4NmExY2UyN2EwOThhNGMwOTM0Y2ExZTZiOTlhZWQyNWFkYTZjMzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f93f3a34460b4449b7d4b9a691ac0e7c",
+      "statement": "The CLI entry point coordinates graceful shutdown on SIGINT/SIGTERM, closing the WebSocket server, MCP runtime, and demo server together.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L334-L368",
+          "version": "repo-lines-v1:sha256:4a2c4850948cbba44fcf4a624412b9cb8a64e4b032af931fdcfc5bc900da5981:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1MDY4ZjZmYmQwYzAxMjE3OTMzZDdhOGI2NGNjZjZhYWM3MjQxMzAxMDA2OTIxNGY1YzkzM2JmOTIzZmY0ODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0ODBkZTE4NzI5MmJkMTM0NGMwZDQ1NzkyOTI4NGNjYzAwYjZlMmM3NTRkNzJlODM4MGQ4NmE4N2U4YjE0YjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlY2Y3NDE0NzQyZTZmM2UzYjVlZjVjMDEwZGU1MjMwZDBhODM1MzQzNGEzMTM1ZjBhMjI1YTQ3ZmNlMGU0OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRlNTU0NzM4ZTUwYzY0OGExNWJjM2IzNzhhNzhlMDA1Yzk3ZGQ0YWE4ZWZkYzc0YjNiNWExZWRjOTdlMjU5ZDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4e37925af73843a390f1ae4a2400f03e",
+      "statement": "When a change touches multiple domains, the repo's explicit-contract discipline requires updating the shared protocol or an ADR first, then the relay/server, then the browser adapters, with security docs and the capability matrix kept consistent as cross-cutting constraints.",
+      "evidence": [
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L16-L27",
+          "version": "repo-lines-v1:sha256:3e19d218a350020138f18d6b213930ab7842b684cb127e47149c64cab8e1286e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3ZTZmOGY4OTIxZjE4ZDkyMTViYmUyYjViOTEyYzM4NDhjMDc2NmE3NDk3NjBkZDcxN2MwYmI4OTA0MTM5OGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMWYyZWMxNzU5M2MxMDU0ZWI0NjM2N2Q4NDUzZWYyNGExNzNjZTk2YjcxMTdkOTFmOWE2OGQ0NGZlZjhiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE4N2YxZjUzZjIwMWVmZjkyM2NiMTY5YWY2OGJjYTk1ZWE5OGEzZjYxYWNmN2VlZDE3ZDY1YjgyMjhiMjViYjYifQ"
+        },
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L7-L14",
+          "version": "repo-lines-v1:sha256:041c8e464bd0d12766cb94fd3b5c409f54e0edf8efc3deb185647c0decabef4f:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjJjYmFhNjM2Y2YxNjUxOTMyNDkwNjc0YTczNjliNTMwZjM0YzMxZjBhZmFiMTIzNGFhZjg3NGVlZjQ1YjhjMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjc2NGFkMmU1MDE4MjQ2N2Q2ZmIyYWI5NmE2NzZmYWRkYzMyOWExODg2Mjg3NGY1ZjZlY2U5OWQ0OWMwMGU2NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDVhMjQzMDQ1MDc2NDdiNmVkZjM5MzllY2E2NDRmMjI5MDM5MzQ4MTNhMGQyMWIyNTFmOTc4OWNhZWI5OTEyMyJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-17T11:58:52.754Z"
+  }
+}

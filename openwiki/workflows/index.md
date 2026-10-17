@@ -1,3 +1,4 @@
 # Files
 
-- [Multi-tab Workflow](multi-tab.md) - How agents use explicit per-call tabId targeting for reads, actions, batch operations, and navigation. Covers list_tabs, open_tab, and the recommended multi-tab workflow.
+- [Browser Action and Tool Catalog](browser-actions.md) - The agent-facing MCP tool, resource, and prompt surface of Brijio: read tools, action tools, batch, upload, download, fetch, screenshot, and the shared error-code model agents see.
+- [Multi-tab Workflow](multi-tab.md) - How agents target specific browser tabs with per-call tabId: list_tabs to discover tabs, threading tabId into reads/actions/navigation, open_tab to create new tabs, and re-reading after navigation. Covers the active-tab fallback and where tabId is currently dropped.
