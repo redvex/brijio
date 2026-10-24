@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:7fc5be737683f1714a1f0791542f07302fbbe4067c7af65e77c5e635b00c5f46",
+  "claims": [
+    {
+      "id": "claim_262c83538a8f42a3a9b0d97a173939a3",
+      "statement": "Tab targeting is per-call and stateless: tools accept an optional tabId and fall back to the active foreground tab (tabs.query active:true currentWindow:true) when tabId is omitted; there is no hidden selected-tab session state.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L93-L115",
+          "version": "repo-lines-v1:sha256:579cd4b4a4c957b2f70a56c2a06f8bba76eb5123021632c0f60ee4a7921a754f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3NTdmYWZkY2ViNDEyYjgwMzJkNDAxNWFlNjlmNjJlYWYwYzhjMDY3NGI1YTQ2MmU0YTgyYWE0ZjFjMzlhMDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxYjhmMzQ4OGUyMzVkZWJmYjM0MWUxZDE0ODlmM2VkY2FhNzJlMzRmODgwNDIzMzY5OGJhMTM4OWMwMDAzNzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxMmE2NDUwZjk1MjFhOGY2OGQzNGViNWNiMzlmNjQ5ZDQ5NWYzNWM1YzY2ZGYwOGNmNDJhMThhZTMwMzhhN2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM2NTVkMWIyODQwZmRmYjQyZTdlZmJjMzMwZjk3Mzg2OWQ1NjBhMGU4MzUzMDM1ZjBiMTI5OTFmMjg4ODZmMDEifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/skills/navigation/SKILL.md#L108-L128",
+          "version": "repo-lines-v1:sha256:9d4b24b18cbf2c9f92af6a0643396cdc777449156fcad25c9de6e34cb7773705:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2MjYyZmQwZjJlM2E1MzBlOGRkMTljNTk5OTY0ODg5NjkxOWE2MjNhM2I4MDI3ZTdjNTE3MjkxM2Y2ODYxMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhOTZmNzA0NjE5NjU4NzZhNjY3Y2IyNTg4ZTcyZTQ5Nzg0NjNlZGQyZWZlNmU1NzU5NTQyZmQzYmVkNWVkODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZDNiMzFmOTE4YzY2YTE4ZTE3MzY1MzU4NTU4ZGU3NzgzNzU4NTg0ODRlMWZiZTVmYmZhOTAxNjI5ZTkxZjIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/skills/using-brijio/SKILL.md#L160-L211",
+          "version": "repo-lines-v1:sha256:cdfd15014d5edb244dff3532fb8585f17f7e827e705b4d7379ce501e2df1ce6a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4ZTUwZGJlMjY1NmMzNTg4Y2ViNTQ5YzBhOTljNjhlNDZhYjkxMzZhYWRlZGQzYmM2ZmYxYjk0NzA0MDFlOGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjNTMxMjM1MjVkYjE5ZWY1ZDU4ZmVmOTRhZjFkMWY5MTE3MTg0NjA1ZmUxYmU2Nzg5ZGIzYjY3Nzg2NjdiNDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE5ZGZlZTZmYTE3MWVhZTgyYTIxZDRhOWZhMWYzZDQzZjI5ZjZlZDM1MDNmNjBhOTY3ZmVlZjU1OTYwNzIxNDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhZGNiZGFjNGIzMGRiZTE1YTAyYjE4ZDljYTBjOGVjZTQyNGVjN2IxZWJmMTU4MzM3MDg3OGYyOTBlMzI3NDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1d2e805909cc4cc8b5bd75ef54d378be",
+      "statement": "tabId is threaded from MCP tool input through normalizeTabId into page-actions.ts/page-context.ts functions, placed into the WebSocket envelope's target.tabId by targetEnvelope, and parsed by the extension's extractTabId before being forwarded to per-handler adapters for read, action, batch, and navigation calls.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L104-L299",
+          "version": "repo-lines-v1:sha256:4bf6cc9a7682df86a3a8f012f9e5e445b6ed2fd5187dcf0c77a611cebb34ce26:eyJzZWxlY3RlZExpbmVDb3VudCI6MTk2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhMTUxYWM1ZGMzNDQ1OTI3NmQ2NjIyN2RkZjEyZmJhYzY5M2JlOTRjM2U0OGM5YWM4YWVkOGI5NWNhNmNmYjViIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyNjJmZjlhZjg0NjhiOTMxMmI0ODI0YTE4MDBhOGViNmVhYzQ3M2Q0MWE5YjgyOTlkMTIyZDVmOTBjYTQzNjM4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmNTA1Njk5MWZhNDEzZDg2MmJjYjg1MzNlYTI3YmFkYzdhNTkxMThmZGQ4ODkxZWI2YjVhYzY1MTI5NzNkMjYyIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-reading-tool.ts#L32-L102",
+          "version": "repo-lines-v1:sha256:8efd428a2c20759d3c157236b10f0c643ec763dce02836f4611127c4bca19101:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFjYWEzODcwODljMTc1MDUzZGI2ZGJhOTFiOWVjMTgwOTMzMTAzNWM5MWY4YWFkNTMzNmZlMmRiN2ZiZTY0NzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5OTJjYTI5MWE2OTc5YWZkZmQ5MDMyYmYzNDRiYTU3YTA5OTVjMDVlZWFjMDI2ZDZlZDI1NGY1ZjYyM2RhZGIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L807-L838",
+          "version": "repo-lines-v1:sha256:0042e190734687b0912c98fcd6ae6e9c4cd9fa5c6cac51b3efaada91579bb028:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1M2E5YzhiNDRiMWVmODcxNDAyMWQ3YTU1ZTM5NzhmNzZkYWQ1YWNhODY1Y2I4YzA2ZmNmMTU3NDAyYTM1OWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ5ODgyZmNhY2E3ZWNkZTVjNTk0N2Y4NzdhYjVjNTgzM2E3YTU1ODE2ZDUyZDBlZGEzYWJhMDg4MTBiNmExMzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_23aa90c661a64ae58a29f3c7355e5323",
+      "statement": "In the extension, readActiveTabPage/performActiveTabAction/performActiveTabBatch use the provided numeric tabId directly for executeScript and tabs.sendMessage, and when tabId is undefined they fall back to tabs.query active:true currentWindow:true and validate the active tab URL with isRegularPageUrl.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1793-L1800",
+          "version": "repo-lines-v1:sha256:e821db89f1235f8f15ac222a7f411904657bcdb7dd9b98aa8b4b04a3a4749b3b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjkwNTcxNjYyZTUwNDNhZmFlNDA5YTY2ZDkyOTZkZDNlODA2YTY0NWU3MTZlMzExYTNkMGM4Y2YwZmFhYTI0NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWM1MjAxZTVmZDc2Y2Q2NDQxYjlhN2MwODFkNzMwOTNkY2FhNDhlY2Y1ZjVhYTM4YzljOGQzZjNhMGUwMzQ5OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L118-L156",
+          "version": "repo-lines-v1:sha256:09d8fc2d2a63ed85fdd1fd361ca6c49934c5538450fb0fe4a813eba3b5a9360e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NGIzYzdjMzZhZDIwNmE3NjQyZDhkOTc0YjBkZjk4MWNmMTMxZDJmMjdiNjY2MzViNjhiMWNhYzNkODAzNGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMTI5MGVmZTg3OTg4YzBjNGE1MmE0YzNmMjRmNjdkYTNlOGExZWIzNzdjMmYxOTM5YzQ3YWNmNGY2MjdkMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxZTgyNTc1NDM5MjZiYzViODRjMjY4NGQwYzcwY2FkZDI5MmI3NmJmZDkyMGUxMTQzZThhMTVmZTlmMWM0MTEifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L205-L243",
+          "version": "repo-lines-v1:sha256:d937d049761438429f6f7bf2325fa05d54186d4efa69ff6ea50961228a6c05ad:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMjc5NjJiNDM3MjRmM2FkZGJmOTJhYjMxZWJkODZkN2Y2MjY1NWM5ZDE5NTIwZDJhMmJhZDQzNWJhM2NiNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhOGY1MGQ5MTUxMzQyNWUwYTk4M2ZkMmM2ZWNiNzY5Mjk2NjY4MTBmODRkOTNlYjRiYmE1ZjE2NzIzOTE1YzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxZTgyNTc1NDM5MjZiYzViODRjMjY4NGQwYzcwY2FkZDI5MmI3NmJmZDkyMGUxMTQzZThhMTVmZTlmMWM0MTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6ffd9067c5f349c0a5dbc0ab6df81948",
+      "statement": "open_tab opens a new browser tab at an HTTP/HTTPS URL and returns the new tabId; it takes no tabId input itself, and the returned tabId must be passed to subsequent calls because the new tab may not be the active foreground tab.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md#L40-L49",
+          "version": "repo-lines-v1:sha256:54e780f03721da633081f99379f324077cf02ef9703c4f8b9f3c8444100beb97:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiMzg3MjVkZWQ4M2U3NmFlN2NlYWNjNzBkOGI0ZDU1YjFhODA0OTJmMTZlOTU4NTI5M2NhZDdjYWU3MmE3ZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiNWNkMDM3NjE3ZTMyYTNlMjUxZWY1YjA1NTdiNTEzNDVjMjI0NDlhMDhlMWQ5MTdiM2MyOGQxZDM3YzVkY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUzNDhhZmRhOTdmZjFlNzhjNGNmNjY3NTc1Mzk3NTJjYmRkYWFhYmM3NmFiZDU2NTBjZGY2OTkzMmVlYTI1MzQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/open-tab-tool.ts#L24-L39",
+          "version": "repo-lines-v1:sha256:f44707d785001aa252be1d6e656dd6cf75a21b541f01aebfe923156486f6fdd9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg5ZDZmMzdlMGNkMmU4ZDdjYmJjYTFiOTQ0NDQ0NTE0MDk3NGRhYmZlZjNmZmIwOWFiZjc3MTFkOWYwMDcyNjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiNTI2M2E1MGUyMTRmODFlMmEwMDY2ZjAwZjE2ZTRmMzJhMWQzZjA2MGMzMDAwNzEyNWE4NzFlNDVmOWViNGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4M2ZmNzllYzlhYmYwMzA2OTYyOTI3ZjlkZjg0OGJhNDZhZDVkOWU4YWNmZTNmNDhmNGQ4YzNlNjZkOTUzYmUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L301-L316",
+          "version": "repo-lines-v1:sha256:468b23679d5bc7d95050d626afe48204f9a4dc8f53c978fa9e27ab02f2ac7bee:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4ODFjNGQ4NjJhMDU4OTZjZTgyMWJjYzNiODJmNDIyZTdhNWU0MGI0YWQ5OTdjZjc0NDAwYzEyOGQ0MTM0NmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVhYmJmYTY5M2U3ZmYxN2M5NDI3NmQ3MTk1ZDgzNWYwMGY5OTJlOGM1MDhmMGFhZGIzY2I3MGUwZDVlNWFlMjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7ce7b4145e0a468790ceeffe126de0b6",
+      "statement": "navigate_to_url and perform_batch declare tabId in their input schema but their tool files do not normalize or forward it to navigateToCurrentPageUrl/performBatch, so tabId is currently a no-op for those two tools and they always target the active tab.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md#L175-L193",
+          "version": "repo-lines-v1:sha256:8d65f22ecf4eb67fbe61925c336013a00afe1e6a7f5fbddb29d47d188e9ca1f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjYzhhMDEzMTU4ODQzNzMwNTI1ZGMyOTU2ZGYwMzRjOTdiMTI2YjQ1NjlmMDU4ODUxODUwNTQ5ZWMwMTg1NTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjMDNmYTNhOGMyZDRhZGY0NThmZjU4YzAzOTRjNDVjMTAxNDE1MzM3YWE1MzY0MWQ5OTBiNzgzZmQyZmFlNzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc1Y2ZlNTRlNGMyOTRjZjRlZDhkYmM0YTJmZmJhMjE5OTUwZjI3MjBlNmJjYjNlYTFkNjdkM2IxODdlMDM4NTYifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/batch-tool.ts#L93-L99",
+          "version": "repo-lines-v1:sha256:533c8e2ed1f768dae6017fe77ab767adf363b9dba02a37b5ee042a645dfdfe6a:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2MyZmI1YzQ3Y2FiZWRkNDg4ZWU2MTIzM2I3YWRiOWQ3YzQ2YWYwNTdkM2YyOTk0Mjk0NDE4OTg5MTBiNDU3ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjIzNTI1ODljMzRkM2M2MDY4NTkzMWI2ZWNjNGQ1MDk5MWE3YzU2YzhmYmEyODk0MTE0NjU3NjkwMjcyY2FjMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjg5NTlhYzc4MTE5ZjA4YjY3YzZhMzdjODllMTFlZTRjMDQyNTAzYTExMDVmOGRhYzMzMWVmMmFkODc2OWZhNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGI0YmEyODU0MmY0YWFkZDAwYjY0MjFhYzc4N2QxNjE0MWU1ZjJmMDhmODZiYzIyNTc4YmI0OTY5ZDc4ODU3YiJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/navigate-to-url-tool.ts#L27-L42",
+          "version": "repo-lines-v1:sha256:7cc27dfad035ef62b25ab625b1becffdc4e98b1965bed7c6d9d31ad3ee157916:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmY2Y5MzM3MDlhNThhNDJkOTcxMDI0ZmI2NGM2OTFkMjg0NDI2ODhkZGRiN2UzM2VjYzZhMGFiZmNkY2ZmNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1YjdkMzUxNDNkMWM3OTkyODEwY2RlOGQ5ZDkyNDA1OWNkMmMwNTE5MmNkMzBlM2NiY2ZmZWM5NTgwMzQ0OWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY1NTNjOGU4NjUwNjgwZDRhMWYzODFlMzg4MGY4ZDU1OTcyODAzNTRjNmI0MmUzMTgxZjJmODg1YzE5NzIxM2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c616cdb5257a474ba4594a1c9c173009",
+      "statement": "The using-brijio and navigation skills document tabId for navigate_to_url even though the navigate-to-url-tool implementation does not yet thread it through.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/skills/navigation/SKILL.md#L108-L128",
+          "version": "repo-lines-v1:sha256:9d4b24b18cbf2c9f92af6a0643396cdc777449156fcad25c9de6e34cb7773705:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2MjYyZmQwZjJlM2E1MzBlOGRkMTljNTk5OTY0ODg5NjkxOWE2MjNhM2I4MDI3ZTdjNTE3MjkxM2Y2ODYxMTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhOTZmNzA0NjE5NjU4NzZhNjY3Y2IyNTg4ZTcyZTQ5Nzg0NjNlZGQyZWZlNmU1NzU5NTQyZmQzYmVkNWVkODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZDNiMzFmOTE4YzY2YTE4ZTE3MzY1MzU4NTU4ZGU3NzgzNzU4NTg0ODRlMWZiZTVmYmZhOTAxNjI5ZTkxZjIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/skills/using-brijio/SKILL.md#L193-L201",
+          "version": "repo-lines-v1:sha256:45e9dd49cfddc8bbc19dd7247050b354d7e45e8d8de1b881da934a6968951a0c:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOWU3Y2EzMGUxYjQ4MmI2YzQzOTk4N2VmYzY5YWQxMDIyZjMyYzVkOGUzMjcyZmM4MTZjYmU2ZjczNzJlMzc3MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdjMDZjNTYxZDVjMzI3MzQzNjg1MjY4YTQ2YjMzOTFmMzk5OGVlZTg5MGQyYmU1MWYwZDIxY2M0YTUzYWU2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTY4MjNlMzhlZGVlNThkYjhiZDFhOTgxYTg2NjY4NTMzM2FkN2I0ZTk1Y2Y1OGZjODY1OTNjODk0Njk0ZmUyYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzU0ZWEwMzQ4YjExOGRmYjYzN2YxOTA5NWFiNmY0Y2Q2NzRkNDYzZGQ2NGIxOTBkYzBiOTkxYzhmMDk5OTU2ZiJ9"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-24T12:27:27.124Z"
+  }
+}
