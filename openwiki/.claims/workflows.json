@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:52a4aeade5908dd1666fe92a5c98e294a8ff898b9d40d6a423e5223c4dee3aa6",
+  "claims": [
+    {
+      "id": "claim_a597d7cf8f7e47f59baa775d9b08a094",
+      "statement": "The root package.json is the authority for the pnpm/Node engine versions and the top-level scripts; current scripts include build (pnpm -r build), check (pnpm -r check), dev, dev:ws, dev:mcp, lint (lint:ts && lint:md), lint:ts, lint:md, test (pnpm -r test && node --test scripts/*.test.mjs), and token.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L7-L23",
+          "version": "repo-lines-v1:sha256:24b2a658f3a1a2710f2b0d04cebb21d21968fd9e00221cd25cff42b40a1e8cd9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0YzExYmRjYzIwMDJmODNkMzY3ZmE2ZjY2YjQzMmQyNjNmMTIxZjcyZTAyYWVlYzI0ODFmOGJhY2RkZWI0MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3MjYwYzg5Nzg3OTJmNTIwNzMwMzEyZmZhNWE4NTYxYWI3N2EzMTc2MmEyZTY2ZDA0ZjIyMjZkZjczN2Q2ODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTY5MTJmNGNhZWQwMzRlNjQyYmY4OWRmMzM5OGIyMzE4YWQwMjkwZDZjMGVjNzlhMTZjNTg0ZDQ2ZjUzOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8ca4c1215125479e99e15ba0cc910e7c",
+      "statement": "Each workspace package manifest defines its own scripts: @brijio/shared has build/check/dev/test; @brijio/websocket has build/check/dev/test; @brijio/mcp has build/check/dev/test/prepublishOnly; @brijio/chrome-extension has build/pack/check/dev/test; @brijio/safari-extension has build/check/dev/test.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/package.json#L8-L14",
+          "version": "repo-lines-v1:sha256:447d6fa8274f93aee2aaadf4e44a8a3e6637c3272ef15f40e482c616222c1e2a:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2M2YmNmZGNlODNlNjBlMGMyMmU0ZjdhNGY1MTU1NmQxYmZkMWRkYTM0M2VlMTM5YjZhODMyNWYwNThkMGYxZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGNiOTJiNmQ5YTBmNjdjYjVhMzcyNTI2OGU5MjY3M2ZmM2E2YTg4MzZiMTU3MjBhNDViYmFmMmM0OWZhZmY5ZiJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/package.json#L8-L13",
+          "version": "repo-lines-v1:sha256:29c729b6c392f3211ad6488fd749adc6e8a594974f35cba680cad6d38002c1f5:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGE4MTFiNjk3ZDQ3NTQ2NDM5MzU1OTZmODY4MDQ1YmFjNTA2YmU3Mzk1OGM0Y2Q3NWVlNGMzODJlNDBkNGM1ZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGNiOTJiNmQ5YTBmNjdjYjVhMzcyNTI2OGU5MjY3M2ZmM2E2YTg4MzZiMTU3MjBhNDViYmFmMmM0OWZhZmY5ZiJ9"
+        },
+        {
+          "resource": "repo://packages/shared/package.json#L11-L16",
+          "version": "repo-lines-v1:sha256:4b3d505846b8c08351494e6ee4e72e8035aade1aaf078994e11c602580734b5d:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjkzMzRlMDRlYjVlNWFjM2VlZGFkNDY4ZmEzM2E5ZjhjZDMyODAxOTQ3NDFlNDQwNGJlZGU4NjAyZWM3N2IwNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWM5MzE5YTEyNzkzOTQ3NTYzNWEzMzVhMjE1NmY2NmNmZjRiYTdiYjQ0ZGY0NjQyNTBkNTJjOWI3NTJhNGEwNyJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/package.json#L21-L27",
+          "version": "repo-lines-v1:sha256:57a2336564cf2d95f8d56f35aa02b147ab973fb0c371e8d96262caadd35db6ea:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmZhNGI2ODRlM2YwNzZhMGQzZWMwM2RlMzQyZmVkODM2MWQwZGQ3NzQ1OTJiOTk2ZTU1YWViMDA0NDQ2MjBhZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGZiNTM4NGM3ZWY2MmI3OTIyNjY3NTEyNDUwMGFjYzIwYjA5OTk5ODk5OTQxMWQxMTViMzExMmRhZjNjYTYwZiJ9"
+        },
+        {
+          "resource": "repo://servers/websocket/package.json#L12-L17",
+          "version": "repo-lines-v1:sha256:f754e2bfd3184bbed7a61e54cf4826b741a32d064cd3d15e6b2d8b61a5e7000b:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQ4MzNkNTk0OWMwM2E0MGNhOTUyNDkxNjEwYTY2NTk2NDRiM2FhNDY2MzYyZjc5OTAyMGRiZjE5ODE1NDdkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZjhjODgyOWY0MjlkMzZiYzU4ZjRlMDVlNTI3MzYyODI3YmU1YzdjMGMxMjdmN2Q5YjJlYjNiNmJkZmJkMjc0MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODI2NGE2NTBjZjU3ZjU0ZjMzYTllOGFjNGJjZDg3N2ZjZDYzNWRmZmNmMTUwMzlkOWUwMzQ4MDliNjBlNDVlZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_e14abb5621e74b5595c379647dec5a7b",
+      "statement": "The AGENTS.md change workflow requires an ADR before implementation when a change introduces or alters a product capability/user-visible behavior, a cross-package protocol or schema, an architectural boundary or ownership decision, authentication/authorization/privacy/storage or a trust boundary, browser routing/targeting/lifecycle semantics, or a dependency/framework that materially changes the architecture.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L65-L75",
+          "version": "repo-lines-v1:sha256:47aa042896d00c0524723a16ad3a33a9ead63dc94dc6c4206d9ef893c2ff00cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyMzJiNzg4ZTc3ZjU2NTA3ZGI2NzQyYWViMzk4NWU2MGY1MDAyZTc0MDBiZmVmMTcyZmI4NDhkZTI1OTE3Y2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI1Y2FjZTVjM2FlMWE5NGZhOGY3ZTBlNjU3MTIxYTI2NjQ5NGVlMGFkOThlYWY4NDE5OWEyNmQzYjNjNzMyZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5ZTdlNGRiMjE1YzgwZmQ5YmRlNDk2NTk4MjkxNTE2MTZlMDEzNmZlMjcyMWE5YjJhYjE3YzMwODhlZWJjMGEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b97946360b644e87be0d88ed90c3b69f",
+      "statement": "AGENTS.md specifies the ADR lifecycle: create as Proposed, include Mermaid diagrams when architecture or message flow is relevant, wait for explicit user approval before implementing (a feature request does not by itself approve the ADR), assign the next unused ADR number from docs/architecture/decisions without reusing numbers, mark Accepted after approval, and record superseding/superseded relationships; do not leave an implemented decision marked Proposed.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L76-L84",
+          "version": "repo-lines-v1:sha256:0d95962eb1cac54ba1130724055ae47ae02e79371572d89ea6e27d0856e6a7ca:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGJiMmQyOTI4MWI0ZmM1OGY5NDZiNDg4ZmZhNjY2MTYwYmYzOTJmYzU0ZTI5YmE2MTliNGJhYzZkODljMDFiNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzE5YzVjN2EwNmIwMTBlZTczMTg0ODQ0ZGE5OWQ2NGMxNDI3OTliZjU3MTNjZWM4NDljMDcxYWNmYWZjYTgxNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNzQyNGJiZDZmN2YzZWVjNWZhY2QyOTQ0YzhjNDhhMjRiMDVkYzc1M2U1MWVlNTRiZmQ2MDE4ZTgyYzhkNTRmMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNTMxODdhM2ZiZjYyMmI2NGFkNWQyODIyMGVlZmRhMmMwYzNjNDkyNjY2Njg3YWRmODNlMGQ3ZTgyY2MzMGY4MCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_432f98f261e0418b84cbf7dff3c2cbfb",
+      "statement": "AGENTS.md carves out cases where an ADR is usually not required: a bug fix restoring documented/tested behavior, tests for existing behavior, documentation-only corrections, a behavior-preserving refactor, narrowly scoped tooling or dependency maintenance, or implementation already covered by an accepted ADR; if a supposedly narrow change requires a new design decision, follow the ADR workflow.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L86-L98",
+          "version": "repo-lines-v1:sha256:912c46afb998884593eb5c526c131a91930bcb0e28e0474f6ba437e0f30517ed:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjg1Y2U0OGExMWNkMzMyNzM2OWEzNzhmMTM0Y2JmNzQ0NzdmNDhlN2YzYWRiYmRjNDZjNDJhOTczZmZjODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkMzNmMTBhY2Q2OTA0ZjY3MzZlNDMxYTY0MjQ1NDgzOGYzYWFkM2RmMzMwMzhlODlhN2E4YTllYjcyODcwOGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5N2E5MDc1YjY1Y2ExMmE1NjFiZTZjZDhiODJhMTk4MzE1YzZlZTJjMzk2ZjQ3YjkwNzczNTEyNGJjOTRlZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzZjA1NzBiMDk1NDJmMGYzNzkxMmI0YjJiNjFhYTNjNzQxZjMzMDI4Nzk3YWMzNTBkOWU0MzZkMDZkZjVjMmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0e969ed49c7646dc997f5a36108ec801",
+      "statement": "AGENTS.md mandates TDD for behavior changes: write a test that fails for the expected reason, implement the smallest change to make it pass, refactor only when necessary while keeping the test green, then run the relevant verification commands; for documentation/config/tooling changes where a failing test is not meaningful, validate with the narrowest applicable formatter/linter/build or direct inspection.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L100-L111",
+          "version": "repo-lines-v1:sha256:193fa5f4ee8ed37f99cb0dc7977ec9481df488005dac3f23288d4e70706f593a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2MjI2YTM1OTE2ZGYyMzhiZmI1ODgyY2RhOWY1NjJmMmZhYzhmODY3OWM3NDg2NDc3NWJmODcxNzc3MjVkNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYjAxMDU0ODA4MTQzY2UzY2RkMDY5MGM0MGI0MTEwYzVhNDY1MWZiNjk3ZDc4ZjY5NTU4NWQ5ZGNhYWU5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxNGIzMGYyZjk5YmU5ZWViZjc1OThjMzVlMWVmZDNkYzU5MzI3YWIwYWI0YjA3ODM1NzkwMzc1NjgwMGU4NDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4ZTI3ZDFlODBiZDIzOTY2ZmIyYWY3NmE0ZjU3YzBlYTRmMjExZmUwNDQwMTFkNjgyNTI1MWJhNjE5YTdiYzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3a13e1cf44404a72a015f0cf0a8fbb6f",
+      "statement": "AGENTS.md maps documentation updates to what changed: capability/support status to docs/project/CAPABILITY_MATRIX.md, architectural decisions to docs/architecture/decisions, repository navigation/cross-layer workflow to openwiki, public setup/commands/configuration to root or package README.md, completed-feature/operational explanation to docs/artifacts, and security boundaries to docs/security; docs should be linked rather than copying large mutable inventories between files.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L194-L206",
+          "version": "repo-lines-v1:sha256:d9ec1f4db1f5584656c587f1a6169552d54a8175c6e2a8a3eac7485e2528f60d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2MmFhMzI0NDcxOWE3MTE2ZDIwMDE3ZWRiNWI5OWM4YmNkMTMzOTdhM2Y5MWFiMDljYzVhMWQyMmI1NTM3ZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1YzFjNWI5MzAyNTk1ZmU0NjViN2ZlZjZkZTEyM2JhYWI4NmQ1MzQ2NGIyMTY1MTZjNWIwZmZmYzk5MzBkODQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY0YzU4Yjk4NTg2MzQyOGZlNmI4MmM0NjY1OTU0NWM1ZWU2NTMwMGEwMWE2NWJlNDE4MjkxOGY1OGQzYjY0MzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkMjMyZDJmZDE5OGIyZThjMmFhNzFjY2JhZWRjMTUyNGY3OTJmYmZlMWY3ZTg0ZDgzNDQyZDY0ZTg3ZDFlNDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4dd9f9c11c70459eb8fef07c1381501c",
+      "statement": "AGENTS.md defines ownership boundaries and a protocol change propagation order: shared protocol/browser-agnostic behavior in packages/shared, relay auth/presence/routing in servers/websocket, agent-facing tools/resources/prompts/skills in servers/mcp, browser-specific integration in clients/extensions/chrome and safari; a protocol or browser-capability change follows shared protocol -> WebSocket relay -> MCP surface -> shared controller -> Chrome adapter -> Safari adapter -> integration tests.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L113-L128",
+          "version": "repo-lines-v1:sha256:900a49497975b645e906db9d43f6fe061c58e73bc23fdf7ccbd24278d73f3dc3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4MTk2NGE5OTFmNzY1MDhkNmQxMDAxZmI0ODA1OWJkMjc3MzNlYzVmNTU1ZTQwMTAxNTdiZDQwNDM4ZmEwZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlYzdjNTg2Yzg4ODI5NjczNDBjNWI1N2VlNzUxNDJlMTI0MGZjNzE0ZDgzZDAwNTYwMDg1YWNlNDdiYzQ1ZDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxZTQ0ZWMxZDFiM2ZjNGMzZjY4ZDE5MWE4ZGE0YjFkNGIwOTliODgwNTQ2MTM5ODU4ZWM5NWY1M2YxODk3ZjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7ff247514eb241bb88a08c3279465820",
+      "statement": "Browser-targeting changes require explicit per-call tabId threading through the full stack (MCP tool input -> page-actions.ts -> WebSocket envelope target.tabId -> BrijioBackgroundController -> shared page-reader.ts -> chrome.tabs.get/sendMessage) with a documented active-tab fallback when tabId is absent, and forbid hidden selected-tab session state; page context must be re-read after navigation or mutations that invalidate short-lived target IDs.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L131-L137",
+          "version": "repo-lines-v1:sha256:6cefd99f121c64b8ab7d73db091293bd86ada9315e0b00194d6b894db032f5ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNiNmIzMWU2NmU3NDk5Njk1NWZhZTg1NjExNDZmM2E3Yjk0M2Q3ZDQ5MjY3ZWU4MWVmZGYzMWM3ODVkODZiOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjc5NWIwOTMyMTZjYjVlOWMyYWQ3ODczY2NjNGExNTU4NzNlOTVjZmU1ZWVhMTA3YTBkYTE2YmFjMWYyOTU3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzM0NmEzN2NlYWIwYmEzYWRjZTBmMDNiNWY4YTZhMjQ1MTQ1NTkzNzdiYTVlNmYyMjFmN2VhOGI4ZmNhMTIyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ1ODMzZjlhMWIzNTQ2ZGU5NDQ5MDllMzdhNjkyODM0Y2U4NDEzNzk1YzIyYWMxYTA2NzZiMzY4YWM0MjQ2MyJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md#L223-L227",
+          "version": "repo-lines-v1:sha256:255e44d78ee989518525daebaefcc43dc989889105de21866bfd89280b0b8e81:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDBhNGMyN2Q3MDE4NTIyMDkwMzM2ZjU2YjE4YjdlMTM1MmUzZWY2OTgzOTJkYjkwYzAwZGRjZTI4OWJmZDNhZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQ2NDE1ODczMTk1NDdkMGMwNjI0OWY5NzQwNDBlMzc4YzdkZTZlN2NiODgwYjhiY2ZlNzQzNTFjYzAxYTc4NSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTUzNDJlOWFjNjBlMGQwMmI5OTJkMGEyNTYyYjMzMmY4NWQ5NjlkNGFlZDMxNjYzNjFmMzhmYWZlNzhmODk0YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTY0MzRkYmE1NWZhODYzYTNkMTQ0YzE5Y2VmMjE3NzE5ODFhN2ZjYzkzZDRhYmQ2ZjkxZWNiMTY1MmJiZjljMiJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md#L48-L75",
+          "version": "repo-lines-v1:sha256:7e0c9e9f36c21776daa0123f87bf235c9751986ca4f9afa20605184d268b68e2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkM2RiYzRlN2U3Y2JlNWRkYzg5MWIwODA3MTJmNjM1MWM5NGI3MjhlYzhiZDg1NTZmNDYxMmIwNzBkMjdiNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5MWMzMzVmMjkwZGRlMWFjNGUwYWUzMGE3ZDVjODYxZjYyOTlkMGI3OGU2ZjIyNDcwN2QyZDcwODhlZDEwZDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjODk3MWJhMDUxMmMxYTc2ZDE2NzZkYWUxNjMwMGM2Njc5ZDBlMjc4YzI0OWMxMGJkYTAzZDBmNDM3MmYzMjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmZTVkYWQ2NGMwYjNhYWIzY2RhZjdlMmY0ZTcwYTAzZDg0NzJlZmNkYzA1NTVkNTk4NTIzODk1OWFlOGE0MDEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_246f918f9bc34a4bab47d993737a0c1b",
+      "statement": "ADR 0060 establishes explicit tab listing and selection: a list_tabs MCP tool, a per-call tabId parameter on existing tab-operating tools, and a TabInfo shape, while preserving the active-tab fallback when tabId is omitted and excluding non-regular (chrome://, about:, etc.) and incognito tabs from listing.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L44-L52",
+          "version": "repo-lines-v1:sha256:88cfeeea5cbd81767bfe5599e8bb6b3b66ca709d2823e617690977744025d8e0:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmU2YTU4OTFkMDc5NDk4MjIyMmM5ZGU4ZDdiYmFjYzI5NzMyNzlkYzRlZTJmNzQ5MmZmZWJhNDEyNGFhNGFjNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDgyOWE5ZWE2YTFiNTgyYjJlMDhhYzhkNjA0NzhhYTZjODlkY2EwMGI0ZTVjODEwMzZhYjg0NzY5MDllODIzNSJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L93-L124",
+          "version": "repo-lines-v1:sha256:8c161fdc732c8452473befc1a9630d24db3074a31f22bac6915b7ef090a91e63:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3NTdmYWZkY2ViNDEyYjgwMzJkNDAxNWFlNjlmNjJlYWYwYzhjMDY3NGI1YTQ2MmU0YTgyYWE0ZjFjMzlhMDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NTIwYzQ1NGE0MzhlYjY1YmQ0ZjZlOTBmODYzZTRkOTFmMGNiNzRiYTIxYjQxMTA2NTBlODMyZWVhNTM4NDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcxMmE2NDUwZjk1MjFhOGY2OGQzNGViNWNiMzlmNjQ5ZDQ5NWYzNWM1YzY2ZGYwOGNmNDJhMThhZTMwMzhhN2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5NzY4MzgzYjA2ZWRiNzU4NWU1ZjQyYmI3YjMwM2M1NTVmYTU1Yjg5NDEzMTJmNDI4MWZlMmQ3Mjk1ZmYzMGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_421b1e51ce11488ab2fa43611901a328",
+      "statement": "AGENTS.md directs agents to start from the OpenWiki quickstart, follow only the architecture/workflow/domain/security/testing links relevant to the task, preserve unrelated user changes, read the package manifest and tests for the area being changed, and treat source code and tests as authoritative with a ranked set of sources of truth (executable behavior, CAPABILITY_MATRIX, ADRs, docs/security, README files).",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L8-L36",
+          "version": "repo-lines-v1:sha256:e60409d6b334b71e43d35c93746ad6843d8acdfd645fa9ea60a3074347157342:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAyMGQ5ZWQ1MDVkYjI1MTkyYTYwZjdkNmMxMzJjNTliZGM4MzU3ZDgyMmFkNmFlMjljMDJmMjI0Yzc4YjA2NjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNhZWM1YzVkYjMzNzEwMWY4NjM5MjVjYWJiNDFlMmEyMzQ1OTgxYWNlZjYzZjU0MTIxMjUxMDk2YmFkZjY5NGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3MTk4ZDE1YWQ3M2JjY2NhOGFjMmFlYzk5NzA2MGE3OTc1YTAyZTZkZTUwYmFlMTE2MTJkMWU0MjgyYTA1ZDgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c5f73bf47054ec7aa6a81e538801878",
+      "statement": "AGENTS.md's OpenWiki section describes the openwiki evidence index as optional just-in-time context: do not preload or search wikis at task start; use openwiki_search/openwiki_read when unfamiliar architecture materially affects the task or source inspection leaves an important uncertainty and stop once grounded; use openwiki_list_workspaces/openwiki_list_wikis only to discover membership; treat source and tests as authoritative; and do not hand-edit generated OpenWiki pages since the scheduled GitHub Actions workflow refreshes the wiki.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L221-L236",
+          "version": "repo-lines-v1:sha256:8926524de63a1266e7592d9f1256ec367b67e9fa0583f343808e3e51f19d4990:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmMTgwZjljMTI2OTAzYmNjMzMxYWE5NTQ1NmU0OTQ0NGE3ZDRkMDExZThhMmE4M2Y1ZGM4NzAyMzkxODEyZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5Zjc4NzE0ODkzYWE3Nzk0MmNlYTFjNGEyZTAyMzFkYmI3ZmEyYTQxYTcwYzgxNDYwYTNjNjc1NjJkYTNhYWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0NjI1MjE3YTZlNDc5NTRjYTkwYTYyZDI1ODUwMzA2NGQyYWI3NjZmOGFiYTJhOTZmMWI4MmFjOTU4MTNiYjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-24T12:27:27.124Z"
+  }
+}
