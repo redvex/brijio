@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:063927e09a114aa5ba012f02dfb7641a53d11dd6b18261720c8836ce974f30c3",
+  "claims": [
+    {
+      "id": "claim_551d3422c56543b086d2867bc9d67398",
+      "statement": "The top-level package.json scripts are build, test, check, lint, dev, dev:ws, dev:mcp, and token, with test additionally running node --test scripts/*.test.mjs after the workspace tests.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L8-L23",
+          "version": "repo-lines-v1:sha256:db62c1d9f33a4a878fbafb0faa9293aa7d81b736ab13369caf92a3a18179f8b2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ODMzZDU5NDljMDNhNDBjYTk1MjQ5MTYxMGE2NjU5NjQ0YjNhYTQ2NjM2MmY3OTkwMjBkYmYxOTgxNTQ3ZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkxMDFmYTE5YmIyMDJiMTg4NDViYWI5ZGYwNWQwMmY4ZTdkMWQ1MjQ1NTZhMjA0MzZiM2E2ZjFiZmEwYjVlYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5MTY5MTJmNGNhZWQwMzRlNjQyYmY4OWRmMzM5OGIyMzE4YWQwMjkwZDZjMGVjNzlhMTZjNTg0ZDQ2ZjUzOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_719c1226bab84b54b3fdb663df125cc8",
+      "statement": "AGENTS.md prescribes the per-domain verification filters @brijio/shared, @brijio/websocket, @brijio/mcp, @brijio/chrome-extension, and @brijio/safari-extension (each run as test and check), cross-package pnpm test and pnpm check, and the CI set pnpm lint, pnpm build, pnpm test.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L158-L185",
+          "version": "repo-lines-v1:sha256:bb420092a52066c140c7d46dd6bb2afeb9901ac01c6b26595ea226bc4f63da86:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2N2EwODQ3MjUyZTNkMWNiYTkxYzU4MzIwNGQxYzk5MWQwZDYyYzM3OGIxMDYyOGQzNTRkYWEzMmY5OWYxMzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3YzA2YzU2MWQ1YzMyNzM0MzY4NTI2OGE0NmIzMzkxZjM5OThlZWU4OTBkMmJlNTFmMGQyMWNjNGE1M2FlNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhmNWZmNTI4MDAwYzVmZGYwNjI5NDQ1ODQ0NjJlZDM3MTk0ZGJlMTZhYmEyOTUxYzNkNmI0NWVjMDE4NWRkYjQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3YWE2ZWFkNWVmNTI5ZjU2ZTY1YzhkZDkyYWY5NzViODk5NGMwMmQ5NGVkNDUwMzRhMTUzMjc0OTM5YmEzY2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6fcbe07a484b4f40a2f9e85489a510e0",
+      "statement": "AGENTS.md requires an ADR before implementation for changes to capability/protocol/boundary/auth/routing/dependency scope, and states an ADR is usually not required for bugfix, tests, docs, behavior-preserving refactor, narrow tooling, or implementation covered by an accepted ADR.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L61-L98",
+          "version": "repo-lines-v1:sha256:dc6726f293f5a229ac4475f146638a70d38503413c8b377a8bd62b53be49abfa:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmMjYxN2MzNmJhNWNkYjVkYTM5NGNjOTE1YjM1NWQyMGYwZjQ0Nzc3M2RjMjlhNzk1ZGZkMTdmZGFlMDJlMGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkMzNmMTBhY2Q2OTA0ZjY3MzZlNDMxYTY0MjQ1NDgzOGYzYWFkM2RmMzMwMzhlODlhN2E4YTllYjcyODcwOGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNmN2IwYmY0YjU1ZDA2NmUwODg5M2RmOGQ4ODhkMDhiODIyMzE4OGZjZWFlY2I3MjlkN2IxNGFlZTQyM2NiNmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzZjA1NzBiMDk1NDJmMGYzNzkxMmI0YjJiNjFhYTNjNzQxZjMzMDI4Nzk3YWMzNTBkOWU0MzZkMDZkZjVjMmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9270b2c58704418da16b7e60d2c6d58b",
+      "statement": "AGENTS.md mandates TDD for behavior changes: write a failing test for the expected reason, make the smallest change to pass, refactor only when necessary, then run verification.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L100-L111",
+          "version": "repo-lines-v1:sha256:193fa5f4ee8ed37f99cb0dc7977ec9481df488005dac3f23288d4e70706f593a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2MjI2YTM1OTE2ZGYyMzhiZmI1ODgyY2RhOWY1NjJmMmZhYzhmODY3OWM3NDg2NDc3NWJmODcxNzc3MjVkNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYjAxMDU0ODA4MTQzY2UzY2RkMDY5MGM0MGI0MTEwYzVhNDY1MWZiNjk3ZDc4ZjY5NTU4NWQ5ZGNhYWU5Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxNGIzMGYyZjk5YmU5ZWViZjc1OThjMzVlMWVmZDNkYzU5MzI3YWIwYWI0YjA3ODM1NzkwMzc1NjgwMGU4NDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4ZTI3ZDFlODBiZDIzOTY2ZmIyYWY3NmE0ZjU3YzBlYTRmMjExZmUwNDQwMTFkNjgyNTI1MWJhNjE5YTdiYzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_010828b7c5fc413d907f71ac24dea6c4",
+      "statement": "When tool behavior changes, AGENTS.md requires updating the tool's tests, MCP registration, relevant skills under servers/mcp/skills, the capability matrix, and relevant OpenWiki workflow pages.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L138-L140",
+          "version": "repo-lines-v1:sha256:bd5833f9a1b3546de944909e37a692834ce8413795c22ac1a0676b368ac42463:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmM5ZmJkMDgyZDFhNWE0ZjNkMWZhZTRkMmU0YWVhMzNlZDE1N2FjNzhkNmZlZmE2Njc1NGJlMmI4MTFkNjcwNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWViYTFlMWViMjFlYTg1Y2I1N2I0ZWU5ZDllNmRmNTFmZjM5MGNhYmMyMTM2YjcxOWEzNzMyMDEyNmI5ZDI3OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTZjYzIzNWZiMmQzNmM1ZDEzMTlkMGI4NDA3ZTZhOTgzYTc3YmE2OTlmM2U2NWQ2MDJmN2UwNTA3ZjJmZGNkZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTM2ZDgyOWNjMGYxZTg2MGFmM2NmM2QyMTE5ZDdlYjI1NmQ5ODI3MTQwMGVhMzFiODY1MTlmY2VhZjlhOWNhZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_392f739f88c545a7ac3ddcd546d94741",
+      "statement": "AGENTS.md fixes ownership by layer: shared protocol in packages/shared, relay auth/presence/routing in servers/websocket, agent-facing tools/resources/prompts/skills in servers/mcp, and browser-specific integration in the Chrome and Safari extension packages.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L113-L120",
+          "version": "repo-lines-v1:sha256:4b6dd92baf8fa503e06e394dff6b5030e62f04e461b74950faadab32f991c2f9:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzgxOTY0YTk5MWY3NjUwOGQ2ZDEwMDFmYjQ4MDU5YmQyNzczM2VjNWY1NTVlNDAxMDE1N2JkNDA0MzhmYTBmZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTQxZmE0YmZlOTZkNTk3MDgyNzU0YWIzNzBhMjZhN2U3Y2Y2NDBlYWIwOTcxYjFmNmY4MjU5MjMzYmJhYWJlNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2VjN2M1ODZjODg4Mjk2NzM0MGM1YjU3ZWU3NTE0MmUxMjQwZmM3MTRkODNkMDA1NjAwODVhY2U0N2JjNDVkMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWZiOWNkZTBhYzdiNGIwYTE4NmEwMjk0ZjRjYmFhZGJlZjBmMWVmOTMwZjY3YzhlZDI5OTE4ZDAzZDliNDMxOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7c622f6331d54e628a7f4c71e1442de5",
+      "statement": "AGENTS.md specifies the full cross-layer path to check for protocol or browser capability changes: shared protocol, WebSocket relay, MCP surface, shared controller, Chrome adapter, Safari adapter, integration tests.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L122-L127",
+          "version": "repo-lines-v1:sha256:d5b522a3661265e8de375257da236cf958fd0d5a833ebd519c79f054c55f8c40:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjNkMGZjMTYwMTdiMmE5Y2U3NDMwYzZjMjIzMjA1ZDhlODg3YzAyNDlkYjZkNmIwNTRjZDk3YjNlOGJhNTMyNyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDdjMDZjNTYxZDVjMzI3MzQzNjg1MjY4YTQ2YjMzOTFmMzk5OGVlZTg5MGQyYmU1MWYwZDIxY2M0YTUzYWU2ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmI2ODAzYWFkY2NlOGUyMDA2ODg0MzNhM2JlNjEzOTM5MWVhNWZkMDcwYTBiNDQ1NTNiNzA1N2ZlNTZiODg3MSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzM0NmEzN2NlYWIwYmEzYWRjZTBmMDNiNWY4YTZhMjQ1MTQ1NTkzNzdiYTVlNmYyMjFmN2VhOGI4ZmNhMTIyZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b456d8139f1457a9873f7466665483a",
+      "statement": "AGENTS.md requires preserving explicit per-call browser and tabId targeting, forbids hidden selected-browser or selected-tab session state, and requires preserving the documented active-tab fallback when tabId is optional unless an accepted ADR changes it.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L131-L137",
+          "version": "repo-lines-v1:sha256:6cefd99f121c64b8ab7d73db091293bd86ada9315e0b00194d6b894db032f5ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTNiNmIzMWU2NmU3NDk5Njk1NWZhZTg1NjExNDZmM2E3Yjk0M2Q3ZDQ5MjY3ZWU4MWVmZGYzMWM3ODVkODZiOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjc5NWIwOTMyMTZjYjVlOWMyYWQ3ODczY2NjNGExNTU4NzNlOTVjZmU1ZWVhMTA3YTBkYTE2YmFjMWYyOTU3MyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYzM0NmEzN2NlYWIwYmEzYWRjZTBmMDNiNWY4YTZhMjQ1MTQ1NTkzNzdiYTVlNmYyMjFmN2VhOGI4ZmNhMTIyZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYmQ1ODMzZjlhMWIzNTQ2ZGU5NDQ5MDllMzdhNjkyODM0Y2U4NDEzNzk1YzIyYWMxYTA2NzZiMzY4YWM0MjQ2MyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_7ac66ffad37c4810b3bfd51fdab0fc51",
+      "statement": "The token script generates a local pairing token for BRIJIO_PAIRING_TOKEN and notes BROWSERBRIDGE_PAIRING_TOKEN as a legacy alias.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/brijio-token.mjs#L6-L15",
+          "version": "repo-lines-v1:sha256:ecfedc283d03c84f294cda3b45c1166149d2cb11262a016f533888a2ca515e67:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhNWUyMjFmMTUyNzUyZmI1MjM3MDNhZGQwZDlkNGIwOWVmYzNkODZlZDQzOWE2OTdhNjQ1ZDIxMWQxOWU5ZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVhZWE1NjhkNmY3MmYwMWNlNTBiODRkN2U5YjVjODQ5OWMwNDdiOTlmYjcwNjI5MGM2YjA1Y2M1YTc2ZDFiMDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwMDVmMWY4MDQzMDMyOTM3NDFiZjY2MjQxNDA1MzkwOWM0OGM5YjA3ZjhmMjg4YWQ4ZDY2MDYwNTViN2NmZDIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.7.2",
+    "at": "2026-10-31T14:18:08.591Z"
+  }
+}

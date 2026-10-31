@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture.md": {
+      "pageVersion": "sha256:81cce0d9a948a4041538ef241fa412edcecf085f7106762031ee7e8b1984814e",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/architecture/mcp-extension-flow.md": {
+      "pageVersion": "sha256:427c27b7a8b3beec63d52304befc94b1064b692b662ae6b90eca73e5ba01b5ba",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/data-and-protocol.md": {
+      "pageVersion": "sha256:49ee6b23c80be7cbe6843b408f0c64a329b6b1e8e751d8c07cc0ebe6664d8450",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/domains.md": {
+      "pageVersion": "sha256:3eac8d1a3c34b085f0404d9dc794bf1daed9c06177ba40c159fc0c56fa1fc3bc",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/operations.md": {
+      "pageVersion": "sha256:8cdd30b93d3eda34a17369f553e4722748dd8f51cc17e8113ac96f13efa9e2e1",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/quickstart.md": {
+      "pageVersion": "sha256:7d1f530b7d23b8a89e057cced35cc554b7a9d078340b08c1ecb0b0a393d72730",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/security.md": {
+      "pageVersion": "sha256:4d93d987ec73ae1182965d71a053059a19b1a3e71eb6a25504f14af01f463d9d",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/workflows.md": {
+      "pageVersion": "sha256:063927e09a114aa5ba012f02dfb7641a53d11dd6b18261720c8836ce974f30c3",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/workflows/action-approval.md": {
+      "pageVersion": "sha256:f8a18d6cbcad5a4f3cf877f82021f4cc304c6f8fd89642c51c339f00219e2335",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    },
+    "/openwiki/workflows/multi-tab.md": {
+      "pageVersion": "sha256:8b85e4c7216b292d3466927b8e0a4ade4ec2dc101f4b8d3222846bcfe0aa435c",
+      "completedBy": "openwiki/0.7.2",
+      "completedRunId": "da4a4841-7c69-484b-bfc5-c3ee37edadf2",
+      "gitHead": "dfc7ace01955f2638b363e32d8a0a9a1679839c7",
+      "sourceFingerprint": "sha256:dda05efa3904934eeb3da367a9a5019684738438256d40f64dd730e8226d0550"
+    }
+  }
+}
