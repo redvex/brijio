@@ -1,0 +1,172 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:dab031b3d0abaa3609488176317b456de6de3b81d4520fcec38733ffa931fe43",
+  "claims": [
+    {
+      "id": "claim_1ff954a65c9e4562a0b8cb87d66fb8f6",
+      "statement": "Every browser-interacting MCP tool registered in mcp-server.ts exposes an optional shared tabId string input, and tool modules normalize it and thread it through page-actions.ts / page-context.ts into the websocket-client request options.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L63-L65",
+          "version": "repo-lines-v1:sha256:d72bb3c0b29f9a78da408587364ff544987e9cdd602bf7bf3128f7d8ba6f5044:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjdjZWQxYmRjNjJmZTk5NDkwODE1MDM4MzVkNTU5Y2UyNmM2N2E1MWJiN2Y2OWUyMzQ1ZGY2NGNiYzVjZjI3ZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGZiNTE5M2RmYjMyZDY5N2E2NTMyNzI1OWU3YWRlZGFkNGMyYjQyODE5NWNhMWUxNzMwNDMwMThkNTNlYTI2OCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjNmZjk5MWM1NjQ1YzBlNDU1MDk5YTQ4ZDI3NTZjMTA5NjQ5OWExZTI0MDJlYjdmNGJhZjhlNDIyZGQxMmIxNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzIyYjgwODI3ODZiMGQyMTIyNzhhNzE1OTQ0OTA5OGJjOGE3YWIyNDYwNzcxMDUxYWJkMDkyMDEzMTg5Y2E4NSJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L108-L124",
+          "version": "repo-lines-v1:sha256:8fd46cc2401a2cd314f56a214544f8c095902e6efe532ebc273a310c6b894f8b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1ZjQ4ODgzYjAyMzIwZTY2ZDU2YzY3M2JhNTk0NTVjYzk1Zjk4YjRhMzI3OTk5MDU3N2M1MTVmYjk0NGVjOGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4NmY2NTM3MGJjNDE5ODYyYmNkNjRlNWIzMGZhYTNmZWQ0OTM1YWQ0NmQ1N2U2Y2FmMTNmNTVjZmRlMjRlZWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE0M2JjYTkwZTY4N2MwMGQ5MjU4NmFlOTRmZWE5OWE5OTQ5MTEzOGE5ZDI0NGEwYjBjNzcwZGRmMWFjZDEyNTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-reading-tool.ts#L111-L154",
+          "version": "repo-lines-v1:sha256:6c8681ceaef144ce0b312f64627f2295cdaa60839d5ed369fdb65aa8e991d501:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyYWIzNDI2MjNkNzAyM2NmMGNlZjI4NzU3ZmI5MTE5OWVjZTZlNzI2MjdjNzA1NWUwYmIxZDQxN2U5NDMyYTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxZGFiMmQxYThkZjQ2YmI5MDM1OWY2NGM5MGZhYjZjNmZiYjVhMDM0ZTRhYmIzMTA2NmExZTRlYjQ3ZjgwOGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQxZjM0OTJhODU4MDdmYzczNmRjNTY1YzVhMjM0MmU1ODFhYjlkNGJmMzZlMzRmZmVhYTYyZTBiMGM0MjI2YzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmZDhmODRmOWZiNThmNzZiY2VhMzY5MDA3OTUwNjc3MTExMDhjYzg3NWMyOWZmYjBkNzgwMGEzODhjZmY4ZDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eaafdac1c687479a842335fd8a6b64be",
+      "statement": "The MCP websocket client opens a fresh WebSocket per request, authenticates with createAuthEnvelope, and on auth_success sends the request envelope wrapped by targetEnvelope which merges browserInstanceId and tabId into envelope.target when present.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L744-L770",
+          "version": "repo-lines-v1:sha256:b8a2a87e1808ae263280b8f5fef2784cd270f26130e3eca4a20525a064c3a2cf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5YTdlNjUwNDc0YWVmNGU5Zjg1MDI0MGY5MzgzMzkwNzNiMWRjOTQxNTg2OTI0NmM5YWM5NmQ3ODdkZDY0ZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1MDdkYmRlZDNhOWFkNmRjMmMwOWIxMmJlZTk5OWY1MTBkY2I2ZjE0Y2M5NjE4ZTA4ODEwYTk2OWU1NDZmMDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhjNjIyYjU0NzkyNDFkZTkzODUyM2E1YTdhYWJlNjI2YWU3M2U1ZDYwMzAyMzM0NTgzOGY1YzcyYTI0ZWY1YzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjZThjZGFjMTA0OTdhOGJiNDhmNjBiZjQ0ODJmMjk1ZGQ5ZjA2MmFiOGQ4OTI5N2JhYzA4NmExYzA3YmZkZDUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L807-L835",
+          "version": "repo-lines-v1:sha256:2fff1de6016641b46f6c303c1991f510b765c98d266837aaa401aaad6a97b191:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1M2E5YzhiNDRiMWVmODcxNDAyMWQ3YTU1ZTM5NzhmNzZkYWQ1YWNhODY1Y2I4YzA2ZmNmMTU3NDAyYTM1OWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhMmVmNWZmNmE1OTEyMDkxYzdjOTVlOTNkZjc1NDEzYmZmMTU2NGMzN2QwMGUxYzI3NTZkZGZmMmEzYTkxM2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRjZjk1ZjJhMmZmNDU0NDJlMTM1ZDA0ZjY2ZmIyNTRiYTcwMTBlZTMyYmU4YjNhY2EwMDI3M2UxNzdkMDlmMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMGM1MGNjMTVhNTVmOTVmNzBkODRkYzI2Mjc4Yzc4NmU5N2RkMDBkNDQ4OTIzNWRlODFmNTUyMTU0NDQ1MjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7b65b9d6a3cf4f25b4f6a8f7542a6512",
+      "statement": "The WebSocket relay resolves the target extension socket via selectBrowser (preferring target.browserInstanceId, else requiring exactly one online browser), records the pending MCP socket under scopeKey:message.id, and forwards the entire envelope unchanged so target.tabId is preserved; extension responses are routed back by that pending-request key.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L278-L298",
+          "version": "repo-lines-v1:sha256:5888144b66fc28dfe03c6154adf290ffbe3ab1baee23a190f5ddea079fd4cc50:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhZDI0OWVhNmZlNGVmMDk4M2RmODY2ZDNmYTg3M2MyYTI3OTgzMmNiZDQ0ZDY3ZjcwMmZlZjRmNWJhNjk0NGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzNDQ3MmE4YTM1Nzk4ZjM2MmU4MzE0NDY1MWM3Y2ViM2JhZGM3NjhlYzQ1ZTkwYjUwNjRhNWFlMTU0NTRiN2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2ZDU5YWRjZjgxZTI5M2I0OWU3ZDkyMGZjOTliNzEyNDg3NTFlYzc1N2E1ODhhZDk4ZDVlMTdmNmFmZWU0NjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRjNGM1NDQ5MTE1MzQ0NGNiMThhOTkxM2JmNmU1Yzg1YjQ3NTM0YzBmMDE0MWM4NmQyYzcyYzAzYjJlMTI5NjUifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L352-L382",
+          "version": "repo-lines-v1:sha256:584c6fa2a54d67948812b165882d4e2d31eb2c4152510d05645eb3941f80ef6c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZmRjMDBhOGEyZmRiOGUxYmE5MWUxZmMwNzg0YjU5NzFlMzgzNzlmYmY5ZDkzY2I4NjcyMGMwYzQ1YjQxNDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3N2I1OTRhYWQ5ZTVlYTcwMDkzODFlYzRhMmM4ZDYzN2QxZDY4YmY1MzIxNTE3MGMxOGE4M2RmZjk1Y2ZjMmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhNDY3Y2RhYjViNzU3NWNlMjU5ZjhjYjNhNWM0NDQyOTQ1YmNlNjE1MjZiM2ZmZTAyMDMxZTQ0MTA5YzNlM2UifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d7bd95b1504349d6bef1cff3a385e5d5",
+      "statement": "BrijioBackgroundController.handleSocketMessage parses each inbound relay message and calls extractTabId to read message.target.tabId into a number, then dispatches by payload type and threads the numeric tabId into the page-reader, action, batch, and navigation handler methods and their adapter calls.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1789-L1800",
+          "version": "repo-lines-v1:sha256:94d04d781b628de01e5183a7a8cab5ddb2ad71209152f397949f5d9b43805550:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVlYmNjMTI5NGM3NzRhYTlkOGM5MmRiODg0MThlMzQzODg1NDI3MTVhN2QwNjY4YWEyZjkyOWI1MzYxNmRlN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM3OTI5ZTkxZTBmOTljM2U4MjVkZTY5YjQzNWZiNjQ4NGQxYjBhMWRmMmY0NjU2MWFiZjFhMjlmMDQxODhiODgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L564-L653",
+          "version": "repo-lines-v1:sha256:fe181992b2459f3cefac4c78d4e25048dd706e7ad96ec0a5e77e5118890d591c:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3ODg1YjdlYTRkZTQyZDM3YjFiY2FiNmMzNmVkMjVlNGMyNjNiOWNjOTAzNWJiMjUyZDM4NTY2YTkzMmYwYzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmZDE3NDA5ZmIzOTYxM2E3OWU1ODYyZjA0NTI2NjY1MTkwNzEzNzVmMWUzNGU0NWQ2MWM0ODBhNDY5NzExYjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU4MzNjNjE5YmZiMWU5MThlNDg0NjI0NTUwMjMzMWZiM2MzMWIyMTIwNjM4NmY3NjM1ZGIzYmRiNTk0ZWVmODEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d395a00b71c44758950e27831961b353",
+      "statement": "When tabId is provided the shared page-reader helpers and the Chrome/Safari navigation adapters use it directly for executeScript/sendMessage/tabs.update; when tabId is omitted they fall back to tabs.query active true currentWindow true, preserving backward compatibility.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L671-L692",
+          "version": "repo-lines-v1:sha256:ffa21558b008691c3cb36f5e99db0608b7ed41afe8b438b2a496dd02ab9c15c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1MDI5ODExMTRiOTFmNTczZTlmMzM5YWNlZTU2MmY5MTEyZjczNmVmNmQ5YjFlMWFjZmQ5NzFhZDNjODJiZDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4MDA1ZDU3MTA2YTM2MmViMDAwZGFmM2RhNDY3NGM4MmI1MThmZjVhMmUyZjY3ZWU4ZTc1N2EzMzNjMmFmNjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjExODkxZWFjZmZiNjVmNDVjNGU5YmFjYmY5MWNiNTczZmQwMGI5MTc0ZmMyNTRjYTA5MDYwY2MyZTJlZTg5MzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAxMzQxZDBjNTg4MmU5MWE2NmM2MGNiODYwMjBiMjQ3ZjBhZmMzMzZjZGY3NmMwYWUxOGJjZDIwYWM4ZmUxZDUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L398-L414",
+          "version": "repo-lines-v1:sha256:078eb8d7a42e7facc3d3c5a8f2eb456285576bbb830bffb60cf10384b5faa72d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0NDZlZTMwNjNlMWVhZTFkNjM3YjE3YWQ1ZGM2YjY4ODc4YmZhNGZkMmQ2YWY0Y2FjZDk5ZmI2MzAzZjNkOWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc3MWI3ZTUyNTg2OWMzNjEwMWJiYTVlNWFhNzM1NTk4YjlmNjBiNDQ2Y2I4ZGFlZTA2NjUwMGM2ZDQ2MWQ4ODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5YjgxZDc3ODNiNjc1YTJiZDI0OTE4ZmNiMzU4NjllYmNiZjUwYzhlNmQ1NjgzODMzODI2OTdmMzc0YTQzOGYifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L118-L145",
+          "version": "repo-lines-v1:sha256:0dfe78d1704ccfb3c1485190594fde8cab0af62529faa1771ad96e5c0a97f836:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NGIzYzdjMzZhZDIwNmE3NjQyZDhkOTc0YjBkZjk4MWNmMTMxZDJmMjdiNjY2MzViNjhiMWNhYzNkODAzNGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwNzc5NzAwMTZkYmQ5OWU1ZTRjNmUwYTRiNGU0NGY1NjkxYjM4NzNjZjhkZTgwN2U4OWVlOTRhMTFjZWRiMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMTI5MGVmZTg3OTg4YzBjNGE1MmE0YzNmMjRmNjdkYTNlOGExZWIzNzdjMmYxOTM5YzQ3YWNmNGY2MjdkMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ3OTRhOTMzYWUzZGJkODMwMWQ0Zjg0YmQwMDdlNmY2ZDYwMWNhNGI2ZWZiZGY4OWFiMzFjZjk2NGI3YTg4MDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_88b8bfc99ea84f56ba9698247937cf5f",
+      "statement": "The controller's adapter interfaces PageReaderAdapter, PageActionAdapter, PageBatchAdapter, and PageNavigationAdapter all take an optional numeric tabId parameter, and the Chrome and Safari background files implement those adapters forwarding tabId to the shared helpers.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L444-L514",
+          "version": "repo-lines-v1:sha256:adfba03eebc63ad5ca4eca3931609e31044a20d876634463199531caac9e2365:eyJzZWxlY3RlZExpbmVDb3VudCI6NzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2YWRkODEzMDA5NDVlNWFiZmEyODQ4MTAxYjAxZDNiNDg2MmMxM2IxZGQyZDYyODU4ZmE3YjUwMmZjZTkyMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0Zjc4NzhjYTU1NjRiNzQzOThjMWVkOWI2N2EwNjAxMWZlNmU5NDFjMTM2ZDRhNDUwOTM4NzNlZTZmOTNkYzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJjMDVjYTVhY2I2MDYyMjkzMmY0MmNiOWM4ZjQwOTM5ODhlMjQ5NTMwYjE1NzQ2NTllMWM4NTc4NGQzYjk4MGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0MjY3ZWU0YjM3MDRkMGUxMjc1NmI4NDhhMjM5MzdlZDMwMjVkNDllODI1MDk2ODkzMTNmYjYwNDU5NjEyMDMifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L63-L127",
+          "version": "repo-lines-v1:sha256:cacecbf8ebd5c57e1092b3e4ac744e90d76a4c5213ed1293b74d054b1c7a5aa1:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZTZkZDIzZDMxZWQ1YjUwNTBkNGQ1OGUzZWFmNTcxODc0MjYxYTdiZTYwNGE1YTg1MTU1N2ExZmNkMzNmYzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0MGY4ZTJmZjYyOWRkYzY0MDAzMGNmNTg0YmVhYTllMjY4NmJmNzg0YWFkNWU0MjkxNDgwODkyODc4MDI1NWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlMjRkYjhkYWI4YjE0YzA1YWQ2M2M4OTE1MmViMzgyMzBkZTU3MWRhYjlmZjAzYmJmODYyMTg0NDk3MjQyOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L135-L200",
+          "version": "repo-lines-v1:sha256:20d9e716029a7a3dd15019ad45347e0bfc198756d58adfb6a75c4b0aff8ae1bf:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZjhlZGU1Y2Q3YThjMDlhYTg4ZTYxMzhmYzY0NmFkYTZiODMyYmMyZTk4MGY3YjkzYzFhMDgxZTA4MDU0NTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjVkYzJkYmJhNjYzMmQ5OGU4NzhiYjNmMDVjOWI1OTViNzc1ZjRkMzVmY2MzNGY0MWZmYzMyN2QwOGQ4MjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_195b3042e9914bee946ddd44369724b0",
+      "statement": "parseRouterErrorEnvelope forwards any string error code and message from a WS-server error envelope as-is, only returning invalidResponse when the envelope structure is malformed; it no longer collapses unrecognized codes to invalid_response.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1498-L1525",
+          "version": "repo-lines-v1:sha256:b5fe9def77679fe3cd27a110261349747b5fcdd725afc09f296a4eb10b7693e9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhM2E3MjVhZDdkODJlNzcwY2I1YjZjNDFlYmY4MjhjYmI5NzE4NjU3YzZmOTIwODAxZTY0OGM2YjliYjNhYWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzY2EzZWMxYmEzZjcyM2ZmYzNlMmZkNDFmNDhmMTVmMzhjYTQyNTQxMjE5NmM0ZGM5OGU4ZDM0MGQ3YTMyZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzZjEwZDEwZTg4YjZmNzllZTI5OTZlMjZlODk1ODI1MDZkNDNmNjZjYTU5MzZlYzAzY2NmOWI5ZDEwYzA4MTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1f027ea61d914111b695149a37113158",
+      "statement": "parseErrorPayload preserves stale_context and page_navigated with their structured detail, and forwards every other original string error code from the extension instead of wrapping it as browser_error (browser_error is only the fallback when code is not a string); the message is always preserved.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1608-L1651",
+          "version": "repo-lines-v1:sha256:78e8ef1b0a5789d25ffd7bd41c80536b1e121b057d3083c699d144c972256dcc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlYTNkZDYyMGYzMDM1ZDZjZDM2OTk4YjhkODBjZDg2MDE4ZmMwMGExNzc3OGZiYzRmNDc3OWM4ZDFjOWU2MDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5NWZhMGYxMTE3YjVlYTQwNDM0MTQwZGRlMWEzNDBjNzIwZGRiZjMyNjIxMmUxOTE4MzhkNGIxNTZkMzE2YmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzY2EzZWMxYmEzZjcyM2ZmYzNlMmZkNDFmNDhmMTVmMzhjYTQyNTQxMjE5NmM0ZGM5OGU4ZDM0MGQ3YTMyZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMmVmYzA4Njg4YzhlODhmMDVjNTAwOWNlZDQ0YWU4ZDhlOTRkZWU2ZDhmMzQ5ZjgwNTQ0OTY0ZDliOTgxMzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bc84518698e742dd98edbce1195bd8fb",
+      "statement": "The MCP websocket client maps socket errors and unexpected closes to connection_failed, timeouts to timeout, and an empty pairing token to auth_required, surfacing these as structured BrijioResourceResult errors.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L719-L735",
+          "version": "repo-lines-v1:sha256:438ba48122ecb70f4fedbb0cc9ae280deca62e40c43f237267dcfb80d2e63bdf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmN2VmYjVlM2Q1NjRmNjFlZWQyZTI5MWI3NTA3ZjAwNjg4NzVmNTQxNzExYjc2MDY0ZGVlZjlmNjMxMGRkODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBjYmY0N2I5NTEzZjdmZmU3YTEwMzg4N2FjNjAyNmU2M2IzYTUwODM3NDBlNzQ2Zjc0N2UzMDRjYmNmMzY2OTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU5MzgyMGRlNDZmMmFhOGJiNWMxMDUzM2JhOWQyODkyMThjYTgxYjAzMjY0ZDQ0NWE0NmJmMDEwMWFiZDIxODAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3NTczZjM1ZDFkY2UyM2RmNGU5NzJiNmNiZTM4NGRiZTIzZWUzZTlmMGM3MGU4MmQ5MGM1MDZhZGNlMGJlNTkifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L772-L792",
+          "version": "repo-lines-v1:sha256:7d4cc92e5ff0e560247e176c598148b7adb15b8ed71cc4b40c5744514fb5b7da:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmNjEwZTY5N2VlN2QwYTU3NGFiODAxMzMzM2NjMjFmNWVmZDlhNDg1N2ZjMTI1NTdiODJhZmNmMTE3YzE3YzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0NzVlOTRhOTA0YWM0OWIzMTU0ZDQ2NzJhNjZlODYyOWI4NmRhYzc0ZTNlMjkzN2JlNjkyN2FlM2RhMTFjNTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwYmY5ZjMwODhkMGU3NTc1MmM4YjdjYWI2MTI5ZGJkZGEzZWY1NGQ4MTdhMjJjMmNhN2NhMTFhMmQ1MTUzZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdiZGRjYWE1MTkwNTMyYjVmZTY1N2UzMGQyOTU2MWM1OGE4NmI5OGEwMGQyNTVkZDI3NWY1OGFjYTM5YmE1ZmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4ac6c73f5d3d479e9021cd2d133a5761",
+      "statement": "The MCP tool/result error code field is typed as string rather than a closed BrijioErrorCode union, because the relay and extension may emit codes the MCP server does not know about; agents should read the message and treat code as an arbitrary string.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0061-forward-error-codes-through-mcp.md#L100-L130",
+          "version": "repo-lines-v1:sha256:6b0746a76a6f4362efe6c4c054ebc96aa8369496ac02774e1c97b8cd74037ede:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0YjlmODlhMDU1MDY5NmYwNjJhNjZjZTZhYmMzMmY3MjMwOGY5ZmNjZmFiMjg2OWFiNDMzODViMGFhMGYyZjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxNTQxOTU1MTc4Zjg2MDAzYTg4NWNjMDk3NzBjZGUzZTBmNDlmYmQ4ZGZjNTdjYjQ5ZDBiNDliOGY1MzU3NDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU3NDFiYzE4MWYwY2UzOTk2YzhiNzA5NjhhOTE2Njg5NGZhYWI1NzFmYTI1YTUwMGQxNmRhNWFjNzk3ZjlhZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlNGQ0ZTBlYjJiODYxNmViZWJjN2NhODczZjEyZTFmMjZkZDkwMjRhNDBlMTk2YmIwOGYwNmE1NWYxMmJiODAifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1608-L1651",
+          "version": "repo-lines-v1:sha256:78e8ef1b0a5789d25ffd7bd41c80536b1e121b057d3083c699d144c972256dcc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlYTNkZDYyMGYzMDM1ZDZjZDM2OTk4YjhkODBjZDg2MDE4ZmMwMGExNzc3OGZiYzRmNDc3OWM4ZDFjOWU2MDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5NWZhMGYxMTE3YjVlYTQwNDM0MTQwZGRlMWEzNDBjNzIwZGRiZjMyNjIxMmUxOTE4MzhkNGIxNTZkMzE2YmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzY2EzZWMxYmEzZjcyM2ZmYzNlMmZkNDFmNDhmMTVmMzhjYTQyNTQxMjE5NmM0ZGM5OGU4ZDM0MGQ3YTMyZjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkMmVmYzA4Njg4YzhlODhmMDVjNTAwOWNlZDQ0YWU4ZDhlOTRkZWU2ZDhmMzQ5ZjgwNTQ0OTY0ZDliOTgxMzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3de83c304de48e588d808ee03779326",
+      "statement": "Editing the action stack requires coordinated changes: tool input changes usually need matching edits in servers/mcp/src/protocol.ts and the background controller adapter interfaces, and the extension adapters must stay in sync with shared page-reader behavior including the active-tab fallback and explicit tabId path.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md#L100-L220",
+          "version": "repo-lines-v1:sha256:bdffd49bfccd4354285297d4a0b1174c449900b7baa4a2f6217f67d12876fdf7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0OTk2N2VjMWVkMzgzNmY4ZWIxN2FmZjE3MmI1YmZlZjdkZTYwNDg1YTQzOWM2Y2ExMWM1OTFlMTc1NTczOWFlIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkNWU2ZjExMmUzNGIzOWJmYjMwNTUzNzYwZjhmY2QxN2QxMjQ4YTRhMjg5OTU0ZTc1N2Y1ODQ5YmNkMWUyNmE3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlMDQ3ZDZhNDRjM2E3YjZiYjIxMDAxNzQ3MjdlM2VmMTEwMDI1NjM0NjFjZmFiNzYzNjZlZjFmZDhmNWFiMjdhIn0"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L135-L200",
+          "version": "repo-lines-v1:sha256:20d9e716029a7a3dd15019ad45347e0bfc198756d58adfb6a75c4b0aff8ae1bf:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZjhlZGU1Y2Q3YThjMDlhYTg4ZTYxMzhmYzY0NmFkYTZiODMyYmMyZTk4MGY3YjkzYzFhMDgxZTA4MDU0NTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY2ZjVkYzJkYmJhNjYzMmQ5OGU4NzhiYjNmMDVjOWI1OTViNzc1ZjRkMzVmY2MzNGY0MWZmYzMyN2QwOGQ4MjYifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L118-L145",
+          "version": "repo-lines-v1:sha256:0dfe78d1704ccfb3c1485190594fde8cab0af62529faa1771ad96e5c0a97f836:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NGIzYzdjMzZhZDIwNmE3NjQyZDhkOTc0YjBkZjk4MWNmMTMxZDJmMjdiNjY2MzViNjhiMWNhYzNkODAzNGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwNzc5NzAwMTZkYmQ5OWU1ZTRjNmUwYTRiNGU0NGY1NjkxYjM4NzNjZjhkZTgwN2U4OWVlOTRhMTFjZWRiMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMTI5MGVmZTg3OTg4YzBjNGE1MmE0YzNmMjRmNjdkYTNlOGExZWIzNzdjMmYxOTM5YzQ3YWNmNGY2MjdkMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ3OTRhOTMzYWUzZGJkODMwMWQ0Zjg0YmQwMDdlNmY2ZDYwMWNhNGI2ZWZiZGY4OWFiMzFjZjk2NGI3YTg4MDQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}

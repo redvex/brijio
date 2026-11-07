@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:cd5bc19ffe40a2fcca8e99b5cb529e278014ab84b9234669b3f720c7808a7f76",
+  "claims": [
+    {
+      "id": "claim_3a501353cff3402c88105aa0cceaaeb1",
+      "statement": "The WebSocket relay authenticates connections with a pairing token (options.pairingToken, then BRIJIO_PAIRING_TOKEN, then BRIJIO_TOKEN) plus additionalPairingTokens, throws at startup if no token is configured, and derives a SHA-256 scope key from the token that isolates routing and presence per token.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/protocol.ts#L15-L17",
+          "version": "repo-lines-v1:sha256:5daf1de898a45d905f420b599d9dd804b696bed85ddffe44fee1db78a0169735:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODQzYTA4MzNhOWFmYjBjMGFkNTkzMGFlZjNlMmU4MTRkMjQ4NWJiNWQwODRmZmU5NzVlNDg4YThhZjcxNWEyZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTJhNWJlMmRmOWFhNTk3NzhiYjExMmY1N2RhOGU5YmVhY2ZkNzRkMmU4MGY4MTRmNzcwZTg1NTQwOWU0NmIzNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L143-L156",
+          "version": "repo-lines-v1:sha256:4333b1e6a99e6f6dcca97625dcd5f2f3b1feadf5c49ee5cb2b563a53c84e9191:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ1YjVjOGM1YzFhNzg0NTg0ZTMxMDNhMzA2MmNkYmM1MTRlMWJkNjkxMDEwYjc4NjhhODAyZGRjYjBlOTMwMWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0MDA0MmU3OTUxZmQ4ZThhZjU5MjM2MGI1ZmEyMDExNDM2ZTcyYzQ3ODY2ZTMyYTcyZGE1MjMwYzcwZjVjMzEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b674b2f7f732497f84c57befeab04aa2",
+      "statement": "Connections start unauthenticated; the first message must be an auth payload or the relay replies auth_required, an invalid token replies auth_failed, and on success the relay sets role and scopeKey, replies auth_success, and (for extension role) immediately sends a browser_presence_request.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L170-L202",
+          "version": "repo-lines-v1:sha256:c44f75d216bcd0f469fbec7a64803d4c5ae95518e881a090e1ae2b3d58d62eaa:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFkMTcxYzdjOWNlOTY0OGQ2YzliZTQ3YjNmZTVkYzBkN2NmZGE0MjcxY2E4OTQ3MTI1MGNlMzJjODkxODk3M2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2MzlhMGE2NjFkZTk3ZjRkNzMwZDhmMzA4N2FmN2RkZmUwNjJjMzU4Y2VkYjExMmVmMGZjOGYxMTk3OGUxYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUxYmMyNTUyODA4NDY0ZjM5YTQ3ZWQwZTBiOWUzYWRiYjU2MzA2N2NiNzgxOGRjODc4YWQxNGY1M2I4ODQ0YTQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_89ac79697d2e4d1aac1bd3521f395e56",
+      "statement": "The relay recognizes two roles only (extension and mcp): extensions announce presence, send keepalives, and return responses to pending requests; mcp connections list browsers and send requests to be forwarded to an extension.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L20-L21",
+          "version": "repo-lines-v1:sha256:7f4d9d46e5004743a7dd8542569720837469c420f5fe7088ae174449ca24f47a:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzM2MmZkYTEzZThmMmVkYzA1ZDk3OTU1M2E2MmY4MzUwMzI2M2NhMGEzNzE3NTIyMTc2YzU3Mjk5NzE4YzA0OCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYWZkNjk1M2UxZjZjYWRmODVhYjA4ZWI5MDgzZDk1YmE1NDdhMjY4MGE3N2FlNTU2ODI0MDYwZDMwNTkxNWFkNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWNjOTU1ZGY0NTQyMGJiOThiZGU0MWQ5ZmQ4ODU1MTFmN2YwNmQ3ZGY4ODdjNTUwNTc2OTlmYWQ1ZDg5MzlmMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiN2E4MmNmZmIwYzU4ODJhMDZlZWMzYjlkN2M5MjVjOWVhMzNkMTA3MDY1MWIzOWU5NmM1ZmYzYmFiMzU1YzM1OCJ9"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L204-L222",
+          "version": "repo-lines-v1:sha256:dc7a621f9c8148f4a7a981b16c12936e44c303fa6e7bc3fc0c97e48301f0cea7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmNjQ5Y2QzNjdlNTg1ZTVkMGI1ZjcwYzQxNWEwMzU5MzFjYTU1Mzg4YmE3YWE2ZDZmMTI3NWM2ODI4MWNlYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3YzNmOWZjYWM5YWVhOTY0MDVjZDZjZTNkNjgzYmM4MGY5NWU4NTMwZDRiZTNmMjJmMzQ0MmViOTUzY2IyOGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcwM2EwZDYzYTFjODIzMDU3YTNhNjMwM2RlMzkyNzc2OTBhZDFkZTc4NjFkMzZiYzcyZTYwNjQwMDIwMjI5ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2YzhkM2NmZDAxZjJkYjY0MTc5ZDM2MjJmMGM2NDgxZjA5N2I3ZGMxYjkyNGY5ODA5NWM2ZWE5OGM0M2U3ZjEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b09f128369e045f08e00a55514e80733",
+      "statement": "Presence is runtime-only: an in-memory Map keyed by scopeKey:browserInstanceId, populated by browser_presence_announce (preserving connectedAt on re-announce, refreshing lastSeenAt via an injectable clock), filtered by socket OPEN, and deleted on socket close with no persistence.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L120-L134",
+          "version": "repo-lines-v1:sha256:d28cb8adf1aa2a9740f168c639216c3a3ae15f84b5ad0b4116de2475114bdc22:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0YTVjYWNkNWFiMzI1OTdjZjUxZmQ3NzZlMGNmYzNmODg3N2JjMGY2YzFjOTBmOTg0MzUyYmMwYjM0ZWRmZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0ZDg3ZmI1MjMwNWE1OGI3MzRlZTY3MWIwNzI0ZWI1YjQzMjVjNjcwYzYzOWU4NDIyZDAxOGI3NTFjNjgwNzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliOWZhODMzZGFkY2ZkZjllMWE2NzZiNzg5NDdmYmM4MmVmODFhNTFjNDgzM2E2ZGVhNGU2Nzk1OWM2MjEwODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljMDhjZTY2ZTJkYjIyMDFlZTU2ZGZjNjBmMDZmNmExOWI1NGQ5MGRkNWQ2NzFjOWUyMGFiNDA2NDkzZWJjOTUifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L304-L324",
+          "version": "repo-lines-v1:sha256:4305f3749cbcb4692b263671120a39aa7013bc854456325e24290ce06bb0e62d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwYzQ5MmIzYzRlODBkYWVhOGI0MGRiMjJhNThiNmIxYzhkM2E3NGRjZjYxNDNmNWIwN2ZjYTdhNWFmYzFmNmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE2ZDc5NDNiZTJlODUzYzFhMGFjMmU3YWIyNTI3YTU3Y2ZiYTZiODM3NTQ3N2UyYzBiZDk5YjI0ZTIyYzE2MDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0OTYxYjNiZjAyMDhjZTdlYzBkOGU3M2VjM2E3ZTNkODcwMDQxNDgwMTg4Y2QxNTFkNDFlOTlhMGUzOTQ2MTAifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L366-L372",
+          "version": "repo-lines-v1:sha256:8b0e7f7cd11f2974649ca31ba1d3ba4bd69fdc757bff5cdd76489fc0cb73fd8d:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGJlNDFlYTdjYzE3ODc0OTVhNzc3ZGEwYmQ3YmUwMjZiOThlZDY5MmQ4MDQ0ZjQ0MmJmMTU1YTBmNDRmZDZjYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDZlNjI1YjRjNWQzYTU3ZDk0YjdmNGQ3ZTFiZTMzZTc4YjZmNWUyMTE5Yjc4NzBlNDBjNGZkMmUxYWI4YjRjNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_cfff28d871c3405fa312bc4abd67b4b8",
+      "statement": "list_browsers is answered directly from the scoped presence table while list_tabs and all other MCP requests are forwarded unchanged to the selected extension; the relay does not inspect or interpret forwarded message payloads.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L326-L360",
+          "version": "repo-lines-v1:sha256:e703a47fda14e56961e2e05b7d2d2f323e473b45868d5d3b372aba33f81328ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkNDdjOTU3NGU4YThhMWU4Mzg2N2Y0MjhiMTAzZmVjMDkzYjlhOTllMTQ4MDEzMWM0ZmI5ZDc4ZmY2NjE5MzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjNGM1MmIwNmUzOTIzZDFiZDM2MmU1Y2QyMGUyODQzMDYyNDc3YmQxMjMzOWQ1YmIzNWFmM2NlNDFhMWI2ZmQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5Nzk5ODZiOGRmMTAyYTEyZTBmNzNkOWQ2NmNiNzVkMWM2YmUyOTkyMTUwOTI4M2ZjZWNkYTk0MGFlNzQ4MDYifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L525-L548",
+          "version": "repo-lines-v1:sha256:3990124b7a897eb2a9b7b2a03bbbafe8b4b19ff139ef5acf6e1484d1b7d19271:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkNWI0NThmN2MwYjI3NzYxYjc2MzE3NzlmNmZkNzY1N2JjMDcxOGFhYzI0MzFmNjZmMjFjNGVmMmJhZGJjN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjYzRhYzI1OGRlYzIzYTYzZDFjOGU0MGNmM2ViMWJmMzM4OGYxNDVmZDVlMGJjMTA2N2ZlMjUzYjYzYTdiOGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiZTUxNGRhMGZlYWMxMzRiMmViMjRiZDBjNDQ4MDcyNTdhMGEwODE4MzZjYjBlOTEyN2UxMGMyNTM1N2NjZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3b7b1c052e7846c2b2258c4f05d3775d",
+      "statement": "Target selection returns structured errors: browser_unavailable for an explicit missing id or zero browsers online, and ambiguous_browser_target (with a candidate browsers array) when more than one browser is online and no browserInstanceId is specified; routing is automatic only when exactly one browser is online.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L362-L402",
+          "version": "repo-lines-v1:sha256:a26b03ec071dee802ae8ed9a4f59b198d7adadeb87b8af06d5a31b31a6305424:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1ODU5MTA1NzUzYWRjMDgwZTg2MGRlNmVlYzUxNjgzOTBlMTk2OTYwYzE2NjU3MmNmYWE3Mzg3Y2EzZDk5M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwYzFmMTg4ZjE0MmVkN2E4MjQ2ODBiMjA3MTcyYzU1MTliYzYxNGE0OGZkYTdjZjE2N2VkYjhkZGY3OTk1NmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJkMTkwZjg1MzBjZjNlNzEwYzA5Y2UyMDg5MDA0NDIwMzQzMjhjMGM4Mzc3ZjE3ZjdhMTYzNzI3ODRmZDgzMzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjMWU2ZGY0MTg2OGZmZDBmNzM2YzMyNzQzOWUzMGY1MjFkYmQ0MGI3ZWQ2MmExNmFkYjMwMjdmY2I3MjU0ZGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_92f241c5636a4d9faecffa8abd2f510a",
+      "statement": "Responses are routed back to the requesting MCP socket by matching scopeKey plus the original message id via a pendingRequests map; the relay is payload-agnostic and forwards whatever the extension returns with that id.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L268-L305",
+          "version": "repo-lines-v1:sha256:0afa4d61901421519772be040fc905e7778a8be6c71a6e9d87e7258c5753e773:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0ZTc3MTc2MTFlOTI1ZDZmNGI1YjE5NTJlYmNhMDBkMzk5OTU0MWRhYjNiZTZiZTdhYjg3ZWYzOWUxM2JjZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwODU1MWNiYmFiZGVhZDRiYjc5ZTkxNjI2ZjJiMGRkNWJmMGRmZTU3YmZiNTlhNjQxZTUwNmMxNjJkYTJjMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhkMjdkYmU3MDE2OTc0MWZiYTg0MWNiMGI5ZjkwNDgxZTUxM2QwMGUyMWVlMjc0ZjVjYWUwZTgzOTJkZmU2ZWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxNzQ4M2U3MTdlZmQ1NWI3OGQzNjQ4ZmUyMjlmYzBhNjUwZDU4YmQ0N2IyYmUwYWM1MjZiOWEyZjJiYTUyMjUifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L404-L422",
+          "version": "repo-lines-v1:sha256:05b3e33fe90a4e171f5e44560e4b15f5c2d3640843eb6bb9d3cc5ae1915718ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjNjk2MDY4MzkwMGNjZTEwYjJiMWUzNzdlMjQ0YWY3M2Q4N2NhZjc3MDJlZDkzNTQzYmFjNzg0MDgwZDcyMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxOTI3Y2Q3MmMzZTVlOWIyNzQ5NDY0MWIxODY0ODRkNTIxNzUxZGRjMGY2NWEwMTU5NTcyNmFhMmM3ZmM5MTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImYzZGIwNTk0OTcwNzI3MGM4Nzg5MzBjMTI5YTNkMDIxNDA0ZjIxNTdhYTk4MzFhYjkzMjMxZWI3MmEwYzcxNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwMGQyNTdhNjEwNTBmZWRhMWFiMDBlMGZkOWQwMGVhZmQwNzgzYTllMjFjZTQwY2I1ZmFjZjZhZDNkYjhlZjUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7e9170631a794da984ac17844dd6866f",
+      "statement": "extension_keepalive messages are silently accepted, logged at debug, never forwarded to other clients, and do not update presence; the 20-second interval and minimum_chrome_version 116 exist to keep the MV3 service worker alive via WebSocket activity.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0006-websocket-peer-forwarding-and-extension-keepalive.md",
+          "version": "repo-file-v1:sha256:2e8111eba7ed8a7400243ef61d2c4f8e04ef7cddc901412755f8b53ecf17ad0f"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L248-L252",
+          "version": "repo-lines-v1:sha256:4bf2cd038a58f18362d0a75dc8bb35242e3a88d7b79a20a4baceaf552adc24a6:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjQ3NWU5NGE5MDRhYzQ5YjMxNTRkNDY3MmE2NmU4NjI5Yjg2ZGFjNzRlM2UyOTM3YmU2OTI3YWUzZGExMWM1MyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODU4YjQxYzZlZGRlZDg4YjkyM2VlYWFjMzY0ZTM1NGEyZTlkMDYxMDk4Mjc5NTE0M2QyM2Q0MWEwZmY0YWYxMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjE0YjU4YTFkNmZhOThhZjRiNzllNDg4OWMzOGM5MzlhYTA2YjZhM2FkOWE4NmQ4YjE1MmMwNTU2ODliZmNmNSJ9"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L478-L487",
+          "version": "repo-lines-v1:sha256:20d09b90beb93daa991af41f3ccb76116c2eec0f210c8613de4d630509e825ea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1M2ZkMjI0ZDkxMDNkZTRmMjlmMTZlMjIwNmEzNjkxM2ExNDY4OWU0MzQzMGQ0YjhjMzJjOWU0NzFkODE2ZTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgyNzhiNTJiZmY2OTYyY2EzNTQ2NTc1OGFiZDA0YjBjNDRmN2NiYzcyMWJiOGRkYzRhMmE4MzQ4NDA3YTNkNGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEzNWU3OTBjOGNiZjBhZTNiMWVlMmM4ZDg4Y2JlNTAyMGJjOTUwMDVjNzk1MmI5OWE3YWNhYzllNjM1YzFlOWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0466fc3bbcfb4299a67cad73e049f590",
+      "statement": "GET /health returns status ok, version, uptimeSeconds, and a count plus minimal browserInstanceId/label list of OPEN presence records; any other path returns 404.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L49-L75",
+          "version": "repo-lines-v1:sha256:9c240a3c92eebc5d14d9d58176e6ff75c320befc25974adbc835bdbd724d36b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0Njg4NWQxM2QyZGNlMTVjMDJjOTY3Y2JlODM0ZjY4ZGJlZGNiMTg3ZWE1OThiNDVjNDQxMjU4ZmZiMDNhZjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk4ZTkxYTU3MWNjNTZmY2E1MmEwNDYxYTIwN2JlZmYwYzJlZTBmNjE3Yjc0NDNjNDRkOWE3YWZmOWNmNTBkZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM3ZDhmMzY3YzY0NjBiNjY5NDFiZjQ5OWEzNmY5ZWRjNTYwZGMwZjY3OGQyMGEwN2NiNTBiOWNhOTBhZWI0MGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU5ODNhMzEzOTJmZDUyMmE2MGVmMWE4MGU1ODc5MjYyZjU0YTc1Y2YwNDZiNDQ0NmQyZWJmMjdkZGMwZmY3MTEifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L595-L606",
+          "version": "repo-lines-v1:sha256:a2e779ff5b93091c0a5d09d488066f2e99d2fb449a7b4608257d085c8f92f364:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1OWZlYjZmYTU1OGY5NzhmOTA4ODJmMGY2YzY0NGNhNzdkYTJiNzk4NTMwZThlYTE0YmM3YjkwYzY4YjMwMTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzNGJiNGU5MDI4ZTFiNzEyZDVjOGZiYjY5ZWU5NjBjN2I5NDk3ODc4MDUzN2ZmY2ZiZTI5ZDRjODYwMjUwNTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFjOWNlZDc1MDBkZGUzYjBmN2VkN2ExZjJkZjhkNjIwMDAyODZjMDc0YzQ0OGJiOTBkNzNiMzI1ZmZlMGQ4OTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjYjBjMDZjNTE1YjU1ODYyZDhmZjBlZTg0OWU3MjI4NmZhMGU5OGRiYjcxZmJmMWUzNDY4OGZmMDFiMzg2NTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ae24e9739061471d979970668540a114",
+      "statement": "The relay is state-light: presence and pending-request state live only in memory for the socket's lifetime, there is no durable store, and on disconnect the browser disappears immediately so MCP requests fail fast with browser_unavailable rather than queuing.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0021-local-pairing-presence-routing.md",
+          "version": "repo-file-v1:sha256:3b91e264495651d40d47c48f0ba382d1e69964525c5f4eb9accb8b3e08d409e5"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L120-L134",
+          "version": "repo-lines-v1:sha256:d28cb8adf1aa2a9740f168c639216c3a3ae15f84b5ad0b4116de2475114bdc22:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0YTVjYWNkNWFiMzI1OTdjZjUxZmQ3NzZlMGNmYzNmODg3N2JjMGY2YzFjOTBmOTg0MzUyYmMwYjM0ZWRmZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0ZDg3ZmI1MjMwNWE1OGI3MzRlZTY3MWIwNzI0ZWI1YjQzMjVjNjcwYzYzOWU4NDIyZDAxOGI3NTFjNjgwNzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliOWZhODMzZGFkY2ZkZjllMWE2NzZiNzg5NDdmYmM4MmVmODFhNTFjNDgzM2E2ZGVhNGU2Nzk1OWM2MjEwODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljMDhjZTY2ZTJkYjIyMDFlZTU2ZGZjNjBmMDZmNmExOWI1NGQ5MGRkNWQ2NzFjOWUyMGFiNDA2NDkzZWJjOTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4c866a82edf44d4eb992c26f510ab291",
+      "statement": "The process entrypoint reads WEBSOCKET_HOST (default 0.0.0.0) and WEBSOCKET_PORT (default 8787) from the environment, constructs the server, and logs the bound ws URL.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/index.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:e0f6605a7e1def495322c60b48db3217cea305f32ac47b42db2662db837a1240:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzYTZhZjc0YjUxYTVlZDZjNzI1ZjllNGIxN2VkYzdiNzkzYjg4NGZmZTY2YmVjNjg5ZjkwYjljYTdlOGYxMDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwM2NmYWIzNjhmMDM1ZWFlZDY5ZGRmODMxMzhmY2VhYTI0OWUwYzRhY2MzZWFkYzdhZTE4MjcyNDcwZmI4MjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}

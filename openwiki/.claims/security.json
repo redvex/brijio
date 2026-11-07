@@ -1,0 +1,148 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8766ce9a6d21381b544dfd1ba7430db67b42d21d8e901aaaee5a30fe872ecdda",
+  "claims": [
+    {
+      "id": "claim_05cb7e63082444629266d95057b4627f",
+      "statement": "Brijio's core trust assumptions are that the user explicitly starts and controls the browser connection, authentication tokens are held only by authorized parties (separate MCP auth tokens for server/relay and a pairing token for relay/extension), the browser session belongs to the user, and the relay transports messages without needing to inspect content.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L55-L63",
+          "version": "repo-lines-v1:sha256:1c1e36c94cbb0280c8c56c15f273aad6bf53df8e6a4eabe34f0dfa1b6eab4ce9:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWJmYmNjZjU5OGZlNjJiYzgwMTBjNzJlOTJjMmE3MTNmZDI2ZTQ0MTkyNWIyNjU4MzM3ZDY2NmZmZDFkODEyYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMWNmZWJhZGJlYWIxZmUyMjczNTMwZDlkYzMzNTUwMjMzMjM2ZWU2YzRiNzViZWEyZTA3NjY2ZThlYTEzZWFhMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTFjMWU2NDQ2ODQ3OTM0ZGY4NDE2OTJhOTAwNWNlN2U2NTY4OTdmOTcyNDNkY2Q1NWE2ZGFiZjJhZWYxOThkMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md#L22-L35",
+          "version": "repo-lines-v1:sha256:f565263ca2f5e1ad6a144f7f370a0d8a0524ba6507ab73ecf576ef64f12de011:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MmQ3MTExMDNkNTBhNDM3ODMwYzZmYmNkMDRmYjRiYWI0OWEwZjgyZjZkMjZkMWM3OTFjNmU4NDg4ZGQwOTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlOGY3NzUxMmNjOTkwODVlODAzMzI2N2Q1ZDFhOGRjMzcyOTc2ZDlmZmM4NDg4ZGU3NzdhZDA4ZWIxNjIxY2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjYjhlZjYzY2JhNDY5NjkxNjVjYzViNGQ0Y2M5NTgyNTg3MzExZGMyNjZmNDczYTI0Yzk2ZGUxY2MyYzJlNWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2f43c2c799b44fd999c8d9fa45c0a03d",
+      "statement": "Trust is bounded across four interfaces: Agent↔MCP server (MCP validates all requests, does not trust agent intent), MCP server↔relay (authenticated with separate tokens, relay need not inspect payloads), relay↔extension (pairing-token authenticated, extension does not trust relay confidentiality; E2E planned), and extension↔browser (extension runs with user-granted permissions, reads page content as data rather than executing it).",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md#L45-L70",
+          "version": "repo-lines-v1:sha256:029ebe98b51306c5660821ce4575c4a7f198786d644a92a3913ccfa2e68c8929:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhNGU1OGZkNWVhMjI4Yjg0NWU0NWEzNzQxMWFiZDI4NjdlNDk5MzY0OGRkNDM0NjUwOTljODE3Njc4OTJiNWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRhMjcxYzE5Y2Y1ZDNmYjAyMzJhNzVkNzg4Y2ExNmM3YjcxZmRhODBhMzYyMjhmZDdhODQxNjM2NjQ3ZDY4ZmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyZDY5N2Y4YzZiNTAyYjg2MWQ2ODU0YjNjOWZlYjVjNDE2MGNlY2I1MDVhMzY5ZTEzMzUxMDM0NDNhZWM0NWQifQ"
+        },
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md#L8-L43",
+          "version": "repo-lines-v1:sha256:0e49ab0a711b5f1577b42df8b2572f1157fdd1a89928dff2dd56b8e4efd1e1d0:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzNjY4ODFhYzg4YTA0NWE0OGVhZDM4NDk2MTUxYTczMDhhNTNkNDNlZTYyOGY2MTI3OGJlNzA3MGM4NWU1ZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlNDAwYWYzZDdiZDZiYjE5YjEyNGFmY2MxZTc3MGRjMGQxM2E1YjdiYzg1MzM2MDc3N2I2NjU1NjYwMzRiODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI1NTRiNjQwNGViODUxZjk0MmJjNTY1MjM0ODc0ZWUxNjVkNTYyMmVhZDYwMGU0NGVkYWU3ZGI2OTBjNzYyY2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2db191d4f56491f92c626611c2d0d89",
+      "statement": "The threat model defines four attacker classes — malicious agent, compromised relay server, network attacker, and malicious website — each mitigated architecturally: explicit request/response protocol, no continuous streaming, user-controlled connection, progressive disclosure, least-privilege extension permissions, TLS, and planned E2E encryption.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md#L13-L54",
+          "version": "repo-lines-v1:sha256:7e41f2f78009bb3a9c2076ee66ebdd4424e5f4906978c1a43b00436db1a5c13d:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM2MjcxZjVlZjhmODA1YzIwYWVlZDMwZGRkZTRmZjU5MmE3YTk0Yjg3YTIxNTJlY2U0MGFmNjE5ODYzNmViMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZlMmJmYTI3ZDIzMzk3Nzk1OTZjZDlkZThhMGI5MzU2ODA4M2IzMWU2ZDk3ODI4MWEwMjZiMzUyMTI3NzVjZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVmY2IyYjg5M2E0MDhjN2IyODkxZjE0ZDIxMDA3YjU2Mzc0OGU2YmY1NzI0OTlmMzk4N2RiOWEyZGE2YmI0MDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1YmFkN2EzZGIwYmJkYzNkODUwNjIyYzg0ZDUzZmUxNjBlODJiMTRkZTA5MDZkYmNkNmI2YWI0NmIzMmM0MDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f66e0cf7d7224fb4adbd5b848cc94af4",
+      "statement": "Brijio intentionally does not provide cookie export, session cloning, browser mirroring/remote desktop, continuous screenshots, continuous DOM streaming, background surveillance, browser history collection, credential extraction, or MFA interception; these are deliberate product boundaries (intentionally unsupported in the capability matrix), not missing features.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L40-L55",
+          "version": "repo-lines-v1:sha256:809169498b4f65625b20da68e5f80e935aae8d733565d892885a96a5f797db61:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmRlMDNjZDM2NDkwOGY0NzM2ODU1YzQ4ODA5MDAzOThiMjA2YTY0ZWFkZjJiNjNiOGQ5ODRjM2U2MGEwMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiYjg0MmI4ODI5NDk5ZTBjNmVmNDhlZTE2MmZjOGFiZWFkMGUwZjMxM2QxZDJmNGRmMDU4MDQ3MWMzMzVjMTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MTk4ZDE1YWQ3M2JjY2NhOGFjMmFlYzk5NzA2MGE3OTc1YTAyZTZkZTUwYmFlMTE2MTJkMWU0MjgyYTA1ZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2OWJlMjYxNTBhZWFiMTAxZjQ1MTQ5ZGU4NzNkMWM5NzdjODNlN2NlMDMwNWVhOTA3N2ViMWEzMDliNTJiMDAifQ"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L173-L188",
+          "version": "repo-lines-v1:sha256:83ee070f427010a71239c1765ab1432c04b2159a45463312bafb0d99e9172b21:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkYzViOWI1MWRmMzY5NmJhZWFmZWQzNDg1NTc5YjliNjA3YzBlMTE2Y2M0NjUwNGRjNWZhYzE3YjRlOGY4ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVlNmFhMWFjNmJjNTZmNGNkMDdhMTkzYmY2MGFmMDhlM2UzMmZmNzJkNTc3MjEyNzA3NjAwYjIxYjlmNjUzMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4N2Y3ZWIwYmVlMWViOGQ1MjQwZDRhNjRiMzVmZWFiNTc4ZDNlNWMzZjIxZjgxZjQzOWY5MTQ3MmUyNmJjMTcifQ"
+        },
+        {
+          "resource": "repo://docs/security/SECURITY_GUARANTEES.md#L1-L73",
+          "version": "repo-lines-v1:sha256:3626a37f667d817cce96ac5aba03bb25c6183302efe00e7bd3aadc3e93b32472:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViYjI4MmY2NTBlNjM4MTNjMjY2NjdmODYyNWJhOTVmYjM1M2FjMDQ0Yzc5NzIxZDU2NzA1Y2I2ZTU4OGY5NzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkNjBhOGZlN2Y1MjE4ZGMyMjQxNTY3OWRiZmU4YTczNzQ3YTE2MThlODA0N2Y0ZDViNzM4YjJkN2UzMzNiMDUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f6ff019a19f64b7ba6ae15f2d2d93045",
+      "statement": "AGENTS.md codifies non-negotiable product invariants: the user explicitly starts/stops the bridge, browser state is available only while the extension is connected, every read/action is initiated by an explicit MCP request, no continuous streaming or background surveillance, no cookie export/credential extraction/session cloning/MFA interception, preserve user-visible connection state and client-side action approval without bypassing approval checks.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L40-L55",
+          "version": "repo-lines-v1:sha256:809169498b4f65625b20da68e5f80e935aae8d733565d892885a96a5f797db61:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmRlMDNjZDM2NDkwOGY0NzM2ODU1YzQ4ODA5MDAzOThiMjA2YTY0ZWFkZjJiNjNiOGQ5ODRjM2U2MGEwMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiYjg0MmI4ODI5NDk5ZTBjNmVmNDhlZTE2MmZjOGFiZWFkMGUwZjMxM2QxZDJmNGRmMDU4MDQ3MWMzMzVjMTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MTk4ZDE1YWQ3M2JjY2NhOGFjMmFlYzk5NzA2MGE3OTc1YTAyZTZkZTUwYmFlMTE2MTJkMWU0MjgyYTA1ZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2OWJlMjYxNTBhZWFiMTAxZjQ1MTQ5ZGU4NzNkMWM5NzdjODNlN2NlMDMwNWVhOTA3N2ViMWEzMDliNTJiMDAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_45b33ee0123446368d219093dc1281c5",
+      "statement": "Client-side action approval (ADR 0048) requires user approval only for a hardcoded set — submit_form, fetch_resource, and download_file — evaluated through a requiresApproval(operation) function; every approval-gated operation carries a unique actionUUID and approvalRequest flag.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L29-L50",
+          "version": "repo-lines-v1:sha256:2fdf109051f3197a80b79db2d000f9ce505dfbe4d550226a461d7a506c59570f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk3Y2JmZDczY2VmN2I3NjM5NzRiZTNiMTJmMTBmMmM2YmY4NzU2NmYwZmI2ZDk2OWNkNzkxMTY1Y2I4NTYyMDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJkM2EzNzdiZjBlNzk4YjY0NDU2OTQzNjQzYjZhMTk1YjAyM2NkMjQ0ZjdhZjgwMmVhNmU1NGY5ZGY4ODY1YTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdiOGE1ZGQ1NDgxZWViYzE5YTE2MjVhMjJhZDM3NDIwYzE3OWU2NDlkOGViZmViOGNiNTc4Mzg0YzBlOGM4ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyMDE0YmMxNzliNWY4YjdjYjAxMDc4YmJhMzY2YmU0NGUwMTJjZTkyZTA1YmI5NjRlOWMyNDk0MWQ0MTFlMTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a5afd9b7c84e4db4b538a5b78e7d40b3",
+      "statement": "Approval pending actions and session grants are held in extension background memory only (never persistent storage), scoped to {origin, actionType}, verified against active tab origin at execution time, and cleared when the bridge disconnects, the extension reloads, or the browser session ends.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L131-L149",
+          "version": "repo-lines-v1:sha256:e7ab103e316d196d24f41651054903d4d633ec3f8ba18de94aa1bcb7bcd0c029:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0YzBjZmI0M2M4MmU1Y2FkMTRlMjgzNmM0NzljZjkxOGNhYTI4ZTFiNGQ3MjA4NWM1NWM5MTYwNzlmNDk4MjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4MDkxOGFjNjQzMDcwNDAzMDA0MzI3OGFiYjE2NzAwMWM2ODM0M2ZjNWEzYWRmN2Y4MmI2MTY5NTI5Yjg0YWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg2ZWUzZjhhNTRjNTdiNTMzZDE2MmQwYWFjNGQ0NjMwZmFkYjhmNGJhOWMyODg2OGQ4ZTZjOTdmZWQ0YjU0ZjQifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L38-L42",
+          "version": "repo-lines-v1:sha256:3a96dd5a6b24aa1980972ca6cc79ad5631c555c8e0288a78522074e3512e7dfa:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjY4YWRkNmU5ZTc0M2UyN2M4NDIxMzQzYjY3ODJlNzZiOWYzYTQwNGFhYTVjMWQyOWU0YzcyNzE1NTRkYzYxMSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjdkYzc3NzJmMmM1OWU3MWVhNmMwNDZiYmI2MDg5NzQ0OTVmZjMxMjVkODcyOGQ1ZTkwYTI5YzIyZGU5YjVhYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOTYzMzY5YTAzZTA3NmEyZWFjMmI4NWQyYzRiOTBlZjFiY2QwNmI1NTMyNWQzNDQ2ZDliNmYxZTM1YWU4NGFkYiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6bcc800a46064513b7d57170573b6feb",
+      "statement": "The approval timeout is computed as httpRequestTimeoutMs minus a buffer so Brijio returns a structured approval_timeout error before the HTTP request times out; remote deployments must configure it below the shortest client/proxy/gateway/load-balancer timeout.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L151-L180",
+          "version": "repo-lines-v1:sha256:2dc3200f1b7e506f8cbaf8b26a119c92558212008bc1f394ddd2b10ddfe4a46e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5NjA2MzkzZDlmMjFhYjQzNzM1MmMzNzkwMzJjZmNmODcyNWVkZWY3MjQyNGMxYTU5YmJjMjY5MmUyMmFjNDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZjYWM2ZDNkODU2NWU2NzdmMTFlNzY4NDNhOTg4Zjg4ZDlkZGM4MjM0NTQxNGQ0OTczY2Y1NWY5MzA5N2NiMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcyMDlmMTVhOGI3YmI4M2JhY2VlYWUwMTBjNTdiNGM1NTQyMGM4ZGM4YWY1MmZkODM1NjY4OWM1NmQ2NjczMTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e519ef87a04e494e9e900dd7cca2de67",
+      "statement": "Approval failures return structured error codes — approval_denied, approval_timeout, approval_unavailable (banner could not render), and approval_origin_changed — each carrying the relevant actionUUID; in batches denial is a focused per-action outcome and timeout yields a partial batch_result.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L220-L270",
+          "version": "repo-lines-v1:sha256:957550aca067468056826c785a8e944e50b21307b91304705cda2312fd020723:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmNWY5MGEwZDFjMGJkMWRlYTM0NWE4NjFhODc3Nzk4YzEyMGZiZWZjM2E4YWEwM2E1MDVmNTNhZTFiNzI5ZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhMGFiYzQ3NDQwOWQzZmQxMTMyYzdlZDEzOGMzYTdiNzZkZmVlZDI1Y2Y1NDZiMWQxOGE3ZjNkNzNhYWYyMzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFlMGJhMGRlNmI0ODRjYTc4MTczZWQxODQwZGIxYjVjNWJiMzBkYzk0MGEzMmMyOTJhNDY0MzA4N2I0MmRhM2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwNGNiYzNmMTI5NTlhZDQ5ZmYzMDRkNjkxYjA4Mjk1MTA0NTZmNTA0ZGRkM2IxOGM5Y2M5MTUxYWJiZTU4ZTMifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L280-L298",
+          "version": "repo-lines-v1:sha256:35143c57e4b13544565f2e1bd3fcdcc2beb0fabf9ea4ce155913ff9bd5a01354:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0YjU5YjgzZjdiNzZlOGIzOTkzZDcxMDg3N2E0NWFhYThiMWY0NGE5N2MyZGZmNDc1MDQwZWE3YWQ3ZWY2ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhNTU1YzhhYmEwZmM4NjNhMGMwZTI1YjZmM2Y5YmJkZjJlNTg0MWQ2MmU5YWQzYWZhYjExNjg0ZjYyMDI5YmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmYzJiNDljMDhiZjFkYzRkNmJlMTg5YWYwY2I5MGNjODVmYTk5MDVjNzQxNDVlMTFhM2FiODdjZGU2NDk0MGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2NzE5ZDNhZGRkZjQwYzQ3ZDQxM2RlNzgwZGRiMWJlMTUyNzg2ZDIzMWUxZTJlM2MwNThjMzc4NzIxMjU5YjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_170b21a4304643778bc3e6103d747067",
+      "statement": "The relay is intended as transport rather than a data processor: keepalive messages contain no browser state and the extension is reactive, answering explicit requests and returning structured results rather than publishing ambient state.",
+      "evidence": [
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L167-L170",
+          "version": "repo-lines-v1:sha256:14e576380ddc9dc0d54c994923133390a84c638c0c340653bc41addc302dff13:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZGVhZjA5ZGQ2ZGIzMzc2MWEzYmJlZTc0Y2Q1M2YxY2ZlNTVjMmE1ZmNhYjQ5MTJlZThmNzUzZmI5ZWQ2MzdjMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZGNhZmU3MGZjNGQxZmU1YjE5MzBiMTUzOWYwM2E4ZTU0OTE3MTM2MjVjODE3YWQ0ZjA3NThlN2M3YmQzODk3ZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWM2MmU0MTc5OGU5ZThkMTg5YTc0OTA5NTQyOGUzZWQ3NjdhMmVmMWY2MjU0ZjUwMjkxODQ0ZWFlNjA4ZjM2NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzBhOTgwYWQ3YjQ2YTI3OWM5NDAwMDQ3M2QxNzM3OWZmMWY2ZDgwNGUzM2E5Y2RhNTVjZDI4ZWNlOGYzNTc1ZSJ9"
+        },
+        {
+          "resource": "repo://docs/security/SECURITY_GUARANTEES.md#L56-L62",
+          "version": "repo-lines-v1:sha256:ff42be3fc6221234439e94fb6579d1adcaa2bfa0aede33adfdbec7877f676806:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTFhN2ZlZmQyOTE1ZmEwZTZmMGE3MGZiNjZmMzMyZjA1ODFkMDkyMGM4NTM4ZWNkZjhjYzk0YWRkOWVkZWI5YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEzNTM1YzI5NmI2MzMwYWU5ZTkwMmViYjA5OWU1MGQxMTUzZDhlZjE2OGQzNTZhYTMzZjViMjdmNTRkMTM2NiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_a6d605388bb44ae386012ce91feacfff",
+      "statement": "AGENTS.md requires an ADR before implementing changes that alter authentication, authorization, privacy, storage, a trust boundary, browser routing/targeting/lifecycle semantics, a product capability, or a cross-package protocol; security design choices must be re-checked against the security docs first.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L57-L72",
+          "version": "repo-lines-v1:sha256:28998c19abe1dc3d2aa1b84a380167acadfa843717e735bf8f5dccde98dfacd0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhOTU4OTJjN2E5NjIyYzZjMmI1ZGM3MjE1YjBiMGNhNTYzNWRhOTM4M2Q0NmI1Zjc0ZjE5MWUwYWQxNzg1M2MiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU3NDIyZjE4ZTk4MjIxZTIxNjg0YjBjYmYxNWFiNDRjNTY2YTJmNGMyMWQ2M2Q0YzI2MzgyOTkxZDZiYzEzNTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MjRiYmQ2ZjdmM2VlYzVmYWNkMjk0NGM4YzQ4YTI0YjA1ZGM3NTNlNTFlZTU0YmZkNjAxOGU4MmM4ZDU0ZjIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}

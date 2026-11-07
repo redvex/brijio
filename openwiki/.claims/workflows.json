@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:c195b0e37f569e0cfed2bce9a1c1dc5539523e95258711c621bdcdd32a15de60",
+  "claims": [
+    {
+      "id": "claim_59c90851de354e72a4243d71de5df740",
+      "statement": "The root package.json defines top-level commands build (pnpm -r build), test (pnpm -r test && node --test scripts/*.test.mjs), check (pnpm -r check), lint (pnpm lint:ts && pnpm lint:md), dev (node scripts/dev.mjs), dev:ws (tsx watch servers/websocket/src/index.ts), dev:mcp (tsx watch servers/mcp/src/index.ts), token (node scripts/brijio-token.mjs), and serve:test-pages; it requires node >=22.0.0 and pnpm@10.32.1.",
+      "evidence": [
+        {
+          "resource": "repo://package.json",
+          "version": "repo-file-v1:sha256:7504154c7e56d2117d5479c1785a05d41dde7319b2a8efff0ceeb938ddc4ae6a"
+        }
+      ]
+    },
+    {
+      "id": "claim_15231e303f624e38b90261f0cbfa5803",
+      "statement": "Each workspace package defines build, check, test, and (where meaningful) dev scripts invoked via pnpm --filter; tests run with node --import tsx --test src/**/*.test.ts, and the MCP server adds prepublishOnly while the Chrome extension adds pack.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/package.json",
+          "version": "repo-file-v1:sha256:ac6d5cfe2479a496ba371a43fcc938360dd80af2721a47c7e7ec16db99e18447"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/package.json",
+          "version": "repo-file-v1:sha256:9efe4448a67a3245dd38dab21dd8fbf6d22036fcc879ad8101f4942a2989315a"
+        },
+        {
+          "resource": "repo://packages/shared/package.json",
+          "version": "repo-file-v1:sha256:1c4f41b8a323a400d9950d789f144e7ca6ee484c1846f9d7bfac2bc9be03c026"
+        },
+        {
+          "resource": "repo://servers/mcp/package.json",
+          "version": "repo-file-v1:sha256:fb05f369ae4a742448dd044462e41529fa6a4a63727b9ee16c43bf05b941a9f4"
+        },
+        {
+          "resource": "repo://servers/websocket/package.json",
+          "version": "repo-file-v1:sha256:5815340302c1b9bcfc6c19ba65302edc1152943605bce8e6cd422362eb26414c"
+        }
+      ]
+    },
+    {
+      "id": "claim_726cb21c512b48cb96f49fe53be12463",
+      "statement": "After a change, run the smallest verification set per domain: pnpm --filter @brijio/<domain> test and check for shared, websocket, mcp, chrome-extension, and safari-extension; cross-package changes run pnpm test and pnpm check; before a PR run pnpm lint, pnpm build, pnpm test to match CI.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    },
+    {
+      "id": "claim_fcb28192887f40fea3b0e86bf487bba7",
+      "statement": "Docker validation is used only when container or runtime behavior changes, and profiles/commands must be derived from docker-compose.yml; the compose file currently defines runtime, legacy-runtime, and test profiles where test is a static nginx test-page service, not a containerized test runner.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://docker-compose.yml",
+          "version": "repo-file-v1:sha256:bd2d87c56b9f726afa5de556e8041743e3dd8d05295fd9786f0ce58389ac2367"
+        }
+      ]
+    },
+    {
+      "id": "claim_d8eec4d541a4424fa1ec8baf5101e33c",
+      "statement": "Behavior changes use TDD: write a failing test for the expected reason, make the smallest change to pass, refactor only when necessary while green, then run verification; for non-behavior changes use the narrowest applicable formatter, linter, build, or direct inspection.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    },
+    {
+      "id": "claim_0f7b75427e81402bbcff71fd98b4190a",
+      "statement": "An ADR marked Proposed (with Mermaid when architecture/message flow is relevant) is required before implementing changes to a product capability, cross-package protocol/schema, architectural boundary, auth/privacy/storage/trust boundary, browser routing/targeting/lifecycle semantics, or a materially architectural dependency; wait for explicit user approval before implementing.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    },
+    {
+      "id": "claim_d26479390b8c4ae98dbabe87c9be9a30",
+      "statement": "Before assigning an ADR number, list existing ADRs and use the next unused number; never reuse an ADR number; after approval mark it Accepted, and record superseding/superseded relationships when a decision is replaced; do not leave an implemented decision marked Proposed.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    },
+    {
+      "id": "claim_de4cd10224b6432e9527fe34d610f9b1",
+      "statement": "servers/mcp/src/integration.test.ts is the canonical full-stack test: it starts a real createWebSocketServer and real startBrijioMcpHttpServer pointed at it, connects a mock extension over a real WebSocket that authenticates and announces presence, and drives real MCP SDK Client tool calls over StreamableHTTPClientTransport, exercising the full path from MCP client to HTTP to MCP server to WS client to WS server to extension.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L1-L18",
+          "version": "repo-lines-v1:sha256:062e6137bc593276d92d041cdeea7afa874321910991c9aa0a7fbb081492abb5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhZTM5MDJjM2ExMDEyNzU1MzI1M2Q4YmI5NmMyMzc2ODkwMjllOTUyNzNjNjhhNzQ4OGI2MzUyMjVjNTcwZjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk5ZDg5NDI5YTk5N2Y1ZDliZWFiNjZhOGE3YWEzMDhmMzI3OTljNDA1ZjIwNTVmYTkxZWIzY2VlMjgxN2Y3NjQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L318-L370",
+          "version": "repo-lines-v1:sha256:05f56fd4d19372838d6cb92f3f2f59193d1fd08563bb2504145c0795b51613a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUxYzVhMGZhYTJlYzIxMjIxMjQxODhkODlmODBhMGYxZGExYjY2NmMxMTAyNzBiMTNiY2I3YTY1YWQzNmFhYzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU0ZWQwZWFhZDkwZGQwYzU5MTg4YzI5ZTUyMjg1N2FlNmM1OTI1NDFmZTE2NjUwYWRjYjcwYWIxZDBkZjU0NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQwOTVjMzdiOWNkNzRmZDI3YjcxOTU1M2Q1YWM0YjgwOGUyYTBiNTk5NGU1M2Y1Zjg1Zjg4NzhiMjFkYzNlYmYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f2aff13f9f9b44d9b622dcc7c143192e",
+      "statement": "The integration harness exercises error flows across the stack: unauthenticated MCP requests return HTTP 401, read_current_page and navigate_to_url return browser_unavailable when no extension is connected, and navigate_to_url returns unsupported_scheme for an ftp URL without hitting the extension.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L26-L42",
+          "version": "repo-lines-v1:sha256:30177e0d773e20f4f123089146a6a8d767e30a08bad57075eb45e6b787980306:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1MTIwOTI3NzNmZGM0Yjc2ZmQ5ZWJmMzZiYTFlMmVlNjdiNTUzNTZkZjBlZGQ4NjE2NjMwYmI5MGU5NGQ5ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2MTU1MjViMDRhZTEyZDIzYzgwODIwNGFlZGVhYjhhY2Q1Yzk4NmE2MTI4ZDBjMzU5ZjcwODAwM2E0MWI1ZDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjcyZjY3MTIyZTdjYzllODI0OWZkYzU0Njg3ZDUyZGM0MzZhNjYwYTc4OWM5ZjNiYTQ5ZTQ2MjAzNjFiMTVhYzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2MGFhZTU3NTU2MTEzMzQ0YzE2MzZjZDcxOGFhNDczMmRmZTdjYTFmYTMzZGM0MTAyZGYyZTQwODM1ZTVhMTMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L302-L320",
+          "version": "repo-lines-v1:sha256:6dc9caa1a2d8536490bd574178105dbe7b209e06fceff21e047b5e3860de2d7a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4ZmU0ZDUxMTIyNWUwZjE3MjM1NGIzMmY3YWFkZDUwOWQ2ZDQ4MTU1MmQ3MjY0Mzg5MzVmYzQxYzQ2NzVkZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUxM2ZkZGE3NDNiNzIzYWM1ZDQ5ZWQ3NzYxNWYxNmMxMmY5NDFkZTA4ZjM3YjM0YTQ4ZTRhOWY2YjVlOWIwZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE3YzEwMzg1ZDc3MDM0NTVkYzBiZTkwMjE2MDVjMjM0OTc3YTQ4YjE3OGQ4Y2EyYjA0NTc2YTU0MDQ0ZjczOWIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L336-L358",
+          "version": "repo-lines-v1:sha256:7a953914b2954478b5bde9d21e2754afa156704b815cea4567e24e327889809a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkOTVmNDQ5ZWEzMThmNTc2NjMxYmEwY2UyOWNmOTUyM2ZlMmRlMTAxYWVhNjM5MDU5MDk2NDdhNzY2MzUwN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlM2I3ZTc2ZGQzY2E1MTI1Mjg3NWI2YTQ2ZjY2ZTk2MWU0NDU4YTU5NjNhMWMyMGUwNzA4NGNhZTE3OTIyNjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzNjY5NDRhNzQ3OGM5ZGIxNmI0MDk4YWUwNzUwMzk5MmY2YWMzYTRmMzI0NDBlZjMzZGM2ZjQ5ZmE1MGUyNDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5OTdjYzMzZDdlODQyNzFlZTE0NThiZmIxYTdjOTc3ZWVhZjI1MDdiZjFlMGYyODNlYjMzZWU4MGY4MzMzNWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2245065fe88142b6820b6141a175fe5d",
+      "statement": "The mock extension in the integration harness answers forwarded requests with fixture responses (page_context_response, action_result for click/write_text/set_checked/select_options/submit_form, navigate_to_url_response, page_content_response), while the WS server itself answers list_browsers from presence data rather than forwarding it to the extension.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L44-L62",
+          "version": "repo-lines-v1:sha256:42fa0c5e52ea777ed3bd78d02eb53e135030ac9ee7b1886b672d56cc7e991659:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0YmVhMTJmZDA5ZTM5NzU2N2UzNmI4YjAyMmExMTQ1ZmM1NmZiMmQwOWVmZGUzODNlN2M0N2VkNzFhMWU0NTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwMjM4YTc0Yzc5ZTg2NTZjNjFhYjBiYjhjZDQ5MGMxOWQxMGZhZjU3NTQxMDdmNWQyMjNlN2EzMDYxMmZiM2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzNDMwOTBlNGIyNThhZDQ3ZGQ3MjFhNzAyNjRmZjQ4ZTIyZDEzMzkwZTFjNjJlNDE2YjViY2EzYzQwZTk1YzUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L519-L545",
+          "version": "repo-lines-v1:sha256:d8a8abf94fe2866f7946a66982449883cd7aad7c82ec152da37b483ecbb418cc:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxNWU4ZGNmMTQ1M2VkM2U0ZmE4NmNjNmY3ZTQ1ZjhiMDkzMWM3ZDE3ODBhMjVlZGQ5NWRjZDk4NzczMzg1YjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkNDJkOGE2MTc4MDNjZmRiNjljMGEwODQzZGNiMWFhYzZjYTAyZTY5YzlmYWU0M2ZhM2RiY2RiYTU3MjFjNzEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUyYWFhNzBlZDg0OGM2Y2VlNWRjNTk5MjJiMGZhNzhhM2UyNmFmMzA5NmJjZWZkZmFiZDYzMzFlZTI5YjBiYWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxNzM4YTk3ZDI0YzE5NWRhMzVhMTA3MzAzODhmMTk5NzI5MDg1NTA4MjRlOGZhZmU1NzJmNTBhNTU2YTllYjYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b1f82d2f813f4274a1049d1fcdbefef4",
+      "statement": "Ownership boundaries are: shared protocol shapes and browser-agnostic behavior in packages/shared; relay auth/presence/routing in servers/websocket; agent-facing tools/resources/prompts/skills in servers/mcp; browser-specific integration in clients/extensions/chrome and clients/extensions/safari with adapters kept thin and shared behavior shared.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    },
+    {
+      "id": "claim_2f1c4103882d41f2a4c931077d63f5d8",
+      "statement": "The repo threads tabId explicitly through every layer and requires explicit per-call browser and tabId targeting; do not introduce hidden selected-browser or selected-tab session state, preserve the documented active-tab fallback when tabId is optional, and re-read page context after navigation or mutation that can invalidate short-lived target IDs.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    },
+    {
+      "id": "claim_a787f1dbd92b4c99ba557f73b0139afa",
+      "statement": "When changing a protocol or browser capability, check the full path shared protocol -> WebSocket relay -> MCP surface -> shared controller -> Chrome adapter -> Safari adapter -> integration tests; keep protocol definitions in packages/shared without duplication, and when tool behavior changes update its tests, MCP registration, skills under servers/mcp/skills, the capability matrix, and relevant OpenWiki workflow pages.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}

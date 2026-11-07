@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8b122dfebc3ae4650c6d7f4441b0d10afd235dd855ffe526c67eb70a6aadbb91",
+  "claims": [
+    {
+      "id": "claim_9a1c492a513f4304b62ee28d7fd532d7",
+      "statement": "Brijio is a pnpm TypeScript monorepo that connects remote AI agents to the browser session a user already controls through an explicit Agent -> MCP Server -> WebSocket Relay -> Browser Extension -> Browser Session request/response chain, without launching a separate browser, cloning sessions, exporting cookies, or streaming screenshots.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L1-L60",
+          "version": "repo-lines-v1:sha256:6f49b78575e60f4edf93454d99cdbd9f076007c8d730c489f2b412e52a1f2672:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3NDQxZDEyMjA1OWE5NDJiYWQzZWQyZjhlMDQzODM1NzAwNjY1YzY1YzkwYjdkYmQ2MGNiYTk0MWU3OGE2NDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA4YzIyOTlkOGMzNzI3OGU4MjU3NDVmMDQwZWFkZTcxMmQyMzIxYWE2ZDhlMmU5MjJiZDg1M2RmYWQyNDJlY2YifQ"
+        },
+        {
+          "resource": "repo://README.md#L1-L40",
+          "version": "repo-lines-v1:sha256:84f1d0cbf45d91480e33afbf2e5526fc4b605309696f53ba96f8f876abd6d7e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIxZGE3MTFlYTA5ZDY2Mjg3MTc0MDE3YjMyODVkNmVjM2VlNTRlNGFkMWU4ODI3MmVmNjk5OTljOWYxZjdhNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE2NDNhMGFjNzU1ZDNhMTFjOGYyMzhiZDA3NWE4NjBiODZhMGFlNGNjNmI5MzZiOTkwOTc1Y2RmNmZjOGZhMTYifQ"
+        },
+        {
+          "resource": "repo://package.json#L1-L32",
+          "version": "repo-lines-v1:sha256:7504154c7e56d2117d5479c1785a05d41dde7319b2a8efff0ceeb938ddc4ae6a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c262eec5612a4b8ab3d634290df07f45",
+      "statement": "The browser extension connects only after explicit user action and agents must ask for browser state or perform actions through the MCP server; there is no continuous streaming of screenshots, page updates, DOM changes, or browser history and no background surveillance. Browser state is available only while the user-controlled extension is connected, and every read or action is initiated by an explicit MCP tool or resource request.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L24-L50",
+          "version": "repo-lines-v1:sha256:9fccd81ade6584967a93dcd60b9d84ac91deeafcb5b47517057eb599134ff197:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZkZmY0Y2UwYWUwNDdjNjNkNGQ4MDRmMDNhYWQyOTI0YmJjMDk1ZTdmOGFiMTUyNzUwYTc2YzJmM2UwZjI5ZjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAxNDFiOGNhMTNkM2FiMDIxZjlhOGJmMGYwYjU4MTVlNzMxMDk3ZmViODBjMWMzZWY3M2NkNmVmOGU1MTMwOWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjczYTg3ZWQwOWE2MjQyMzk3MTczODc3MTViOTVmY2RlMTQ3MDliOWM2MzJmNTNmZjk1ZTFiM2FkZjhlZWZmOWIifQ"
+        },
+        {
+          "resource": "repo://README.md#L42-L92",
+          "version": "repo-lines-v1:sha256:cfc24e4fd128ceada680f70f733b6266b69f4f3ad5699c61b572f4d53e695d6e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkZmRkZTk3NTQzMGI0YzFiYjRmNjY1ZGY2MjZkYTI2MWZjYmQ5YmFiOGJkYzU2NWI4MTQ3YjJiN2M3N2Y4MjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg0NTQ2OTUyZDJmYTAzODI2ZjRhNTkyZjkxN2I4Yjk1NmIyNDlhNDg4ODhlMWE3NGI4YzllMmZlYzI4YjhkODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ee720239a6954425ad75dc1e9c9dec40",
+      "statement": "The four source pieces are servers/mcp (MCP tools/resources/prompts/skills for agents), servers/websocket (relay authenticating with the local pairing token and tracking runtime-only presence), clients/extensions/chrome and clients/extensions/safari (thin browser adapters over shared logic, with clients/extensions/firefox a reserved unimplemented boundary), and packages/shared (shared protocol envelope and browser-agnostic page-reading/background-controller logic).",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L64-L90",
+          "version": "repo-lines-v1:sha256:60d0c98efdb76ab8a04648dd30861d238d9ca885abc82aba469b985de0810a99:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMGZkMTUwYjQ5ZjAwZGRiMGM4NjAxMjU0ZTU0MWU0NWU4YzNjYWEzODMzMThmZGY3M2Y1YmE3NzJhM2U0MmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4YzIyOTlkOGMzNzI3OGU4MjU3NDVmMDQwZWFkZTcxMmQyMzIxYWE2ZDhlMmU5MjJiZDg1M2RmYWQyNDJlY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMGM2N2ZhMTNhY2VmMjM0N2Q1ZThiMWUwMzRiMGIyNmM0MGE2NmRkOTJhNzc4N2Y4MjcyODY0NTE4MTRhYjcifQ"
+        },
+        {
+          "resource": "repo://README.md#L490-L570",
+          "version": "repo-lines-v1:sha256:3c6f6ff04af2ac3fc471e6a0ee0473d65499dd617dec2aee41e14218443491af:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY1MmQ3MTExMDNkNTBhNDM3ODMwYzZmYmNkMDRmYjRiYWI0OWEwZjgyZjZkMjZkMWM3OTFjNmU4NDg4ZGQwOTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0NmQ0OTBmNmJkMTcxNzI1YWE4YzcyNDQzN2RiNTQ1NTQyZmQ0YmE2M2NlMzI3NTM1ZTNlODQ3ZmI1OGEyMTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEwNTMzMzI1MDFkYTRhNzA2OTkwMjU2ZDJiYmJiYzRmMTkwYzYzMDljMzUxNWM0ZDkyMjY1MjUwNzY1OTdlNDAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMwYTVlZWYyOTU0NTNjMjQ3ODFlMmRmY2JkZTMzYzBjMzVlZjBhOTM2ODI5MmFmNzdiZDBjOWZmMTlkNmY0MGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8f503615ab454cec8e797132b5ed13a6",
+      "statement": "docs/project/CAPABILITY_MATRIX.md and docs/project/ROADMAP.md are the product contract for what is implemented, planned, experimental, or intentionally unsupported, and docs/architecture/decisions holds ADRs required before implementing changes to a capability, protocol, boundary, auth/routing, or trust assumption.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L12-L22",
+          "version": "repo-lines-v1:sha256:bc2a9daec13455cbd8496a80f003af14761cdaeb8f537c0824abcac43c71aff4:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1NWRkYTFiOWZkNzU3Y2Y0NTNiZGQ3OTMxMzNlZjE0NTQ2Y2Q1NTY4OGIwYWNhMDIyNzE1MGZhYTBjMTM0YzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2YzI5OTA5MzgwNTdlODFkMGMwOTllOWNlOWJlMzc2MGYwNTAyNWIzMDIwMzk2MzU3YTRjYzNiMzdhMGRmYmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyMjc2OWRkZjdhMDlmZTc1MDM4OTRkNTI4NWU5NTg2YjA2ZTNjOTBjZmZkOGUwNWI1Njk2MWZjN2QwODFkYzYifQ"
+        },
+        {
+          "resource": "repo://AGENTS.md#L52-L100",
+          "version": "repo-lines-v1:sha256:190ff9dc23de3469c57a98890e2ed7d69b678d1a58238f89e83e331b5cf36a71:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5ZGNiZDAwMWZlYmQ2YjMwZjJkY2E5ZDRiYjgxZTNmMDJkODhmN2M2MzAwYzRmZDllNzY2ZjQyOWMzN2VlNGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2MjI2YTM1OTE2ZGYyMzhiZmI1ODgyY2RhOWY1NjJmMmZhYzhmODY3OWM3NDg2NDc3NWJmODcxNzc3MjVkNWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0NTU3NTgwNmIwZGJlNzNmMDE2OWZlMDI0MmVkYTEyNTI5ZGY3ZjRiYTEwZjQyMzBmOGQ0MmRiNzdlOWI1MjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkNjdkYmNkMTU1ZGU0MGNkOGVlMzdkMzc4YTllNTNmNzk4ZmI1ODg3OTJmYzBkZGE1ZDg5NmE1MTkyMWQ0ZDQifQ"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L1-L30",
+          "version": "repo-lines-v1:sha256:02ca103fa8bb7636eb32b008abf02a00e34d2a0f96bf60739b4353b477459686:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ZmQ3ZmM4ZjgxMzBjMTYxMDMyOWMxOTdmNzY5NTlkOTNiNTg5MDBhZTAyZTg3YzdmYjRiY2VhYzE3NjgxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNkY2YyMDExOWY0YWY1ZWMwNDFkMGZkYTMxZGRjMWUzYjYwNmY1MDEzNGQzMGZmNDg3YjgxYzg0YzQ5ODVhODEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjMzM5YWMyMzI1NmEzZGJlYzkwNDBmMjk1MDc5YzZmNzg4NDM4ZGVlMzI5MGQyZGQ0YWM5NDlkMTQ1OTM4N2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3e1822e624d47f2b3d59a041e86024f",
+      "statement": "For changes touching multiple domains, update the shared protocol or ADR first, then the relay/server, then the browser adapters and integration tests; the cross-layer path to check is shared protocol -> WebSocket relay -> MCP surface -> shared controller -> Chrome adapter -> Safari adapter -> integration tests.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L64-L90",
+          "version": "repo-lines-v1:sha256:60d0c98efdb76ab8a04648dd30861d238d9ca885abc82aba469b985de0810a99:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMGZkMTUwYjQ5ZjAwZGRiMGM4NjAxMjU0ZTU0MWU0NWU4YzNjYWEzODMzMThmZGY3M2Y1YmE3NzJhM2U0MmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4YzIyOTlkOGMzNzI3OGU4MjU3NDVmMDQwZWFkZTcxMmQyMzIxYWE2ZDhlMmU5MjJiZDg1M2RmYWQyNDJlY2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMGM2N2ZhMTNhY2VmMjM0N2Q1ZThiMWUwMzRiMGIyNmM0MGE2NmRkOTJhNzc4N2Y4MjcyODY0NTE4MTRhYjcifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}

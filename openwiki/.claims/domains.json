@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:0655675117fa75bda8758fb70672af1d9565bc9413ccf4fd3370c99fc492a83e",
+  "claims": [
+    {
+      "id": "claim_2b799d4e653b4870b0268f928c7cc233",
+      "statement": "The shared protocol domain (packages/shared) owns the data model and reusable browser-agnostic logic that both servers and browser extensions depend on; its protocol.ts defines the WebSocket envelope, auth/presence messages, browser capability names, browser presence metadata, tab-listing shapes, staged file upload messages, and download/fetch status shapes, and protocol definitions must not be duplicated elsewhere.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts",
+          "version": "repo-file-v1:sha256:317ae9eab9874132cf13f138c38f1a7d2957da3ca3127c8e6824b9d6110cc0ba"
+        }
+      ]
+    },
+    {
+      "id": "claim_8f7c4d8b24114ea49b1c853fed8a5f06",
+      "statement": "The WebSocket relay domain (servers/websocket) is the transport and routing layer that authenticates MCP and extension clients with a local pairing token, routes messages to browser instances in the same token scope, and holds only runtime presence that is removed when the socket closes (never page URL, title, content, or DOM state).",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://servers/websocket/README.md",
+          "version": "repo-file-v1:sha256:88b8c545a134b6e3cbf4ea7291d39dd15e9d412dd6ff40f12a4d54b3679efc37"
+        }
+      ]
+    },
+    {
+      "id": "claim_23d8e2b859f84d588a19d2d567c71d6e",
+      "statement": "The MCP server domain (servers/mcp) is the agent-facing surface exposing browser resources, tool calls, and skills via the Model Context Protocol, reaching connected browser extensions through the WebSocket relay, and also ships a demo site under servers/mcp/demo and skill markdown under servers/mcp/skills.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://servers/mcp/README.md",
+          "version": "repo-file-v1:sha256:817b3a3b403483cb0b770a07c609a7ef067582f08225e337f94982e328ed672e"
+        }
+      ]
+    },
+    {
+      "id": "claim_a37d16365e5448c5b0a6415fbc3579e4",
+      "statement": "The browser extensions domain comprises clients/extensions/chrome and clients/extensions/safari as thin adapters that share the same product rules (user-controlled activation, explicit request/response, no continuous streaming, page context before content, short-lived action target IDs), with Chrome the first implementation and Safari a parallel implementation with platform-specific manifests and MV2/MV3 differences; clients/extensions/firefox is a reserved, unimplemented boundary pending a future ADR.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/README.md",
+          "version": "repo-file-v1:sha256:c3192aa6aa576be50fed351ec4f05727ecfd34c57fc4599f5031d9bad9787b54"
+        }
+      ]
+    },
+    {
+      "id": "claim_85dcd4c598e242be82bde2342c9e5b3e",
+      "statement": "The product/business framing domain (docs/project/CAPABILITY_MATRIX.md, POSITIONING.md, ROADMAP.md) records what Brijio is for, positions it around authenticated browser sessions, privacy, and explicit control rather than generic browser automation, and is the authority for current capability and per-platform support status.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md",
+          "version": "repo-file-v1:sha256:c64326414b87af620985e8df9bb94e1825d9fbb09790dc0459e069953c1c9b24"
+        }
+      ]
+    },
+    {
+      "id": "claim_476852419b26413ead8d3dbcb692ec9b",
+      "statement": "The security/trust domain (docs/security/THREAT_MODEL.md, TRUST_BOUNDARIES.md, SECURITY_GUARANTEES.md) documents trust assumptions behind the bridge and the reasons the project avoids credential export, browser cloning, and ambient browser surveillance.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md",
+          "version": "repo-file-v1:sha256:3834ef41b7cfab6d8f74090137951457198afb0a14be8c7e2f80b629dbc08e4e"
+        },
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md",
+          "version": "repo-file-v1:sha256:9d602d167bc17cbe51fe47ac973dd2dfc7cdacbbad271b23f2ec64df9bf63482"
+        }
+      ]
+    },
+    {
+      "id": "claim_be137dc275c94a5aa87e1341a660fcfc",
+      "statement": "The docs/design history domain (docs/architecture/decisions, docs/artifacts, docs/project) records accepted architectural decisions; an ADR is required before implementation when a change alters a product capability, cross-package protocol/schema, architectural boundary, authentication/authorization/privacy/storage/trust boundary, or browser routing/targeting/lifecycle semantics.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0001-initial-project-skeleton.md",
+          "version": "repo-file-v1:sha256:3047a4c4fb38db20d28dd30587a2d9560dcebd45788874400d1d065ece03701a"
+        }
+      ]
+    },
+    {
+      "id": "claim_3c6e087c6d1040d6b17e74abe3a8838d",
+      "statement": "For cross-domain changes, AGENTS.md prescribes checking the full path shared protocol -> WebSocket relay -> MCP surface -> shared controller -> Chrome adapter -> Safari adapter -> integration tests, updating the shared protocol or ADR first then the relay/server then browser adapters, keeping protocol definitions in packages/shared, preserving explicit per-call browserInstanceId and tabId targeting, and updating tests, MCP registration, skills, capability matrix, and OpenWiki pages.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}
