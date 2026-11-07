@@ -1,0 +1,310 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:5de64299e0495db269e830d6cb539bfbf1324e4ccab94ddab03e2a9851f2cfe6",
+  "claims": [
+    {
+      "id": "claim_7963cda53c6a4478835ce2ab64bf7d41",
+      "statement": "Brijio configuration is environment-driven via .env/process env. Key variables include WEBSOCKET_HOST/PORT (0.0.0.0/8787), BRIJIO_WS_URL (ws://127.0.0.1:8787), BRIJIO_REQUEST_TIMEOUT_MS (5000), BRIJIO_PAIRING_TOKEN (auto-generated), MCP_HTTP_HOST/PORT/PATH (0.0.0.0/8788//mcp), MCP_HTTP_AUTH_TOKEN (auto-generated), MCP_HTTP_ALLOWED_ORIGINS, and TEST_PAGE_PORT (8080). Tokens are generated with crypto.randomBytes(32).toString('base64url') when unset/placeholder, and BROWSERBRIDGE_* names are accepted as backwards-compatible aliases resolved via a fallback chain.",
+      "evidence": [
+        {
+          "resource": "repo://.env.example",
+          "version": "repo-file-v1:sha256:c1c65a13599dc3d5c783de920c260e577161069e8e8e040e88111f863f3a816c"
+        },
+        {
+          "resource": "repo://scripts/token-utils.mjs",
+          "version": "repo-file-v1:sha256:1701ac01e0179587bd2016a6c242e3f662ea340c0c8d26522ca3278cb5e32fb0"
+        },
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L80-L120",
+          "version": "repo-lines-v1:sha256:1ab7d2ab225a47ec5c6d773d53d1b46258e9e3b520a3a1e2330bb4f96eda6c8a:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhNTNiYTM1MDk2Njc2YzUyNDBjYzA4NDQ4M2ZlMDM1NjE3Zjk0ZjA5MGMyYTA5YTI4NjdjMDQwYWEzNjE5ZTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmNzc2ODYzYjNiZjk0YWMxMDcyMTg2ZTcyNzllMzhkYTlkMjZhY2M5YzAzZGU0Yzk2MWFmYmNiMDEzM2FhNTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxNDdjNzEwZGJiNWYyZWQyN2Q4N2I3MjQzMzNlZmFhMGZiNGEyNDcwNTYxMDU3ZTI2MjQ5YmMzNzQ4ODE2NzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7ec3eb042683443e85a0deed3dbaea23",
+      "statement": "pnpm token (and pnpm brijio) run scripts/brijio-token.mjs, which prints a freshly generated pairing token to stdout via the shared generatePairingToken from token-utils.mjs, noting on stderr that BROWSERBRIDGE_PAIRING_TOKEN remains accepted as a legacy alias.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L18-L19",
+          "version": "repo-lines-v1:sha256:6317dac4ac1a64c57e9e2fd5330da1e42e2c3b634880c7ff9d9fd0ca06be9f4c:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjMxYTJhZTE3ZGUxYzFkZTJmMzUxMTg3ZjM2NjU5NTMzMDVlMjExY2E5ZjYzMWM2ZGRkNWRiYWQyOTg0NmRkZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjRkZmZmZTg1ZmRlODM3YTc4ZGM5MjQyZDYzOTMzMTZhZWI4ZTUwMWIyYzRkMTk5ZjI4MGM5ZDY4NTQyYmMwMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMTNhNjM4NGI1NWMxNWFjN2IzNTYwM2IxMGVkZjM2MWY3YjcxZmQ2Y2FhZjNhYWZlNDliMjk0ZjE5OTlkYzMzOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmNiNmZlMTMxNWFiMGU4ZDg5MzcyNmIyNWY0ZDEyMjY5Mzk3NWIzYzMxYTU0ZjUyYzA1YzYyMTE0YmExMmM1NiJ9"
+        },
+        {
+          "resource": "repo://scripts/brijio-token.mjs",
+          "version": "repo-file-v1:sha256:9fb019eef8439f7d1199890da0c743d5c239a6839e24e2680c6eae68f9d9a0d0"
+        }
+      ]
+    },
+    {
+      "id": "claim_8f35e9216ea642e2854d02dc2d04cd66",
+      "statement": "pnpm dev runs scripts/dev.mjs, which classifies the .env (placeholders/incomplete/configured), generates tokens when needed, spawns the WS and MCP servers under tsx watch, polls GET /health on both (every 500ms, 15s timeout, probing 127.0.0.1 for 0.0.0.0 binds) before printing a banner, supervises children with a 2s-backoff restart (max 5 attempts), and performs graceful shutdown (SIGTERM then SIGKILL after 5s) on SIGINT/SIGTERM. Non-interactive mode is triggered by --yes/-y or CI=true.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/dev.mjs#L1-L40",
+          "version": "repo-lines-v1:sha256:69bd9e53d525c4bc34fdff86f90372ec588e4f310b83c5a1c87018c091983687:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA4NjU3NGI2OGQ3NGU0OWU4ZTU4MDA3MTM1MmY2MTlhMmFiMzRkNTNhM2NkNjE4MGM2OGQ4MmYxZGM4ZWRjNmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2OTE1ZThjNWIzNDRkMzc5NWVlYWY5MzA1MGE4MmNjNDYzNGRhYjk1ODJkMjJjNWNmNmU3NGFlOTZiOTEwYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQwNzdkNzg2NWUyMzQ2NTdjZmUyNmU4YTJlYzlmZmZjYjljYjRmODE0MTU3OGQ3YTJkNWI4ZTRlYTkwNDVlM2UifQ"
+        },
+        {
+          "resource": "repo://scripts/dev.mjs#L250-L330",
+          "version": "repo-lines-v1:sha256:f740c17d0d0e083928991c772556911194f6869f27e792e1ac4fa562c8e243fe:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1MjkyMzk3ZTlmNTMyMzZhMGRjMjk2ZmIzNjU0Y2E2NDY5NmI1MTczYTkxZTljMmUwNTIzNzZlODk1NDdjZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgwMGJlNDVmZDljMWU3MWRmOTlhMDRkYWY2NTFlY2YwM2QyZWFkNzYzN2I1YTVhNzEzOWZhOWY0ZjA5NTRiMmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjNDI4M2ZlNDZlMDQyMzQwY2YwMDg0N2JhZThiM2E5MTg0YzNlN2JiM2FhZWEyMmJkOThhNTUyOTBhZmZmZWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiYWYxMGJmYmMwNmE1NGM5YmQ1Y2I2NjIzMTcxNjAzZDM3NzgxNzllMGI5OTE1NDEyZWE5NzkxOTMzZTQ2YTAifQ"
+        },
+        {
+          "resource": "repo://scripts/dev.mjs#L360-L469",
+          "version": "repo-lines-v1:sha256:84c1f755c949baf507703785ee4b72387edf935f7b84c949a4cd7bbf7d18ce54:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkMTBiMzZhYTc0YTU5YmNmNGE4ODE4NTgzN2Y2NThhZmFmMzY0NmVmZjJiYjE2YzM5MjhkMGU5MzM1ZTk0NWQyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJhMjMxZTQ2YzM3MTU3M2M2OTNhNDgxNDBkZDU4MjE5MTFhNzU4M2I5ZWU1ODNiNDBlMjdiNGJjYTRjYzQzMDA5IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_6e8a6356934c49a78637fb40ce9a4854",
+      "statement": "The dev orchestrator's classifyEnv returns 'placeholders' when tokens are still the replace-with-generated-token/replace-with-generated-mcp-token values, 'configured' when both real tokens exist, and 'incomplete' otherwise. writeEnv preserves existing lines, comments, and ordering while updating keys in place and appending new ones.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/dev.mjs#L240-L260",
+          "version": "repo-lines-v1:sha256:c036c3195cf4a1c8eb64774b00d63e7af03892a2fa2e114e2160159a82bf446b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyNTc1MTg4NDdkM2QyMTU4NTc5MzQ2ODIyMTRmNGM2M2M0NjEzODZkNTlkZmQwM2RjMjE4ZmE1NDA2ZjVhMGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM4OGQwZDY4MjM2Yzc0OTdlNzE1OTNlYzYyODJiMmM4YzNmNmZjMjViMzc3MjU3ODQwNjRiZmVjZWE3ZGVjZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU3NDViZDIyMmQyOWY0ZjU1MTgwMTE2ODE3Y2EwOWM4YWFiMGJlZWFmZTc0YjY1Yjk5ZjFmNmM2MDg2NjNjNTMifQ"
+        },
+        {
+          "resource": "repo://scripts/dev.mjs#L55-L95",
+          "version": "repo-lines-v1:sha256:c2837d4ef4df58ea6c2bf79b9848230bab6cf80e01e81c4da003f7b489df0100:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkNmIyNmUyYTFjZDMyZWYwYzk5MjI4NmU4M2Q2YzU2OGY4MWZkM2I1MjA4NDRjYWNiOTJmM2I1ZmViN2QzZjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4MzI2NjYwYmRmMmM5NmRkOTVhZWFmM2ZmYzY1YjNhMjc2ZjdkODk3NDY5ZGQ5NTVlODFhNjY3MTgwYzkxMjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIyYmEzYzc2MzM1OTU0OTRmNDc4MDZkN2RhZjQ4MGIxMTlkNGFlNDQxYmI3NmQwMDg1NDVjZTIzNmY4M2FlNzUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhZmFjZDg0YjEyMDJiY2E4NTc3OWVlNTczMDIwNmUzNGM4YjQ2ZDgxZGE1MTEzMDY5ODAzMTcxNDQ1MWNkYzIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_84565a077a5b4a489638c05847a8b9bd",
+      "statement": "Both servers expose GET /health returning enriched status JSON (status:ok plus version, uptimeSeconds, and server-specific fields such as extension counts or websocket reachability), not the minimal body originally proposed; the WS health is handled by handleHealthRequest and the MCP health inline in handleMcpHttpRequest.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/http-server.ts#L127-L144",
+          "version": "repo-lines-v1:sha256:b17fa1e1868f87274c1d7c183bad7f76c1cd4a27627e751c813849649a64a5a6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkZGY3YTRiYWEzMGQzNjVmNWQ0ODM2YmQ3MGVkMzgyOGNkN2U4OTkwZmMwOGEwZDFkYjdlN2M2YjlmYzA2YzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0MWE4NjAxZmU3OTgwMGE2NmY2MWE4ZTVjY2NhNTcxN2E1ZTRlMGNjNmMyN2ZlMjE1NGY4MWViYjk1NmQ3MzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI4MWRkNzdhYTdjNmMxZGNlNzllNzQ4YmJkYzhlNGMwYjYxODA0NDIxYjExM2I5MWI2MmRjZGI5OTRhYTk1MDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5OTE0ZWIxMDZmOTYwNWQzOWZiZDllZDkyN2Y3NWViM2U5OWQyZDY5YjY5MzY3NDU3OGE1ZGE1ZTU2ZWIyM2EifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L601-L616",
+          "version": "repo-lines-v1:sha256:be70e524f5a152d63123d417aa0d89236f784a05574060e62d1f2a01988ac5c3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3YWM2OTYzZDVmMzQ3MjJhZGE5ZGZkODIwZDhjOTlhYzk5YmVhYWIzZWU3NDg3ZjEzODcwOGQ4ZTMyMjNhNzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRkNmE4NDRmMDc3OGJkMjBmNGYyZGQ1NzEyZjUwNjJkNmRiMWYzM2E5MTM2NjQ1OTZkZWZiNzc1MjgzNjM4MmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e3d52de22ccb4b538211cd73f41cf4b8",
+      "statement": "MCP_HTTP_ALLOWED_ORIGINS is a comma-separated CORS origin allow-list. Entries beginning with *. are treated as hostname suffix wildcards (e.g. *.ts.net matches device.tailnet.ts.net, *.local matches browserbridge.local), implemented by isAllowedOrigin/matchesWildcardHost. This is a routing guardrail, not authentication: the MCP_HTTP_AUTH_TOKEN bearer token remains required before MCP tool handling.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0025-tailscale-friendly-mcp-http-hosts.md",
+          "version": "repo-file-v1:sha256:af0b0e71b8c2500a527c621d98197739ef22e6b2902ee1d4bb846992908c9188"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0026-local-domain-friendly-mcp-http-hosts.md",
+          "version": "repo-file-v1:sha256:76b77a4a015bc0b65f8c42568cf07f1d612fb949ea13db29f9c98abb8cf4e683"
+        },
+        {
+          "resource": "repo://servers/mcp/src/http-server.ts#L306-L350",
+          "version": "repo-lines-v1:sha256:0c52381290936b222948412bb789387e699da58b8ac999bed75611b64d7a3563:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4NWI2MTllM2YzOWFjZjc4YTA5ZjY2YjY0ODE1OWIxMzQ5YjVkM2IzNDhhODA5NTUzYWM3MzkwM2NkYTBmZWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc5YWE2YzVmYTQ4OGIxZmFkMDVhN2JkYTQ4Y2VhZDhhMTVmMDgwZDdiMTY2OWQ2YWZkYzEyYzI5NDI5YWNmNTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcyMDU1YTdlYTgzNTEzNGVjMWQ4Y2Y3YTg2ZWQxN2JlY2I4YTlmMGNkN2FlOGM3YzUyZTY3MjIwMTI5NGZkYmEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e700cbccce314a4baf87e7b5493df481",
+      "statement": "The current MCP HTTP server implements only Origin validation via MCP_HTTP_ALLOWED_ORIGINS; there is no Host-header allow-list in http-server.ts. The MCP_HTTP_ALLOWED_HOSTS, MCP_HTTP_ALLOW_TAILSCALE_HOSTS, and MCP_HTTP_ALLOW_LOCAL_HOSTS variables described in ADRs 0025/0026 are not read by the current server, consistent with ADR 0035's proposal to rely on the bearer token alone.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0035-combined-docker-image-and-npm-package.md#L151-L160",
+          "version": "repo-lines-v1:sha256:69adb168f3105d29d7831a41223ac7ca7167212a80822bfe43d858b357e18c3f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwYjc4OWQ2M2FlZTFhNjQ3YTc1YmM5MzVlN2ZjZjIxNTUxMzIwYjVlYWYwMTM1Y2Q2ZWQ1MWVjNjE3MjdiYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU1N2ZlMGJkNjU1Y2JiZjI3OGRhYTg1YWQ5NDRjYzJlYmNkYTNlN2VjMGY1MGM1YWRlZTM0NDE4NjI5YjQ4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzNmIxMDQ1YjFiNGUyYmIzMjcwNzY4Njc2ZGY5NmIwY2E5Mjg5OWFlYmFiNGJiMDYzYjdkNTIyMmUzMTlkNWIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/http-server.ts#L100-L130",
+          "version": "repo-lines-v1:sha256:e4460d29841748b77f8a3fff88b1477e40ec4a109b17b6b1f29ab99b012a3a25:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwYTU1NmFkNTEzMzM4ZjMwNTM5MDQxODI3YjBkZDUzY2RhZDM2OTFmOTRhMzc0ZTI3NjUyNzI1MjIzYzNhZDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM4NTBkNDhiYjMyYzE1MjIxZGQ2NmI4MDFhMWNmMTY2MmY2ODJlOTBmOGIwMTlmYjdiNzFkNWEzOWNkODQzZDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhlMzUwZjdiNWNjYTA2ZDkxZmMyMjBiOWY3Zjc3NDMzYTE3NTE0MGM1MTAxNDA2YmI4MWIyM2M2ODVlMWI2MDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4NmQ4YWFkNDIzMzVkZjE0MWVjNjY5ZWEzYzc1NjdhNTU4NDVlMTQ5YzZkMDkzYzlhYzAxMWZkMTU5NGU0NWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_32ffc04f3b1c4ae0910fa7e758a8915e",
+      "statement": "The root Dockerfile is a multi-stage build producing a single image running both servers under s6-overlay v3. A single s6 longrun service (docker/s6-rc.d/brijio) runs `node dist/bin/brijio.js` (the combined entry point), registered in the s6 user bundle, with ENTRYPOINT /init, EXPOSE 8787 8788, and default ENV for hosts/ports/WS URL/timeout. Tokens auto-generate when empty and print to stdout.",
+      "evidence": [
+        {
+          "resource": "repo://Dockerfile",
+          "version": "repo-file-v1:sha256:a5e0892d31eafeb98671b88629aed450cc6e9e057934b697af09bcf3a2775792"
+        },
+        {
+          "resource": "repo://docker/s6-rc.d/brijio/run",
+          "version": "repo-file-v1:sha256:8bd266438a214682af22d039568e440bef96158b60011553e9d3f7dd65569a59"
+        },
+        {
+          "resource": "repo://docker/s6-rc.d/brijio/type",
+          "version": "repo-file-v1:sha256:d0001a150b83f68f09004c5059045cb76a3f064eed4d42ce072bc3722c118006"
+        },
+        {
+          "resource": "repo://docker/s6-rc.d/user/contents.d/brijio",
+          "version": "repo-file-v1:sha256:8c1ea03069e574c6d51fda2e18dca82c7f4fb91784a683a28569b64760d9ee27"
+        }
+      ]
+    },
+    {
+      "id": "claim_843845564d8742e8b077fece9e1bc479",
+      "statement": "In the combined Docker image the MCP server connects to the WebSocket server on loopback (ws://127.0.0.1:8787) since both share one container network namespace, requiring no Docker Compose hostname resolution. The image defaults to 0.0.0.0 binding because 127.0.0.1 inside a container is unreachable from the host even with -p port mapping; strictly local-only access requires npx or docker run --network=host.",
+      "evidence": [
+        {
+          "resource": "repo://Dockerfile#L70-L85",
+          "version": "repo-lines-v1:sha256:e9db94b416822885c794ebcfe3ef6e554f54c76c996c5941ee85c182f82e3e29:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2MmFlYTU2ZjVlNjc3OTcyNWJkZjMwMzVlZjAyYmJjOWJkOTU3NmFkYjBkNDQyZjZjZmIwZmFlMjQxMTk5YjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0YzhmNjI1ODJmMzJhNzMyYjkwYzI2M2FiZGZhM2ZiZjM4NTBmYWQ2MmRmN2EwZDVjNzVmOTkwM2ZjM2IxYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMzYjBhNzIxYTQ4Y2ViNzEyNDE1NjhiMDc0YjZiNjk1MjIwMzJiY2FjMTgzMDYzZTMxMjUyMTQ0NGI4MzQ0ODMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4MDdiNTIyZTUwZThjNDc5Y2I2MmE2ZjMzYTMwNzg4YWZiNzBkNTdiMjlkMDExOTVlMjU5Mzg5M2FlODQ5NjEifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0035-combined-docker-image-and-npm-package.md#L165-L185",
+          "version": "repo-lines-v1:sha256:304e5b0efd78cccb92ac17430d033edbf8978e75c0619c4c915a076df053993b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3YjZhNzMzZWZmNGFlZjhlNGZjNmM2Mzg1NzU1YmRhOTk1YWUyNjc0M2U1MTU4YmU5NjMxNWI3NWRjNTYwY2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU4MTExOGEzYTJhNzk4ODgxNWE1Mzk3ZjUwNjUyZDE0MjU5NjkzN2RmODQ3M2I1MmM3YTI5MzYxMTExYWY2N2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhhOGIyZTA2ZTE4ZGI5NTgzOWVjM2U5Yjk5MWNhNTAzMDU2OWI2ZTY5MmU4NWYxMDA3YTA1NTlmZTQ4NmI5ZjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlOTJiYmNiMGM5ODY3NzMyODdkMGEyNGU3ZDBmNmUyMTk5ZjkzNTBhZmJlOTk3M2Y1MDg1NDcxYWEyNmMzM2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ab61c3e493fa4d4eae2edc85472773a8",
+      "statement": "docker-compose.yml defines three profiles: runtime (brijio service, the combined image, ports 8787/8788), legacy-runtime (browserbridge service extending brijio), and test (test-page nginx serving clients/test-page on TEST_PAGE_PORT default 8080). Tokens and BRIJIO_REQUEST_TIMEOUT_MS are passed through from .env.",
+      "evidence": [
+        {
+          "resource": "repo://docker-compose.yml",
+          "version": "repo-file-v1:sha256:bd2d87c56b9f726afa5de556e8041743e3dd8d05295fd9786f0ce58389ac2367"
+        }
+      ]
+    },
+    {
+      "id": "claim_60508ba2e6ac447896f2209a2f6c12cf",
+      "statement": "The published @brijio/mcp package (private:false) exposes bin entries brijio and a deprecated browserbridge alias pointing to dist/bin/brijio.js, which starts both WebSocket and MCP servers in one process, auto-generates BRIJIO_PAIRING_TOKEN/MCP_HTTP_AUTH_TOKEN when unset (mirroring the pairing token to legacy BrowserBridge env vars), prints a startup banner to stderr, and dispatches daemon lifecycle subcommands and run modes (--dev, demo, --print-config, --doctor, --version).",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L1-L120",
+          "version": "repo-lines-v1:sha256:714a39f8ca5ee0058472187ac64bad55323cdf84dc42dfe0337a109d62a56bcb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhNTljNDc4NzJiNzFmMTI1ODk5NDI4OTI0NjRlNzY0YzBkYjM1MGMyMGI3MjIyODY0NTYxNWNjMzZlMGEwNzI1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjYTUzYmEzNTA5NjY3NmM1MjQwY2MwODQ0ODNmZTAzNTYxN2Y5NGYwOTBjMmEwOWEyODY3YzA0MGFhMzYxOWU4IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmMTQ3YzcxMGRiYjVmMmVkMjdkODdiNzI0MzMzZWZhYTBmYjRhMjQ3MDU2MTA1N2UyNjI0OWJjMzc0ODgxNjc3In0"
+        },
+        {
+          "resource": "repo://servers/mcp/package.json#L1-L20",
+          "version": "repo-lines-v1:sha256:a066fe01f67f5eee126cfb21d126160ae63d6eaa968b5a6d23c37d5a85d5e615:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA2MDJlODEyOTdkNTcxYmI1MGJiZDM4MmQwYWQ5ZTY5NmQzNzg0M2E4NGJjMjI4NTQ4YTZiOTc0NjdhZTYyZGUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba94cfe097d6421f93ccfcfa447590eb",
+      "statement": "brijio install [--ws-port N] [--mcp-port N] creates ~/.brijio/ with a mode-0600 .env (tokens generated on first install and preserved on reinstall, ports optionally overridden), a bin/brijio shell wrapper exec'ing the resolved binary, and a platform service definition symlinked into the OS location: a macOS LaunchAgent plist (com.redvex.brijio, RunAtLoad/KeepAlive true, WorkingDirectory ~/.brijio) loaded via launchctl, or a Linux systemd user unit (Restart=on-failure, EnvironmentFile=%h/.brijio/.env, WantedBy=default.target) enabled via systemctl --user. Daemon support is darwin/linux only.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0037-daemon-install-via-npx.md",
+          "version": "repo-file-v1:sha256:93cf33f6adcc600930e6a2ab14a4ca66c75b3e1cddfd1faaed534ac12b2cfd7d"
+        },
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L176-L260",
+          "version": "repo-lines-v1:sha256:8189338fc7917068843cee62930fae1628fb8d04263a86aa67e51250bad6bd7f:eyJzZWxlY3RlZExpbmVDb3VudCI6ODUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkNjg5YjIxMDZiZWRlNzZiNjRiY2M3NTVhZGFhYTVmNjFjMjUwZjNkNDczYTU4ZDIwYTdkNGU1MjUzNDA0MWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxZDI3ODY1NDk2OTNjNmNhMTI4NjY0MjUxNzcwNTk3ODdhMjJmYWExYmMxYWM4NGQxMmVlYjdmOWViN2ZlNDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRhNGY5NmM3ZjcwOGY0M2VjZWFmNGIxNGJmYWE4MmE0NGY3NmYxNTAwMGVmNWM3ZjhkOWI3Y2IxZGQ2MDg0MTgifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L440-L480",
+          "version": "repo-lines-v1:sha256:662f1d9a13e9c355712385c9fd938bad1b90f79b2016be791b76afb2613147bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2ZWVlZjg5ODRmMmNiZDVmMzM1ZmEyZWM2MzI4MjgyNTVlZjdkZDYzZGFkMDg4NDAzZTEwNTAwYjY3YmU2MTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmNDBjYjU1M2FmZDRlZWJhYmEyZTA2Nzk1MGVlM2RjZDEwMTNjMDc4OTcxMmQ2ODA1NDE0M2FjYTgxYjg4YTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUxOTAxMDVhOTFiNTA3ZDU1NWFiM2M5OTkxNDczMTgwMzJmZWYzNzkxZDA1ZDJiOGM5YWMzYWMyNWJhMDhkMzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2ce9dbfdd77e489d8884ed6ecf2dfd4f",
+      "statement": "Daemon lifecycle subcommands map to platform tooling: start/stop/restart use launchctl load/unload on macOS and systemctl --user start/stop/restart on Linux; status probes launchctl list / systemctl is-active plus both /health endpoints and reports config/binary paths; logs uses tail/tail -f of ~/.brijio/brijio.log on macOS and journalctl --user -u brijio.service / --follow on Linux. uninstall stops and removes the service link but preserves ~/.brijio/.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L280-L400",
+          "version": "repo-lines-v1:sha256:58e3ac0eb5dabf7984acb68f912ca5b8c3bd912d4491425227dc2132c91dbb1e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlOTIxYWNiMzczYzQzNzMwYWZhNTFiZGNjOTc4ZjMwZjZmMmI3ZGE0OTIwY2FmMzZhN2Y2NmI1ODIxODQ4Y2UyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJiOWYwYTNiZGY2NTRjZDE0OTAwNjUxNTEzMDJjYTJkNzhhN2M3ZDg4ZTQ2YWYxNjhhNDA3OWNmZDdjMTYyNzVlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0NmRlNmMwZGY1OGM3MGZjMGY5YjM5N2MwMjc3YmIzNDQ5MWE4ZmM5MjM4NTUzNTllNjI4MWZkYzllZWZlYjBkIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L480-L560",
+          "version": "repo-lines-v1:sha256:e8b589167fb71c81c4c4e6741fd8417cde1c53fc9948bfd1495abdc00acd7491:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0Njg3YTA2YjgyMjc3MjM3NmM4MzU1N2EwNmI1ZjI0NWVjYmFiYTJlMWE1YmEzYzUzMzc2NDY4MDIyYjA0NWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg0NWZkZmI0NGYzNTFkMzcwOWQwZTA1MGEyZWFmMTk3M2FjMTI4NGFkOTc5NWMwYTBjNzAwMGZiOGYxNDE4NmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fb15e1acc92e4e319679b9e93d9944a0",
+      "statement": "The bin entry point loads .env via loadBrijioEnv checking in order BRIJIO_ENV_FILE, CWD/.env, then ~/.brijio/.env; applyBrijioEnv only sets values the process environment doesn't already define, so explicit env vars take precedence over .env. The daemon's WorkingDirectory is ~/.brijio so it always finds its config.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L120-L145",
+          "version": "repo-lines-v1:sha256:8ddb9f22e3e1380244dfca2645125d804e00119cbd20dea92e9db4846b2270f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzY2U1ODczMDk1ODYyNzJmMmNjZDdkMTRhYmIxNDQyY2FjZGQ4Y2VmNGQzZDc3ZjY2NmY0OGViZDdmZDg1YzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3YTc2NGFiNmI1YjMwZDBiYTU2MjYwNjdiMzRjZDRmNjVmNjQ3YTIyNGZlNDA2OGM4MDM1ZWRjOGEzZmNjNTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE5ZWJmNGZjZjJmMDhiM2EzYTdiNGIxOWIxY2JmNDI1YjA4NTAzNTY5MGIzZGNkYTdmZWU3YTAzYjgwNTAyOGMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L210-L250",
+          "version": "repo-lines-v1:sha256:1b197a01ff9ccec5c43581520610d6e07e1322407a55dadc5afb3a5a43ad2577:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiZWM5MmNlNmVkZTE5MGYxODQ3OTUwNjEwZTNlZjE2MWViNjA1NGY3OTQyMjVkMzVhNmRkNzBkYWYxYzcxMTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlMGY3MjkzZDE1NmE2ZDEyNTI4ZGIxMjkzMzc5ZTUyYTVmODM2NzA0NDI5N2IyMjgyYjk3ZmYyYzg2MDQzOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzY2EyOWExMTgyZTU1ZjgyNDllOGE5YmQ5ZTQ0MTg0NzQwZGYyOTE3MGE0Nzk0ODQxNTE2OWUyMGQyOWM4ZDIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3ffcbe70b350453c901bd9c3f6872a89",
+      "statement": "The brijio binary's run modes include interactive foreground run, `demo` (both servers on 127.0.0.1 plus a static demo page on 0.0.0.0, attaching to an existing healthy daemon to avoid port/pairing-token conflicts), `--dev` (bind both servers to 127.0.0.1), `--print-config [agent]` and `--doctor` (which import server modules dynamically only in run mode), and `--version`/`-v`. EADDRINUSE on startup is caught and reported with a pointer to --doctor and port-override env vars.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L150-L300",
+          "version": "repo-lines-v1:sha256:e135ed6aae46d2c2456fbcfd1187221967a61bf1045658027353e4f1cc8b1818:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2MjRhNjJiYjk1OWRkNTY1MDE5OTZmMjYwMTc4MTk5YTNjNDY1YTM3NDJiYjVkNDAzZTg1OGI0ZDJjNDMzMTliIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIxZDY0OTQzNmE5ZmRjZTgzOGU2YTZjNWVmMjNjYzZkNzI2NzY4NzcwYTgzZmI1MzYzZTY4ODliNWY3YjUxMDg2IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI4Y2UwNWE1OWRhNDZlZmZjODY2MmY0MjgyOTg2OGU4M2UxNDM4M2Y1YTE4ZmIzZWNkNzc4MTA2NTg0YzBkMTczIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxM2YzYTA0MjA2M2IxMTliNDM2MWFjZDNmMzlkNzAyNzE4YjEwNzcyNWY4ZjEyYzRiZDgxY2MxM2U4MTJhNjM5In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_7d9ea61bf25d452b99d76b8f76d3527e",
+      "statement": "ADR 0049 unified releases on a single vX.Y.Z tag. The tag-and-release.yml workflow (on push to main / workflow_dispatch) reads the root package version, skips if the tag already exists (git ls-remote), otherwise builds/tests, extracts the matching CHANGELOG.md section (failing if absent), creates and pushes the annotated tag, and creates the GitHub Release. It superseded the older ext-chrome-v*/ext-safari-v* extension tags.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/tag-and-release.yml#L1-L120",
+          "version": "repo-lines-v1:sha256:a7d451964c2859f1337059cecc2f8d9cfad78da51a967fd446b6bbc8cc559891:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjZGU1MzNlYWUzOTc5MTY5YjZiYTAxNmFlZTA4NWE2NzBkM2JlMTdkMzQ2ZjI5NTUzMTQ3MDY0YmRjODFkZDA1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MDY3M2Q5ZTQ4OGFmZTNhYTRjZTE2ZTg0NDE2ZDM3NzNmNWY1M2ExMGUzZDQzN2ZiNTNhYTA3NjY5MDkxZjQzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI5OTIzYjZmZjY2ZTVmZTJhYTBiNTZmNTFlMTc2NjExMmJlYTlmMWQ5NmFiOTBiNDMyNjlmNTFiOGFjN2FkYTI5In0"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0049-unified-release-tag-and-assets.md",
+          "version": "repo-file-v1:sha256:b28ceedcd2adc5ebc55bc11fd7f4e46aa9b26e7bf6ae60ea608136d46804b39c"
+        }
+      ]
+    },
+    {
+      "id": "claim_dece0abb3a71416b83824fdcb0471595",
+      "statement": "The release workflow attaches extension assets to the vX.Y.Z release: Chrome (ubuntu) builds @brijio/chrome-extension, validates dist/manifest.json version equals the release version, and uploads brijio-chrome-extension-<version>.zip. Safari (macos-latest) builds @brijio/safari-extension, validates iOS/macOS manifest versions, uploads web-extension ZIPs, and runs xcrun safari-web-extension-converter (continue-on-error) to produce Xcode project ZIPs.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/tag-and-release.yml#L120-L250",
+          "version": "repo-lines-v1:sha256:8adfbc733331ca690ab3e8fdf23c2baf8290dc69eaee6d2261abfe045027b2ca:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0MDY3M2Q5ZTQ4OGFmZTNhYTRjZTE2ZTg0NDE2ZDM3NzNmNWY1M2ExMGUzZDQzN2ZiNTNhYTA3NjY5MDkxZjQzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyOTNkNTEzNTdhMThlOTRjZmFmYzI3ZWI5MjlmYTA0Yzk2ODUyYTg0MDFiMzE5NDNiMTE3YjhjNWNjY2VlMjcwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkMDJiZTE4MDZlYTI2NzhmOWQ0ZmNhYWIyOGI0NjgxZmQ5ZGM2ZTA1MmMzMjJkYTRkODNjNTlkZDQ2N2Q0MTlkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIyYzQ2N2NjZjJlNjM4NTJkOGEzYWNmMjYwYTk4Y2Y0Mzc3MDRiYmMxMzE4NmQ4MzE1NGM3YTVlYWE5YmY3YjY4In0"
+        },
+        {
+          "resource": "repo://.github/workflows/tag-and-release.yml#L250-L330",
+          "version": "repo-lines-v1:sha256:63803f1e48e12980b94bafb86a498b97d200b15f9228bfb0dd4553253caebed7:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5M2Q1MTM1N2ExOGU5NGNmYWZjMjdlYjkyOWZhMDRjOTY4NTJhODQwMWIzMTk0M2IxMTdiOGM1Y2NjZWUyNzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlYmUwZmYzNGRkOTg2ZjgwMGE3ZDg2ZjBmMDNhYzljN2MzYjEzM2VkN2NmZWYyNzg5MDllYmY4YmE5NDRmOWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2Yzc2OTk3Y2Q3MDBjNGNkN2I1NDgzZWQ5OWQ3NzM3M2FiYTZmNGMxOTI4MzM1YjJiYzQyMWEwNjM3ZjQ1MDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVkYzhiMDI0ZmE0OWQ1NjQxOWZkZjVlMTc2ZTEwMTM2YzE2YTBkMjZjNGVmZTRlMDIzMGU5NTE1YzQ0MjE4NTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5974112bd82c4663b95d760836a2dd50",
+      "statement": "When Apple Developer ID secrets are configured, the Safari release job builds a signed, notarized, stapled Brijio.app: imports a .p12 into a temporary keychain, xcodebuilds with manual code signing and a secure timestamp, submits via xcrun notarytool submit --wait verifying status is Accepted, staples the ticket (retried up to 5 times for CloudKit propagation), and uploads brijio-safari-macos-<version>.zip. Without signing secrets only the unsigned Xcode project ZIPs are uploaded.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/tag-and-release.yml#L330-L475",
+          "version": "repo-lines-v1:sha256:8b9a8e45e1482fbcbebf24f9ef532111d5ddf71966d53e3d9c0d0cd8e193f059:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQ2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhZWJlMGZmMzRkZDk4NmY4MDBhN2Q4NmYwZjAzYWM5YzdjM2IxMzNlZDdjZmVmMjc4OTA5ZWJmOGJhOTQ0ZjllIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIxM2QwNDlkMDlmYzMxYjBhOTA1ZDUwMjRlZDM4NGIzZTE0Y2IxYTZkYjg0NWVjNDFhNWU5M2JjZWJjZjA0ZjMxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1MjQ1N2RhZmVmZGM0MmExZTFkMjg3ZTQ3ZGU2ZGE2ZGEyNzRmMWVlMDFhNTQ2MTU0YmYxNjFlZGMxMjRhMzM2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI0MDFjYmI5ZWI1MTE5MjJhNWFjNWYyOWQ4ODJkZWUwNjgyOWM0YmM5NGFhMGNjMDJlYjViOWE2ZGEwZDcwYmM3In0"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0049-unified-release-tag-and-assets.md",
+          "version": "repo-file-v1:sha256:b28ceedcd2adc5ebc55bc11fd7f4e46aa9b26e7bf6ae60ea608136d46804b39c"
+        }
+      ]
+    },
+    {
+      "id": "claim_56784dc23c544326a5257fb6d0856edf",
+      "statement": "The release workflow publishes npm and Docker after release validation: publish-npm (Node 24) verifies servers/mcp is @brijio/mcp at the release version, skips if npm view shows it exists, and runs `npm publish --access public --provenance --no-git-checks` using OIDC trusted publishing (permissions: id-token: write). publish-docker (gated on release and publish-npm) builds and pushes the root Dockerfile to Docker Hub as <user>/mcp:<version> plus :latest for non-prerelease versions.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/tag-and-release.yml#L525-L619",
+          "version": "repo-lines-v1:sha256:a343925a8e66fd15d57c981350747df74f0c7d041d04593cc728aad9a2028856:eyJzZWxlY3RlZExpbmVDb3VudCI6OTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVmYWQzNWNhMWQ5ODQzNjgzZTJmNWQxMjk3ZDc4NzU0YWQyNGU4YThlN2MxZGQ2MzMzNDdiN2Y2NzhmMzA4ODAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyNmUwN2Y3NjcxMGIzM2I1MmU0ZGQ4NWUyYWM1OGM4OGFhNWQ5NTc3ZTRhYjU4ZmZkZTcwZmI2YjMwN2U2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQyYjBiZTBkYjY2MDI4YTQ5ZmI1NzljMjYzMjM4YjdiNThiNzQxYTQxYzQ1ODFmOTdlMDZiNThmYTNmNjJlZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0049-unified-release-tag-and-assets.md#L85-L105",
+          "version": "repo-lines-v1:sha256:6bbc34eea4f0a2a100cf8bc8d0782c69a4f51bd816955a359f79f0958be82c9a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjZTVhYjVmYTFiOGUyNWNhYjEzMTg2NmU2MzExNWExYzY5OGQzNzFlODk0MjgxMWFiZDMyODc3NWJmN2M5M2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA0NzMyNjQwMzI3NzIzNzMxYTgzNDE2OTY3MWMyNjc0NDg5ZWEwNmRhYjljZGY1ZTBmMGIxZjAxYjUwZjljZDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0OGZlOTE2ZTEyNDQyYmFjMTQ2NThhM2U4ZjM3YTIzZWM5NWU3NThkYzBlYjVkMmI3ZGQ0OTViY2U0NjczYzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3YjBmZTM1ZjUzZjFhZDhlZTBlM2E1MGMyYzNlZjAzODhjZWY3NThjNTkwYmVhMjQwMzY2OWU1OGQzZjJjMzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ac6313aec9864a6296b6870706500f26",
+      "statement": "The WebSocket relay exists only to bridge the MCP server and browser extensions and is never deployed without the MCP server; every distribution mode (pnpm dev, npx, Docker, daemon) starts both servers together, and the combined entry point connects the MCP server to the WS server on loopback.",
+      "evidence": [
+        {
+          "resource": "repo://docker/s6-rc.d/brijio/run",
+          "version": "repo-file-v1:sha256:8bd266438a214682af22d039568e440bef96158b60011553e9d3f7dd65569a59"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0035-combined-docker-image-and-npm-package.md#L20-L40",
+          "version": "repo-lines-v1:sha256:0bebae94cbc4719e9d2263ca8b426a158affedd3055fd745b72b3b049337a924:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFlYmQyOTk5Y2U2OTAyMjIwY2IxMmI2MDZhYmI0ODMzZTkyNGQ5M2UxMDFhMzJmNmM2NDFjZjgxZWViNGQxNjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5N2NhMDgyNDE3MmI1YzM0MzU0YmFiOTAxNTY5YjY2MjFlNDQ0Nzk0MmUwODI2ZmIxOTZhMmEzN2UyMjdlMjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlZmNiYTI1NGYyMTMwZWIxNDljMjQ4ODlmN2QwNjVkYzc2OGYwMThmODkxNWU1NWVjZWQzY2VhNWQ0NjEwZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyMTVmYTcxOWIwNTViNDk1YjFlZjM1ZmFmMzhhODRjYWFlZDMwNzUyOTljNzFmNDRmYzcxMDQwM2FmMDc5Y2YifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/bin/brijio.mjs#L290-L330",
+          "version": "repo-lines-v1:sha256:b2f5197066267364748f3417d10f80061bd05aec709ba94177afe9d802f4f7ac:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxNDYyMGJhMTcwMjNiODk3ZGZmMDQ1MWU4M2FiYzdiN2I2ZDA4OTFjZGM4YTE2MTA4YzU5N2QwZmIxNjBkOGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0NDZhZWVkYmM1NTIwZGJiNDUzNjYwOGZmYmI1NTAwZWNhNzk3YTU1NzVhNzFlYjMxMTM0YzU0NmJmYWY2OTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFlY2Y3NDE0NzQyZTZmM2UzYjVlZjVjMDEwZGU1MjMwZDBhODM1MzQzNGEzMTM1ZjBhMjI1YTQ3ZmNlMGU0OTcifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}

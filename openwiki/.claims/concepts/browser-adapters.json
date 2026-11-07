@@ -1,0 +1,270 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:153daf0517449b3652290778a0a443f675543637154f80260e8743079e39885c",
+  "claims": [
+    {
+      "id": "claim_10b50c4d9efc43299d41bb44306b47f0",
+      "statement": "Browser-agnostic logic lives in packages/shared (background-controller with adapter interfaces, page-reader, content-handler, settings/permissions/popup/protocol/timers/batch helpers); each extension provides only a thin BrowserApi adapter and controller construction, and extensions do not duplicate protocol logic.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0019-safari-web-extension-and-shared-extension-package.md",
+          "version": "repo-file-v1:sha256:eb7cf29320506f96cebaf59f0073642a589b700606dd1d1245134f84513f4f39"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0031-share-extension-code.md",
+          "version": "repo-file-v1:sha256:1b8160b4cc16462207e570d3b8a0e253848d60995bd6fb64c849bc0173166729"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L42-L318",
+          "version": "repo-lines-v1:sha256:7753f41a7a6248e4a39fba4f7c9ab1df77dd8792f74ac38e436401e360baf112:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjc3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkOWU0ZDU2YTU2MTg2NjMwMjVhM2M3ZDRmYjEzMGMxNTcwYmQxMGViNmY3YjQyOWUwYjBhZWZlYjg1NDdkNDEzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjNGIyNDUyNjIyNjAyYzlkZTBhZTRiOWY5ZDI2Y2Y3NTM1MWZlYjJjYjZjOTJmZDBjZDhmZTk4NzFiNzQ0MDRjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjYTQ2ZjBlZTM5ZmU1MzUwY2I3MTcwYTNhZjRkZjM4ODgxY2U0YjM3OTY5YTJiYWZlMjBmMDhmOGY1MjgwMTQxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1NTQ0NTJmZGY5M2FlNGJiNjJiN2M3OGMyOTc2MGQ3YmMzYmMxNTNkMmVkNWI4OGYwYzM5MzVkMmZjMTc0N2U1In0"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L1-L53",
+          "version": "repo-lines-v1:sha256:d886dbd2c1287bd91c2a901b0357b59ba56d93d255b3442a46ab0e830c59554a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4MjAwOTY0YTk3ODYzNTUyMmIyYWIwOTBjNjUwNjVkOGVmOGU4NWM0NzMwYmIyZWIwNDYwZDM0YzY3N2RkYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlZGM0MzAwNzMyY2ZiYjhhN2YwNzMyOTFkYjFhNWIxY2IxNTdjNTk2YjcyYjRiMzdiY2ZiNWNhZmVjMjlhMWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhYWQxNWY1NDYyMjA4ZTEyZTkzYzNiNGE3MTUwMjY0YWI0MjRmZjU0NmJiZWM5ZGM1MzQ4NjA0MzM3NjFiYWMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L25-L55",
+          "version": "repo-lines-v1:sha256:1730e153e052e209cb9d2b63d361e72ca7a33baedb992a8ac2b8fdc0a103489f:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImViYjkzZjc1YjFlMjU3NTk0MGM0MmIwYzlmZDEzNmRjYTNhZGNiM2RjODkwNzg4MWMzODNjNzFmYjgxMDRkMjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhZjZhNjVkNGJmNjEzMjQzZWVmZDFhNjkzOGFlYzA4ZmQ2NDIxMDczMDJhZGM5ZWIzZGUwMTM3NzIxOTU0MmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjNDZlODhhMGU4ZjhlN2NhOTY4NDRjYWUxOWI1ZTY3NzJiZmM4YzhiY2Q4YTg5NDFlY2QzM2YzY2E2ZWE0NTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE1ZWFjOWM2Yzc2ZDY5MGIxMzZjNDZiOTRjYzZlNTFjNWUzZDMyZTg1ZDc0MTI2MmU0NjZkNzVkNzkzNWM4ZjQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_736526e66ae645238e47eba11432d63e",
+      "statement": "Both extensions instantiate a single BrijioBackgroundController with browser-specific adapters for action, setup, storage, download, pageReader, pageActions, pageBatch, pageNavigation, pageOpenTab, pageScreenshot, tabLister, approval, createWebSocket, and timers; optional adapters (pageScreenshot, tabLister, approval, download, pageOpenTab) report unavailable capabilities when absent.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L460-L510",
+          "version": "repo-lines-v1:sha256:24a39f6cd15ac3b9e71552d5bc65a186e296fe5c3d846230ec58e9c2460af16c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhNTQ3MGRhNzljMjk4NDRmY2E5ZjIyMDVhMmUzYmQ4YTgyYzZiMWFlMDIzOGYxNDM4ZTJiM2Y3NTJiOTEzY2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyMWI3MTdhYzQyMWY4OTBmNTVhNTE2NmM0ZjA1MjEyMDM5NzVlNDgyZTRlYmZmMDBhODUyYjk4OTcyMmZjNWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc5NjhhMzA1YjI0MzcyZDI0MWExYjMzMWM3ZGY1MTAyN2RlZGIzNTgwMjM5ZThkMGE5YzJmODNkYjRlYjZiMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdkMzgxMjlhMGRhMDg1OWMzNGVlMjA2ZjJkMmZhZDVhNDVmNTQ2MzBhZmVlZThmYTBmNjYxMTAyOGM5MWJmNWYifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L209-L230",
+          "version": "repo-lines-v1:sha256:2460575ad3480d946587fe3be848643c0474e1d61c506ea9a1799e58ff4128a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmZDZhMDUxMTFhMzRmYTFlZDIxMWMwNDY2MTg2ZjkwMjkxM2ZkMWI5ZjdhYjhlYjMwOTFiMzk5NGI0YmQwNWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5ZWQ1MGM0OTdiMDExMzM2ZmUxNzUyMzdhZjg1MWZlMzcyMWM3NGIxZmRjZTllNzU2ZDUxMDI4ZTgwZGFlMzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFhZDYzZGQxYTQ0ZGQyNmNlZDUyMjUzMTNkNjA2OTdhMDQxZjViNWM1NTA0MzU5OTc0OGI0YmY3MjU0YTViY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg4YTZmMGFlYWYwY2I1MDllMGQ0YjU2OWE2NDAyMjA5NjY3NTVkYTg0NThmYzE0N2E3YTJlMDAwYjJhZTIwZjIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L321-L340",
+          "version": "repo-lines-v1:sha256:05b04de4284e4670f2206c004238f3f8a699c020aa4d3140cc0c46e35be1fe8f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZiZDAwZjc5YmI2Y2ExNjhjYmVkOWFmODc5MGZhNjg3ZjI4MGM3OGVjYTA3ZDA3MmE3YTQ0ZDFjYzZmZGVmNzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1OWI1ZGYxM2IzNmZhMTNjNGY1YzMzMjgxNTk3MDk3NjVhZWUxNDMyZjI5YjZlNzdjZTJkYjAzMzJlYjIyZTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZkNjJjODI5ZjMwNDYyZjE1MmEzNjAyNzAxNGY5YzRiNTJjMGU5MTIxZmQyNjhhMjBmMmVkMGE1N2Y1NWMwMGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4eba768089f54079a095ca10f404b351",
+      "statement": "Chrome is MV3 with a service-worker background, chrome.* namespace, action, host_permissions granted at install, and real badge color APIs; Safari is MV2 with a non-persistent background, browser.* namespace, browser_action, required *://*/* permission, and no-op badge color methods.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/manifest.json",
+          "version": "repo-file-v1:sha256:a389ff181dadd0ff46f415bba4054e6e60bbcd0615d4a3d2f6e8bef78b937ca4"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json",
+          "version": "repo-file-v1:sha256:408cda1bc648c2fb17c8cf78eda350d894765da0a90527456e44274e85336c1e"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L30-L52",
+          "version": "repo-lines-v1:sha256:662fe157f1f86b885fff62f5849e2cfba509059c4630ce6e13bb6ece83357fe6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlMjRiZmJkZTViMGFmNzA1MmJkMjM4ZTI1N2M0OGZkZjAyZWQ5ZDFlZDY4NjA5Mzc2NjA4YmNhZmE0ZDdlOGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA2MTZhNjZkMmY5ODNlN2VkODI4MTc2OTZhNjY0NjRiNmNhMmMzOGNjZTZjNTI0YWU1MTM0NDZjMjQ4ZDg0NWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI2NmIyOWQ4ZThjMzY3YWVkNGY2YjE0MzAxYTUzNWE0MzFkZjcwOWI2NmIwYTNkNDE0OTA3NDhkZmJmNDkwMmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI1ZTE3ZTZkNjA3NTQzYjRlOTdmNTMzMDUwZTU5ZTZmNDE2MDlkMWViMzBlYWQwMWFmOWY0M2YzODg3ZTZlNTgifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0019-safari-web-extension-and-shared-extension-package.md",
+          "version": "repo-file-v1:sha256:eb7cf29320506f96cebaf59f0073642a589b700606dd1d1245134f84513f4f39"
+        }
+      ]
+    },
+    {
+      "id": "claim_09e19c47584f4323a94909c53307f88a",
+      "statement": "ADR 0050 made the Safari background page non-persistent (persistent: false) for iOS/iPadOS App Store validation; durable config lives in browser.storage.local while WebSocket/timers/controller are volatile; ADR 0051 splits Safari build output into dist-ios (persistent false) and dist-macos (persistent true) from one iOS-safe source manifest.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json#L6-L9",
+          "version": "repo-lines-v1:sha256:be7b3e94c3215c1bb826dfbf7441ce41570e231d57862b63ae2625a7e046df75:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjUxMTJjMmVlMjI2MjQ5YjBhNGM4OGM2YWVhYjBlZTlmODFlNjQzMmRiMWE2OTEwZmE0YzYyOTgzYjFkMWQ3MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODQ4NDc1MGU5Y2UyNTJiZWJhZDg3M2IyOGVhNTIwODU2YzE4NGMwZjg0OGEzM2E5MjlmZWE2ZDkxYTE5ZWJmOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTQzZDBjNzJhNmI1Y2EzMTBkZTljZGU3ZDRmYjIwYjFlZDY3NmM4YTg3YzRjOTVlNWI4NjVjZGE5YWQ1NWYxZSJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0050-ios-safari-non-persistent-background.md",
+          "version": "repo-file-v1:sha256:77083927c4a4b79af1e1c53d3780ed8a09ba7ad0858beecd3a7e4735ef603883"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0051-safari-platform-specific-builds.md",
+          "version": "repo-file-v1:sha256:8cb235d231bd197f118403cb4156370f15379fc395f3baf0d3095173e59b0f42"
+        }
+      ]
+    },
+    {
+      "id": "claim_378e180bcab34c4aae1279f9a7140ac7",
+      "statement": "ADR 0052 adds Safari reconnect-on-wake: the background entry persists desiredConnectionState (connected/disconnected) and reconnects on startup if the user previously requested a connected bridge with usable settings; the Safari content script sends brijio_page_active on pageshow, focus, and visibilitychange to give the background another reconnect chance. This is best-effort and only fires when Safari wakes the extension.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L260-L340",
+          "version": "repo-lines-v1:sha256:e8a8438a40087b7190921ada05948e15a99bd8ec811aaa4cbc058ae403304535:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5YjIyYzgwMTdmMzY3MjhlY2Q5MDQ3NzkwZGQxMmFiYjBiMTYwNWY0NzJmNjMwMGE3YzFkMDIzMTFhZGIyYmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk5YTZjZGRlNzZjMjkxYjMwNTg4MWUzNzJmYTdiOTA0MTgwZWZjZmUwOTQzZDUzNmRiOTliOWQyMGQwOWVkZGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4YTEwMGQ0MWEwMmIwNzVkY2M5ZGUyZWU4ODYyYjg5YmJhNmM5OWNmMDhjODA4N2E3ZDMyYTdiOTI1NTMwYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMyN2U0NDMwOWVhZGRlNzc4ODE3OThkY2Y5N2ZjOTQyYWI5OWVkODVlYzg0YWE3N2ViZTQxNTg1MmQ1YWY4YjYifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/content-script-entry.ts#L350-L405",
+          "version": "repo-lines-v1:sha256:1d932b852ba8e24de9fcca25a77560ba11489d3b0ad3285c4ce72e7aeb4b6027:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlMWRhYzZhOGU4YTZjZTllOWZkMWIzZTYwNTVjNWZhZThiZDdkZTdkMGE0MWFiMWY4OGZjOGQxMDJhODZjMDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxMjQ5OGRhNWU2NGRmNTAzOTI0MmE4Nzg3YjhkMzI3M2E4N2UzMzc3MGEwZjk5OTE3MTQ1MmFiN2M5ZDkwMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjllOWMzNjQ2ZmNjYmM2ODliMWVkM2ZmMTRhOWVmODU4ODM5ZGEzNWVlMzlhMWQ2MzE1NDU0ZGI1MzgzMjRmZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkZjNlZTUyZGUzNDM2YTc0MGRiYzA5ZTIxNzNjYTlmZmEzNGRlNmE4MGQ4OTU1ZmNmNWJiNzMwYzY5NjY2N2IifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0052-safari-client-reconnect-on-wake.md",
+          "version": "repo-file-v1:sha256:ef6a6a64f83f8c4dc249799ec047be4d417f0f02576f7573c4b0e521b627265d"
+        }
+      ]
+    },
+    {
+      "id": "claim_c2f6f4b2912b48628b8b14b3e92b28d5",
+      "statement": "Both extensions target only regular HTTP/HTTPS pages via isRegularPageUrl; Chrome grants broad host permission at install (no runtime request, hasRegularPageAccess always true), while Safari declares *://*/* as a required permission with no chrome.permissions API, so both hasRegularPageAccess and requestRegularPageAccess always return true and there is no 'regular page access not enabled' state on Safari.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/permissions.ts",
+          "version": "repo-file-v1:sha256:40d65c495a372d61f000a940c71797467e93cf03c939ab79ee3bf2e4807c04d2"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/permissions.ts",
+          "version": "repo-file-v1:sha256:8a9db02cb836738cffc575a7eb9b3a21744a2c0fb5d55ec22de5c3dec6c0b36c"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0011-regular-page-host-permissions-for-chrome-extension.md",
+          "version": "repo-file-v1:sha256:858d72b9a6d8579de2259a65a80f6ef981cf009da81780ebdcd7e93c07970d13"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0019-safari-web-extension-and-shared-extension-package.md",
+          "version": "repo-file-v1:sha256:eb7cf29320506f96cebaf59f0073642a589b700606dd1d1245134f84513f4f39"
+        }
+      ]
+    },
+    {
+      "id": "claim_0afa64d964294b69aba2091baf06e878",
+      "statement": "Both extensions implement a TabListerAdapter (tabLister) that queries all tabs via tabs.query({}), filters to isRegularPageUrl, and maps to TabInfo; tabId targeting is stateless and per-call, threading through readActiveTabPage/performActiveTabAction/performActiveTabBatch via an optional tabId that skips active-tab resolution.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L313-L343",
+          "version": "repo-lines-v1:sha256:af7156febfbc3b5823fee2bfc163c12bf53c80358511f1ca8651f9818bb141a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmY2Y4NWIxMjdmMzljMDA3NjIxM2Y4NjYwMDUwYjg5MTUxYTdlNzkzZWJiMzRjNDYyNTI2MjIxM2EzMWZiMDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0ZGE2Yzg1MTM4MDgzMzExODNjYjM5Njg5OWVhYzNkMWUyMDgwNzQyNTg3NzJmNDNmOGViZTEzYjQyYjcxMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzMzIxOGY0NGM3MDRkNzU1M2VlMjFhMGY5MmU1MDc2MDU0NDY5Yzg3ODQzZjFmNGQ5NDUxMzcyNDkxYWFjYmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlNTY5MzM0MmVjZDkzM2ExN2Y3YzgyNTJlOGU2ZGU5NWFkYjgyMDYwZTA2N2IzNDdkMTNhNDcwNGJiNjdlOTYifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L528-L555",
+          "version": "repo-lines-v1:sha256:d020043324e715bfb5448c2506ac0441f8adb5b6fed6ed20408ff51c80013c50:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3OTE4Nzc3ZDc2NGQ1NWQyZjZiNGMxNWFlMWU4NDI5MjgxNWI3MTJjMmQwMWFhNmMyODI0ODEwY2NiYTNjYWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjJjNDJjZDE5YzZkMDNkODA4YzQ1MjcyMDU1MjgyNWI3ZWExYzViNDkxYjIxODUxMWNhYzc0MTVjZjlkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmYmFhNDIwYTEwNTAyM2RhZDI5Mzc0ZjY0MmIwMzViZTk3YmZiMjdmYjRlODU3MWUyYjZhMmJhNmE0MjE4YTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L121-L180",
+          "version": "repo-lines-v1:sha256:834b52a81f8533b48769a1fd77f0d278ffda87895f05ad0f5a4ddbdca6c16000:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyZTQ0NjM5MmUyMDlhMzM0ZGY3ZTc1YzI3ZTQ3YjM2YjU2MzJlODRlZjZhY2E5N2Q1ZGEyZjU4MmQ1N2IyMzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjViNjVlMjljMjAzNTU0M2QxZDc1MjNkNWJkMjFjMDkxNjNiZTQ4ZGMwYzlkN2ZiODI3YjRmMWQ0ODUxNzNjNjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlNjc0NzZmYmQ5ZGNhYjM5YjFjYmQyZTZhM2Q2OWM3NGU3NzMyYmY0ODYzZGIxNTEyODJmZTNhODM1NWM3Y2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_26a1fcf0d6da4b819c2ff3aaf8abc16d",
+      "statement": "The tab indicator (ADR 0060) prepends '● ' to document.title with a MutationObserver re-applying it, plus a persistent blue (#1a56db) in-page banner (#brijio-tab-indicator, role=status, aria-live=polite); indicator state persists on globalThis.__brijioIndicatorStates with a 60s inactivity timer, and re-show resets the timer instead of recreating the indicator to avoid flicker on executeScript re-injection. This is pure DOM and identical on Chrome and Safari.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L240-L360",
+          "version": "repo-lines-v1:sha256:a9c9f07d95bdffa152b771b0c98f85a0f0a8986aa0f8890fe3a6a151679e8ef0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2MmMzNTdmOGFlZjhiZGE4MGY2ZWE1MzgzZjI4ZWY3MWFhYWQ5NDUxOTk0NmVhOGRlNmIzMjMwMjc0ODg1ZDc2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlYWY5MWI2NDY4YmRmMzMxZWFhYTQyODgwNjZkOTExYmEzOWEyZGNjYzhmYTRjNDdkMDI5OTE3NTliN2FiNjU2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxMmQzMjZkMWVhMTNhOWVjZTM4NGFhNmMxMDUwM2RlYmZkYmE0Yjg3ZGU4MTM2MTVhZDk3NmQyMGM3MWM3NTY4In0"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/content-script-entry.ts#L240-L360",
+          "version": "repo-lines-v1:sha256:88316cf6cfe2832e77983bf3feac49a1e04e41fea55262b0534d36d07af55248:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIxODg5M2UzNjE5OWViMDMzMWRhZWEwMzc4YjAzMTkxOTJiZWZiNTBmZjQxNDQ5NjNhYTY2YmJhYWYyMDE3ODYxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyN2YxZTdkZjE2OGRiOTk0ZjUyYmNlYWUwZWU2MTExNjhkNTY4NDI3YzM0Mzc4Y2VmZWExOGFhNmYyY2MyODNhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxNjkyYTdjNDVmNjg2MmU3MGVhYzFlMDE5YmI0ODM3ZWNmMmE5MWVkMTYyN2E5NmUwZjFhYmE0YTlmZmNkZDkyIn0"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md#L180-L240",
+          "version": "repo-lines-v1:sha256:5983075b273559d5b41657072fa034b0978b2e4798064e03b34f60712da27bc9:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyZTQ0NjM5MmUyMDlhMzM0ZGY3ZTc1YzI3ZTQ3YjM2YjU2MzJlODRlZjZhY2E5N2Q1ZGEyZjU4MmQ1N2IyMzAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjZDU1MTViNjA4ZGFhMTdmZmQ5Mzk2YzcxODVkMzM2Mzc1ZjQyMjYwNDA1YjFhYjRhZTNkMWExNDZlMDRiMjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2ZTkxYjgzZjIzZGFhZDRiZjk0ZjJjZTI3OWEyYTk2NjM4NmQyNTEwYjYzNmI2YTU2MzUwYTc0N2RiYmMwOWQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhlODZlOWYwZmZmYjE4MjhkOTQ3NTcxM2NlZWQ0ZWQ0Y2MyZjcwZTE5NDg2YjcyNDhjZWM5MTFhMjQyYjk1NGIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_45007d1f8ca24acbb9fbf6ae82e99694",
+      "statement": "Both extensions provide a PageScreenshotAdapter (ADR 0064) calling tabs.captureVisibleTab with format jpeg, quality 80, stripping the data URL prefix and returning base64 plus tabId/timestamp (width/height 0); permission errors map to capability_not_supported, other failures to capture_failed. Viewport and active-tab only; full-page is deferred.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L518-L558",
+          "version": "repo-lines-v1:sha256:b6529af8f7ce15b01648ce21978c5d361c7ea7b9a9b91c3e3ab4b765c22e3d19:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNkYTI5MjVhMWY5MzlhNTM1MDFkYWFhYzNhY2ZjZDNiNTYwOTljMzQ0MGJkYTE3NzgzZWNjYmZlNjUwNmI1OTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0MjY3ZWU0YjM3MDRkMGUxMjc1NmI4NDhhMjM5MzdlZDMwMjVkNDllODI1MDk2ODkzMTNmYjYwNDU5NjEyMDMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwMzk1M2ZhN2RhYjExYTUyN2ExOWNjNGMxZWY1NWZkYzYwYjBmYTk2NjJiYWM1Y2M5OWQwZjA4YjMzMGMwZDUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L160-L205",
+          "version": "repo-lines-v1:sha256:5054ff8ce86f70154a080e1c97bb8f93fb2b4a8f06ba7295bcffb3c778acb549:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1NWQ2MTU0YmVlODMwODA3ODI0MmRmMWNlNTcwYmY0MzVlZjM4Njk5MTQyNzkwZmNlNGE2OWUyMTE5NmRjMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwZTkwMTFhZGE2Y2RkZjNjZmM2NzA0ZjhlYTE2YzhiYWJjMWYyNzFlMDk1ZTIyOTA4N2IwMzQ2MjUxZGU5Y2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhZDYzZGQxYTQ0ZGQyNmNlZDUyMjUzMTNkNjA2OTdhMDQxZjViNWM1NTA0MzU5OTc0OGI0YmY3MjU0YTViY2EifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md",
+          "version": "repo-file-v1:sha256:e6a4b9e46e48fb1ec1e7d58bd8f3965a846f5d0d400d79f69ebfe208ce51177b"
+        }
+      ]
+    },
+    {
+      "id": "claim_68cd090d902a4250b319b08023a55c59",
+      "statement": "Chrome's DownloadAdapter uses chrome.downloads for full download status and numeric downloadId, degrading to not_supported if absent; Safari's SafariDownloadAdapter returns not_supported for status and fire-and-forget downloadFile (opens a new tab, initiated_fire_and_forget, null downloadId). Both share a fetch-based fetchResource with credentials, timeout, base64+SHA256, and AbortError->timeout / TypeError->cors_blocked mapping.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L209-L299",
+          "version": "repo-lines-v1:sha256:fda257f69546a39f15663f24fdfa3e79dd76680025c259682fb7019bd77a60e8:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI0ZjRjMTMxY2I0NWI0ZDM3NmIwYjM4NjlhNGJiM2E0NmE5YTk2NWZmZjcyZWZiZjhkZWY4M2Y0ZDgyZDg3OGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxMDA4MzhjZjVjNjY2ZWI5MWVjNTAyMzVkNzAwMjE4NWY5ODM3NTdmMGI0OGY3N2I1OTE0OWU4YzA0Zjg0OTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI0MGNhNTU3ZjA0MTA5YTIyOGVlYTE5MThlNzZkZDEwZGMzZTNmZWUyZTRjMDI0ZGMxNjU2NDA2ZWMxZWE0ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFmNzJiOTkzZTFiZjQyNjYxNDNiZWVmNWU5M2MzMjRmYjViYjJiNGFlNTg3NmI3NDkxODFjYjdhMzc2YTgwNDUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L270-L390",
+          "version": "repo-lines-v1:sha256:cdb244b95ae3b7f07b3e67a52467b38a1b652f359f7fa56753238f7cc1bd08a8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1NTM4NjA5ZDBjYWM2NjM5N2Y5NmQxMjJmMDJiNzg3N2NjNjlmZmIyYzBlMzMzNTdkNWYyNDUyNjcxZmE3ODhjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1NjU1Yzc3ZTVjZmIyOTkyNTU5MDU3NTUxZmJhNGUwMDM3MmI5NTUwYjllNWM2OGJmMjE5OGY0OThjOTgwNDZhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2Yjc4NGUwYWNkOTViNWViOGQ4ZmIwZGZhNWRlYjgzMmQyNmUzNjE1OGUyMDY3YmUzOTMxYzZhZWRkNTc0MGY3In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_4d4841277e6b483ca48deae29e82ce23",
+      "statement": "Both extensions implement ApprovalAdapter by finding the active tab, injecting content.js via scripting.executeScript, and sending show_brijio_approval; the content script renders an approval banner (approve/approve_session/deny) and returns the decision, defaulting to deny on unrecognized responses; the logic is near-identical across createChromeApprovalAdapter and createSafariApprovalAdapter differing only in the chrome.* vs browser.* API.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L121-L180",
+          "version": "repo-lines-v1:sha256:508017e90a62c8865ffd55f01898e3de6ad92e8e9368d01212e82244b70ba959:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4ZGE5ZDBmNmVjZjkwMzFiYmFhNjBlMmMyODhjZjBjNWY1YjI1ZGU1ZTcwNzdhNzRjNjg4NzkwNDhiMTZlODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjYWQxZjJhMzQ4ZTZjMGFiYzNiNDgxNDI1YTFkZmMzNWNlOTQ4ZWNjZWE0YWUxMzhmNGZmMDFhMmFmMTc3YjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjM2QxYTBhNTU5MDFlNzJlMWNkZWU3ZmM3MmFhNzU0MWYxOGU0NGM2MTM1ZmYwMDU5ZDJhMDMwOTY5MDRhY2MifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L100-L175",
+          "version": "repo-lines-v1:sha256:9611c897dee3d4d48f69972462f2fde68d4e356fda54312e7e70a7a212098e49:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1YzI2MzBlNjgyZTgxMDc3ZmMyODIwMDY3YjEyOGE4MDYzZWI0OTI3YjNiZTY1NmJlNDhjNjEzY2JhYzcwMjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3OGFiOTNjOTJhZjE3YjE4MWU3YjE5ZDgyODVlMGIxZDczZWU1OTM5NTU4OGFhNDhiNmFhYzNhNTQwYjk0ZDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjOGVhNzg2ZGI5MTk1NTZhMjQxMDQ0ODFkZjE2NTE3NDhkOWFkNmJhNmVhMzEyMzczZWIyYmEzNTliMjIxZTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlYTkxNTgwYjU0NzZkNzIzZDFhOTMzNWE2MzE3YTg1NzNkY2I1N2U4ZjkyZGY4NDk0YmUwNTEwMjhjODdkMGIifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L60-L155",
+          "version": "repo-lines-v1:sha256:fde3e4a015550fbe14561daa1c5976c775aa6e7b375ee773fcc0fffe544227b4:eyJzZWxlY3RlZExpbmVDb3VudCI6OTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczM2JiYWZlNDE4ODc0YmZlMGY4Mzg1MjI4M2U5MjQ4NTlkOTdjZWE2YTY5M2JlMGVhMWM4NGI0NTIzOTc5ZGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVjNjQyOGE1NGQxZTJhMmM0YmQ2NjY2ZjhhNDljOTE4MzEzNWJiODY4NDZlZmIxNjI2OTU0ZjE3NGE4Yzg1OTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJlODc4ODY4ZTY3YjJiZmFkYTc3ZDJkZTlmNGVhOTE4MzZjYTZhOTAxOTJlNTJmZWI2NDY3Nzk4ZWFmMjhhY2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c825d3024694fae858fbc19121c9a87",
+      "statement": "ADR 0043 makes content-script injection idempotent: the background calls scripting.executeScript before every tabs.sendMessage (to load latest code), and the content script replaces its previous onMessage listener via globalThis.__brijioOnMessageListener and its pageshow listener via globalThis.__brijioPageShowListener so at most one listener is active and pageContextVersion stays consistent across re-injections.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L375-L418",
+          "version": "repo-lines-v1:sha256:f2a8d3ff087d15ab5e18d7a374db9597f4f873522ba88d7bb0b8cdf9d9b0f9b2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI1MjNhOGZlODcyZDM2OTBkODgyMjJjNjllYTM5YTA1Yjk2NDFmMTUwNWE1NjBmMzlmODI0ZTllOGJlNmIwYjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjNDJiOTczZTUxMDQyNTQzN2QzM2M1YWU5NmY1ZjE1NGQ2YjRhN2UwNTg4NDc1OGY5MDE2YTZkYjBlMDA1ZmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/content-script-entry.ts#L415-L465",
+          "version": "repo-lines-v1:sha256:cfb13711fc19cab07a1c1305c340edfe7c057b63f9e8e819982ec1060b6dfc7c:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJkMjgzNTk0NGU1YmJhYjM2MDFjMDMzMjI4ODgzOTkyYWY4ZDE5ZDE4NmY3ODlhM2RmNDAyYmNlZWUzMjFjZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0043-idempotent-content-script-injection.md",
+          "version": "repo-file-v1:sha256:663a2d6c54aff3c98df4d61251af6de4be85b7d77cd59b780f66adab3a09064f"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L28-L53",
+          "version": "repo-lines-v1:sha256:5668fd7cb44f29da0c4422eabd8d8c7b40b73a8415a11d33c2512fef64294240:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYzZWFlNWNiM2VlMzViNjI1YjY0ODY0NjU4MGM3ZDI2NjljNDFjMzAwNjBhMzkzNDgxYjg5OTJlZDA5MDBmNjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlZGM0MzAwNzMyY2ZiYjhhN2YwNzMyOTFkYjFhNWIxY2IxNTdjNTk2YjcyYjRiMzdiY2ZiNWNhZmVjMjlhMWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQyNjI3YWJmYTcwNWI1N2I5YmVlNDIzZDRhNDFmNzVmMGY3OWJmNDJmYmRmYjdhOTZmMjc3OGQ1ODAzNDI0MTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhYWQxNWY1NDYyMjA4ZTEyZTkzYzNiNGE3MTUwMjY0YWI0MjRmZjU0NmJiZWM5ZGM1MzQ4NjA0MzM3NjFiYWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4112f0d4647947afaf79400794a239a7",
+      "statement": "Chrome injects the content script only programmatically (no manifest content_scripts), while Safari declares content_scripts matching HTTP/HTTPS in the manifest for auto-injection and still re-injects via browser.scripting.executeScript before each message.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/manifest.json",
+          "version": "repo-file-v1:sha256:a389ff181dadd0ff46f415bba4054e6e60bbcd0615d4a3d2f6e8bef78b937ca4"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json#L30-L35",
+          "version": "repo-lines-v1:sha256:2f130de54b2c0989af505e17e2e04893266aabde1f95aa257552ab0543101bff:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjljYTg5MWJmZjdhYzFmN2NlYWFlNDBlZjA1MTA2NmJlOWVmZTQ3YjRlNDI4MWU4NmMzMTliZTJjNTVlYmNlNCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZmU4MmIwNmIwMjgwOTAwMzg0Yjg3ZWY1M2YxYjExNmY2NGZiMjJmOGQzYjQ2MDg5ZDkzMzZjZTgwZjZhMzc4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0043-idempotent-content-script-injection.md",
+          "version": "repo-file-v1:sha256:663a2d6c54aff3c98df4d61251af6de4be85b7d77cd59b780f66adab3a09064f"
+        }
+      ]
+    },
+    {
+      "id": "claim_8b66ea349c66425c9ae154cee34b0dff",
+      "statement": "Firefox support is planned but not implemented; clients/extensions/firefox/README.md only reserves the client boundary and states packaging, permissions, and user-control behavior must be designed in a separate ADR before implementation.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-07T14:40:48.642Z"
+  }
+}
