@@ -1,0 +1,256 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:17d42905f2dbc6eb7e8361c8924533af6de4ac7ef03429a1133bf9de95be4e0a",
+  "claims": [
+    {
+      "id": "claim_9ff892dfa49c4cfe806ab9cc5f2bdac2",
+      "statement": "Every runtime package uses Node's built-in node:test with describe/it and node:assert/strict, executes TypeScript sources directly via tsx (node --import tsx --test src/**/*.test.ts), and co-locates *.test.ts files next to the module under src/.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/package.json#L13-L13",
+          "version": "repo-lines-v1:sha256:0d64303a0f9e820001f12773555ef1f79012ae13c365d85877967908bab32f02:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQ2NDMwM2EwZjllODIwMDAxZjEyNzczNTU1ZWYxZjc5MDEyYWUxM2MzNjVkODU4Nzc5Njc5MDhiYWIzMmYwMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQ2NDMwM2EwZjllODIwMDAxZjEyNzczNTU1ZWYxZjc5MDEyYWUxM2MzNjVkODU4Nzc5Njc5MDhiYWIzMmYwMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTcxZTRiYjRiMDBkOWY2ZTlmMzI5ZjE3NzNlYjkyZjJlYzg4NWI0NjFiYTZmYWIzODVlNjMwN2YyYTg3ZTc4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjVkOTY4NzY0YzRhZmNmZGQ5ZTkyNmQ3N2E5MzgyNTZhNmQ2OTRmOWYyZTE5ZWNkYzFjYTYyZTAxNGM3YzU1OCJ9"
+        },
+        {
+          "resource": "repo://packages/shared/package.json#L15-L23",
+          "version": "repo-lines-v1:sha256:999f117e32c54b023234569c6242f4b5d28b682a6bb131bdef7a4e2771f56c41:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMGQ2NDMwM2EwZjllODIwMDAxZjEyNzczNTU1ZWYxZjc5MDEyYWUxM2MzNjVkODU4Nzc5Njc5MDhiYWIzMmYwMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjdlNTc4OGQ1ZDlkNzNkMjRhODFkYmMwYTVhNzRiZmE4MmM5YzNiM2FmOTllNTJhZjc5NmU5MGI0NjhhOGEzZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTQxNWVkNzc0Nzg3MGZjZWU1ZDM4ZWZlMWNmNTQxMTBhNjZjMzFmYjRlYzVhYmM2ODc2MjBiZWIxN2U5YTdjMyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjEsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.test.ts#L1-L4",
+          "version": "repo-lines-v1:sha256:0c3fc3589ff9c29ada5218c8de69cbda02f04a383ace047600cb46edf05cac4f:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2JiZTZhYWFmMjE3ZmYyYjA2ZWIyN2MxOTBiNjk3NDZlNjkzZTVmOGQ1NWY4NjUzMDg1NTE5NTIzODZlMTA1YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGJkNWIwNjI4ZmFkMjk4NDMzYTEwM2UzYzA0ZGU0ZWM4NzY2NmQ1NmQ5ZmRiZDkzNDYzYzljMDIzMWQxMTQxZSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjAsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDZiY2YyNzYzNDdlOTU2NjA4MzQ5MTBlZTVlOTE5YzRhY2QxZTM3MzQ0NGY5OTZjZmE5OTQxNzBhNmY5OWIyNyJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/package.json#L25-L26",
+          "version": "repo-lines-v1:sha256:1a32471de02793dc326aa916c442e14a2c8c5c7a87a93327c59e43570bf05717:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDcwY2Q3YzNmMTY2MTE3ZmJlYWM4ZTdkYjFlMzA4NDIwYTFhMWEwMjk0ODM1ZjE3NWUxNjNjMDMwN2NjMGIyMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiM2FkY2M3OWEyMDkzOWRhOGY1MTA2ZGJiYTNkZWUyNWM0NjIzOTgzMGJjODg1OGIwMjU0ZTIzZjlmYTczNjRkZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjIyYWY4MjIyMzM4ZmI0ODQ0YmYxZmMwZGZlNjUxZjIzYTJiYjUzOGU1OTViNTIxZmY1OGRkZmRiZGY0NzIyOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNmFjZDhjMjk1ZGJmN2I2NjY5ODVhMTcxZWM1ODhkNWUyMTY5ZDE2ZDFhNjI0NGMyOWRjZDIxOTQ3YzNjM2QzMSJ9"
+        },
+        {
+          "resource": "repo://servers/websocket/package.json#L15-L17",
+          "version": "repo-lines-v1:sha256:ad564ca5ec94100e88c05377fd0ebfd64817093739ad4f9d04e852a4f77992e1:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODliODQzMzEzMjFjOGZhMmI3Y2E2NTViZTZkMTkxZGM2OTUwNGE1NTIyZDJkMTJhNWFjYWU0ZTc2ZjQ3MDM2ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODg3OGIzZTZiY2Q0ODQwOTA1NTg0ZGNjY2JkMjhjMTdkNzM2ZmQ1ODE5YWFhY2UwMzJlNWU2ZTMxYmI0NjBiYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODI2NGE2NTBjZjU3ZjU0ZjMzYTllOGFjNGJjZDg3N2ZjZDYzNWRmZmNmMTUwMzlkOWUwMzQ4MDliNjBlNDVlZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_616de253ff80443492cbe5c0072d02a2",
+      "statement": "AGENTS.md defines the smallest per-domain verification set as paired test/check scripts invoked via pnpm --filter @brijio/<package> for shared, websocket, mcp, chrome-extension, and safari-extension, and requires pnpm test and pnpm check for cross-package changes.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L159-L186",
+          "version": "repo-lines-v1:sha256:044ad0cf020a6d8b4a71e259d5188536027d487245ca23ec9e3c91afd7c210f8:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzODI5YWM3ZjgxZmUzZTNkNDM3NjhiODZjYjljODA4ZmZkZWVkOTI1MTZkZWMxNzYxYmVhN2M4YmFkY2U0ZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQwYjlkOGIzMmNhYTk2ZTdkZGJlODdjYjA2MjQ4MmQyOWU5OGNlNjI2MzZhOTYyYTNkYzAwZGQyMTZjN2M5Y2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_352c026cc2fe4abe87165de1847de42f",
+      "statement": "Before a PR, AGENTS.md requires matching CI with pnpm lint, pnpm build, and pnpm test, and restricts Docker validation to container/runtime changes driven by docker-compose.yml profiles.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L188-L199",
+          "version": "repo-lines-v1:sha256:c802aace511bf19fe93035c6746c1045c1a82736023609ba5f5520491bab40d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3OGM0NDU3YjY0NGQ2YzQxMTJhZmVmNjFiY2FhNjllNzcxZGM4ZTYxZThhM2E0ZGVjNzM0ZjY5ODhiN2Y3NDIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY1ZjExZWEwOTFjMzFjYWViN2JkNDI2MGVjMzBmZDZmMTA0MjhkZGZkY2IwNDEwZTU5ZjgyNTQzNTE3MzNkOTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImM1Y2UxNDMxNDZkZjdmOGY1ZGEzNWExNWRjODMxOGFmYTMwMTgyYTA3N2Y1YzJmMDY4NmQ5OTFmOGQ3ZjAyMTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhjMWYyYjNmNzNmNjM3ZjhlNzlmNDdiNTA0ZTU4ODM3NzY0N2E2OTQ1NmI1NGE4YzNlOWY4OWU4NmVhYWRkM2MifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6cd1851a51a84becbdf776701e0cdb1c",
+      "statement": "packages/shared/src/protocol.test.ts covers the shared Brijio envelope builders, type guards (is*Envelope), and parseBrijioEnvelope by round-tripping builder output through the parser and asserting exact envelope shapes, while protocol-batch.test.ts separately covers the perform_batch/batch_result protocol including continueOnError handling.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol-batch.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:ded576d388f4f8694edcaab37befc2cab33e56588c6929acb283fa38e281b453:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1OTU4NzBjNTdhZmU0NTJhMDVkNWYyYWY4ZjhiZWU3Mjg4N2EzNTBmMTMwOTkxZTk2MzBmODU2NDQ1NjczY2EiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4MDBiZTdmNmZhOTk1N2M2MjJjM2U5MmVmODYwNjAwYWZhOTI0ZGJiZDMxZmQ3MzhlYmE5MTYyMjRiN2U2NzQifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:454ecfcf0251f64b900dcf82393582420f047e5456ba532592986eb62bda4736:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjOWExNGExMTZhODBkNzYzMjY2MGFmMDE2Yzg0MzNhMDk2OTdkZWE5MDNmMmE3MjFiZjdlMTkwZmVmNjc1MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdkNjkxMjFhMDViZmQzNDlmZDlhYzlhNTY1MTVkMzkzYzY1NDI3MWQ3YzI0MmQwOTM0NzUwOThhZTRiZmEzODIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2c042a19bfbe4df7993eb22dcc7ae2a8",
+      "statement": "background-controller.test.ts exercises BrijioBackgroundController through a createHarness() that injects fake adapters (storage, setup, action, page reader/actions/batch/navigation, download, tab lister, approval, a fake socket factory, and fake timers) instead of any real browser or socket, covering connection lifecycle, reconnect semantics, request dispatch, approval gating (including approve_session reuse and approval_origin_changed), perform_batch approval interactions, and pending-request/keepalive behavior.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.test.ts#L1526-L1820",
+          "version": "repo-lines-v1:sha256:15f9b6c561c6d626f5645b9bb4914cb26405747d353079151509ba4cdff6d3ea:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjk1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjZTI5ZTU2ZmJjZThhYWU0M2ZkYzRiOTNjN2FiODE0ZWY5MzE5NjQxNTdmMzVmY2VjZWI5ZTRiZDQ3NGQ2MDZkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI1MTJkZjg1N2RhNGIyZjlhYTcxN2Y2YTM3ZjdjNTc2Yjc5MTQwNDUwMDU5Zjg2ZWE5ZThhMmQyYjdhZGVkOTcyIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyZDBlYzliN2FkN2ExYWQ5NzI1ZjQzNGJjN2YxZWJjNzZiMDI1NzFlYzI4Mjk1NjJlMWM3YzY3NWQ4Y2JjNDIyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1ZTU0ZmJhYTA5NGFmMjcyZmM3MWI2ZWRlYTgyNjQzZDA4NmQ3NGEwNTNjYTQzYWUxYWNiMGQxY2Q3ZTJkYTdiIn0"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.test.ts#L2025-L2110",
+          "version": "repo-lines-v1:sha256:b3ee6944104f4c5a1e22d98e635551df39f840334d7d814c3580b2e838b53a5e:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiM2U5YTIyZGU4MmZhYmIxYWE5YzU1NWJkNWUxMWMyZmMxOTMyZjkzYzZhZjY0Nzc2MmVjZWEzNGQ4OGMxMGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNDgyN2QzZWIwYjk5N2E2ODNjYzJjYmY5OWM3NGI5MDA1ZWQ5NzRkNjAzMzg4OTViNTViZDhlYWNhOTQ3YjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhMmUwMTMzYzE2MTc4YWY2OWIzMDYwMjMwNWE5MGQ5YmQ0ZDAzZWUyMjY0OGRmN2M5Y2U3YTE2NGQ4NDY3YmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhkN2Y3ZDY5Njc2ZjIyODE4MDdmZDBmNTM5NTRhYzhlZDU2ZGI2MjZhMzkwMTFlNWNjMmE3ZmI3MDRhYTU4M2UifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.test.ts#L43-L96",
+          "version": "repo-lines-v1:sha256:313c5c4f78c252c417561d22f750a23094ad4ec0c4b2962f503f66f0b7d2eac1:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzNzczNWNmYjJkZTA1ODJlNTUyYWFhZWU3YmM0MDYyMDBiYjQ5N2Y2MGY1M2M1MDM1ODIzYWEwNmQ4ZGY2NGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNiNmQ1Mzg0ZjM4ZDIyYzk2MjcyNTQ3NjlkMmI5YTQzMjIzOTY1ZTAzNjI2YTU5NzgwNjljNTQ5MDQ3OWRmYzkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZmNmUzMmQ0YmQ4OGJjNzY0YTNkNDExZjQ4NjQ4NTAzOGMyODY5YjIwODA1YmE4ZWM2N2E4NDA3NWY1NDllNmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhOWRmNzkxZWFjZGNlM2E3ZmI2NzIyZjdjOWEyNTNiODQ5MTdjYmNjMGI1NGU4YzI0NjcwMGNmMjc4NTNmZDIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.test.ts#L603-L738",
+          "version": "repo-lines-v1:sha256:2fd96f36c85b16f06607962c34516a5fc4c2137acd71f7d523919c72ee9980f6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4MDI4ZTlkZmU3Y2Y2NzMzNzAyZGM0N2I2MDczNWFlZmFiMjBhMjUxZTZjYTUzMzRmYzE4MTQ2ZjFkOGI5YzRjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJmZTAwOGQyZjNjMGUwZTE4YjE0ZWIzNTk1Yzk4NmUxN2IxOWVlYThmNWI0MTc4YTI0M2NkNmQyYTAwMDU4Y2NhIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyZDBlYzliN2FkN2ExYWQ5NzI1ZjQzNGJjN2YxZWJjNzZiMDI1NzFlYzI4Mjk1NjJlMWM3YzY3NWQ4Y2JjNDIyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiMDc5Nzc3Y2Y1MTIyMjU3MzVjYzc2MTAxZTM5MjA1YzQwNTc5ZTgzNjQwNTE1NDM1OTYwZTBkNTcyMDE4ZDIxIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_9af1d698d62547c886417282df06f713",
+      "statement": "content-handler.test.ts drives handleContentRequest against DOM documents built with linkedom's parseHTML, covering extraction, all action target kinds, disabled/readonly/unsupported control errors, and the stale_context validation system (expectedText/expectedHref/expectedRole/expectedLabel, pageContextVersion counter, and visibleContextId invalidation); page-context.test.ts covers the lower-level extractPageContext/extractPageContent/computeVisibleContextId primitives.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/content-handler.test.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:f3c7168b03be18309756801c4075b32aea9d9afe046e49d11adc54cf59a6cbcf:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg3ZTIwYTZkZGE5MTIxMmJmZjU2YzNjYmI0YjhlOWFjZjA3NzcyNDVmODc3Y2E0MjU5NmY0ZTY5OGYyMTExNDMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.test.ts#L1018-L1102",
+          "version": "repo-lines-v1:sha256:ef4e84ae0d959f88eb098787db049fcd71a932f4029c16eda6a1e4a05de0938b:eyJzZWxlY3RlZExpbmVDb3VudCI6ODUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZkNjk3YmJlMDRhMTIzZjE5NDYwMzMyN2IwYmIzYTI2MWNlMjAyY2U4NDJiYzIxYTU5ODI2OGVhMzRiZmU4OTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMDNkODg1NzY0M2ZiOWJkOWZhNDAyMWNhMmFmZmVhZThiZDM5ZTZhYzkwNGNjMGMxZjFjOTM4YmE1ODIxOGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzZGI3YTBmOGM0ODc2YmZmMGVjZDdjY2M5MmY0MGUzNGEyY2RiNTJmMmM0ZDA1ZmUwMDEzOWJjMTA1MzQxY2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5MWYwZTM0MzViOGE4ZjMyZWRhYjBhNzc1MzAzZTI1NDM5MzM3YWFiMjRmYzJmZDZlYTg2MzQxNzRhYzE4NmMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-context.test.ts#L1-L20",
+          "version": "repo-lines-v1:sha256:dbeb6537f8afe64c224fe9487c6c17022cf1c839f8c32161b9739dbfda42a1d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxNTM1ZThhNmRkMzFkYzVlYjZkMzNmYmMzNDU2ZmE3YjUwNWNlMzY2ODc3MDQ4ZmY0NzNmYjNhZDUxN2U4ZjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVjNGYxODdkYzg5MjY4MWU3YjY2ZGQ3OTA0YmJkNzMwNjMwMDkyNDdhODAwZjY0NWFjMGY4OWI2OWRkMjI5MWIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f75b24927da3440a996ef12d6de4eacb",
+      "statement": "page-reader.test.ts tests readActiveTabPage/performActiveTabAction/performActiveTabBatch using a makeDeps() helper that injects fake ActiveTabDeps (tabs.query/sendMessage, scripting.executeScript, isRegularPageUrl) and asserts ok/error-code result shapes (no_active_tab, content_script_unavailable, regular_page_permission_required) with no real browser.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/page-reader.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:41fb5936ae9992809020814ac902fce60859d0b8e27448c12a35df4b42cd63c4:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4MzU1MmFiNTcxNDk0YjM5OWIxODE5OTYyMmRiZTNiMzgyNmViNjFmY2QxZjc0Y2ZiMTJhYmNmODhlNGY3MjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0MTE5MDRiMmM2ODk3ZmYwNWU0MjIxOWQ3YmI4MWE0MDRlNDljZGI3YWYwODFiM2ExZGQ0Mjc5OGM0NmQyYzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_17d9498b19754ab4aefc5ecd1006b10a",
+      "statement": "batch-handler.test.ts covers batchActionToContentRequest conversion and executeBatch, including single/multiple actions, abort-on-error vs continueOnError, the rule that page navigation always aborts even with continueOnError=true, readAfterActions appending page context, and the page_navigated error code for aborted entries.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/batch-handler.test.ts#L35-L375",
+          "version": "repo-lines-v1:sha256:9dc5f0d56c624f56891bdd7b6956e20fd8c137ffed49f490ceb1fd70dd8f9361:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1NzIxNDBhYjM2MWYxYjI5YmYxZjA2ZDNjYTIwZWJhZGQ3OWMxMDcwZDJjM2ZlYWY4NzdjOGMzMDQ0YTBkNTM2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4NTgwYjc2NTE4ZGFlOTc5ZmFlYmQwMjM2N2EyOTI5MmE1MGQ5NzYwOTIyNTFhMzhhNmNlMzA4ODBiYTQyODI1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmYjU4MGU5NjRmODNhNDczZjQzZDQ0Mzg0NjI5NDlkNjhiNTYwMGZkYTc4N2YxNjM3NDVkMDBkZTg5Y2JmMzZhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_32796443915b475e8a05d12845a78c23",
+      "statement": "servers/websocket/src/server.test.ts starts a real createWebSocketServer() on an ephemeral port with known pairing tokens and drives it with raw ws clients, covering /health enriched JSON and getStatus presence tracking plus authenticated routing: auth_required/auth_failed, server-initiated presence request, token-scoped browser listing, list_tabs forwarding, default vs explicit browserInstanceId routing, ambiguous_browser_target, browser_unavailable, keepalive acceptance, and presence removal on disconnect.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.test.ts#L17-L70",
+          "version": "repo-lines-v1:sha256:8c0769770f80f066409b462a2b4864b78b3032de8314d3b84f74ebbb433e6079:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0MzIxOTZkNmY1MzkwN2Y1MzNjYzk2YWEwNWRmMzk2NDRkMGQ0ZWRkNWI4Y2ZmMjg3ZjdjZGIwMmQyODc5N2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiZjZjNWVhYmIxNDJiNWNlODYyZGI5NWQ4ODQ1YTJkZTg1MjgyYzNjYjZjZmNiZGU2NDE3M2QwNTVjNzFmMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkMzdlNmZiOGYxZmI2NmQ3N2Y1YTZiMmE3MTc4MmNkZTI1YTNkMGEyZDUwZmI5YTNhNWQ4ODhjYzQwNDczOGUifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.test.ts#L72-L360",
+          "version": "repo-lines-v1:sha256:511c2e1f78c0afde6785ff469b8149f0a558c557a19607524d081389433d4c1c:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjg5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyM2U5Mjg2OGUxOTUyZWRmZDNjZTUyOWNjNWNjY2I0Y2NjMDMzYTg0ZDdmOTY5YmM5ZmU0MzE1YmY1ZjM1YzVjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxZWYwYjlkYzJiNWUxYjlhYmVjYmYyZjEwMTVhNDUyM2NiMmE3NTFlZWQ4MjQ0MmEwYTcwODgwZmZjYWY5YmZmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2MjcwODQ3MTlkMDM5MmRmYWRhYjJlZTJjNmI1MWExMjViNTA2NWIxMzRiM2M1YjY5MjdiZTJjZDAzYTVkM2EzIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_098dfb4e196f421d958cfb707e4f80d0",
+      "statement": "servers/mcp/src/index.test.ts starts a real MCP HTTP server backed by a mocked WebSocket layer (raw ws WebSocketServer) and drives it with the official MCP SDK Client over StreamableHTTPClientTransport, covering /health, unauthenticated-request rejection, origin allow-listing, the initialize/resource-discovery/ping lifecycle, browser://page/current and paginated content resources, and structured tool errors for invalid inputs.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/index.test.ts#L116-L1341",
+          "version": "repo-lines-v1:sha256:7fac89ab41259077b90589b6b6b2aba06823178797b69a91c958aa8901129e2b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIyNiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWYwMDdkYjQxY2Q0NTVmOWNkNmEwY2Y4ODE1MGU5MWY0ZDU3MDI5YzU2ODU3NzkwYjNhNDQ1MzE3MjRlNTIxZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDJmM2FlODdjZmJiMmVkODcwOWJiZGM4NDRlNDZhMWRjZGUwYmNmOWUyZjkzMTQ0MTQzMjY5OWM0ZjlkZDVjNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYmFkMTc4Y2MzNmIyYzJkNGI2ZjlmZjU5ZjQ3OTQzZTM0MmEzNjdmZTljNWUwZjdjYTEzNzVmMDU3MzYzNmRlMiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzZjMWNiZjVmMzZkNGY0MTRlMjEwMTliMjMzMjBhMzdkNjkwYTQ0NzE0Nzc4ZWM1YTFlYWQzYWIwYmI0NDQwOSJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/index.test.ts#L26-L60",
+          "version": "repo-lines-v1:sha256:6c9aa53df987b5db0cb12d9e91c9196f2a6619982bd2b6a9cf1c5ce40135d2b2:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmMDYxYTMyMTllYzQ3ZDRmNjRhZDI3YmQzYzZmMTVjNzgyYjcyYWMyNmY3NDhjY2Y5ZjNjMzRmYmM4MWRkMTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNWQ2ZGUyOTNlYWNlYjk2ZWE5MjFjOGU3ZDA5OTMyYTZiYjFjOThhNzcwNTc1NmM4OGQ5MmI4Mjg3NDMzYjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhMGJlNmQzOTE5ZjgyMWZjMGY1ZGE4ZGRhODUyMDc4ZDVmMjE3NmQxM2ExZGJlMzkzNWUyZmIxZTg3YzRjOTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYwMjM4YTc0Yzc5ZTg2NTZjNjFhYjBiYjhjZDQ5MGMxOWQxMGZhZjU3NTQxMDdmNWQyMjNlN2EzMDYxMmZiM2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6a96f1c524804869a9142ff51d9696ce",
+      "statement": "MCP tool unit tests validate tool input validation and result shaping against mocked request* WebSocket-client functions: click-element-tool (target/expected validation and stale_context passthrough), fill-input-tool and form-action-tools (ID/type/checked/array validation and success shaping), and batch-tool (non-array/empty/oversized >20 arrays, invalid types, non-boolean/non-number/non-string fields, valid mixed-type batches, and error propagation).",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/batch-tool.test.ts#L7-L236",
+          "version": "repo-lines-v1:sha256:930f5e6679d4700b9c6a958883d2806365204736479262b0bc33660199db9702:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI1OWUxYTM1Yjc4Yzc3Mzc1NWViYTMyNmQ3OTliZmZmYWFiYWVjMTQ4MzRkOGFhNDE1NTBlZjcyMDY1NjIzMmQ1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0NWY2NjlkNWQ2NWUyZGRiZmQ4NWI2YmI5ZDRlNjY1ODY0MWRjNjA0NzJlNzgyMjYxZmZmOGJjM2YwMTRmNGFhIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI2ODc5NmNkYTc5OWM3NzJiMzRhMGUxMjgzYzc5NzFhYjQ1NDlmYzhiZTMxNWNiZjdjY2Q1NmJiOTQzOGVkYzZjIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjYTkzYmM5YThjMTdiMDk1ZWIzM2E2MDJmZjM1MTQ0ZjNhNzA1NDA5YWEyOWUyZDI5ODZjYmFjZGFhN2U0Y2JiIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/click-element-tool.test.ts#L5-L300",
+          "version": "repo-lines-v1:sha256:6177d9b0135c1bb8bd9cdb127dea1b66c91c92141b699822f7b21835487deeef:eyJzZWxlY3RlZExpbmVDb3VudCI6Mjk2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI3NGJjM2E3ODg5ZjFlOWJkOGM5MjUwYTZjNDJmYjZhNTVlZTcyZDgxYTJkODk0ZGMxZDVhOTA2ODdkODcyZDJjIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzMGMxZjE4OGYxNDJlZDdhODI0NjgwYjIwNzE3MmM1NTE5YmM2MTRhNDhmZGE3Y2YxNjdlZGI4ZGRmNzk5NTZjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlNzljMDdiYzZhZWQwOGM0ZmJlNmM2NmVkMzY1MjAwZmI0N2Y1M2Y2YzlmYmQ5YzBkNjc0YWI3ZDQyZDRiZjY4IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiYWMxMzVlZThkM2M1OGZmNWVkYWNiNzBkY2IwMGVlZjc2YmRkZmYzYjRkMTljNDJjMmFmYTdiNGRmYTA0MGRhIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/fill-input-tool.test.ts#L5-L135",
+          "version": "repo-lines-v1:sha256:f72e5437e3e38126f092a2c35bfa795f4a9e370dce69f8619d45c073bba7f95d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI4ZTE3NDA4MDVhNjJjZDRkODBkYThhYjViZTY3NjdjZjFjN2Q4NzU2Y2I1ZGFiYWZkNjA1YTFkZDI4OWU3ZDA4IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzZjUzMTFkYjFmZWZiZGI0MGMxMTUwMjBiODNkNzk1ZGY4NTkzMTMxOGU4OGQ0OTRiZTBiYTEyZGJhNmI4ZTljIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJkYjBkNGMxM2FjNTc4YzBiYzliMWQ4NjYwZTY5MWY5MDIwMjBjNTEzYzQ2ZjU0MGJlYmU5NWQ4YzQ5Njc0MWM3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI3NmQ4NDg0MjZhZDU0YWZjZWQ5MzM3ZjdlYTUwZjM0ZTBmYTMyMWQ2NWJiMzgyNDAyYzQxYzIxZGEyM2E4MGNkIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/form-action-tools.test.ts#L11-L105",
+          "version": "repo-lines-v1:sha256:27ad2257433cdc99e95269241f4e172abf03d320b86ae833d05372d574527d15:eyJzZWxlY3RlZExpbmVDb3VudCI6OTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmOTRmMWVkMjczNTAxNmEyMzQ2YzMyNzRjMWVmYTk5NmE3NmUwNTIzYjBmOGU2YTFkMWI0YTA2NmYwNTBjZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllMjY5NjhjYWFmMDI4NTQzNzA0NWNmMDcyNDc4Mzk5ZjI3NzgyYzc3MDEzYTIzN2MwMDQzYThjZGJlMDU4YjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3Yjk2YWMzNDNlZDQ2OTRjMTM2MjU3Zjc2ZjM5M2UzYmIxZjg4MWQ3MmJkOWYzY2MyOTJlNjY2YTY0MTM0OTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZmMjEzMWFhZDg3NTAxMDRmYTRlMWU1ODUwMjJhODg5NjE0ZDZkMzNkMTk2MDZiZDA0ODVjODFjMTJjNDA0MmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_665a3d7a5c8845debfba381c6a9d36ee",
+      "statement": "servers/mcp/src/protocol.test.ts covers the MCP-side envelope builders/parsers and extension-specific error-code parsing (with protocol-batch.test.ts for batch envelopes), and websocket-client.test.ts asserts the MCP-to-relay client authenticates before sending requests and routes responses back to callers against a raw WebSocketServer.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/protocol.test.ts#L27-L1290",
+          "version": "repo-lines-v1:sha256:1abd903ca20bf02a1c7b2deb750f2908b717450a8ac2e51af2c44a6d40cc8335:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI2NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZTg4YzJjMDdjYjY4ZjU5NDJiMzM5YmE1ZmUzY2M0YmVhNTE4YTlhZTBjMjZmMDcyOGU3YzRjNDg4NjM5MTBmMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODU4MGI3NjUxOGRhZTk3OWZhZWJkMDIzNjdhMjkyOTJhNTBkOTc2MDkyMjUxYTM4YTZjZTMwODgwYmE0MjgyNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjFhNjhiMWI0ZTVkMTJkNDViNWZhYzRjZjViMzJmMGVjNmE3ZGZkNTI4MmRhZDcyYjA1NzI4OTQ4NDAxMzYxZSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:f52dd2a0d0c4a931d2303c1c470d49b4bad6c849d80e67e778456caeb6830496:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5MDk4MDM2NzhhMDA5NzZmZGU5Nzk0NzM4NmNlZjg2YzdlMzdjYzhiZjIzZjQyMjZmZWFhZWI5YjBhM2RjZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjOWNkNTY2NjY2ZjQwNmI5ZWE3ZWU3MTI2OGI0OThhOGY3MDkwYzQ5NjQ0ODhlZTU5ZmY3YTEzZGI0NjhhZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b36ed47122f04548b461c3609b71dfdb",
+      "statement": "The full-stack integration test (servers/mcp/src/integration.test.ts) was introduced by ADR-0034 because unit tests mock the WebSocket layer and cannot catch auth/routing/presence/protocol regressions across the real stack.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0034-integration-test-harness.md#L1-L30",
+          "version": "repo-lines-v1:sha256:3c7f5f72fb09e20fbdd38f7937dad9e6afc936869ce4433a4cc8d8a2fe71ed56:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZWU3OTkzMGM4NGMyMDc1NDcwZmJlM2QyYzA1ZDNlNzFjZWU4ZjFlMzQ4N2RiZmI1YmEwZGRjNDRjNWIwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2NDMzZmYzMzAwM2U3ZTkyMjQwMTE2ZGNlZTdmNGYwYmU2NWUyY2VlN2ZhZTE0ZjY5MTcwMTg2MGQyMzkxMTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijg1ZDUxMjViMWE5MDgyYzQ3NDNmYTk2MGI1ZTg3MjA4YjA5Mzc2ZDJhMDI4MzhkNzQ4YjEzNGY3ODQyZGY0OGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_959e1dd0900c422180c21d1fb9a64523",
+      "statement": "The integration harness (startIntegration) starts a real createWebSocketServer() on port 0 with a known pairing token, a real startBrijioMcpHttpServer() on port 0 pointed at that WS server with a known MCP auth token, and a fake extension over a raw ws WebSocket that authenticates, announces presence, and responds to forwarded requests with fixture data.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L452-L525",
+          "version": "repo-lines-v1:sha256:3a1274d1cc4632364ceded31a2c4a1b0c2ed2123d3c7301e0017e820195cf5c5:eyJzZWxlY3RlZExpbmVDb3VudCI6NzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE0MmRlZDg3NTk3MTI2MTk2ZDQ5MGM3ZjZiZjMxOGQ0MmZkNmI3N2M3YmVlNDNkNDUxOGQxNGNlMDExNWE0NzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjNTdhY2U1M2YzZWJjMTY4MzhlYmY0NTY4YTdlZTU5NDc0YjExOTdiNjJjOGFhNzAzNjNiN2Q5YjE2MTI1ZDQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5Njg0OWMzNGM3YmY0ZjA1ZWJhM2JiNTk5Y2JiODNkNGI2ZDBlYWY1YmYwMjFkMWI3ZWRiMTg0NGI0YWZhNGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyNDRkYWE3YTE5MjE2MDMwNmNlYzQ0ZGUxYzRkYzllOGZmMzhiYjdlNWNmNjMzYjIzMzU1MmNmM2U0ZjhkZGIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L560-L720",
+          "version": "repo-lines-v1:sha256:b6dbedf23c529acb1347bfdb8ff824f319655413703d24b1a399979c196d9216:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5YjYyZjYwZDg1OTBhNTc5Y2Y0NmY4ZDY3Mzc4YzRjNTcyYjk2MmNlY2NkYjkwYzdhNWY3YjQyYjk2MDc4MmE0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkMDUzNDRmNjZmZGE2YTY4ZGYyNzhlOWQ1YWZkMWZiZjFiMDBiNzVhNjVlMDI1MzIzNThiZWRlMDM5ZjQyZGE5IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0YzEyMWY3OGNhMmQ0MDRlMWNjMDc0MDA2MDc1M2I3MDllYTk5YWI2YTE1YmRjZmUzNTkwMTdiMDQxM2Y3NGNlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1OTA5NzM3YWM5OGQzN2EzZGMwZTM4MjY5NTE1OThlNWVjY2NlZjgxMDBhNmIyZGEyODdmNWNkZDE2YzRhZjExIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_3cdf732d189e4be78123c290b6e397f8",
+      "statement": "The integration suite drives a real MCP SDK Client over StreamableHTTPClientTransport to assert end-to-end behavior: 401 rejection of unauthenticated requests, list_browsers from presence, read_current_page, click_element, fill_input, fill_editable, set_checked, select_options, submit_form, a fill-then-submit lifecycle, navigate_to_url, the unsupported_scheme short-circuit for ftp:// that does not hit the extension, and browser_unavailable when no extension is connected.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L31-L447",
+          "version": "repo-lines-v1:sha256:e4811e21784a4cd2ac8a6adfcc2a35fcabf1e45f44551fc7359133c9de33b4bc:eyJzZWxlY3RlZExpbmVDb3VudCI6NDE3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmZDAwNGU4MDMyNzhkOTM2N2JjNmYwYWNjMTZlM2M0ZThiY2VlY2VmODgwNTlhZjg2YTgxYTRhNTM5MjdiYTBmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJiMjM1MjU4OWMzNGQzYzYwNjg1OTMxYjZlY2M0ZDUwOTkxYTdjNTZjOGZiYTI4OTQxMTQ2NTc2OTAyNzJjYWMzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjYTQyY2Q4OWE4ZTYwYzY5MzBkY2U3MDY5ZDI3ZDRkNWFkNDgwMmQxYjgzMmYxMTM5MGNjNmFjNGI2MjYyMzIwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI3MjY5YmIyZjU0Y2NiNWI5NGMzYzYyMzNjYThmNTU0MzgxOWU2NDQ2N2Y0ZjZiNGNjZmU2MjdiNGViMTIxN2RlIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_5e79515e47d84f3c9de3154acbd1451f",
+      "statement": "In the integration test, list_browsers is answered by the WebSocket server itself from presence data rather than being forwarded to the fake extension, while other requests are forwarded and answered with fixture responses.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0034-integration-test-harness.md#L40-L44",
+          "version": "repo-lines-v1:sha256:333d0933673d9dc2b937ae3b2571859966e4bff7a33359c457b655eb737b793a:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDljYzA3ZjY4Y2FlNjRhMWI4OTYwMjUyNjExMmQzMjAxZDRjZWNjZjdhOTEzNmFkYTJlNzJjNDkxZTcwYjlhZSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzhkYmZjNzM5MDdiYTY4ODkwM2NlZjQzZTE2MDhlNTg1MjUzNTQxNTU0M2RiMGQ3ZWEyM2IyNzI0NGJkODIxMSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjFkM2I4YTY4MGFhN2NjZjYzZTcyYTM5ZjVhZDdiODI1YTgyNDc2MzU2YzRiN2M1MjhmN2Y3Yjk5OTdkYzlkOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTA5ZjJkMDhlMWQ3ZjBkOWQ1ODRkOWEwZjkyNDQ0MDI0YjdhNTFlYTFkOTBhYjdjMWQ2MmMyYmE0NjMxNTUzNyJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L54-L80",
+          "version": "repo-lines-v1:sha256:2c85c1830f39eba5594360143da81d9b7dcc64d549afbc682dea6329a8359d3a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZTAzMGVmMDhhZWRiMjQ0OGNiMTA0MmQzMWZmNTQ4MjAxZjdiMGZiNjBhOGNjNWQyMmZkNjA5YzFiYWZhMzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJhZDE3OGNjMzZiMmMyZDRiNmY5ZmY1OWY0Nzk0M2UzNDJhMzY3ZmU5YzVlMGY3Y2ExMzc1ZjA1NzM2MzZkZTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNhMGE4NzljY2RlMjdkYWRhNzdhOTMxNDE4OTFjMzliYjQwYTMzZjkwNmFmYTNjZWZmOWZlNmFmOTdjZGFhYzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_91e2d08b366f4e478771291e82ec2493",
+      "statement": "Chrome and Safari extensions each run their own background.test.ts under node:test using injected fake browser APIs (mocked chrome.* / browser.*) so they run without a real browser; each platform tests its thin adapter glue (approval adapters, message handler, navigation, tab lister, badges, storage) while delegating shared behavior to @brijio/shared's BrijioBackgroundController.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.test.ts#L1-L50",
+          "version": "repo-lines-v1:sha256:b778b26e6f19552a50567d095a6d751440ef1325f6c0f6d37193f62cc88bff27:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjZTk3NTIyN2M4MDFmYmQxNzUzMGUwY2UzODNkODFhN2Q3NmFmODkxNmUxZmI3YTU0MWE4NzQ3MTQxZWJkNWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlMGY3MjkzZDE1NmE2ZDEyNTI4ZGIxMjkzMzc5ZTUyYTVmODM2NzA0NDI5N2IyMjgyYjk3ZmYyYzg2MDQzOGQifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.test.ts#L1-L50",
+          "version": "repo-lines-v1:sha256:74c69f742e55281d4532dbb86d4ba3185858085a3a0092a6136c5df50775e14a:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0MDZkZmYzMTg3YjYyM2ZhOWRiY2U4YmU5ZWUxNjRhMjRlNDk5MjFkOGM2MzVjYWYzNGM5MDI4NmE3YTdlMzEifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:46:23.462Z"
+  }
+}

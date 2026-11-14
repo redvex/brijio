@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1d34775af24cd4d1a8aa5b84d5870bb858f895cf25b974d92bb7c871d243fe6d",
+  "claims": [
+    {
+      "id": "claim_960ef60594054b74b48939f6a0926393",
+      "statement": "Brijio is a user-controlled, privacy-first bridge that relays short-lived explicit MCP requests to the user's authenticated browser; the extension connects only after explicit user action, the browser never streams ambient state, and every read or action is initiated by an explicit MCP tool or resource request rather than continuous streaming or background surveillance.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L42-L57",
+          "version": "repo-lines-v1:sha256:076913ecfc129585addf0fcec6e0f510faa8c6672f5b1f169ddf89ad2fef1748:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzMGMwNDEyODVkYzI3M2JmZDNhZTFjN2FmYmFkMDFiZTJlNjAwOWMzMDVmNDYwZDZmM2M2ZWM1MTI1MThkNDUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJmZTdlMWY4YmRmZmEzNTgyNGNiNzNiZTg4YTJlOTg0NzdiM2MxZjdkMWY4ZjAzMGU1ZDhjZThkNDVjMjc5MTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNmN2IwYmY0YjU1ZDA2NmUwODg5M2RmOGQ4ODhkMDhiODIyMzE4OGZjZWFlY2I3MjlkN2IxNGFlZTQyM2NiNmQifQ"
+        },
+        {
+          "resource": "repo://README.md#L61-L97",
+          "version": "repo-lines-v1:sha256:53ac11d6486b511aa9252930de1795474b92324824c51ba670db8671519bdefb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ2ZjFmYTdiNTczMzdhZmJiNjY3NTRmMmVkMWU3ZWI3YzFhZmI4MzBlOWVmZWY1MGIzMzgxMDViZjk0OGJhYzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmM2MwY2M3NmY0ODQ0ZmNmYzI3N2ExYjY2NGNkZjJiOTA1MmY5OWJlOTU3Y2YyYTdiYzViMTczOGQwOTg2NzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRkNjc1NGVjMGQwNjY0YTY1ZTljOGEzZDhiNzQwMGRjY2JhNGM2YzRkNjJkZTM4MzU1ZTI1NTNhNzk2Nzk1MjIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4381d8e279e94e45be0bc9370b79b373",
+      "statement": "The repository is a pnpm TypeScript monorepo whose major domains are packages/shared (shared protocol and browser-agnostic logic), servers/mcp (agent-facing MCP surface), servers/websocket (the relay), and clients/extensions/{chrome,safari,firefox} (browser-side bridge packages), each with a distinct ownership boundary documented in AGENTS.md.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L111-L120",
+          "version": "repo-lines-v1:sha256:5491ed1ad7775e76d826adced2d8c8cdc32e175446768eb8f6c95307a33acd3d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxYjAxMDU0ODA4MTQzY2UzY2RkMDY5MGM0MGI0MTEwYzVhNDY1MWZiNjk3ZDc4ZjY5NTU4NWQ5ZGNhYWU5Y2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0MWZhNGJmZTk2ZDU5NzA4Mjc1NGFiMzcwYTI2YTdlN2NmNjQwZWFiMDk3MWIxZjZmODI1OTIzM2JiYWFiZTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgxNmVmN2YyYzhiY2M5Yzg3ZWJhOTk0MzczNzc0ODNlZmNhNTRjZmU2NmZkMzRlM2I4MDM0ODM1ODM4Nzc0MGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVmYjljZGUwYWM3YjRiMGExODZhMDI5NGY0Y2JhYWRiZWYwZjFlZjkzMGY2N2M4ZWQyOTkxOGQwM2Q5YjQzMTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0ecb9c713e4c4b3fa7a44ce9485cb90a",
+      "statement": "The runtime path is a single explicit request/response chain with no continuous streaming: the user manually starts the bridge, the extension authenticates to the WebSocket relay with a pairing token and announces presence, the MCP server (also a relay client authenticated with the same token) forwards agent tool calls to the relay, and the relay delivers the request to the connected extension which reads or acts on the target tab and returns a structured result.",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L140-L185",
+          "version": "repo-lines-v1:sha256:c8f61b8bd4de8f3da46cc0d495b72e7d7bd180ddd763255621d093bb9d8da2fb:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFhMzlmYjQyYTE0YjI2ZGFlZWY0ODMxZWMxYjk2YTZiNzNmNzBkMzI4NDgyNWFkY2Y0OTlkZmQwZTc2NThjNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2MGRhMWNlMzQ0MzdmNWRhM2E3MjlmNmUzNDQ2MmE3MTUzOTI0NTg2ZDhlZGFiMGM3NWY2MzRmMzEwZDcyOGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiYjg1ZjRhYWJhNWU2OWE3OGJiN2FlNjUwZmQxM2Q0OThlMWU3MmRmYjc1ZDZlM2I2ODYzZThiZjkyNDU2NGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiZDgwZDdlZGU2NTM2MmMyNmI1YTU5MTA2NWViY2Q1NTI3ZDA1MjExY2MyY2IyZjU0ZTk4NDExNmViZGIzYzMifQ"
+        },
+        {
+          "resource": "repo://README.md#L187-L219",
+          "version": "repo-lines-v1:sha256:9421dd9d41823c06ec45eaf3d721d805499cbd3365d3837dc6568e2d508588e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2NmEyMDI0OGU4M2Y3OGM3MWU3YjBiOTRhZGZmZmQ4OTM5NmQ1YzFlNmEzNWVhYmJlNmUyMzA4MzMwN2M1NzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2N2U0ZmY5Y2Q3MDRmMTk4ODg5YzVmOTE2MmY1YTYwMGI5ZWM5M2UxZGNkNGJmMzc2ODI3ZWI1ZjgyMTJkYmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk5ZTJlNGVmMTM5YmM1ZDljNDc2ZGQ4MjJhYzIzOGNiYzg3N2MwMTIzODM5ZDU3Y2JkNDQ1YTM3OTlmODlkMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzMmM2MzYzNzUxODFmYjMwZGRlN2FlOTRiYWM5OGZmMmMwMGM4YWFlNDY0NzQ4YjdlZThmNTQ1ZTBjYjZiNTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8b5751200ec3404788f51ea3a8742aa7",
+      "statement": "Reads, actions, batch operations, and navigation all accept an optional tabId for multi-tab targeting, and when tabId is omitted the system falls back to the active tab; the tabId is threaded through the MCP tool inputs, relay envelope target, shared background-controller adapter seams, and browser adapters.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md#L30-L52",
+          "version": "repo-lines-v1:sha256:1fbdabb8137d6c621c34aec48590f17e887d91bd8188ab26f9bd2959543ce823:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyMzQ3MDY3MDZhYTg1NDE2Y2M4MGQyOGYyNTM0ZjNkZjIzNWM1ZDUyOWY0OTA5YmI2MTY3ZmY1ZmEzY2RhMGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkODRjZDlkZjgwYTY0ODcyZTlmZWE3MmJjYWNmNDMzODVjMDUzNDc0NDAyMWVlZGZkNTJhNmZlNTA4OTIxMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdkODdiNzBiNWYyOTE2M2RjNTg1ZjMzYWExZGU3NDUwY2Q4YzhiNGUyMmM4MTU3ZjdlYTYxYjQ0MzVjN2M1OWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRhNTA5MzM0ODE4YmRhZGI5MWZlMDdmMTk3ZThmNjQ3ZDM2YTAyMGFkZGUwODIyMTIyZDM1NTdhMTdjZGUxNzMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L136-L145",
+          "version": "repo-lines-v1:sha256:c919d06465019688d22824ca8171afe6f795657883365b7bcfc38f0805c328c8:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4NzkyYjdmOTZhNWI2NTA3ODAwMzRkMjI3MGFmOWQ0MzExYmNhY2ZhYzQ1Y2IxNjljY2UwZmI0MTQ4NDNhNTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQwZTUyYzE5ZTk5ZTFjZGFiZGZjM2EyYjJhOGY5OWNhNTJiM2QwZDE2Y2NhZTM4ZGMyYmIxYzM1ODhjYmU2YzQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4NzQ2OGUyOTUwYzQyMzVhOGZjN2I3NmU1NWJiNTU4ODUxZDYxZDhiMDc2MjgzOWUxMWIwNGU1OGRjMDk1MmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJjZjU2MzdmMTUzMTM1NGMyNGZiOTkxOTZjYmU4MDg4OGQ2ODQ1OTViMTFlYjNlMWE3YmRiOGZlNzgzZTBkNTgifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L80-L80",
+          "version": "repo-lines-v1:sha256:d8e02efa81455c9ca076a5aa9e893bce4406ad2dda099e5ba47f6c4bf0061adb:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhlMDJlZmE4MTQ1NWM5Y2EwNzZhNWFhOWU4OTNiY2U0NDA2YWQyZGRhMDk5ZTViYTQ3ZjZjNGJmMDA2MWFkYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDhlMDJlZmE4MTQ1NWM5Y2EwNzZhNWFhOWU4OTNiY2U0NDA2YWQyZGRhMDk5ZTViYTQ3ZjZjNGJmMDA2MWFkYiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDkzMTZlYzc4YTcyNWM3ZjNmOTk2ZmFhOGEyNmM0NTM4MWU2ZDk0MDU3OWFmMjdlM2JhMWEzYzYxODllOWRlOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzlkODU2NDI3YzZjM2ZhNGI1YjE2MWM5NDNkY2E4MWNiYTVmMTYwZDk3YjVhZDMzOWExNTRkZDYyYTQ0MzU0NSJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L98-L109",
+          "version": "repo-lines-v1:sha256:537e24ba6fccc7c1a7a970dc72e317bc7f822ef5da2c94199c0bd18ee72920b5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMDQ5YjQ3YjlhNDc4YWEzNjc0OGY1MzVkN2FjMTVkMjcwODI3YTdhY2UzYWE4NGI3Y2I3ZjU3NDY2MWYwNjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwOGYyZjU1ZmE2MzYzMWNlMTg4YTk1NzI2NDFiMjk0ZTkzODJlZjA3ZDYzMWM1YjcyZjdjMjM1YTYzZTNiYTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNhNThjYzFiZjQ3Y2NlMDM1MDhjM2M1NDAyZGFlMmVjYWQyZGQ0NjRhNmNjZDBhNTQyN2YzNmU3N2RiMGFlOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5MzdkZmIyM2U3NWViNGQyOWFjZTQ3MTRkZmRkYTNmNWE1ZmZhN2E3ODUzNWRmNjRiNjM4NTcxZjczOTY0NzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_aa7a39d8f3534607a2270a012a4b61c8",
+      "statement": "AGENTS.md designates executable behavior (source and tests) as the authority for behavior, docs/project/CAPABILITY_MATRIX.md as the canonical product contract, docs/architecture/decisions as the architectural decision record, docs/security for security intent, OpenWiki for repository navigation and cross-component workflows, and the root and package README files for public setup and usage.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L19-L37",
+          "version": "repo-lines-v1:sha256:3abcb7943ac030c21e809c80e4deb46e28e657a8f273726bd8aa5035c468326d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcyNTY4ZTM2ODkyNDY0YjdlMjc1MGM2ZTcwZTdlN2Q3MDE5YzcyM2NlM2FiZGEwZjIyNmFjZTBkYTEwNDQ2OWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNhZWZiMGMwZTU2MWE3Mjk5MWFiM2RkOTZiNDliNTRjNDJlMjAyZTRkY2I1MWMwNGQ1MWExMzNlNDNkMWNhYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNlZTRkMmM4OWFkYjEwNWQ0ZWMyZTZjYTdhOGQxNzViZTQ0NjM4MDI2NmNhZWUwYTdiZGFiYTUzODkyMGY1NTkifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:46:23.462Z"
+  }
+}

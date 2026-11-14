@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8576232179901738336445ba717b63b740ef062596155ac367afe744ab3e034e",
+  "claims": [
+    {
+      "id": "claim_20bc2329d2b3460a862dd77685bd6369",
+      "statement": "The shared BrijioBackgroundController gates only submit_form, fetch_resource, and download_file for client-side approval via getApprovalActionType, and calls ensureApprovedAction (which uses ApprovalAdapter.requestApproval) before executing those actions; all other action types execute without approval.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1693-L1710",
+          "version": "repo-lines-v1:sha256:c4dac79010e5c382b24fdeb120f72aa57a667125b0875f081d08c1e53384d105:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2MjY3OTM1ZmM2MzM0NjVkODQ4YjQwYTRlZDY5NjdlN2I3YTMyM2Y4MWNkNTNjMTEwYWUyMTAyOTY4N2FhMTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwNTZmMGJjMGIxZGU1YTEzNWQ2OWIxZjM0YWVjNTRiOTdjNmQ0ZmYzYTQzMTk0ZmI3OTY2OWEyZjE2ZmIwYWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMxYjRmNDU4ZjJmYzk4ZDk2YjI3MjFmYWRlNTFlNGM3ZmMzZDU2MDlkZjM1MTVlNmJjOWI3YjQ2MTZkYzA4ZmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjNWNhMTVkOWJiOTg2NjczZDJhMDU4YjFjMzZmYTk4YmE2OWIwM2Q3YjJhY2YyYzU4ZmQyMDc3ZTM4MTg2YmMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L280-L290",
+          "version": "repo-lines-v1:sha256:be22808017294854b4da9dadb6ea7f1fb3d9380e258305167841717802ec76bb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0NDNjNjdmOGEzN2JkOTUyYzQ3MWQ2ODBlMTA5ZTYxZTU3ODlmYTRmMTY5NDMyOTdiZTM4MjBmNjIwMTE2ZjAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNiYjc4ODU0NWU3NDU5ZDg5OTg5ODMwZWEwMmQyYzM5MjA3MjEwMzI3YjA0Mjk5YzNlNjYzYmYyMjYxZjM0MDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5MTY5MGZiNjRjNzQ0N2Y1MDE3OGFjNzUxODE2NDBkNzg3ZWVmNTc2MTA1MGJkYzc3Y2Q1MDk0NjJlMGJkZjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU3MTU0YjRhMmFhNTMzMWVkMjc0YWZlNDBjYjRmMzNiYTllZDMxYmU1NzFkMTMzYTNiODQ4YzRlNTUxNTc5NWQifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L807-L820",
+          "version": "repo-lines-v1:sha256:53cc644adbe4317a80f17f90e0f90a1bda338accdef80337bb3865b439e4827c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmZDE3NDA5ZmIzOTYxM2E3OWU1ODYyZjA0NTI2NjY1MTkwNzEzNzVmMWUzNGU0NWQ2MWM0ODBhNDY5NzExYjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3NDgxY2MxMDcwZjlhYjZiMzk2OGM0OTNlYTcwM2E3MzdlMmE2ZjY2ZjBmN2ViMjkxYjE4NDhjZWY2YmIzYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3NTNmZDhhYzJkMjY4NGZlZmVjNjIyMDFiMmVmMzA1MjU4NmNmNTM4MzQ3ODYzODAyZGRhYWRkZDJjNmUzOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImEwOWZlNDZjYjFjODgyZjBiZTI3YmIwOTNlZmQwNDM1NzY3NjA5YjE3OWY3MzFkNGE0OGNjM2JiNTYwM2EyNWEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bf6335ea2d55485198241bbd36a2cd25",
+      "statement": "ApprovalAdapter is the platform-injected contract with getActiveOrigin, requestApproval, and hideApproval; the controller receives it via BrijioBackgroundControllerOptions.approval with an approvalTimeoutMs default of 55000, and returns approval_unavailable when the adapter or active origin is missing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1307-L1370",
+          "version": "repo-lines-v1:sha256:071a3a6d961e230e5233406cb3495e130ab81366b9e3cff0a668df7eff9771ed:eyJzZWxlY3RlZExpbmVDb3VudCI6NjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkMzY2ZTgzYTAyOTg3MDg2YTIxYTFlYWMxNWM2MzFlNmUyZTkwODUyOTNiY2VhZThlMjM1MGI4M2VhOGZlYTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc4ODgxNTI5ZGUzY2IzMGMyMGMyNmM3NWM0NmEzODEzZjNkNmYwODlhY2Y1YTEyMTcyZDg5ZWVjOGM5N2FlNTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjMDhjNThlYmQ5ZmM1NjJjNGVkNDg5Nzc4NzE0OTU4MDQyNjlkMmFkY2E1ZDg5ZDM5NWM1ZDc0NTMzOGY3ZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBhZDkzZGJhNmEzODc1Y2JkN2Q4MTMyYzVkMWFkYmU1MTc5YWU1Njc0YzYzMmNiNTFmMzFiOGY2OWZlMmQ0ZTUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L272-L285",
+          "version": "repo-lines-v1:sha256:dbe790a5f3e01ddd97f1d07af687517a5b2fea4d85d57cb9a4b20822652052a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRlYTM5ZTY0MzUzNzVlYjBmNzUwYjE0YmRmZTRiNzhhZjcyMDBhYTBhOGM4MzYyMjJiMzZlYWZkODJkOWQ5OGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc1NWQ2MTU0YmVlODMwODA3ODI0MmRmMWNlNTcwYmY0MzVlZjM4Njk5MTQyNzkwZmNlNGE2OWUyMTE5NmRjMzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBjYjlkNGM3YTcxYzliZDQ1NDI2ZDE3ODQzOTY0NmJiNWY0NzUxMWIxYWI2ZjY4ZmU0ZGRkMTAyZDBkOWQxMmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFkOTM0NWNlNzlkNmQ4NDhjZTBjMzRiODFhZmUzZTkwOWM0OWZhN2E0NmY3MjZmYzEzNzE3Y2I0YmJmYjgwYzMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L315-L321",
+          "version": "repo-lines-v1:sha256:0b8aa05cc2355619321227967ee5417c29321053eec225928a7d981f379a1059:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmJkMDBmNzliYjZjYTE2OGNiZWQ5YWY4NzkwZmE2ODdmMjgwYzc4ZWNhMDdkMDcyYTdhNDRkMWNjNmZkZWY3NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDE1YzU5ZGJlMTA4N2EzZjRhZjQ1MjljMWQ2YTNmMmY2YWEzODZkMmUxN2ExMmExNTVhMGJmMmJhNDdhODgwMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODViZmQ2MDFmZjllOGI2YjUyYTAxZjY4MGZjNzdjYjU3ODcyZTU1NWM2ZGU0MDE0NTlhZTlmYTYxODg5Nzc1NCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_1b963ba5bb974b50ac99bc3fe5784add",
+      "statement": "ApprovalDecision values are approve (one action), approve_session (grants future same origin+actionType actions for the connection), and deny; session grants are stored in an in-memory Set keyed by origin+actionType and cleared on disconnect, never persisted.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1712-L1721",
+          "version": "repo-lines-v1:sha256:fbc5ec13f3071d60ca8014799688b013c5f9c992ecaa6c25b16159b87e98d808:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4NjRkOGNmOTZmMzgwOTViYWI4N2Y1ZDY3ZWI0MTg4NjYzZDU1YThiYzliOWU4MTQ3ZmRkNDFlMDM4NjIwZGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1MWFiNjZjMjM5MjE3YmMyMDE4YmVjN2E3NGRjNGU5NDYzODZmZjJkMTliNWE5MzhlYzJkZTFmMjdmYTQ3Y2QiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjNjc3MDI1MTFlYjU1MDQ5ZTMwODFlOTBmODFlMDhkZTI0OThiM2VkZjgxZTk0NDQ0ZDJkM2RmM2QwMzA5YWYifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L288-L299",
+          "version": "repo-lines-v1:sha256:a51c77b052047f46f24e04f9d2a3d1103610359582b66350bdca204930e44d08:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE2NmMwODIxOTJiY2YyZGE2ODY2NWU2YmI3Nzg5OGFkZTdhODQwYmNhNTNlZDljZThlZDU2YTAxNjY3NWZmMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYxZWQ5Nzg0MTg4MzlkMzQwOTMwOGRlMDQxOWVkZDNlZjdjOTU3OWUyNWJmYTEwODllNDZkODU1OWVlZTcwZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4MjEwMmU5YmYyZTcxYTFmYmFhOWRhNzZjZjc1NjY5Y2VmYzZlN2ZhZDM2NjViODM2YzA3NDAyNzk5NTU3YTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI5NDkzODc1YTBiZTFiZjM3YmYxZDNjNDBmNThhZDc4ZTEyYjNlOWQ4MjczM2UyNTViODBmN2E2OGYxYzM3NjQifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L383-L386",
+          "version": "repo-lines-v1:sha256:265b905dd31ca8a512f1be74949f7813655a61c33bc7934b20f3df63a06eada2:eyJzZWxlY3RlZExpbmVDb3VudCI6NCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTQ0MDdlNzI0ZWNiNTgyNGQ0ZDcyMTkwMmMwYWU4YzE3NmE1NjgyNzRjZWM1ODNjY2UyZWFiMzVmMzVhMjAxYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTMyODk2YzI0OWExNjdmZDljYWUxMTkxMTg1ZGM2YjllOTY3NzI0OTUyMzM3YzMxYWUxMTgyZGMxZjYzZWU1YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjFlNTRhNTc5YTUwYjQwNTUwZTA0ZDNhODcyMjYyMGU2OTk3YTYxZmVjZThkMWZhYzM4ZWIwNTY2OWYxODFlNiJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L509-L516",
+          "version": "repo-lines-v1:sha256:70553c26dd59360a22956abb6ec559f33fd061140d8067b257b4cfeec0daf9cc:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjkyYjA3MDU3NzExMWQ4YTU0NWE0NThlOTI1ZThmZDRlMWQ4NDQ3NzZmMjZmZjEwM2FmNzg4NThkMmQzZDY5ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzdhODYxNTFmMjEyNjU5N2VjZGQ5OTFkNDIwMjE4MzNkMDU1ZWQyMTAyOTM3ZjlhZjk4YTg1ZjRjMWI3MzVhNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGE1NTc3YjhmNmI1NGJmNzM4YmMzNjIxNGY0MWFhODU4NWI3MDU4ZDM3Zjc0NjEzZDcyZmQyMjRiOWIwNzhmYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMjFkMTg4MGJjODQyNzU2OTllZWNhOGQwMWJiNTk2YzZkZjIzM2ZmMDhlYTdjYTJjMjE0ZjliMzBkZWMzOTJkMCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_bfdaf3d3480f4c41b67c49e6f2cda2aa",
+      "statement": "waitForApprovalDecision races ApprovalAdapter.requestApproval against a setTimeout(approvalTimeoutMs); on timeout it calls hideApproval(actionUUID) and returns the timeout sentinel, which ensureApprovedAction maps to the approval_timeout error.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1322-L1335",
+          "version": "repo-lines-v1:sha256:0712b3539ea029a5851eca674b7d0d30286421572aab7a109aac5eef4d046661:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjljN2FlMGFmOGIzOGQwMTA0NzBjNmI4YTkzNzllOGY5NjVjNzE2MTQzOTJjNTcwYzUwYjJmZDljN2I1YmExZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmM2I0NDgxMGQwZGFhNzBmNTVlZjkwMzdhOGYxYTkyZTYyYzVlN2IzNzhkNGZmNmEwZmYwMzU0OTA3MzFkNTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiOGVhZDFmOGQ5MmE4YjlhYmYwYjc2MTViYzliNDkxMTFiMmM1MjRhNWM5YWJkMmI0MDk4MjNiZmU4NTY3YTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3ZDg2MzJlNTRlOTI5OGFiYjk1ODcyN2UyZDUxNDA4YWJhZjEzNjYwMzUzNzkxMDE0MGFiZjY1YjMwYWI2MTMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1372-L1395",
+          "version": "repo-lines-v1:sha256:e46427a83349df028af592783436113c554a3f15e40d294f8251e75e92d9c242:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0MGVkYmQ0ZDc3ZTY1NzVkNDZiYTQzZGM1MjUyNWIwYTExZDY0NDY1MGE1MTY5N2I3NWFjMTM2YzQ1NGY4OWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0MGVkYmQ0ZDc3ZTY1NzVkNDZiYTQzZGM1MjUyNWIwYTExZDY0NDY1MGE1MTY5N2I3NWFjMTM2YzQ1NGY4OWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjlhYjAwMzhkY2I2OGZiY2Q0NjAxNzRiNGY4MzliM2ZlODQzZDJlNzhhMWY0MWIwOTdhYTI1NGNkNTJhZjljMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyNGE1NmE1YWNkYTE2MTIxYTYzYWYyNzk4NGEzN2M1ZTJhZDY1N2JhMjBhZGZkYjMyMzk3ODJhOTc2YTQ1OTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b4c393136fa046f399e64ba8c519909e",
+      "statement": "After an approve or approve_session decision, ensureApprovedAction re-reads the active origin and returns approval_origin_changed if it no longer matches the origin captured before the prompt, failing closed when the page navigated during the prompt.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1346-L1360",
+          "version": "repo-lines-v1:sha256:0fdf5d452cddbdc77d977d9cae26f2338f732319f962d90c125ce2843d1334ea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0MGVkYmQ0ZDc3ZTY1NzVkNDZiYTQzZGM1MjUyNWIwYTExZDY0NDY1MGE1MTY5N2I3NWFjMTM2YzQ1NGY4OWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImJmMGFkYzcxZjE0ODc4ZTc4MzAxM2RlNDEwZDdhMTI2ZTUzMzMyYjRkMTQyMTEyOTNiOWEyYTRhMjMxZjQ4MzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0M2I5Zjg1MTJhYzUyOTBiM2FkZTM0NTM3MDc0YzliZDFlNWQ1ZjJjN2FjZDg2NjE0OGY3ZjQyN2U1NTliNTIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cd905241653f44f288b0f677f1b63955",
+      "statement": "Approval error codes approval_denied, approval_timeout, approval_unavailable, and approval_origin_changed are part of the ActionResultErrorCode union in the shared protocol, and approval errors carry the actionUUID when available.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L687-L712",
+          "version": "repo-lines-v1:sha256:ddb9415b2bc1ee46ee4fe53bc743c905a0e2cd045e183a08b97904e274d65352:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NGY0ZDA2NWU0ZDM4NjJkOWNiNWE2MjRmYmFlYTQzOTRkNDczYmQxNzVkMTMzZjE2OWVlMTkyZWQ3OThmOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcxMjc3NzE5OGEwMzEzNGI0N2M0N2EyZmZkZGQ4NGIyNjUyZjQ1NGIxZThiMzNlNGY5NTk1Yjg0OWY3NmU4OTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg4NmI4NmM2ZDUzZjg3Y2MxZjg4MGQ2Zjg1ZmVkNzJlNDhiMmMxNmE0NTU1MzFjNWMyOTA2ZTI0NjY0NTlhN2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFmYzdkYTQ2YjUwOTQ4YjMyYWY2NzBkYzczMzBkOWFlMjBkMDJiOGRjYmRjZTdmMjQ1NGJjNWNjY2U1MmNhNzkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_14fc1db587574732a42af1c0ac3b6617",
+      "statement": "Approval-aware batches route through performApprovalAwareBatch when any action is gated; denial records approval_denied with aborted false and continues, while timeout records approval_timeout with aborted true, hides the banner, appends skipped timeout entries for remaining actions, and returns a partial batch_result.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1217-L1270",
+          "version": "repo-lines-v1:sha256:cd043264b3e1b35c18893a6cd523eb158e673b0831fe3a9d42d694713fb5273e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExZjRkNDM4ZGQ2MzZlODcyNjYyZTA3MTkzYTQ3MGQ4OTVmN2NmY2VjZTc5ZTI3YjkxNzcyMjQxODBjNmZmYWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjOGRhOTQ1ZjE3ZDg1YTQ0ZTU1MmEzYWNkNzg1NWI0OTczYzY0MzBlZjIwMDVmNGQ4YWY4OGY3YzgwZGQwMzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEyYTA2NDYxOWNiMjZlZjYxYmUwM2U3YmVkOWRhNjkzN2MxNzRkYWQ5MDEyZDhhZjZkOGZjN2Q4Zjg4NzVkOWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY3NDQ4NGU1MzM4OWNiODc1OWY4NWUwZmNmNTY5MmZkODY3MDkzMDRmZjQ0ZDY3MGI3NWQ4YTQ5YzNjYzRkYWMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1733-L1748",
+          "version": "repo-lines-v1:sha256:1bb824f669e379544f05033b1c27b27b61ade4eaa10be087d43870415515e8a7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUzZmY0MTQ0ZWE3ZDc0NWVhYzJmYjk1NTdjYjliZTQ4YzlhNjJhZTYzY2M0OTc0NmY4Yzc5OGY0YWNiNmNkNGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdhYTZmMjFiMGE5MDY5NWZmZGQyNWIxYTE5N2ZmYTQ3OGJkZGMxZjhlNDQ4ODY0ZDBmOThlMmFjODQ1MTNlODgifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L846-L872",
+          "version": "repo-lines-v1:sha256:303f937587507fa3155d0ffe81765f1730a9121de3e39336ac3e6f63fe6a8db4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg0NTY4ZDJhNGZmNzAyMjBmYWNhOGJkNDY0ZDUwNzBmNDUyMGU1NDQ4NmM1ODFiMzhiMDNkNDg0ZTI4ODBjZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMzNzNmZjc0NGNmYzlkNWYwMTkyYjMwYTM1ZjcwZWVhODI3NGQ3NTgwY2Y0MGI4NDQzMDI2MjNiZDllNjE1ZTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVkNGI2YTc0NDc5YTA1NWEwYmQxNmM4MWU2ODI5NDkyZTU5NmYxNjcxMTM2MmZkZjQ0YmQ1MTE3ZDFkMDE2N2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYxZGRkM2U1NWVhMzdkZTBiYmJhZDM2ZDQ5NjBiZTJkMmJiM2FhZTEzYTA2ZTQ2NDA3NmNkNTNjNTIzZDJmMGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eeb51ae803fb495aaa8aa464a1e21422",
+      "statement": "The MCP server assigns a unique actionUUID and sets approvalRequest true on submit_form, fetch_resource, download_file, and each batch submit_form action, and extends the batch request timeout to approvalTimeoutMs when any action is gated.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L421-L439",
+          "version": "repo-lines-v1:sha256:bcb6a96e5cb3d37b22d3d2f8146e15d9e4d3a74d34509ae08b77897774286400:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyMGUwZDk0OGQ3NTM2OWI0ZDZkMTU3OGM3ODJlYjcwNDQ0MTViNzNmNmVjYTQ2YjVhNjZiNzhjMWU1OTBjMmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzNzQ5ZWY2MTM1NGYxYmFjNWQ0MDM0NDZhNjIzMTk2OWZlZGRjN2EwNDNhMzA0MDgzY2I5MTljZGE4NTVmOTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0ZmEyMWZjOThmYTdlMjY4NTNjOGIxNGQzMzI1YzdjMjU5ZjFjODI3NWRhMjVkM2RhY2RmMzIyYjhkNTQ0NjIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L858-L885",
+          "version": "repo-lines-v1:sha256:09b5802a53f66fcb10d97a1ba12d2fbc0d0bc36758347002a3e8ddfdaa241b22:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhNGYzYjZjYTIyYzAwZDk0NjVmYTc5NGE0OTA3MzE1ZTdmMzM5YTcyNmM3YTllMmIwNTE5Mjg2MzgyZDIzOGMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzOWU2OTNkNmMxZmJlMjFiM2UzMjRmYWQ0MDJlY2RjNzA3M2E1ZjJkZTJkNWRkOGI5MDJiMGFlNzk2ZjQ2ZGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c5e4d08067940d1b9aaa52004fcd69a",
+      "statement": "Chrome and Safari each provide an ApprovalAdapter that injects content.js and sends show_brijio_approval to the active tab, then parseApprovalDecision maps the content-script response to approve/approve_session/deny with a fallback to deny; both share the same message shapes and decision contract.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L121-L197",
+          "version": "repo-lines-v1:sha256:859e6f96f87936b4d59ffa030fc658b8613fe26e8368090481aa8d21e0e5550b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY4ZGE5ZDBmNmVjZjkwMzFiYmFhNjBlMmMyODhjZjBjNWY1YjI1ZGU1ZTcwNzdhNzRjNjg4NzkwNDhiMTZlODEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjYWQxZjJhMzQ4ZTZjMGFiYzNiNDgxNDI1YTFkZmMzNWNlOTQ4ZWNjZWE0YWUxMzhmNGZmMDFhMmFmMTc3YjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM3NzU1NDY0Njg0ZGIwNTYyOWEzOWVmODI2NzY1MjA2NTRiMTJhMWE4YTQwODViNjVhMDBmZDBmNDY4ZjQ1ZTIifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L99-L175",
+          "version": "repo-lines-v1:sha256:bc5664bf6d0beefccb540d86603fe6851d4eb1d31d43321895d4e5e657b844f7:eyJzZWxlY3RlZExpbmVDb3VudCI6NzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIxZjU1OTMxNjMyNjU3OTQ4MTJiNzZiM2I1YWEwYTM2NzFiZmU1MzQ0OWE5MTBjMmFiMGNkYzg4NWE4MTRhOTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiYzE1Yzc0NDlkYjUxMDkxODViMzM3MjVhOGM2ODVlZGIwNzg1MzVlMzE4MTFiNDg2YWQ5Y2UyZjRhMGNjZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzNGFlNWMyZjMxZmVmNmU1MGRmNDg4ZWI4MjZiNDA5MWZjZjE1NDZmNmYyNWQ2MDVlN2YwYTlkNGYwNjZhMWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE3NTBhYzdkZWM5MjNkZDhiMDE4Yzc4ZDQ0NmFhYjk0MzdiOGQzNDlmOTg4N2JiZTg2Y2I0ZmQyODUwYTQyOWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3fc9e31be80d4cf58a997e771d3fb5f5",
+      "statement": "The approval banner lifecycle is show on request, hide on decision (button click removes it) or hide on timeout via hide_brijio_approval matched by dataset.brijioActionUuid; Chrome prepends to document.body and Safari appends to document.documentElement with Safari using text-only badges per ADR 0019.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L77-L169",
+          "version": "repo-lines-v1:sha256:5932e302973591befff3c3bd1a5f40257fa08c5d9e0f48cab72892c66920c520:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwY2ViYjI0ZGE2NTY4YjkxMjI2NTBiZTIwZGNkOTA3OTgwNGNkZTAzMGZhYmY0NWVmNzc2NDA2M2Y0ZjZjNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJlZGQzZTE2YzM0NWZiMTZjZTI5Yjc5YjAyNDU3NWQwMGFmOTAwZWZjYTczMWUyYjEyNzY3ZThlNjg3ZmJmZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgzZDgwYjA3NDE0N2Q4ODBkNGI1NWRmN2ZlZWQ2MjEwNjIzMTEyMTg4ZjMxN2M0ODQwMzNkODQ2ZTIzYjJjNGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0NzZjYjgxM2FiZTY4YmJlNmUxNTJkMGU0ZjExNDNmNGZkYzgwOThmNDc2MGYwOWMyZmFjNWE4NTNjNDMyMWQifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L177-L191",
+          "version": "repo-lines-v1:sha256:179df683b988b9f31273cc3b6d199dad589be14e390e36eecb2b5c22a7bd42f5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhNzczMzllMWU3OWZiMGUxNzczNDhlYWY4Y2ExMGQ1NzI0NjNmM2Y2ZTc5YzE4YjAxZmU2OTZmOWUxOTBjODQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkZTQwZDkwNDYyNjRkODA1MjZiOTc5ODBjMGEzMjJiMDUzZjVhNTNkZjkyNGUzN2JmZWI1YjUwZTVmNDU0OGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwYWQyY2VkMDcxNTgwMDc0NTIzZDg1MGYxYzU0ZjUyM2M1Y2FlMzc3MDUxY2UzOGZjZmM3NGI3Zjg3YmFhNzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImMzYjRiOWIxMDg0MTI5ZTUxNmZkMGYyNjM5ZTM4NWRjMGY1ZTc1YmZjOGZjNzMxZThiM2Q1ZDY4MDRiZGZkYTUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/content-script-entry.ts#L79-L176",
+          "version": "repo-lines-v1:sha256:eb21f06827d5f7940355ced4eacb1add1289775523b4ba8d3aa96612da15d492:eyJzZWxlY3RlZExpbmVDb3VudCI6OTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIwY2ViYjI0ZGE2NTY4YjkxMjI2NTBiZTIwZGNkOTA3OTgwNGNkZTAzMGZhYmY0NWVmNzc2NDA2M2Y0ZjZjNTAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhZmY1MjYzNDliMDZkYzBlNTdiZDdiYjBhM2U2N2M1NjQyYjkxMTM5YjNhMjhjMjYwNWI3MWFmZjMwNWMzN2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjczMzA2NzA4MDc4ZjQ1MjRkOTcwNGQwMDNkOTFkYzQzMDM5ODM4NzU3MTIzYWI3MjAzMzU3NDNlZjMzMGIzODQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0MWZkOWNkZmE0YWFmMDYwMTc2NDcyYTcxN2Q2NzhhZmU3MWM4OTE3MWFhZDVmZDc5MDhmOWY5NGRkZWI2M2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_54f58edf200748b8b441025cdc9707c3",
+      "statement": "AGENTS.md states the non-negotiable invariant: preserve user-visible connection state and configured client-side action approval, and do not bypass approval checks.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L30-L41",
+          "version": "repo-lines-v1:sha256:db952c18832e74773a584b050c7070d94754dc3799a74449079404c386c1980d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmMWViNjg2ZWEyM2JhYTQ2YjM2OWJkMjJiZmE3NmYwZTJiNjU4OWIwMWUyOWJlYzY4MWNiMWJhMzA5YjdlMzIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3MWZjNTdlNWEwNmMxNDhiYzU2ZmViYzU3NjhlMTI5MjZkMDU4ODg5MjVkYTk1NjdjZjQyZjBmYTQ1M2E4MjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU2YWUzNjhlODA0NmRkZDM2MjM3MDcxYjMzNGRiZDNlMDc2NjBlNjYwYjUzN2ExOTU4MTRkODJjYjRjMGIxZWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRkOGZiMTdlODE3ZTYzNTk5ZTIwMGVmMGFjMGRkMTFhMjlhNDBhMjBiMjMyODI1ZDUxZGRhZThmZDg3NDc1YWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_8288924d8df84cfc9b7ef531d58ea340",
+      "statement": "ADR 0048 defines the approval design: the three gated actions, actionUUID per action and batch item, approve/approve_session/deny decisions scoped to origin+actionType, memory-only pending actions and grants, approval timeout derived from the MCP HTTP timeout, and the structured agent-visible errors.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0048-client-side-action-approval.md#L1-L150",
+          "version": "repo-lines-v1:sha256:e6da0927da477a0fbeef4d1dc0708ad40708d9f9fb5d21be6ac6463a56a010d5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkOGQ4NzQwNjYyZTg4OWY4NzZmZmQ4ZjJmZDc2MDc0ODBmZjM2NDgwMGIwMWJhZjk1MzhmNjExMzE4NDFlOWRmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIxNDkzYjZkNTkyODRmYzZhNGM5MjEyY2M1YzYwZTlmOWNmNDAwMWVmODFiOGJkMmU0MmMwNWE2Y2I3NDc1Yjc3IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjY2U0NzA3NDgwNmFkYmUzY2NhYWIzMTY0NzNjODU3YzBmYzQ1MDdhMTQyNmM1NjUwM2VhZWUxZThmMjcxYmVmIn0"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:46:23.462Z"
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:62586419cf475ec7853a2736b38b86d35c1a14604c6077c1e76f60eee80a373b",
+  "claims": [
+    {
+      "id": "claim_a75b7b613a8640869ceeebc904ac8e51",
+      "statement": "packages/shared owns the browser-agnostic data model and reusable logic that both servers and browser extensions depend on, with protocol.ts defining the WebSocket envelope, auth/presence messages, browser capability names, presence metadata, tab-listing shapes, staged upload messages, and download/fetch status shapes; protocol shapes must not be duplicated in servers or adapters.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts",
+          "version": "repo-file-v1:sha256:317ae9eab9874132cf13f138c38f1a7d2957da3ca3127c8e6824b9d6110cc0ba"
+        }
+      ]
+    },
+    {
+      "id": "claim_b5c782c414954409a173998fb81b9d22",
+      "statement": "servers/websocket is the state-light transport and routing layer that authenticates clients with the local pairing token and forwards messages between the MCP server and connected browser extensions; presence is runtime-only and disappears when the socket closes.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts",
+          "version": "repo-file-v1:sha256:9885af31b32811f6ec7297b1f98ed6d10c2c7d6015b056e9890830591bb78337"
+        }
+      ]
+    },
+    {
+      "id": "claim_cc7030a4010544879b3009376f5c6cd3",
+      "statement": "servers/mcp is the agent-facing MCP surface exposing browser resources, tools, prompts, and skills, reaching browser extensions via the WebSocket relay; it also ships a demo site under servers/mcp/demo and skill markdown under servers/mcp/skills.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/demo/index.html",
+          "version": "repo-file-v1:sha256:64fbff6ea25b368927c3469d0a55ba62461bcc0eed06ae32378447dc687f40a2"
+        },
+        {
+          "resource": "repo://servers/mcp/skills/navigation/SKILL.md",
+          "version": "repo-file-v1:sha256:58347dffd6b717def0df0a31817751f005e19f8b8aa88f23c4202d7e323fcf4c"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts",
+          "version": "repo-file-v1:sha256:21c772698ff263dad4bfdabb0a52096b5a8d749a6010dfe66fd6d0326ab5b758"
+        }
+      ]
+    },
+    {
+      "id": "claim_2048f911a6b24f358f08342d287c7917",
+      "statement": "Browser extensions live under clients/extensions/chrome and clients/extensions/safari; Chrome is MV3 with chrome.* namespace and Safari is MV2 with browser.* namespace, text-only badge, and broad host permissions at install time, but both share the same product rules (user-controlled activation, explicit request/response, no streaming, context before content, short-lived ID targeting) and keep shared behavior in @brijio/shared.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/manifest.json",
+          "version": "repo-file-v1:sha256:a389ff181dadd0ff46f415bba4054e6e60bbcd0615d4a3d2f6e8bef78b937ca4"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/README.md",
+          "version": "repo-file-v1:sha256:c3192aa6aa576be50fed351ec4f05727ecfd34c57fc4599f5031d9bad9787b54"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json",
+          "version": "repo-file-v1:sha256:408cda1bc648c2fb17c8cf78eda350d894765da0a90527456e44274e85336c1e"
+        }
+      ]
+    },
+    {
+      "id": "claim_a14f9ca7717a4f5b9ae83f5d204aa298",
+      "statement": "Firefox is currently a placeholder only: clients/extensions/firefox contains only a README reserving the client boundary, and Firefox packaging, permissions, and user-control behavior should be designed in a separate ADR before any implementation starts.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        }
+      ]
+    },
+    {
+      "id": "claim_78cdd23d1c31478997fab47dd43892a1",
+      "statement": "Product and business framing lives in README.md, docs/project/POSITIONING.md, and docs/project/CAPABILITY_MATRIX.md, where CAPABILITY_MATRIX.md is the authority for the current product contract and support status and must be updated when capabilities or support status change.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md",
+          "version": "repo-file-v1:sha256:c64326414b87af620985e8df9bb94e1825d9fbb09790dc0459e069953c1c9b24"
+        },
+        {
+          "resource": "repo://docs/project/POSITIONING.md",
+          "version": "repo-file-v1:sha256:ba42706a28df132df19f8ae08d8bb0a3e15d39c03f19aabad4e9fe5696602e85"
+        }
+      ]
+    },
+    {
+      "id": "claim_25fa93882de441c5b563615b7924d2c5",
+      "statement": "Security and trust docs (docs/security/THREAT_MODEL.md, TRUST_BOUNDARIES.md, SECURITY_GUARANTEES.md) record the trust assumptions behind the bridge and why the project avoids credential export, session cloning, ambient browser surveillance, and continuous streaming.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/SECURITY_GUARANTEES.md",
+          "version": "repo-file-v1:sha256:3626a37f667d817cce96ac5aba03bb25c6183302efe00e7bd3aadc3e93b32472"
+        },
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md",
+          "version": "repo-file-v1:sha256:3834ef41b7cfab6d8f74090137951457198afb0a14be8c7e2f80b629dbc08e4e"
+        },
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md",
+          "version": "repo-file-v1:sha256:9d602d167bc17cbe51fe47ac973dd2dfc7cdacbbad271b23f2ec64df9bf63482"
+        }
+      ]
+    },
+    {
+      "id": "claim_1e54413820544e35bcca56690c2bd6b4",
+      "statement": "Design history lives in docs/architecture/decisions/* (numbered ADRs, the authority for architectural decisions) and completed feature/operational explanations in docs/artifacts; ADRs are especially valuable when changing browser actions, protocol shapes, or connection behavior.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md",
+          "version": "repo-file-v1:sha256:0e14b1ec7626ee25a7cdf57a45c4bd4f9a26e11986504072a4ce80ccec3bbfe2"
+        },
+        {
+          "resource": "repo://docs/artifacts/client-side-action-approval.md",
+          "version": "repo-file-v1:sha256:cb3e4147b24c1c3ca20763113186ce3be7629e9380a3301ca51a069922e59c4e"
+        }
+      ]
+    },
+    {
+      "id": "claim_a8edeb81d7a64c9e8a0cedcf377cb11b",
+      "statement": "The practical cross-domain change order from AGENTS.md is: update the shared protocol or an ADR first, then the WebSocket relay and/or MCP server, then the browser adapters; for protocol or browser-capability changes check the full path shared protocol -> WebSocket relay -> MCP surface -> shared controller -> Chrome adapter -> Safari adapter -> integration tests, and consider both Chrome and Safari.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    },
+    {
+      "id": "claim_a53673a215324915b9ce52f47cf4aa4d",
+      "statement": "Browser actions must preserve explicit per-call browser and tabId targeting with no hidden selected-browser or selected-tab session state; when tabId is optional the documented active-tab fallback applies unless an accepted ADR changes it, and page context must be re-read after navigation or a mutation that can invalidate short-lived target IDs.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md",
+          "version": "repo-file-v1:sha256:57b5bb216125a97f07035282759332683f1c6e8d44fdd68c97e6783d2263fc12"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:46:23.462Z"
+  }
+}
