@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:9a4dea601fda06c4a72b8b0a692e8801f1a27fab5176e2fbf807201282d9e833",
+  "claims": [
+    {
+      "id": "claim_5c251581b6ff4f64af8121ddd82e9ae5",
+      "statement": "Every tab-operating MCP tool accepts an optional string `tabId` input that selects the target tab; when omitted, the extension falls back to the active foreground tab via tabs.query({ active: true, currentWindow: true }).",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md",
+          "version": "repo-file-v1:sha256:b3ad39adb1eb175e95471f9aa0056c1c1315fa165193725881239733d483e3e8"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L118-L143",
+          "version": "repo-lines-v1:sha256:df2343342707a7c65c4bcfb0c46e5dcb5eb31154328809410c4c9f24f26612ef:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2NGIzYzdjMzZhZDIwNmE3NjQyZDhkOTc0YjBkZjk4MWNmMTMxZDJmMjdiNjY2MzViNjhiMWNhYzNkODAzNGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MmNlYmI1NjM2NTgxZmI0OWFiMmM4Y2FhZjg2MmQ5MjQyYWE5ODFiNGExNzk4N2MzZDY3NGY2NzI3MWUzZDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwMTI5MGVmZTg3OTg4YzBjNGE1MmE0YzNmMjRmNjdkYTNlOGExZWIzNzdjMmYxOTM5YzQ3YWNmNGY2MjdkMDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE1ZjBmMzU2MjFlZDdhN2EyMWY0YmZiYTA5YTFiMjYwMmUzNGEwOWQ4ZmYyYjk3M2I1MTVmODVkODY2ZmJlOTYifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L63-L105",
+          "version": "repo-lines-v1:sha256:c6c0024c9ceea564e27e020f1f8b20757ed9503f80be20c3dc672046cd7ece00:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI3Y2VkMWJkYzYyZmU5OTQ5MDgxNTAzODM1ZDU1OWNlMjZjNjdhNTFiYjdmNjllMjM0NWRmNjRjYmM1Y2YyN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1NGE5NjYyMzRhNDdiOGZmMzA1MmI4MDhkYmRkZjkxZGU2MmYwYzg1M2RkZDk1ODlkMjMwZDAwMGY0YzJmNWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYzZmY5OTFjNTY0NWMwZTQ1NTA5OWE0OGQyNzU2YzEwOTY0OTlhMWUyNDAyZWI3ZjRiYWY4ZTQyMmRkMTJiMTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImViYzRiN2EzM2RiMjU4ODE4ZGVjMzBmZmMxZDMyZWE4MDI4MDllMWNmYTg1MTYwZGZhNDIzYjA2ZDBmZGJjODAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b34a7a57d5964049b6131e06c0b3f64b",
+      "statement": "There is no server-side 'selected tab' session state: tab targeting is per-call and stateless (like browserInstanceId), and ADR 0060 explicitly excludes a select_tab session-level default.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md",
+          "version": "repo-file-v1:sha256:b3ad39adb1eb175e95471f9aa0056c1c1315fa165193725881239733d483e3e8"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md",
+          "version": "repo-file-v1:sha256:0e14b1ec7626ee25a7cdf57a45c4bd4f9a26e11986504072a4ce80ccec3bbfe2"
+        }
+      ]
+    },
+    {
+      "id": "claim_3eadd735238b4ab489a6d172a07a5858",
+      "statement": "The recommended multi-tab workflow is list_tabs -> choose tabId -> pass tabId to reads/actions/batch/navigation -> re-read page context after navigation or mutations that invalidate short-lived target IDs.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/skills/navigation/SKILL.md",
+          "version": "repo-file-v1:sha256:58347dffd6b717def0df0a31817751f005e19f8b8aa88f23c4202d7e323fcf4c"
+        },
+        {
+          "resource": "repo://servers/mcp/skills/using-brijio/SKILL.md",
+          "version": "repo-file-v1:sha256:19d1d63612b22c33b7c903caa0f211d8eecb43f4f3a9d8ca1b144a83e3697f14"
+        },
+        {
+          "resource": "repo://servers/mcp/src/navigate-to-url-tool.ts",
+          "version": "repo-file-v1:sha256:10c03eeef82bb68454de319e8f93bb01a927a8d88e29a6641a8175a22843bf84"
+        }
+      ]
+    },
+    {
+      "id": "claim_918f58ae03ed4b8b9f47f38fd2afbf1e",
+      "statement": "open_tab opens a new browser tab at an HTTP(S) URL and returns the new tab's tabId for subsequent targeting, enabling simultaneous-page workflows without disrupting the current tab; it does not wait for the page to load before returning.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md",
+          "version": "repo-file-v1:sha256:db79ee600db5a83e31a9fb764b37418f9face30de9f3965f9c9c6b6ca3795252"
+        },
+        {
+          "resource": "repo://servers/mcp/skills/navigation/SKILL.md",
+          "version": "repo-file-v1:sha256:58347dffd6b717def0df0a31817751f005e19f8b8aa88f23c4202d7e323fcf4c"
+        },
+        {
+          "resource": "repo://servers/mcp/src/open-tab-tool.ts",
+          "version": "repo-file-v1:sha256:01b18101d51199c1ad661dbce9e7a4bd7b2b17b86d05ba1a9988bfe304ba7a9d"
+        }
+      ]
+    },
+    {
+      "id": "claim_852681475a9c46e09d01724d9f7350c0",
+      "statement": "list_tabs returns only HTTP/HTTPS tabs, filtering out chrome://, chrome-extension://, about:, file://, and incognito tabs; each tab exposes tabId, windowId, title, url, active, and supported fields.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L366-L392",
+          "version": "repo-lines-v1:sha256:c0b5a1ccf2c3f51fe8e36289d36d9d06968f80eb3f08f0d548c0100220229fe2:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZlNmRkZmFkYmJlMTljODBjZDdiYzM2NzVkYjRmMWI1M2IwZTZlZDE5MWY4MDYyMmNiNDNkMTBlMmYwODliN2YiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjMDhjYjdiODU0OTI2NGYxNWIyNGMyM2EzOTJiOTQ2YjM0ODM1ZTMyMDg1NGUwYWM1YTA1MzNjNTZjOWMzNmQifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md",
+          "version": "repo-file-v1:sha256:b3ad39adb1eb175e95471f9aa0056c1c1315fa165193725881239733d483e3e8"
+        }
+      ]
+    },
+    {
+      "id": "claim_9551e2053faa4df79e20bbfc7edc0cbc",
+      "statement": "The extension background controller resolves tabId from the envelope target via extractTabId and forwards it to the page reader, action, batch, and navigation handlers; the tabLister and pageOpenTab optional adapters implement list_tabs and open_tab respectively, returning a not_supported error when absent.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1793-L1800",
+          "version": "repo-lines-v1:sha256:e821db89f1235f8f15ac222a7f411904657bcdb7dd9b98aa8b4b04a3a4749b3b:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjkwNTcxNjYyZTUwNDNhZmFlNDA5YTY2ZDkyOTZkZDNlODA2YTY0NWU3MTZlMzExYTNkMGM4Y2YwZmFhYTI0NSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWM1MjAxZTVmZDc2Y2Q2NDQxYjlhN2MwODFkNzMwOTNkY2FhNDhlY2Y1ZjVhYTM4YzljOGQzZjNhMGUwMzQ5OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjAsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTNiMGM0NDI5OGZjMWMxNDlhZmJmNGM4OTk2ZmI5MjQyN2FlNDFlNDY0OWI5MzRjYTQ5NTk5MWI3ODUyYjg1NSJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L271-L331",
+          "version": "repo-lines-v1:sha256:5fd627517d22547dcb626a40792a332437663c3662b00d413f2ae7f3dd1e7c59:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFhMzU3OTNkZjI1YTAxYTZkNjQ5NjVhZjBlMGE2MzRhNmJlMGUzNTQ4ZWViNThhNTJiMmZiOTFhZTAyNmVkZTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MGJkZDRhYTNmYjRkMDhiNTk3OGYzZmE4OWI4NDZmMTFiZTc4NjBkOTkzYmEyM2E5MzEyYzQ2YTdkODRjNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjZjZhZDhjNjk1NDAzM2YyYjUwMzYxMTZmODE3YWI1MTE1Yzg1ZGE0MGNkMThmZTkzNzhjZmViNTQ3NDllODUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L564-L649",
+          "version": "repo-lines-v1:sha256:a92ccb54ff0d750d175c32fc5485fd3aed836e72b956ee5825d8edaf25cf347f:eyJzZWxlY3RlZExpbmVDb3VudCI6ODYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3ODg1YjdlYTRkZTQyZDM3YjFiY2FiNmMzNmVkMjVlNGMyNjNiOWNjOTAzNWJiMjUyZDM4NTY2YTkzMmYwYzkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2NDY5YjA3ZmM2Y2Y4NzAxZDM4M2I2OTllYjVkYTcwODM0NTM0MmJkNWFjYTBiMWJiMjE4YmJiODZhZWQxOTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA0YjAyYjM1NGY0MDE5NjAyOTI1MDhiMTc2M2RlMmZlZTllZDczOGNlZDMwZWUwOWZmODViYzI5MTE1ZDhmNzEifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L972-L1015",
+          "version": "repo-lines-v1:sha256:a99a6e10d9549f16a74568b3baa626b3354264ff3d2b5314b084083a0e96a885:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhZmUzNDlmYmU5MGU1M2I4ZWY5ZjRhOTRhYTFkODMzYjhlMmY5ODZjY2E0NTNjNjZkODMwNmQ3NjI2ODc0MWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5Y2FiYTA2ZmIwYTZmYWE5ZWJkZjdjYTJjMjk1MTczN2YzNmMzZGFiMmQxMGNhNWNmN2YxZTJmYzIyZTBiZWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjhiZjM5YTg3MjM2NzBlYjBhMWFmYmExMzZhMTkwYTM3MjczNzZjMmJmZDAxMWYwZmVhMjEzNTc1NWI0ZjhkNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjcxMjJiNmE4MGU3N2JjNWU3ZTNjNDRkNjVmYWEyNTExN2UzZTllNThmYjNiYzY2YzZiOWUzMmUwYTkxNmZjNmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_832aaf6921694de99d76ec9571542302",
+      "statement": "tabId is threaded end-to-end by ADR 0062: from MCP tool input through page-actions.ts/page-context.ts into the WebSocket envelope target.tabId, and through the extension adapters into chrome.tabs.sendMessage(tabId, ...) / chrome.tabs.update(tabId, {url}).",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L676-L705",
+          "version": "repo-lines-v1:sha256:ce5541ebbb09fce4a785429e476702434247d818bf60e92d4f887c6658fac6fb:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2NWU2ZGY4NjI0YjE5YWQ0ZmY2ZGU5Mzg4NTQ1ZGJhNzM3ZDQzZDMwOTM1NmJiZWMxZDk2M2RkNWQyMzY5NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0ZDY1ZjdjY2Y3NTU3MTc1MDBjZWI0NDMzMGM5OGE2NmI5ZDA4ODA1MjBmYTMzNWU5ZWM4ZjQ0YTBhOWZlYzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ2YjkyODgxOTcyNmU4MWVjZjdkYThhMzllMWMyOTc3MDYyZjUyOTdhYmRlMDFhMmNkMzhmMDI2MjI4MTBlZTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmYTExMDQyZTcyNDVkOGQyYTQzZDI1ZjY0NjFkNDA4MGQyMDU1OTAwNTQxMWI4YjFhZjQ2NzMzNjJiYTVhNmQifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md",
+          "version": "repo-file-v1:sha256:0e14b1ec7626ee25a7cdf57a45c4bd4f9a26e11986504072a4ce80ccec3bbfe2"
+        },
+        {
+          "resource": "repo://servers/mcp/src/page-actions.ts#L104-L130",
+          "version": "repo-lines-v1:sha256:4ae8e44be0abcbb9dab6b377f91eb17a8b217cfc22808cbadc326a2a6bc92ce0:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExNTFhYzVkYzM0NDU5Mjc2ZDY2MjI3ZGRmMTJmYmFjNjkzYmU5NGMzZTQ4YzlhYzhhZWQ4Yjk1Y2E2Y2ZiNWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0ZTJhZDVlMWRlNGQxMzY2NWFmNGI3NTQwZmYwNzliMDdmNDlhZWFkZWRjOTkyZDI2ZjcxZjRkMDNhNmI5NjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2MmZmOWFmODQ2OGI5MzEyYjQ4MjRhMTgwMGE4ZWI2ZWFjNDczZDQxYTliODI5OWQxMjJkNWY5MGNhNDM2MzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjOGEyMzlmZTcxMjU3OTRiZGY4YzU3ZjQ2MjI2OGUzNjExMDBmYjBiYWQ0YmJiNzlmZjRlYzk4ZDQ3ZGI0NDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_46435dcf45fe45069afeecd2c2e7937c",
+      "statement": "Editing guidance: any new MCP tool touching page state should accept tabId; the using-brijio and navigation skills must be updated together with tool behavior; and the Chrome and Safari extension adapters (TabListerAdapter, PageOpenTabAdapter, and the tabId-aware reader/action/batch/navigation adapters) must be kept in sync with parity.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md",
+          "version": "repo-file-v1:sha256:db79ee600db5a83e31a9fb764b37418f9face30de9f3965f9c9c6b6ca3795252"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L130-L331",
+          "version": "repo-lines-v1:sha256:27ccbf5db37886180805eff88310b8eb6f2178441ec257d7cee53640effe7edd:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJmMWVkOTc4NDE4ODM5ZDM0MDkzMDhkZTA0MTllZGQzZWY3Yzk1NzllMjViZmExMDg5ZTQ2ZDg1NTllZWU3MGUxIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIxYTM1NzkzZGYyNWEwMWE2ZDY0OTY1YWYwZTBhNjM0YTZiZTBlMzU0OGVlYjU4YTUyYjJmYjkxYWUwMjZlZGU5IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI5ZjU1NTA3NWM3OTllMTlkYzFjZmM4MDU3M2YwODk4Y2I0MzNkY2I4ZTkwMmMwNGIyMDNmNWIxOTA4NThkMzg2IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxY2Y2YWQ4YzY5NTQwMzNmMmI1MDM2MTE2ZjgxN2FiNTExNWM4NWRhNDBjZDE4ZmU5Mzc4Y2ZlYjU0NzQ5ZTg1In0"
+        },
+        {
+          "resource": "repo://servers/mcp/skills/using-brijio/SKILL.md",
+          "version": "repo-file-v1:sha256:19d1d63612b22c33b7c903caa0f211d8eecb43f4f3a9d8ca1b144a83e3697f14"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:46:23.462Z"
+  }
+}

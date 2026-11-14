@@ -1,0 +1,248 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:dc0ce191bf40fb3de64d8994a9cff7420b3bbdde4d9e83ea1154dfad7147d805",
+  "claims": [
+    {
+      "id": "claim_98fed847e11541ebba11cabba4b3f3fc",
+      "statement": "Extensions are thin adapters around the shared BrijioBackgroundController, which owns WebSocket connection state, presence announcements, request dispatch, approval gating, and result-envelope construction; the extensions only supply platform-specific deps.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L400-L410",
+          "version": "repo-lines-v1:sha256:2262c34e23f98fd15073c9087594b0f37d10d01b0fc3c399c972f1b3f61ff0be:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjgyNWE4MzFmMDA3ZjlkZThhNzNhMDU5MGZhYzJlNTRkNjQ4MGMxNTNlODNjN2NiZDQyOTJkZWEzYTM1OWM4YWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0MDU2NTJhYjZkMzc1YjdkOTM0NWFkNDU2ZmVhOTNiYzBiODJkZTYwOTgyMjUxOWJlZWZjMzg3ZDQyNWFmNzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlZTQ2ZjI3ODJhY2UzOTgxYTE2MjVkYTFmMmU1NDU0NTdiOTFiNGU0OTFiNTk4N2ExMjY4ZmNiNTA2ZmU4ZTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0NWFkZTIwOTg3MWE3Mjk0NjhlNmQ4OGI3Y2UxZDA0ZmMwMTM2NjFiMDNmZGUwMTUxOWIzYzM5NmYwMmZjMDAifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L316-L353",
+          "version": "repo-lines-v1:sha256:964dd8048083a1010c1b50ef8fcfb0e4a16f06a033018aaedf92ff95e23eee50:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhZmQ5MWU4ZTM4NzMyMjNjNGU0ZDJhMjRjMmEyN2U2YWJlMzY1OGU5OWZhYTIyMzc3YzM4ZWE5MmNiYTkzODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhZWEzN2FlMWVjODlhMzg0Y2U5YjAyYWU2M2RiZmQzMGVlNzgxZTM2ZjcwYmEzNDIxNTI1MTMzNWIzYzc1ZjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZTIyYTc3ZWIzNGQwOTkyNTk0NTE3MTA5ZGNlYWQ5ZThkYTZlNGMyMmVlOWI3ZWRhNTdmOTU1NzFkNTY0ODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjOTU0YmZkYTY3ZjgzNGQ2MmY1YTA3Y2Y5OGE5MmI1OWE5YjI4ZjhlMGM1MTMxNTZhMjgxNTZjNDczYmZhNDQifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L382-L388",
+          "version": "repo-lines-v1:sha256:bc30868777ebe01b966854c1ea36811ae93e076c234ebba511f7cb15b6479ceb:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiN2M2NDJiNGI3ZWNiN2Y1NzYyMmQzZWIxZDZkMTY2ZTY2YTIyYWI1OGNlNzk0OGVkZjcyYmFlNDNmM2QxYzQ0NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTk4N2FkOGM2NGIzOTQ0ZTU0YmEyM2I3MzYyYTY3M2IxNWI0MmIzMTk4MDYxMDdkYmQyNWZlZDc1ZTgxZmY3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWIwMWE1OWMwMDJiZmY4MTZkMGEwOGRhMmMwYzFhMmM5NDUwNDA1ODYyNjBlYTE2ODYwNGQwN2Y0NzczNDk1NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_d466c859b63440588c3c53bddf409d7e",
+      "statement": "BrijioBackgroundControllerOptions defines the adapter seams action, approval, createWebSocket, download, pageActions, pageBatch, pageReader, pageNavigation, pageOpenTab, pageScreenshot, setup, storage, tabLister, and timers, each a typed interface the extension must implement.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L119-L224",
+          "version": "repo-lines-v1:sha256:186b3af1df583260149893f5f5764c9f5f94f4a3b772007a2f049304d8abd35a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJiOTA2OTFiZGE2ZWQ4YjYzNTViMmFlZDU1Zjk0Y2MzYWE2NTlhYjYzNDMwYmJhYTc3ZjVkN2Q4YzU5NTBhYjlkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjYWQxNGZhYjY1ZmZkYWM3NDFkYmVlMmY5YjM0MDM1NGFiM2UwZjliZDA1OGRjNDEzMzBmYjlkODY4YTBmYjAwIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlZTZlY2RiNDQ0MDM0MDdkMWNlMDc2YzYxYTVkNTI0MDJmMzQxM2ZmMjZlYmYzN2UwYjg1YzFkZTMwMjc3MjVkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiNTIzZjk1NzU2NzU3ZDg1ZGRkZDNmNzc2NmU3OTE4MzQ3NjMyZWY1MjUxMjZkZTVmYWE5Y2ZkZWVkZjhmNTViIn0"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L316-L353",
+          "version": "repo-lines-v1:sha256:964dd8048083a1010c1b50ef8fcfb0e4a16f06a033018aaedf92ff95e23eee50:eyJzZWxlY3RlZExpbmVDb3VudCI6MzgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhZmQ5MWU4ZTM4NzMyMjNjNGU0ZDJhMjRjMmEyN2U2YWJlMzY1OGU5OWZhYTIyMzc3YzM4ZWE5MmNiYTkzODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhZWEzN2FlMWVjODlhMzg0Y2U5YjAyYWU2M2RiZmQzMGVlNzgxZTM2ZjcwYmEzNDIxNTI1MTMzNWIzYzc1ZjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRlZTIyYTc3ZWIzNGQwOTkyNTk0NTE3MTA5ZGNlYWQ5ZThkYTZlNGMyMmVlOWI3ZWRhNTdmOTU1NzFkNTY0ODEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjOTU0YmZkYTY3ZjgzNGQ2MmY1YTA3Y2Y5OGE5MmI1OWE5YjI4ZjhlMGM1MTMxNTZhMjgxNTZjNDczYmZhNDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e6c1506595a44207986beb7c99b09116",
+      "statement": "Optional seams (approval, download, pageOpenTab, pageScreenshot, tabLister) degrade gracefully: when absent or unsupported the controller returns structured not_supported / capability_not_supported error envelopes instead of throwing.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1018-L1035",
+          "version": "repo-lines-v1:sha256:ec0c6c0ee81f5c60f775dd298368b579f839865fe8116c0c5ecb8a9b0929cc6d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJmZDE3NDA5ZmIzOTYxM2E3OWU1ODYyZjA0NTI2NjY1MTkwNzEzNzVmMWUzNGU0NWQ2MWM0ODBhNDY5NzExYjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3NGE3YTM2ZTkwZWEyZWZiOGQ2ZmIxYWZlY2RiMGYzNWIzZjc3NDc4MWI3YjM5ZjNhYmM4MmZmMTMzNGY2MjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI3NTNmZDhhYzJkMjY4NGZlZmVjNjIyMDFiMmVmMzA1MjU4NmNmNTM4MzQ3ODYzODAyZGRhYWRkZDJjNmUzOTkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUxMTk0NTRjNTNhNjI4MzAwNTliOTk0NjM4NzA4ZTY4ODJjN2IzMDM2MTZmMjYwZjdhYmJkYjcwNmEzMWI2ZmQifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1203-L1223",
+          "version": "repo-lines-v1:sha256:4b5022efca2ba9d34a57d94123ec3a3059f88fc2519967b0596644622ec5f978:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MDlhNTNhNjE4ZDAyOGUxZDMwMDBjMGE3YWJjZWVjYmU1ZmIzN2Y0ZTUxMWVmZTQ2NjQzZmFkNmU2Njg3MmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQyYTQwMzBjNjJkMWZlYTA3MmFkZDllNWExOTkyNzBiYjUyMWRlM2I1NzJjZGY2NWQzNDM3NTQ5ZDc3ZGFkMWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVlNTJkMWQ0NTkwY2RlYzUwZGYyNGE1OGJjODFhOTc2MGE2YzQ0YjQyNTY0MWM3YTExNjI2YjhlNmViZmNmMjIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L741-L760",
+          "version": "repo-lines-v1:sha256:e7850f2b4dcca402caa476225cc6251b68debd9a46106f41500ef57479affa4b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ1NmI0NmNhNmUzYWFiYmI5ZDdhZTJlNDg3YzdlNmY0NzkwMzFhNTk2Nzg1MGNjMjI1NzgwMzEwYWZiMzM0Y2IiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRhM2MwN2QxZDhhZGEwMzA0YzhjODE4ODFlMzRhYzAxM2UxZDNhYTMwYjdmZGFkNWMzMmZkOThlMGRkMmNjNzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzZDkzNDUyYTA4OGFlNTYxOTk3NmE4Njg1YTYzM2RkNGU4OWRlNmRmMmMzNmVkN2JmNDBhYWQyMWIyYmJmMDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_717bb72e9b664668ae9dfd79c3522b9e",
+      "statement": "Page reading, actions, and batches flow through shared helpers (readActiveTabPage, performActiveTabAction, performActiveTabBatch) parameterized by an ActiveTabDeps value carrying tabs, scripting, isRegularPageUrl, and an optional onCatchPermissionCheck; both Chrome and Safari construct one and delegate to the shared logic.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L120-L126",
+          "version": "repo-lines-v1:sha256:33ca3de8324beb97e6148dd0cad8d32ddfd96a07e71456a2d42c7c418b1b7f5c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODVhZjBhOTg2ZmY2ZmE4NWViZjA1YzQyMDMzNDhjODY4YjI5NGNiODEwZGFiODUxNDU2NWJlYjM4ZTNiMWIwNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjM0NTRkOWMwNTk4OWYzMDZlNDhjM2UxZjA1YmIwMDVjOWEwYWJhOTQ1MzliODQzMDc5MjJhMjYwN2JkNjhmYyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMGExNzcyNjJiZDI5YWI5YmVhNjAzMDUzZWYxYjQ3MTE5YzM2MWI2ZThmYWFjYWIxODEzMDJlNTJiMmI2MjEwYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMTQ5Y2QwOGNhMmE3YmUzYWU4OTk1ZDVhN2E3YmFhMDA1OWMyZDRmYWJkZjY3ODMxMzUyYzFlMzc5Y2ZiMGIwMCJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L48-L54",
+          "version": "repo-lines-v1:sha256:f30ef18856c9084932d417aac05e826c4ba20069976bb30c50c0fc73ef353f01:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjczMWM4ZjhlNzE3ODQxZjhlMjZlZGJmM2Q2YmY3Nzk0OTRlOTJhNDk1OGNjNzAzZGI1NGJiZmRkMmZiNWU2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYWRkZDMwMTA1NmQzY2RjZTJjMjkxMGM1MzkzZmQ4ZjRiNmZiYWY3M2Q2NGU4NTc3ZDNjZWM0Mzc5YjA3Y2JmMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOWQ0MDIzYTgyZTkwZDBjNWQ2MDA0OGRlZjg5Mjc4NWMwYmZjNzg1Y2MzZjg5ZTZhZDdmMjFiYTkxMWEyZWY4MCJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L51-L57",
+          "version": "repo-lines-v1:sha256:a4eab0582aadbd2163dcb254db45172f40625be46d1f8813f3b076a89a7d401c:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjNkOTc3ZGQwNGJkYTVhYTIxZGM3ODQ4MzU0YzQ4ZTk0NGM5OWU2MjU3ZmE3MzIzMjRmMWQ1YjUwNjRhZmIxZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmE3MzJjZjdlNjE3YmVkY2RmODJjZjc2ZTM5NjUzMjI5OWIyNDQ1MzlmMjk3NmM5ODUwMjdkZWFiNDhmNmNkYyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjQ3ODhhZGJlMDQxMDY0ZGRjMWRlNDRmMDQ0MWRkYTBlNDQwZjU5NGRiOGFiMDA3ZDA2ZTEyMzZhOWI0OGYxNiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_8175e93dff6e4f4e9f6dcca8d6c1a32c",
+      "statement": "isRegularPageUrl returns true only for http/https URLs, excluding restricted browser pages (chrome://, about:, etc.); the shared page-reader uses it to gate content-script injection and messaging and returns regular_page_permission_required when access is unavailable.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/permissions.ts#L8-L10",
+          "version": "repo-lines-v1:sha256:e57d19642b367c7b66aa426deeb51753b71dd19bc803ea77e3227d17950de367:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmM4ODY0MTRjYTA0YzBlMjUxYjFiYTMyOGMzNDg1ZDU5MDJmMjI5YjdjZGMwNDdmNTZmMmVkMDlmMTEyZDMzOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2FhN2NiZTJjMWVjZTA4ZTQwNTlmM2M4ZTUzYzVkNzllODMwYWM3NGQ4Mzg0Mjg5NjI3MzVjZWQ2MzVhYTYzMSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGEzNmY0YWVhYWI4MWNlNzEwZDNlNGM1YmE2NTY5NzYwN2U1YjRkNTFjNzE1ZDUyM2E0NWJkODY1OWE5MDYyZiJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/permissions.ts#L13-L15",
+          "version": "repo-lines-v1:sha256:e57d19642b367c7b66aa426deeb51753b71dd19bc803ea77e3227d17950de367:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNmM4ODY0MTRjYTA0YzBlMjUxYjFiYTMyOGMzNDg1ZDU5MDJmMjI5YjdjZGMwNDdmNTZmMmVkMDlmMTEyZDMzOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEyY2EzNDVjY2Y3NWJmOWMwODA2YmNlNjk1YmU4ZGU4MDhiNzk5ODQyNTFhN2E1NGQyMDJjZjYxMDFkZDQ1MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGFjMzA5MzNmNzVmYzNlM2I2OTY2Y2Q3NjhmZjAzMGI3MDJlMDMzYzQwZTQ0ZTRlYjQyZGFhYTI1MzI4YWEzMCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjMxOTJiM2M4ZjdiMDFkODg4OWNiNzlkYWIwOTAxNzhjZjk5ZDY0YzllZTZmY2RlOTdhYTNkNTI5MDE1YmU2ZiJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L73-L100",
+          "version": "repo-lines-v1:sha256:bd0d26763946cd338c5c0b7d2d377d661735c448bd4ffe49f4deb00982335ed9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1OTU4OWQ3MmZmZjI4YzcxN2U3NzM5NzdjNGUyZTA5ZTMwMTEwZjZlYmY2MjYyZWJkOWUxNTBiZjYzMjM3ZjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ3Nzk4ODA1ZDMzMWVmMDQzOGE3ZjJlOTBkOTE2YmRjZTY2NzY0YjRkZWFlN2ZlMmMyNDkyZjUyODc1MWQ1ZDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhOTNlZmU5YTcwNzhjZTNkZDRhNmFlYWIwMDU3NzA3YmMyODgyZmM3YjZhNWMzMTY5ZWU2NjY4MjIxYzY3ZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBlMGY3MjkzZDE1NmE2ZDEyNTI4ZGIxMjkzMzc5ZTUyYTVmODM2NzA0NDI5N2IyMjgyYjk3ZmYyYzg2MDQzOGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_54c38ee5422c47a4b5e2cd1091bf5df4",
+      "statement": "Both Chrome and Safari grant broad host permission at install time rather than via a runtime prompt, so hasRegularPageAccess always returns true; Chrome manifest declares http/https host_permissions (ADR 0011) and Safari MV2 manifest grants *://*/* (ADR 0019/0051).",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/manifest.json#L26-L35",
+          "version": "repo-lines-v1:sha256:6df6a30856b33e87753ca47243c4be211a7db3945172238232c2b164374340e0:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwNDZlZjkxMjM0OTQzOTNiY2IzNDZjY2E3NDVjZjRkOWEwYWZjZWIxZDQ1NmU4NGI0NDAzMWQ5NzdmNjIwYzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2NGQ4YzA3MzQyOTg5MzEwMTU3NmQ4OGQ5OTEyN2U4OWQ2ODkxZDNiMTdlODlkZjAyZWM5YWU3MDcwNWQ4YmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI1YTE4Y2U0MmRjM2VkMmU2MzY0YTZlZWM0ZGQ5MDg3ODIzODgzZTFiZGY3ZDQ2N2EwYTgyMTZmZWU0YjVkYTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjZGMzZmQxNjc5ZDQzNDBjZWMyMjVhYzhiNWVhMjI1MzkyOThkNGQ2NTdmMjY5NTUwNmQ4MzJiOGIyODY5ZTgifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/src/permissions.ts#L1-L15",
+          "version": "repo-lines-v1:sha256:40d65c495a372d61f000a940c71797467e93cf03c939ab79ee3bf2e4807c04d2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZThhN2JhMTBmNmEyYTcxNDk0ODdiMzFlYzRkNmQ0Yjk1NDg5Y2MxNjdhNjkxZWZjZDE0MzUyODdjZDdiODYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json#L25-L26",
+          "version": "repo-lines-v1:sha256:7307cb3ec02fc1622dd4c4b1d0985f231690ec634d58af47aa9edd37e4d5048b:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjA0NmVmOTEyMzQ5NDM5M2JjYjM0NmNjYTc0NWNmNGQ5YTBhZmNlYjFkNDU2ZTg0YjQ0MDMxZDk3N2Y2MjBjOCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzY3MDRkMzBiYTg4ZmNkMDIyZDU3NmU0M2M2NTdiN2ZkZDRhOWFhMDRiZjI2MGJiMWRkODIwNTNhNmJkYTYxNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjVhMThjZTQyZGMzZWQyZTYzNjRhNmVlYzRkZDkwODc4MjM4ODNlMWJkZjdkNDY3YTBhODIxNmZlZTRiNWRhNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmU4MmIwNmIwMjgwOTAwMzg0Yjg3ZWY1M2YxYjExNmY2NGZiMjJmOGQzYjQ2MDg5ZDkzMzZjZTgwZjZhMzc4NiJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/permissions.ts#L1-L24",
+          "version": "repo-lines-v1:sha256:546fa33b1a0d64e60980854fb31bfcfa84b6baa53cf9047c27fc7982c9aa2c1f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE1NDJkMTBlYWUzMTQyYTNhNDM1MmNkZGZkMDEwM2Q1MDA0ZTNkYjU3MDNiNWJlOWE5Yzc0OWQ1Y2E3OWQ4ZWYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjcwODU1MWNiYmFiZGVhZDRiYjc5ZTkxNjI2ZjJiMGRkNWJmMGRmZTU3YmZiNTlhNjQxZTUwNmMxNjJkYTJjMzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_97ede4cc78b2469ca9033f5558701038",
+      "statement": "Chrome is MV3 with a service-worker background, uses chrome.action for colored badges, supports the real chrome.downloads API (capability 'full', tracked downloadId), captureVisibleTab screenshots (ADR 0064), and opens popup.html as setup.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/manifest.json#L1-L19",
+          "version": "repo-lines-v1:sha256:f3b725890fa97fcb61e69977434c63d56391242c01233cb73d4c14f04416009c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhZDIyMmVhMjQwOWQ0ZjBkNGM3YWU3MzNlNTM0NTU4ZDA3ZGI0YWJkY2RmZWJhYzQ1NzhmZDUwZWQwMjkzNzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM1OGJmYTZiZjM2M2UwYzdlN2MxNThkNzUyMWMwYTVmMWUxMjg3MGNhYmIzMjYyNmNmODI0MzcwMjkyZjA1ZDYifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L233-L289",
+          "version": "repo-lines-v1:sha256:668bc69370cf2c7f82e93a1d7bfbeaf6025996d6694fea47c74d1536068343c6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkYjE4NDdlOTNlYmJhMjc4NWY0NDE0MTg5MWQ4OTliYmIxZjA4NWE0ZTQ1NTY5YTgxYzQwZWE5OTljNmFmOGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjEzZjczYjQ4ZjcwMTlhZTU3N2I0MmMxZjFiNTIyMjFlYzQzOWRhZDllMjhlNjFkZDU5YmFhOTlmMmY2ZmRlMjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjMwODg4Y2EwZjgxNTVmNWQwNDYzYTRmNTdiZTc5NTgxNzI1NDBmNTA2ODdlNjJlYTZlNmNlM2NlMTYwYzNmMzkifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L431-L436",
+          "version": "repo-lines-v1:sha256:851a0326435afb491bcd078aa6db84cb771bd4a2aaa071cd646c1ff1b499f94a:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNDg5M2Y0MGUzNzgxZWI4OTZjODJkMDQ2YTA4MDY3YTExZTM1Y2RmMmYxZGZhZjI2ZmVhOTBiOGRiNjY3NjQxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDUzZjk0Y2M4NWYzZTRiZDQwZTY1YmYwZDBlYjQ5Y2JlZjgzMDI0ZWFjOTgyNTNiZTVjODhiODhmZmFkMzQ4ZiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMzQ3NjBhMzhkNGFiYjJkNTBlODYyZjRlN2RhNjczZDMyNGE3ZDMyMDQ2MGQ5YTg5ZGU0YjJmZjA0YWJlNGNkNiJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L500-L535",
+          "version": "repo-lines-v1:sha256:72f825e689afb435646d8969fe944e80b34a7813b7aff3e17cfc29761bc48633:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5YTdlNjUwNDc0YWVmNGU5Zjg1MDI0MGY5MzgzMzkwNzNiMWRjOTQxNTg2OTI0NmM5YWM5NmQ3ODdkZDY0ZDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4MGU2NDYxNGY3OGJiYmE4NGM1MTQ2MmEwNDk3Y2U3ZjFiYThiZjY5MTFkNDIxNzVmNjlmZTIyOGNlNTIyZDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjMDljOWM1YmZkNDU5ZjE4ZjdmZGZmNWUxMTI1MzdjYzY5MjE0MjJjNjZjYzQxNDUxZjQ0MTA2OWJhNjhhZGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4MjQ2MzNiYjE5YTQ4N2FiNDM5M2JjNjhmZDViZDAwZmE4ZDFkYjYxNjJlZTAxYmMwZmVjYjM5ZWI5ODNiYTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_9c78b7f68afa42529b5fe0fcbc5b9735",
+      "statement": "Safari uses the browser.* namespace with an MV2 non-persistent background (ADR 0019/0050/0051); SafariActionBadge implements setBadgeText/setTitle but setBadgeColor and setBadgeTextColor are no-ops because Safari only supports text badges.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json#L1-L20",
+          "version": "repo-lines-v1:sha256:71db50012131b189f75bc4bcc2787b9bcc55cf2e70d7fd5830399ab778691806:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2ZmIwOGZkYTFhY2I5NTdiNjExNmJkMzc4MTFhMWZlNDFhMDE2MTFjMDYzMWVkYmY3ODZkNjg4OWEyN2E1NWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkMTliOTJlMTdkZjFiMmQ5YzY1YTYwZjJhMTJkMDZkZGYxMjU0YmNjZmQyYTYzMjkwMWEwYmM0YWExY2ZjYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdmYmMxNjBhM2U0Y2JmZDk4MmRkMzA0ODNjN2QzMGM3NDJlZDg5NWFmOTdhYzNkZTM0MzYxNTIyYWE3OGZjZGMifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L190-L210",
+          "version": "repo-lines-v1:sha256:1fccde496cc913496e4c45a4626082b60462094b7efcf62ebd110ebf72525cb7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMzgzOGRlZjhkNjY2OTVlNzE5ZTU2YjlmMjY2ZjM5NDA2MGRlYWI4NmIyMDk3Mjk5ODFhNzZkMTBmYTU0ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1MDMwYmExNzEyMWI3NGViZmZiODU4ZTU2NDYyZmVhOTdjOWMxN2RkZmFiOWIwMGY1YjdkY2JjZWI3NzQ0ODUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4MjFjYzQ3NmQ2MGY4ZTJiMmEzYTBkNzVjOGM1OWVhZDg0MzgzZmMxOWFlMjg2M2E0ODE1MGM4OGU3MTIxMzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b5f91f7e715a47b1bd3ed428c40dab49",
+      "statement": "Safari has no usable downloads API: SafariDownloadAdapter.downloadStatus returns capability 'not_supported' and downloadFile is fire-and-forget, opening the URL via tabs.create and returning downloadId null with status 'initiated_fire_and_forget'; fetchResource is shared with Chrome.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L290-L317",
+          "version": "repo-lines-v1:sha256:fbc702b92594eb72ab8f830978dabb3dc2a45ac76edd9746e4eb3e7ac5ffa344:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNjAwMTIxZmJkOGIyZjExODk0MDhiODYwZDVlYjk1ZTc4MzBlNTNkMzIxNGVjNWE0MmUwMjJjOWNlMTg3ZDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBhNjMxYTQ0MGUwMTU5MjVmZWI2MTkyOGYxNzUwNGJiZDY3M2RlOTFmYTgwNjY3Y2ExOWE1YWZjYTMwMzAzMzQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1MjNjN2Y0NWQ5MDQ0OTI5M2YwNDQ5NTdhZDEyZTdmMjc2MTc1ZjQ0NDE2YWU0OWU2ZjVkMGQ4ZWI3NzQ5ZTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_546adf339aeb47c9a2ed417656131a8f",
+      "statement": "To handle the non-persistent MV2 background, Safari's entry point persists desiredConnectionState in browser.storage.local and, on startup and on the brijio_page_active message, calls reconnectIfDesired() to re-establish the connection only when desired state is 'connected' and the controller is not already connected (ADR 0052).",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L255-L290",
+          "version": "repo-lines-v1:sha256:cf2bfc323956510e0f81a43af63a26b9fe80efe8d5d17cb9ef9909303c9999a3:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwZjNiODU5MTRiMjZhZjlhNDg2ZjIxOWY4MmM0Y2U5MjZjMzY1NGVmMTU0NDY3ZmQzY2NlMGUxYTBjODExY2YiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhYzE3NTczNGIxNDg5MjdlNDcyYjQ5OWE3NDlhMDZjYWEyNDIzYWExNmJlZWJhNGIyYzY1MTM5Y2RmMTU5OGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEwZWVlM2U0MTRlZmMwMDA4YTBhMTY2ZTk3NjU4MWJkZDYwZGViNDhiODY4ODdlYzMwOWJkNDVjZDIxM2FhMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJkMDBjMDUwOGNlNTdmNWE2MjZlOTM4YzI3YWYxNDI1MzJmMThjZDM3M2RiMDUwYjIwMDAxZGZhNzMyYzkxMjgifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L312-L351",
+          "version": "repo-lines-v1:sha256:a3619b71bd9e944a2f933242300bfbf7d0acd8ebbaaf65edf671aa22f2b25f86:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiZTVjNGRmNmYyMjM0YzlkMTg3Njg3MWVhY2I2ZjhiYjZkNWY5NDVkMDIyMzY4MWE2M2QzZDRjYjQyNWE1MGEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwZWE3NTg0MjZiYWI0MjMxYTRhNGQ0ODMyMmRjYmQ4OTAwM2NiYjg4NWY0MGMwYTdmNThlMDA3NDAzZDA2YWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ff8d97932f0741778033cd3d2429eb21",
+      "statement": "Firefox is planned but not implemented; the package contains only a README reserving the client boundary, with packaging/permissions deferred to a future ADR, and capability status tracked in the capability matrix.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md#L1-L10",
+          "version": "repo-lines-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg2NWQwODkyMTY4OWJjY2JjNWZlYTkxOGRmNmVjM2Q5M2Q2ZDBmNTRkMTMwMjFkN2ZkMzgwMGY2YjM1NWNkMGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkxZDJmMjJlNzIyODkxNDJlM2Y3ZDZkMTM5MWQ1NjhjMThlODk2OWU3ZmM4Zjc0ODRmZThjNzgyODk4NzY0NjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0daf3c4b33e7454c82381c4bda8211e3",
+      "statement": "The controller gates approval-required action types (submit_form, fetch_resource, download_file) via ensureApprovedAction, which asks the ApprovalAdapter for the active origin, races requestApproval against a configurable timeout (default 55s), caches approve_session grants per origin+actionType, and rejects on deny/timeout/origin-change; the adapter injects content.js and sends show_brijio_approval/hide_brijio_approval messages to the active tab.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L140-L175",
+          "version": "repo-lines-v1:sha256:60f317b9a62162a95742e73f652f8074bd4c7c026dcf17e94ad5f50dea3d177a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMxNmUwMDU3ZGVlOGVkZDYyNTRlYTE2ZTA2ZTdmNGZjOGU2YWNhYTBkYzI3MTEzZjkyZDAwNzJiNDZjZDFmNWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhNTY5NWIyMjc3YzU3NWI5OWZjNjk0MzU3MTk3ZWUxYjY5MGE0ZDlhMGFjZDRjZWMyNTY4NTFjNjE4NTllNjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlMDcwNzkzMGNjMzkzOTZhYjJkNWY3ZTA1ODgyNzExOWE2ZTQ3NmRiYWQ4ZWE5OWNlNWI0MDgyNDE3MjEyYzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4ZTRmOGY3YjBmZWUxMDlkYzcwMmQyZTAzYzc1OWM3NTI1ZDkyNDExYmM0M2RiNjA5NzI1M2M5OGZjM2YxY2YifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1430-L1530",
+          "version": "repo-lines-v1:sha256:97af7dc260bc80822a5d1cf325e8fdc533e9f67034d243f302ff82447cc30210:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0N2FkMzVhMTM1MTAxOTkxM2UwNjQ5ZjlmMTMyZmEwMDY5ODAwM2FjNmQ0ZDVmYWVjMDU4MWY5ZGE2MTViNGQ1IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjOTg5OTcxMTJlNDBmNGEzMDkzMzQ2YjA5OGYyMDU1OTAxNjlkNDExODNmOThlZWU3ZGY1MjM2YmE1NjdlNmJmIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiM2FmNTFjYmRlYTVjNDNhMDZhNjk5NDFhMDk2YzIwZWVkOGMzZmVkNzU3NDIyM2Q3YWRmYmE0NTY0Zjc3ZmMyIn0"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1532-L1558",
+          "version": "repo-lines-v1:sha256:4c4129876a17c7b8e27997b56256afadee81d825b588d090bbd5d0c250605e4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNhMWYwZTg4YzM3Y2FlZDNlYjE5OTM4MGYxNmQ5MWY4YTM0M2ViOTczOTFkMmUyYTFkODFiYTVkODRiYTBmNWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmYWU4MDU3MWE4Y2RmNjc2NjdhMWUyNmVlZGEwMmMwNzc0ZTJhN2MwZWY0OTgxODA0MzMxNTI5NDFjNzkzMGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQzYWQxMDJiNGRmNDFiZTBlMjEzYzY2MTQ0NDhhNzc4YjQxMzNhNDFmMDExNmZhZmIwNzcyZjI4MDkzMDVhNDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJiYjk3ZGVjNWFiNzM0ZDZjMDBmZGU2YTk5N2RhYjNhZWY1NDFmYTZkMTA4Njg1YTY3ZWQwNjgyMjMwYjAxN2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_82bebb93c2c341d6a91df6d8ff325568",
+      "statement": "The controller extracts tabId from each envelope's target.tabId, threads it through page-context, page-content, action, batch, navigation, and screenshot handlers, and falls back to the active tab when absent; adapters preserve explicit per-call targeting without hidden selected-tab session state.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1734-L1757",
+          "version": "repo-lines-v1:sha256:d872ad3faf9f5865b83d36e767b8aa698ac1caee4065a0c891afa4129910c9b4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU3OWEzODg1OTVhYTdjZDA3YTA4NTFkNDJkMTMyOTU1YWU2NTllZWYxMjEzZjNmODM2ZjIwNGFlMDY3OWExNTgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc4YWNlMGE1YTU3ZGIyMjE5ZTFkODg5MTRhYzVhNzMzNDMzMGFiNDZmZjMxOTkyNjI0NTYyNDM4NTIwYmQ1YTIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L604-L650",
+          "version": "repo-lines-v1:sha256:5f5df861c8396ee313564afc08ddd6bedc3e667eac483e0244850fd328d2db85:eyJzZWxlY3RlZExpbmVDb3VudCI6NDcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3ZWE5YzIzMjdiYTUyNWJmZDFkOTI2OGY3YTg2YzFjYzVjZTExYzE5NzUxMjY0ZjA2YzJmNWNiNzRmOGFiZjUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY3ZWE5YzIzMjdiYTUyNWJmZDFkOTI2OGY3YTg2YzFjYzVjZTExYzE5NzUxMjY0ZjA2YzJmNWNiNzRmOGFiZjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZmOGY4YzRkNWExZmJlYWY1MTNlMGIyMDFlZGI0MTJjMTZmMjAxODA3N2Q5YjBjMTMxZDdjMmJkOGY0ZjQ0ZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzYzI3OGY4MzMzNThiODk0OGRhMmU0ZDA2NTg2MmI4MDk0ZDAyZDQzZTQxMzU3ZDMwZGM5YzJlNTA1Njk4MTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4370e56cbec44f41bb49e56ead4c24bf",
+      "statement": "The controller owns reconnect: exponential backoff with jitter (1s initial, 30s max, x2 multiplier) scheduled via the timers seam, with manualDisconnect suppressing reconnect and cancelReconnect resetting the attempt counter.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L356-L360",
+          "version": "repo-lines-v1:sha256:b8bc7e9a87dd411a22e4a5a493909674d09d4cfcb7370c668b1b55a00213053a:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTgyMzQzZTY0NmEwYmM5NjYzMDc3OGRhNTYzMzk2NGZlMjQ2MGVhNDEyOGUxYTcwNmYxYmEzYzc0ZjBmOGE5MSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZWFjNGI4ZTNlM2RhMWJmNTU0Njk4ZTdjMDdhMjU2NGY0Yzc4OGQxNmIyODhhOTAyMzgzOTE5MzNkNGFkYzUwNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiM2RjZmZlMTQ2MjFiYjM0NmMyOGY3Y2M2MjU5MTU1MTNlNzUwMTZhMWQ2MmFmOWJlZWJkYTFhM2ZlMzk3Yzg3YyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDczNGU5NGVkNjg2ODA2ODA2ZDQ3OGJjYjEwNzhkMTRlOWU2Mzc3MmMyNTFiZmFkNDUwYmEyNzM3NWJhMDhhYiJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L513-L540",
+          "version": "repo-lines-v1:sha256:75403c597c1c927d8ff406498ab8684dd8dc0541226f9eff424641a8f279f6aa:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2NzQ3MDZhZGNlMTIwYWUxODNiZjEwNjkyMDk4MmZkODI0Yjk2ZmY0NTZjNmViOGYwNTEzMGVmMzYxMTNhOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1NTU3OWFkYmE2ZDk1YjMxYTFkZDk1N2I3YmQzZTBiZjlhYTFjYmEzZjY1NTNmZTczNmY4MjdiZjAxNWU0ZTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNlYjI2MmE0YWM2ZDkyYzNiMTRiMWRmZDZmMTZlZjQwZjNlOTgwNWNmMTE3N2M4ZjNlZjg1OWM0OWU2MTQ3NGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2ZWU5YzM2MjdmZjc5ODY4M2VlMDA5YzdlOTI3MWE4OTg4ZTZlZTU5YjEzYmVjZGM0ODE2MDI5NDk1YTEyMWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_2d93063a16364c2394112a1cb93168cb",
+      "statement": "Both Chrome and Safari wrap tabs.update in a 10s timeout so a hung navigation on a restricted page returns a timeout error to the client instead of stalling.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L640-L680",
+          "version": "repo-lines-v1:sha256:e669a3b4e0ce1d249dace179c8a976957b27f669e65c600fce73092c90d87c87:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzNmExYjNhOWVlYjMxZDJkNTU3ZDE2MGQ5NTNiM2I2NWRjMjYxY2M0ZDk4MDNjNTMzMDkyYjVmNTYwZjExZTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIyZWU2NDk0NWYwZmZmZWRiOTE1ZmM3M2U2MzdkODViYmI0YWZiZDFkMmYxNWE5ZjM2NGU0Y2Y4MjVkZTI2NDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc5YWUyZDU1NTRmMjIxNmZlZDIxNjc5NTc5YTBjOTAzMWZlNGQ1YmNhMDRhYzdiY2YxNDE1MzUzNjU0NDBlNWQifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L410-L475",
+          "version": "repo-lines-v1:sha256:c6d2a29ab6a55d30fa0fd0d8d48c9aab91b151778eb0c956516e7403a21fc3fd:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1MmIyNWU5NzIzYmI5NDRjOGNiNWJhMDVkZWRhOTY0MzZjZmFhODc0ZDUwNjdkYmEzYmUzYjM2YzM4ZTY4YTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwNjhjZjMxNzVmMzk5NDNjMjA5ZWE5ODQ4ZjMzNDRlYmFkM2ExN2VjZDNjNDE2N2YzYzA2NzkxNzIzMjVhNWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNjNTQzNDE3ODRiODQ2ZWQ2ZTViYmJkYjUxMWE4MjQwOTI5ODE1MWUxMGJhOWI1MjAwOGU5ZTZiYTZiOTgyY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmNjBlN2ZkMTNmMmEyOWUwNjU0ZTIyMjA3YjRkODNlYzM5OTlhY2I0YjU4OGJkNjJmYmM1YmE1YmU5MWI2NmQifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:46:23.462Z"
+  }
+}
