@@ -1,0 +1,186 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:38cab5853fd127c299c2768bb2e6d34142e06da53cebe6f19001576e2747e2b3",
+  "claims": [
+    {
+      "id": "claim_0e972ebd567b4d17be113ce4561e37eb",
+      "statement": "packages/shared (@brijio/shared) owns shared protocol shapes and browser-agnostic logic — the WebSocket envelope, auth/presence messages, browser capability names, tab-listing shapes, staged file upload messages, and download/fetch status shapes — and protocol definitions must live there rather than being duplicated in servers or adapters.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L95-L108",
+          "version": "repo-lines-v1:sha256:776f944118e566dd3d13f9e0e51f3070f4c7619751a617977efd8d9a34d474fc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNmOTZjMGE0NzkwMTQ3NTMyMjZkN2U3ZWQ0YzA3NDlhODQ1ZDRlNTIwZjI4YTJkNzMyZDcxNzI2NjY3MTAxODIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlNjgzZTdmNjA1MTlkZDYyNzliOWE3ZDA0OTRmMGJiYmI5NzAxYWE2NDk2NDU4MWRlYzI4ZjY3NGY5ZWRlNzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3ZTYwNTEwMjI2MGZhMDJiNmM4YWEzNzJmYjhmNDc3OGRkMjJkZTNhYjg0OTc2MzE2ZTU3NWUwNjliNWI4N2EifQ"
+        },
+        {
+          "resource": "repo://packages/shared/package.json",
+          "version": "repo-file-v1:sha256:1c4f41b8a323a400d9950d789f144e7ca6ee484c1846f9d7bfac2bc9be03c026"
+        }
+      ]
+    },
+    {
+      "id": "claim_a7dc5d1a49a34142b09925841e7c26bb",
+      "statement": "servers/websocket (@brijio/websocket) is the state-light transport/routing relay: it authenticates clients with the local pairing token, routes messages between the MCP server and browser extensions, and keeps presence runtime-only so it disappears when the socket closes. Relay auth, presence, and routing belong here.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L97-L108",
+          "version": "repo-lines-v1:sha256:c2c61b2c5f48d7bf4be12696e2bdd7b721971ff1ab4b22242f789e3e17c7986d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwMDg5Yzg1ZGYyYTUzMTE2YjY0NmQ4YzQ5MjAwMzViMmQwYjRlZjlkNDE3ZjhjZGZjOTM2NThhOTQ2NTliMzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiZjY1NjVjZjQ5NjkyODMxZjY1ZmY3M2M2YjdlOThiMDRkYmM3NjZhYWZlNzE0NGZkNzk0MTkzNjI3OTBlOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3ZTYwNTEwMjI2MGZhMDJiNmM4YWEzNzJmYjhmNDc3OGRkMjJkZTNhYjg0OTc2MzE2ZTU3NWUwNjliNWI4N2EifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/package.json",
+          "version": "repo-file-v1:sha256:5815340302c1b9bcfc6c19ba65302edc1152943605bce8e6cd422362eb26414c"
+        }
+      ]
+    },
+    {
+      "id": "claim_f2c5695c29e34f1d858e886a78a7aa55",
+      "statement": "servers/mcp (@brijio/mcp) is the agent-facing MCP surface exposing browser resources, tools, prompts, and skills via the Model Context Protocol, reaching connected browser extensions through the WebSocket relay, and ships a demo site under servers/mcp/demo plus skill markdown under servers/mcp/skills. Agent-facing tools/resources/prompts/skills belong here.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L97-L108",
+          "version": "repo-lines-v1:sha256:c2c61b2c5f48d7bf4be12696e2bdd7b721971ff1ab4b22242f789e3e17c7986d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwMDg5Yzg1ZGYyYTUzMTE2YjY0NmQ4YzQ5MjAwMzViMmQwYjRlZjlkNDE3ZjhjZGZjOTM2NThhOTQ2NTliMzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiZjY1NjVjZjQ5NjkyODMxZjY1ZmY3M2M2YjdlOThiMDRkYmM3NjZhYWZlNzE0NGZkNzk0MTkzNjI3OTBlOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY3ZTYwNTEwMjI2MGZhMDJiNmM4YWEzNzJmYjhmNDc3OGRkMjJkZTNhYjg0OTc2MzE2ZTU3NWUwNjliNWI4N2EifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/package.json",
+          "version": "repo-file-v1:sha256:fb05f369ae4a742448dd044462e41529fa6a4a63727b9ee16c43bf05b941a9f4"
+        }
+      ]
+    },
+    {
+      "id": "claim_2dfab3a4827c40eba14d606a943a3fb2",
+      "statement": "Chrome (clients/extensions/chrome, @brijio/chrome-extension) is the first browser-extension implementation of the user-controlled bridge, building MV3 background/content/popup bundles and depending on @brijio/shared.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L103-L108",
+          "version": "repo-lines-v1:sha256:0dae0bd14b5e2509b9a7a8b3321cc313ae8bc77d555f5dd97caaa6f0a0904f02:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDFiYTQ3MTljODBiNmZlOTExYjA5MWE3YzA1MTI0YjY0ZWVlY2U5NjRlMDljMDU4ZWY4Zjk4MDVkYWNhNTQ2YiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiOTU3MDMxODJlN2I4NTg4MGU5ZWI2NTIxZmY3OTY2NjBjNWNkMmU0OTkwYjg1ZjdmODg1ZWFiMDY1ZTcyODZmYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjdlNjA1MTAyMjYwZmEwMmI2YzhhYTM3MmZiOGY0Nzc4ZGQyMmRlM2FiODQ5NzYzMTZlNTc1ZTA2OWI1Yjg3YSJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/package.json",
+          "version": "repo-file-v1:sha256:ac6d5cfe2479a496ba371a43fcc938360dd80af2721a47c7e7ec16db99e18447"
+        }
+      ]
+    },
+    {
+      "id": "claim_1c3f1f55bdce477480ccceb3c972d7f7",
+      "statement": "Safari (clients/extensions/safari, @brijio/safari-extension) is a parallel implementation with platform-specific manifests and MV2/MV3 differences: its build emits separate dist-ios and dist-macos bundles and generates platform manifests via scripts/create-platform-manifest.mjs.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/package.json",
+          "version": "repo-file-v1:sha256:9efe4448a67a3245dd38dab21dd8fbf6d22036fcc879ad8101f4942a2989315a"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0019-safari-web-extension-and-shared-extension-package.md",
+          "version": "repo-file-v1:sha256:eb7cf29320506f96cebaf59f0073642a589b700606dd1d1245134f84513f4f39"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0051-safari-platform-specific-builds.md",
+          "version": "repo-file-v1:sha256:8cb235d231bd197f118403cb4156370f15379fc395f3baf0d3095173e59b0f42"
+        }
+      ]
+    },
+    {
+      "id": "claim_7e567b4b50d74fc6a5c3fe9fb1a53e54",
+      "statement": "Firefox is a placeholder only: clients/extensions/firefox contains just a README.md reserving the client boundary, and Firefox packaging, permissions, and user-control behavior must be designed in a separate ADR before implementation starts.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        }
+      ]
+    },
+    {
+      "id": "claim_24bc46b1e4bd486e9ea0c60002714839",
+      "statement": "Product and business framing is owned by README.md, docs/project/POSITIONING.md, and docs/project/CAPABILITY_MATRIX.md; the capability matrix is the canonical product contract and support-status source, positioning Brijio around authenticated browser sessions, privacy, and explicit control rather than generic browser automation.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L28-L36",
+          "version": "repo-lines-v1:sha256:89259ea9eb4beab245293eae64fe4c13d7b01d93988c0700eaed4da4532deab3:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMWMwNmU4MTEyZWFhNTY4OGVkMzVhNDlkNTY1ZDFiYTQzNTczOTM4NTA0M2RkNmVlNDgxNjE2MTAwMzE4ZDY4MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDIwZDllZDUwNWRiMjUxOTJhNjBmN2Q2YzEzMmM1OWJkYzgzNTdkODIyYWQ2YWUyOWMwMmYyMjRjNzhiMDY2NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWE3ZTZjYzFkY2ZjMDhlOTU4MWIzYzRjNjRhNjA2YWM0NDRlOGI3NWEwNjdhMWU0NGMxMTUyNTRiYjcyOWVkNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODcxOThkMTVhZDczYmNjY2E4YWMyYWVjOTk3MDYwYTc5NzVhMDJlNmRlNTBiYWUxMTYxMmQxZTQyODJhMDVkOCJ9"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md#L1-L40",
+          "version": "repo-lines-v1:sha256:bc2bca42b3cc9f35695a0ba4f2629aa193111bed064854518131bffbe76522e4:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM1ZmQ3ZmM4ZjgxMzBjMTYxMDMyOWMxOTdmNzY5NTlkOTNiNTg5MDBhZTAyZTg3YzdmYjRiY2VhYzE3NjgxNmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU0OWI5NGQ5ZDc3Y2NmNzAzMWNhZDhhMjgwZTM2NzZkMjhlMGUwNmE5MGE0NjM5YzNjZTQxZDIxNTY1NGQ0YzgifQ"
+        },
+        {
+          "resource": "repo://docs/project/POSITIONING.md",
+          "version": "repo-file-v1:sha256:ba42706a28df132df19f8ae08d8bb0a3e15d39c03f19aabad4e9fe5696602e85"
+        }
+      ]
+    },
+    {
+      "id": "claim_847e1535605f46a782c0a1ef168eb7e8",
+      "statement": "Security and trust is owned by docs/security/{THREAT_MODEL,TRUST_BOUNDARIES,SECURITY_GUARANTEES}.md, which are the authority for security intent and trust boundaries and explain why the project avoids credential export, browser cloning, and ambient browser surveillance.",
+      "evidence": [
+        {
+          "resource": "repo://docs/security/SECURITY_GUARANTEES.md",
+          "version": "repo-file-v1:sha256:3626a37f667d817cce96ac5aba03bb25c6183302efe00e7bd3aadc3e93b32472"
+        },
+        {
+          "resource": "repo://docs/security/THREAT_MODEL.md",
+          "version": "repo-file-v1:sha256:3834ef41b7cfab6d8f74090137951457198afb0a14be8c7e2f80b629dbc08e4e"
+        },
+        {
+          "resource": "repo://docs/security/TRUST_BOUNDARIES.md",
+          "version": "repo-file-v1:sha256:9d602d167bc17cbe51fe47ac973dd2dfc7cdacbbad271b23f2ec64df9bf63482"
+        }
+      ]
+    },
+    {
+      "id": "claim_edd69e4d95a744988bbb220e96b603ef",
+      "statement": "Docs and design history live under docs/architecture/decisions/* (ADRs), docs/artifacts/* (completed feature/operational explanations), and docs/project/*; ADRs are the authority for architectural decisions and must be consulted when changing browser actions, protocol shapes, or connection behavior.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L31-L40",
+          "version": "repo-lines-v1:sha256:9631ccd1ea53c51201ed53ebe0738feda991414e3e007ff50fdcf0c3936dc31c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkNTI5MGM4MTZjZWM1NmE0MGQxZGEyYzdmODdhYWZjNWZkYmIxYjYwM2I5ZTliM2JlZTFlMTU4MThjOGM2MmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmRlMDNjZDM2NDkwOGY0NzM2ODU1YzQ4ODA5MDAzOThiMjA2YTY0ZWFkZjJiNjNiOGQ5ODRjM2U2MGEwMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImMyODA5ZWM1YTAxMzY0YzQzNGJiOWI4NmQ2MjRmZmExOTIxYWFmMWI2OTYwZjE2ODgwMjNjYmEwMmI0YTYxMGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4YTVlNjBjODNkMzFlOWZhNjk0ZWM3ZTQ0ODViYWVhNTIxZTBkMzQ4ZGU2YmVmMTcwYjhiN2E0MDMyMGNiZjMifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md",
+          "version": "repo-file-v1:sha256:b3ad39adb1eb175e95471f9aa0056c1c1315fa165193725881239733d483e3e8"
+        }
+      ]
+    },
+    {
+      "id": "claim_8e66e04e35f444eba57be6b7fd813129",
+      "statement": "Recent ADRs 0060/0062/0063/0064 set the current direction for tab handling and visual verification: explicit tab listing/selection, threading tabId through the action stack, an open-tab action, and visual action verification.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0060-explicit-tab-listing-and-selection.md",
+          "version": "repo-file-v1:sha256:b3ad39adb1eb175e95471f9aa0056c1c1315fa165193725881239733d483e3e8"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0062-thread-tabid-through-action-stack.md",
+          "version": "repo-file-v1:sha256:0e14b1ec7626ee25a7cdf57a45c4bd4f9a26e11986504072a4ce80ccec3bbfe2"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0063-open-tab-action.md",
+          "version": "repo-file-v1:sha256:db79ee600db5a83e31a9fb764b37418f9face30de9f3965f9c9c6b6ca3795252"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md",
+          "version": "repo-file-v1:sha256:e6a4b9e46e48fb1ec1e7d58bd8f3965a846f5d0d400d79f69ebfe208ce51177b"
+        }
+      ]
+    },
+    {
+      "id": "claim_02fece15ccdd410ebf1b6e6d2430d57c",
+      "statement": "For cross-domain changes, update the shared protocol or ADR first, then the relay/server, then the browser adapters; the full path to check is shared protocol -> WebSocket relay -> MCP surface -> shared controller -> Chrome adapter -> Safari adapter -> integration tests, and per-call browser/tabId targeting, post-navigation page-context re-reads, and capability-matrix updates must be preserved.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L97-L135",
+          "version": "repo-lines-v1:sha256:d1fae571ba4dd5869deb05dee66160deaf21bee6e8c61dc58493721996cace1e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwMDg5Yzg1ZGYyYTUzMTE2YjY0NmQ4YzQ5MjAwMzViMmQwYjRlZjlkNDE3ZjhjZGZjOTM2NThhOTQ2NTliMzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFmZjk0MWRkYTNhOGI3Y2U4YThkZjc0NzExMzczMjM1OTk3N2EwMDc3NmJlZjBlMjY4ZWRmZGM4NWEyMWRjNmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFiZjY1NjVjZjQ5NjkyODMxZjY1ZmY3M2M2YjdlOThiMDRkYmM3NjZhYWZlNzE0NGZkNzk0MTkzNjI3OTBlOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjdjNGNlNzFiNmI1MGNmMjRjZTg5NDIzMmYyNjVhN2IzNjE5Y2Y5NGI3YzgyOTQ1YzVmYTFjN2ZkM2I2MmEwZDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_cb3d671cf4a8497180c14222ef277a7d",
+      "statement": "The pnpm workspace groups runtime packages under packages/*, servers/*, and clients/extensions/*, matching the shared/websocket/mcp/extension domain boundaries.",
+      "evidence": [
+        {
+          "resource": "repo://pnpm-workspace.yaml",
+          "version": "repo-file-v1:sha256:99661f5af286f08d5d66e437f506df6a7e6b191f73541f3a6ce794b9bc204830"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-20T16:42:52.757Z"
+  }
+}
