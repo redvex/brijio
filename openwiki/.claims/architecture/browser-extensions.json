@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:342b6556962bb003b165671e8c259ab947a35e67d28c9f1be3a7b7c67771e369",
+  "claims": [
+    {
+      "id": "claim_7248f0a7fc9f4bd591d4ba09198627cc",
+      "statement": "Both extensions share one architecture: browser-specific source wires platform APIs into adapter interfaces owned by @brijio/shared, and the shared BrijioBackgroundController depends on injected adapters and contains no browser-API code.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L345-L420",
+          "version": "repo-lines-v1:sha256:aa5f4e149b5aa7d4eae8d88d94d681993f2ee0b0b0aac3e474d9fcc7c0dcc2dd:eyJzZWxlY3RlZExpbmVDb3VudCI6NzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxOTg0OTQ5Zjk5NjdjZWY1OGU2MzAxOTQ4NWY3ZDRkY2RmMGNkNDM4MTg0OTQ1MGY4MmQ0ZGMxYjFmZWEyMGYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZmVkYjJhMmE2NmRkODM4ZmEwMmVjN2MxZmJlZWEzNDJhZGRiNzc1OWUxN2IzZWJmY2FlZGY0OTc3MDkwNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNiZGJmNjU0YmUzMWUxNTkzN2YzMjYzNDEzYzczOGVjOGVhNjFkMjJiNmVlMWNjYjg1MzFjMTBkN2Q4ZGNkNWQifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L140-L180",
+          "version": "repo-lines-v1:sha256:a1f5eeb1f23183a9b525c47841b33fc08e2d58fb9e41e448396a111c89eed105:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0MGVkYmQ0ZDc3ZTY1NzVkNDZiYTQzZGM1MjUyNWIwYTExZDY0NDY1MGE1MTY5N2I3NWFjMTM2YzQ1NGY4OWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0MGVkYmQ0ZDc3ZTY1NzVkNDZiYTQzZGM1MjUyNWIwYTExZDY0NDY1MGE1MTY5N2I3NWFjMTM2YzQ1NGY4OWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY4YzVlOWZjZjI1M2FlMTgzNTEzMTUzMzg5OTdhNTA4ZGJkYTYwMzY0NTZkNmJiNmMxZGU4NzJmZjUyZWRjNjciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxMTZlMTAxODdmNTQ2ODZhZjFjZmMwNzNkYzQ2ZjE4N2JiNGRjZDBiZTVhOGUxYzI2ZmM0NDg3YzIwZTE4OTcifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L200-L420",
+          "version": "repo-lines-v1:sha256:363b317bcd634249e97819984ecd2d8ff6acdf68e234b9ecca5545054de2f659:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0ODkzZjQwZTM3ODFlYjg5NmM4MmQwNDZhMDgwNjdhMTFlMzVjZGYyZjFkZmFmMjZmZWE5MGI4ZGI2Njc2NDEzIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIyZGJkOWRlNmUyYTQ4YTkyZjgyM2NiMjI3OWI3MDI0MGZjMjhmMWRmZGUzNWEyYTYxODU3MmJlYTBkOGViZWEwIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1NTNhNGVmOGJiNjEyODk5MjFjZWUzY2MxYTkyMTQ1OWMyZmM3MTdiMzcxNWJmZDg4MjcyZjIwYjE0YWExZDZhIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_b0040495297f47dd891de59e822d088d",
+      "statement": "Chrome is Manifest V3 with a module service-worker background, minimum_chrome_version 116, permissions activeTab/scripting/storage/tabs/downloads, and http/https host permissions granted at install time; Safari is Manifest V2 with browser_action and *://*/* declared as a required permission.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/manifest.json",
+          "version": "repo-file-v1:sha256:a389ff181dadd0ff46f415bba4054e6e60bbcd0615d4a3d2f6e8bef78b937ca4"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json",
+          "version": "repo-file-v1:sha256:408cda1bc648c2fb17c8cf78eda350d894765da0a90527456e44274e85336c1e"
+        }
+      ]
+    },
+    {
+      "id": "claim_6bc1dc7c996b485981a29fe578d98c00",
+      "statement": "Chrome's permissions.ts documents minimal permissions with rationale and makes hasRegularPageAccess always return true because broad host permission is granted at install time; isRegularPageUrl restricts to http/https schemes.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/README.md#L73-L96",
+          "version": "repo-lines-v1:sha256:93f587caf5a143de125b0875df85e76837bbc7731cb8e523cb6d972b1729b65c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzZTJjOGEwNWU2ZWU4OTQwMjZmNmQxNGI0MzEwMTQ1ZTUxMDAxNDdlNGNiNmM2ODNmYzZkODFjYTE0OTA5YjkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlNWExOWM4NTNkMGVhOGY4ZGVjMzFjYTBkMmU3NGE4OGM1MWVkMDUyYjBiMTRhOWEzODBjNmRjYWQzZmFlYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAwNzg3ZTc2MGJiYmM5Nzk1MmUyYmM0ODMxN2M1NGFjOWRjYmI5MTRiYmRiY2YxMmM4NWMzM2U4YTNhYmE3N2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjUyMjRkZDllNDI0N2ZmZWVkMDRhOWMzNjNkOTNjYThmNzk5YTUwYWQ2NGZkY2RjM2JhNzA0NTQ0NWU5YTM0MmEifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/chrome/src/permissions.ts",
+          "version": "repo-file-v1:sha256:40d65c495a372d61f000a940c71797467e93cf03c939ab79ee3bf2e4807c04d2"
+        }
+      ]
+    },
+    {
+      "id": "claim_15dd9e9163024b6ebeacc2eb80192263",
+      "statement": "Safari has no runtime permission prompts; broad host access is granted at install/enable time, so permissions.ts makes both hasRegularPageAccess and requestRegularPageAccess always return true.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/README.md#L102-L112",
+          "version": "repo-lines-v1:sha256:85779b1a59d63ac8d5ab0894b48fc5444adbe0657eb273de3406343344b015eb:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3Yzk3YmJiOTMxNmQ2NTIxOTc1YjA4YmM5ZmQwYTU2NTk0NjIyYTBjMmFiNWFmNmQ3NmJiMjljMDAwZmFlZmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRhNTE1OThjNDQ4Nzk1MGZjM2UwMGE1OTc1YWM5OGExZGU4ZGVkMDYzMjA5MGU5YTljMjAzZWNmM2FhYjM5ZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYwODA5OWI4NTM3MDkzMWU1NTk0ZGEyNjgxNzFjZmI0Y2Y4NGU5N2UzMmJmNDBiZmFjMDFmOWJkZmMyMzRhYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRkYTUzZWFiMDZhMTc3MTc4YmM1ZTliY2U3M2MzMDY4MDAzOGVkNGVkOTQ1ODRmZmI3OWQ5ZTJkNTdjZTkyNjYifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/permissions.ts",
+          "version": "repo-file-v1:sha256:8a9db02cb836738cffc575a7eb9b3a21744a2c0fb5d55ec22de5c3dec6c0b36c"
+        }
+      ]
+    },
+    {
+      "id": "claim_bd140896b888432c96e391c3b0e5cb88",
+      "statement": "Safari badge support is text-only; SafariActionBadge implements setBadgeText and setTitle but setBadgeColor and setBadgeTextColor are no-ops, so connection state is shown through ON/OFF/ERR badge text.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/README.md#L46-L52",
+          "version": "repo-lines-v1:sha256:9b779e0b887baf0cefe3d286c091355496c91e5fcc3b7ce095ffe0fb3d4364d1:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjkyMDY1NWYzMmZhOTc5YTUyZjc3NGNmM2Q3ZTEwMmE4Y2NkNjMyZjYxZDM2YTUyMDFjZmZlMzMzMmExNzZhOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiODViM2JhNGVkYTUzN2VlODc4NGQ0Y2M3NDU2ZWFmYTEyOGM1ZjY3MzE5NTcwNTFkMzAzM2QzMzM2NTRkZGVlNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiN2UxNTcxNDA1MzQwNmEyY2FmMWRhMjRjMGUwOWNlNWQ2YjA3MGJiZGUwYzljNmZlNDlhYWJmYzhmNTRkOTBmZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGFhYzUzMjE5ODI0ZTM2YzUwNWQ2NjQ5ZTNiZmFlMmQ2Njk3NTE3YjM3NDM0MjdiYmZjNDg4ZTQyNDYxYWE4NyJ9"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L178-L198",
+          "version": "repo-lines-v1:sha256:154f6855f86ba4b779c6bf7a1e23eb0f8b7cf472303623be2963223a348486a9:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZmOGRkNDEyMzBjNTdkMzhjMTNkMjZiMTBiMDcxNzAxMmMyNmViMmE2NDk4NDI2MzcxMDBhYzdjZmQwYjQ4NWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ0OGY1ZDBjNDRlZDlkNDRmZTE4NDUzMjMyMjdkM2EwY2YxZWYzODM5M2EyNTVjMTVmZTBjZjJkZmFiMzA2NGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyZjVjNmQwYTM2MGNjMTc5NWFkNDQxOTUxYzMzNjJlODg5NmYxZGYzNzAyYzk4NzI2ZGE5OTk1NTNkMWM2ZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlmZDMzNGQ4YTRiNDg2YzQ0NDg4MWQ0MDM0Y2IyZjk4YmRjN2ZiMTE0NmFmNWVjZGNkZTFhOGNmNDdiNzA5ODcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_142f8225567d4a8b827975b30c9798ec",
+      "statement": "Safari has no downloads API, so SafariDownloadAdapter reports downloadStatus capability not_supported and downloadFile is fire-and-forget via browser.tabs.create; Chrome uses chrome.downloads.search/download for full download capability.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L168-L220",
+          "version": "repo-lines-v1:sha256:7de61d81a479d0738df8890f24bf4fc786b7cbe0c4c4714b0101fcbc4d0132d6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU3YTUyNzk4MWI3MTAxOTU5M2ZmNmU3ZDE0YjkyNjFiNzcwMTU4MDA0NThlZDEwZGJlZDYwNDU5MDhjY2ViNzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExZGY4N2E0NzMxNmM3MDhjNTUwMjA5OGU5YWY2YzQ0NTM0ZWI4MGJlYWRjZjYwNjMwMjhlZmNhODU5MzdhYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2YmMwNDE0NzhiNzZkOTdhNDdjODk1ZmQ4MDM5ZTJkOWVkMGI2ODlkYmViZDJhYzkzYTM2YzE4ZmRlNGUzZWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRmZTk2ZWNmYzA2MDAyNDA4ZWUwMzlhNmEyZjY3MjBkNzJhMWFkZTAyZTc4NWIxNmRkZThlOTJiZDIzZDUzMjgifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.ts#L300-L320",
+          "version": "repo-lines-v1:sha256:437e4998c2bb3f790c5e58c5c3798660e12b4ae69b37d2d6cc8ef91ccd7fca11:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY3MGU2ZjMyMjA1OTU5MGVlODZjYjQ3MjYzMDY4OGY5NzE3NjYzNDI5YzA0YzE0ZGQ3YzFiZGFkMjE4MjA5MjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEwYzFkNDdmZGExYThlMzBhN2M2MjAzMTFmYzcyN2U2Y2M3ODUyZjgwMzk0NWI2MjkxOTFlMWM5OTE3MjVkMmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1MGFlN2NmYmM1MWM2ZDUzM2FhZTUyODgwODViMGQyMjFjMjU2MzFhN2I4NTgwZmVmNDA5OWJjNjQ1YTZiMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAyZDZkZDA5ZGQzZGY1MDQxNzlhZjM1ZWZjM2RlYWY0OGE2MDk1YzZiMmI1NDFkODFkMzhkY2ExMDUxMzQ0OTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_eede12d2ff1d4fdcaef20c84ec1b1fe6",
+      "statement": "The checked-in Safari source manifest is iOS-safe with persistent false, and a build script generates platform-specific manifests: dist-ios with persistent false and dist-macos with persistent true, built via make safari-ios / safari-macos running xcrun safari-web-extension-converter with --ios-only / --macos-only.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/manifest.json",
+          "version": "repo-file-v1:sha256:408cda1bc648c2fb17c8cf78eda350d894765da0a90527456e44274e85336c1e"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0051-safari-platform-specific-builds.md#L1-L80",
+          "version": "repo-lines-v1:sha256:4cfafdc5a642abe443be508e1ae188937db29d94018a4b0a3f794dd3f9bee0d7:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY0MDVlOTY4NjJjNmQyODRkODdlMGZiMTc0OGQ2NTJhZDAzMmVmY2VjOTQ1YWVkZWFlOTQwZjgxNmRjOGFlZTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM4MjY2ZjNmZTdkY2VkOTUwNmY3YTUzNTJhZTgyMzU1YjIxYWE0OWYwZDFhZGZiMzY1NDJmZjc0NTk2ZDZmYTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_62e12f62a6f54bf983162beba5ad14fd",
+      "statement": "Safari persists desiredConnectionState in browser.storage.local: connect stores connected, disconnect stores disconnected. On background startup reconnectIfDesired reconnects silently if desired state is connected and settings are usable, while disconnect stays explicit and durable.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/src/background-entry.ts#L217-L351",
+          "version": "repo-lines-v1:sha256:fd0e4d57a398c3472860b8c69807aa2d24fbb372aad7768feb222db9167ca74e:eyJzZWxlY3RlZExpbmVDb3VudCI6MTM1LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwOTg0ZGY4NmI5ZGFkODA2NzIwODM3MTc0MjZjZDc5Yjg1N2ZmNWM2OTk0YmFiNjI1ZTRlZDk5MGFlZjYwYTVkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI1YWMyMzQ1NzVlZGEzZTM2OTk5NTVlZjBmNjIwZTFiNDU0YzZjYzFlZjEwZDk1ODQ2NDZjMGJmMTcxZTE3ODZiIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0052-safari-client-reconnect-on-wake.md",
+          "version": "repo-file-v1:sha256:ef6a6a64f83f8c4dc249799ec047be4d417f0f02576f7573c4b0e521b627265d"
+        }
+      ]
+    },
+    {
+      "id": "claim_c7cba1b323ab4117bcbc6f1476be264d",
+      "statement": "Safari content scripts send a lightweight brijio_page_active message on pageshow, focus, and visibilitychange (when the document becomes visible) to give the non-persistent background page an event-driven reconnect hint; these are wake hints not a guarantee the background stays alive.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/safari/src/content-script-entry.ts#L355-L395",
+          "version": "repo-lines-v1:sha256:6e81ef2808bfc2895230efe7bd32a252114c102d639830e80fc14503bb73d4ff:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk0NzhjMTgzMTY0NDg2ODAyNTk5NWIyZDQ0ZjU0YWZmOTI0OTEyOGQxYjcwODAyZWY0NzQ5ODZhNGRlMzBjOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUyYzg5Yzg3ZDBhYzk5ZTRiN2ViMzkwYTlkMzRkOWQxZTBhMjU2MjA4MDgyMTZlMzBlMmY0M2ZkMzFkMTg2N2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhODUyMjQyMmU4ZDUzY2ZmMDE2NmFiNGIwNGNlZTliZTMxNTU1NzBjMzI4MDE4MjRlMmNkZmJmZGMyODVkZTgifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0052-safari-client-reconnect-on-wake.md",
+          "version": "repo-file-v1:sha256:ef6a6a64f83f8c4dc249799ec047be4d417f0f02576f7573c4b0e521b627265d"
+        }
+      ]
+    },
+    {
+      "id": "claim_150fd51a4e484d52bad53bfa3c9a4a0b",
+      "statement": "On WebSocket open the shared controller sends the auth envelope, starts a 20s keepalive interval emitting extension_keepalive messages with no browser state, and announces presence containing only browserInstanceId, label, browserName, profileName and capability names.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1621-L1675",
+          "version": "repo-lines-v1:sha256:62e79ebb460228994f6236a22165aad6db174152a13dae500ebb4063d2640c19:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyYmRhNzI3MWQxMzZhNGNhZDIzY2VkYzlkMDI2NmVhM2QzY2EyMDM1MThmMzcyNmYyYjE1YTRiMzFmMjlhZjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA3MmExOGMwYzlmMWFlN2VmOWVkNWVkN2JmZDI0NTM2OWFjNjAyOWM3NWMxZTkyYThkYWI3YmFmZTM3ZTYyYzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5ZTlmNGQ4NmY1NzhiMzQ4MTAzMjI3YjAxZTY2NThmYTU2MzViNzZkNWZlYjFjNzliMzg5ZGYyNzI4ODkzNTgifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L455-L475",
+          "version": "repo-lines-v1:sha256:feba57da52be6e94ddf97bd4094a739d03f57d6611c7a7a4ae0457b5b32aec11:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzMzQ1YjBhMjMwMmYwNDIzYzAxNWI0MGEzMmExOGRkY2FhZjkyZjQ5NjlhZTY4YjBiMGY0MzUxMGQ4YjM5YTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUwZTgyMTFhZjJlMzA3ZWVhOGNiMjU2NDVmYjhlOTI5MmJjNjZiNmE0MjRjNWFlMTJlZjRlMDIyYmM4MjNjYjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljYzdjNzI5Yjk1YjVhODEwZDM2OGUyZWVkMGNjNzRiZTc3ZjM4OTRkYjZhMWYxNmY2YWJjZDM2NTdlMThhYmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba9735d7ed2a42ed818635ee3451e082",
+      "statement": "submit_form, fetch_resource, and download_file are approval-gated: the controller calls the ApprovalAdapter, which injects the content script and shows an approval banner with approve / approve_session / deny decisions; approve_session grants are cached in approvalSessionGrants.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L86-L130",
+          "version": "repo-lines-v1:sha256:a8994c8541fd471cbf0b05048cdb710d2ecfadb472a2c40d57d14c014d3952f6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjYTI2OTM4ZjYyZWE0NzgxNjU5MjAwYjkxZTRhNDQ5ZjE4ZDAyNzA1NzA3ZDI1NzYxNjUxYjIwM2RmYmZlOTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhiM2JiMWNkMTEwMGVhNzk4NzUzMmE3YjU2OTMzZTYzOWU0NzQxMjY3ZDljYTQ2MzIzYTdkNmRjZjBlYzg3ZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmZDBhNjQ1MjhhMzNlNWNmMTc2NzFmNjgzMzI4ODlhZmE4ZTFlMTY1Y2E4OWU0MmM2ODc1ZWVkZWVjZTViYjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjMzQ2MjUzMTRhZDA5OTczOTk1Mzg0OGI1MTRjOTgxMWMyMGVhYTg5ZWM4ZTRmZTU0M2I4YWQ3ZTVmMGY1MDIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L267-L310",
+          "version": "repo-lines-v1:sha256:5463a16ca82cf6b2c32f2037ee53db2413ae2d0bf33e001a68807af877ad40c1:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5NzlmNjY3OWY5MDVlMTQzOGQ1ZGFkZjdjNDQ0MWZkNThkMjQ0YTEzYzEyMTUyYzEwN2NlZGJjNDNhYzZiYmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4Nzg2ZTE4NzI3NGU1MGU5NzQ3NmJlMmNhOGZmNjljOWE4N2E1Y2MzOGFlMGU2MGY5ODgxNDY5M2YxOGM0YmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlMGMwM2M3YjVkZTEwMGM3NGJkNzk5YWQzZmFiZjAwZjk4NmNmMDk3ZGM1NmFlMzljZTk4NDA2NmM3NGUxOTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFlZjVkYjI3M2U1ODAxNzcxMDI0N2U1YzNhYzIyYTE4OTZiNTZmZjQ4YzI5NzZlM2ZmNTFiNTMyOGRhOThhZWYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_16473572717d4ac988387519bdf87cfb",
+      "statement": "The content-script entry registers a single idempotent runtime.onMessage listener that removes a previous listener tracked on globalThis.__brijioOnMessageListener before adding the new one, so repeated executeScript re-injections do not stack listeners.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L395-L418",
+          "version": "repo-lines-v1:sha256:79d60c5cb040a5cda76b64bdbcc10bbcaded5f2c8f2aaea960ea451a9f53babf:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE1MjQyZDRhMmJkMTlhZjMxY2NmNzlmOTc1ZTg0YjdiMTQxZDU3MGU2MGFjYTk1NmQyMzUyZTA5YmMzZjcwZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/content-script-entry.ts#L420-L465",
+          "version": "repo-lines-v1:sha256:e29609042b4019827029bb78b698cf7b0e4da96b97b6a63e115f2733f703437b:eyJzZWxlY3RlZExpbmVDb3VudCI6NDYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkwOWE2MjQ2YjMyZTdiYTM3MjY1ZGRlOWI4ZDBhZWZhZmNjYTUzOTliZTI0MjgyYmNiYmY3NGFhYzQ4NzcwZDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a21888dfe0134c4ba1f4184fe09cae76",
+      "statement": "The shared controller dispatches MCP request envelopes by type, incrementing pendingRequestCount around each handler and sending the response (page_context_response, page_content_response, action_result, etc.) on the same WebSocket with the same request id.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L555-L760",
+          "version": "repo-lines-v1:sha256:c9949af9e518211d58d8f9e8f15f4b4909ddea5ee4d5c5548806cb4104155ff7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjA2LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzY2JlODg1NWZmZDQyNTUzOWI1OTE4NWU2N2QzODdhZjBhM2NiNDMyNjM0MWVhMjM2NjFjY2FiMzc3ZTUwMzdmIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkNTZiNDZjYTZlM2FhYmJiOWQ3YWUyZTQ4N2M3ZTZmNDc5MDMxYTU5Njc4NTBjYzIyNTc4MDMxMGFmYjMzNGNiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmZmQxM2MyZDVhNWM0MTRiYWJiZTEyMzg2OGE0OTRmMTUwYjZiMjdiODQ1ZGRjNGU4YTFlN2Y4NmU0NGU5ZDAxIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwM2Q5MzQ1MmEwODhhZTU2MTk5NzZhODY4NWE2MzNkZDRlODlkZTZkZjJjMzZlZDdiZjQwYWFkMjFiMmJiZjA2In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_12bd225a185242caa2e7f948d068752c",
+      "statement": "On non-manual socket close or error the controller schedules exponential-backoff reconnect with 1s initial delay, 2x multiplier, 30s cap and jitter; manual disconnect cancels reconnect and stops keepalive.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L495-L560",
+          "version": "repo-lines-v1:sha256:f68df214bd349db769b9cdf1182234e7bf0878af61bd0ca6119f2754f6046c6a:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFiNWM4MjYzMmZjODJkNGIyYzM0MGY0MjU1OGJhM2RmYTMxYzc2NTVkZjZmY2MxNjhiNGZkY2U1N2ZhYzYwNDMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQyZGY4NmI0NzZiMGQ2ZGJiZDE2ZmExOWZlMTdhOGJlNzc1MWFiZTNlZTgwN2I1MTBmYjVmOGNkZDBkYWQxNGUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQwN2MwNmU4MTNiZmY3OTA2NzZiMzZiOWFiYTk3YzI1NWI4MTkwOGRjMDVkYzQ3ODFiNTJkZjQ3NTE5OGM4NTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZkOTdmZmEwN2I3MDkxYzkxODdkZWI0MTAyY2JhMmNkOTIzZWI1MGI2ODA0OTQ3NzExN2Q5NzFjOGJjYTE5ZGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_01b508655d9c4e28b5cae4ac78d839be",
+      "statement": "Firefox is not implemented; clients/extensions/firefox/README.md only reserves the client boundary pending a separate ADR.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        }
+      ]
+    },
+    {
+      "id": "claim_08780cdd5e074eaa896b64d9606f6e58",
+      "statement": "popup.ts is a thin wrapper that re-exports shared message creators and parsers and adds only the Chrome ChromeRuntime interface and a Promise-based sendMessage over chrome.runtime.sendMessage; Safari provides its own popup message construction in popup.ts/popup-entry.ts.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/popup.ts",
+          "version": "repo-file-v1:sha256:a21e7a12ed5127913571b4feffb7443cda8d8e88ee26dac947302bd030703381"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-20T16:42:52.757Z"
+  }
+}

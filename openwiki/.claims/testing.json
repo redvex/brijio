@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:e8a1904384d9881b9ec19e23fee693e368ae9b38919e615d150b1099aa439983",
+  "claims": [
+    {
+      "id": "claim_c867fef09375455d8009e7d306a01765",
+      "statement": "Brijio uses a layered test strategy: per-package unit tests co-located with source as *.test.ts (node:test), a full-stack integration test harness in servers/mcp/src/integration.test.ts, repo-level layout/UX Tests under scripts/*.test.mjs, and TDD + smallest-verification-set conventions from AGENTS.md.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L62-L88",
+          "version": "repo-lines-v1:sha256:d4aee82088ba5a71d3873072d7c8df611a45ab991e22cf9c31a1c7758c807d5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmNjJiYTUyM2ZkOTZlMDAzOTYwZTUyNGU2NzEwMzRiYTYyMTdkOTg5MDJiMGRmN2IwYzM2MjQ4ZTU0NTA0NzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4Yjc2MjM2OWRmMmRkYjZmYTA2MWZjOGMxYTM4MmQ4YjJkYzc3M2ExZTIwMjI3OTFhNjIwYzJmZmY1OWFhMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MmUyOWQ5MmQ2Y2Y5YjA3MmNiNTU0ZTRjYjNlOTE1YzFhOGRhZGNhNDc2YThlMGJjMDRhZjdmZDI5YWY5YjUifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0034-integration-test-harness.md#L1-L40",
+          "version": "repo-lines-v1:sha256:dae727f553bb9717952c2d34f07befd1abc1e9e5aa8b47f1dad2cd1ef2efda55:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZWU3OTkzMGM4NGMyMDc1NDcwZmJlM2QyYzA1ZDNlNzFjZWU4ZjFlMzQ4N2RiZmI1YmEwZGRjNDRjNWIwOWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5Y2MwN2Y2OGNhZTY0YTFiODk2MDI1MjYxMTJkMzIwMWQ0Y2VjY2Y3YTkxMzZhZGEyZTcyYzQ5MWU3MGI5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzYzQyMzM3N2I3ODUwNDkyNDhmZDY0NDM3NjI5ODUyNzVlYmUxODM5NWNjNDg2MjI0NmQ5N2QzZmFlNDIwODEifQ"
+        },
+        {
+          "resource": "repo://package.json#L19-L23",
+          "version": "repo-lines-v1:sha256:00da16600b1de1e7e264df00a0fe432528aa2b75169b33a59581c405d8c627dc:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNjRkZmZmZTg1ZmRlODM3YTc4ZGM5MjQyZDYzOTMzMTZhZWI4ZTUwMWIyYzRkMTk5ZjI4MGM5ZDY4NTQyYmMwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNGQ1Y2QyZmI0ZjNkZjg4NDUxNTI1NWIzOTUyM2YyZjhiNTQ3MmJlZWE5ZjU2NmZmY2EyMDRkYjgwMjU2MTA0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZGJiNDllYjZkZjY1OTg2ZDY1N2Y2NGI1NjVlZjg3ZDg2Nzg2NjA2MjYxOTM0MDZjYzA2ZjVjYTRkNmE4MWUyNSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZjkxNjkxMmY0Y2FlZDAzNGU2NDJiZjg5ZGYzMzk4YjIzMThhZDAyOTBkNmMwZWM3OWExNmM1ODRkNDZmNTM5NiJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:5837f4092eacbb5768b91d6a04c10fbeea4171e0b462b01461dfd2c9052c1976:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjNzBmNGRhODJmMjdhMDBiZjYyMmVjNjdhYTZiNWRkNDc1Y2U3YjU0MTdmZTZhMmYzZjAzZWY5OThiM2JmY2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyNmM5Zjk3MTdmZmQ1MmZiZDBhZjViNmJkMWVhYzU5YzFjYzMxNjA0NjZjZDViOTIxYzQ5MjFiMDgxYTIxYmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_0e2fb19b80ce4650aa128435b0e6902e",
+      "statement": "Unit tests are written with node:test (describe, it, assert/strict) and live next to the source file they exercise as <name>.test.ts across @brijio/shared, @brijio/websocket, @brijio/mcp, @brijio/chrome-extension, and @brijio/safari-extension.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.test.ts#L1-L10",
+          "version": "repo-lines-v1:sha256:4c78d710e28c9a137ced13286f65734268ba72515e2d72fad551b6c46ef30d63:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmNGRlYjM1MTFlMjk4OTRhMzA2NDlmMmFiNmM2ZDY1MzY3ZWNhYzcwMGE4NTU2ZjM4NWZkNzdmYjZjMGY3NzUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEyOTQzZTQ2ZjllZDFkNWU2ODdhYTg4OWQ1NGU0NzQ2ZDJjOWY2NTE4ZWI3YjZmMDQ2NWEzZjZkNGNiYTIyYWMifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.test.ts#L1-L12",
+          "version": "repo-lines-v1:sha256:9d0d7b1a69ebd292854a6724497d97b3f822f64ad112688911f1b5f011910e19:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYzYzZhZmE1MjUzOTdmYzBkY2EzNmJmMjlmZTdiNWQ1ZDljMjY4MjNmZjA4NWUyYzU2ZTg4YmMzMTcxNzc1ZWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3NDE4YzY4NWZiNGQyMjlkM2Q4MzNkMmRiZmZkMzZjMzc1YWE0Nzc5ZTIwY2QwMTJmMzIwYWUyNGQ4YjU1NzAifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.test.ts#L1-L10",
+          "version": "repo-lines-v1:sha256:f34b175926bd33574def795566fd3b4a4ca9fc26dbde2f8d825115ab0272c345:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFlNTBlZDIzZDMyYjU2NGFkZDRiMjljZTc3YTFiYzlkMTQzYzVlNTI1ZWMxYzZkNmM4ODhlNmMyYTNlNDkxYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjRjNjE1YzJiNTA4NjVjZWMyNzRlMzI2MjVmMTkwZjkyYzhiMmU2YmMzOWZiN2ZhYzQ3YWQ1YTExMWE4MDc5M2QifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/index.test.ts#L1-L12",
+          "version": "repo-lines-v1:sha256:21c8112304b91b465dbfe0ff387321034f6dc54e49d154a8e011f50dded98def:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4Njk0ZWYzNTAyNWQyZjFkMWU3NTIxMmM4MmNjNDMwZGE0M2ZkNjQ2MmNiMTk4ODQ1ZmIxMGUxNmZjNDc1NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM5ZGNkMzQ0NmFiMjI4NzEzZDQzNzZkNjcyNmE1YjYwMDMzYjllYmQzYmUyNDg1YWQwOWI2ZWI1MDEwOGE3ZjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk3OWVlYzI5ODU1NDY2YTAyZGFlM2NjOGYyNzA5YzBjNjJjMTYyYzM5ODJkMjIyNDNlZDY5N2U3YWRhOTQ5YjIifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.test.ts#L1-L10",
+          "version": "repo-lines-v1:sha256:924b01ad8bc7b1254c02e761a6c5fa3850c87a6b9fdd6c63f44e058496f0bf2f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMDU0MDY0MzgxYWU3ZjE2ZTVmNTE2YjdkZjFhNDYyZDQ4MWU2MzVkMjM4ZGRkM2FlZDY1NDA5YTA0YmI1ZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImFhYTIyYzQyMGIzYTRiMDFmY2UzMzAwMDI3MWI0OTNkOGMyZTRhNzhkYzg1NTZhMGQwMDM4OWYzZDQwNzJkZGMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_6dd21653c238460cb517ee40b1b680ec",
+      "statement": "The root test script wires package tests and repo scripts together: `pnpm -r test && node --test scripts/*.test.mjs` — package tests run first via pnpm -r, then repo scripts run via node --test.",
+      "evidence": [
+        {
+          "resource": "repo://package.json#L21-L22",
+          "version": "repo-lines-v1:sha256:0be16cc0888d495b48f7b2db475dc36d64fde28eb2e84893ef3ebdf5923747f4:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjk1NDJiZjRlOWY1OTRiY2NhYzZkOTMyMGUwODJmZDA0NTg2N2UxMzM1MjQxMjI3YmE4M2NjM2I2ZDkxMzg2YyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDEwMzA1MTE4MjQ4ZTc3YzM4NWU5Y2M1YjVlNzRlNGIyMDBlYzQ3ZjVhNWM5ZTZmOWY0MmYwZTlhZjI0OTgyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYTlmNzY0YzZhOTkxZDM5Y2E4YTFkMWY1ODRhZWZkYTZlNGQxN2FlOWI0ODM1NzIyMmY5NmQyNjNmZGZiZmEzOCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDVlYTdmYzFjY2YxMWNhYTVjODBlMWZiM2MxZjkyNGY2ZmQwYjJhYzkwYTI3MmIyNjY2N2VjZjdjYzZiNjAyZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_6b548eba38d24c8e8c76c9588071b83c",
+      "statement": "ADR-0034 introduced servers/mcp/src/integration.test.ts to exercise the full stack by starting a real createWebSocketServer() + startBrijioMcpHttpServer() together and connecting a mock browser extension over a real WebSocket, where index.test.ts only mocks the WebSocket layer.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0034-integration-test-harness.md#L17-L40",
+          "version": "repo-lines-v1:sha256:ca9b84a644253f6193a015dc610855afd6f4e220242fc22d9f346dad0695e581:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwYTc3ZWRiOWJhZTY0MDRhZWM0ZmYwZjIxMjkyNzNkMzczNmU0OTZmZDg5ZTU2MGM0OTdlMDkzNTgzM2M4ZmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5Y2MwN2Y2OGNhZTY0YTFiODk2MDI1MjYxMTJkMzIwMWQ0Y2VjY2Y3YTkxMzZhZGEyZTcyYzQ5MWU3MGI5YWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3NmVmYTU1OTQ0Y2Y0MTBiODgwZjE3OThiODFlMGRkNWI4NzhhMTY3YzdkM2EyNDE4ZTk4NGYxYWVmNzk0YmIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzYzQyMzM3N2I3ODUwNDkyNDhmZDY0NDM3NjI5ODUyNzVlYmUxODM5NWNjNDg2MjI0NmQ5N2QzZmFlNDIwODEifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L1-L30",
+          "version": "repo-lines-v1:sha256:5837f4092eacbb5768b91d6a04c10fbeea4171e0b462b01461dfd2c9052c1976:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVjNzBmNGRhODJmMjdhMDBiZjYyMmVjNjdhYTZiNWRkNDc1Y2U3YjU0MTdmZTZhMmYzZjAzZWY5OThiM2JmY2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIyNmM5Zjk3MTdmZmQ1MmZiZDBhZjViNmJkMWVhYzU5YzFjYzMxNjA0NjZjZDViOTIxYzQ5MjFiMDgxYTIxYmIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L417-L460",
+          "version": "repo-lines-v1:sha256:329b3a23206da50566e3d6ca7d80652809ff72cd649cae4f933f09516f492ae6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhMGUzZWFiOTcwZTNiODk5MGYxNjljNzBmYzhlYjVmYmEyYzY1NzA1NzVmODkwN2FiM2RmM2VlNWUwMGE4MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4ZWFkOGI1MGJiZjhiZGY1YjBkYjc3MmQ2OTUyMWY3YTNhN2VkYjcxNTRhYWUyM2NhZjYzYzZkYWFhNDI2ZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1ODNmZWI2NWE0NGJhZjA5Njg3OTI1NDFiM2ZjZDRhYWZjN2I0ZTFlMjVkYWUyMmNiMTRiOTdmNjkwNWZmM2QifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_518ae0824223477988cc0414ef1638ea",
+      "statement": "The integration harness avoids real browser/relay dependencies by injecting request-function overrides into page-actions and page-context, and the mock extension answers forwarded requests with fixture data so the full TCP path is exercised without a real Chrome/Safari instance.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0034-integration-test-harness.md#L40-L60",
+          "version": "repo-lines-v1:sha256:4d5e3f60cbff2dab1a91f990d8bb0166507eb7a0ab5a8eda460be024be6001e7:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5Y2MwN2Y2OGNhZTY0YTFiODk2MDI1MjYxMTJkMzIwMWQ0Y2VjY2Y3YTkxMzZhZGEyZTcyYzQ5MWU3MGI5YWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3MWIyZjJhN2RjZTgzZGY2ZTZmMGUwOWU5OTIxOWQwYmVhNTgyZGIxMmM0Njc0ZjQxNjVkNzYzYWNmOWQzZWUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIxZDNiOGE2ODBhYTdjY2Y2M2U3MmEzOWY1YWQ3YjgyNWE4MjQ3NjM1NmM0YjdjNTI4ZjdmN2I5OTk3ZGM5ZDkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiZDI3OWU2Yjg3OTE0YjAxODU4N2UwOTliYTYxN2U4MmRjNjg0N2YyOGQyNDBjY2QwODdiMTY2NzljMDU2YWIifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L417-L470",
+          "version": "repo-lines-v1:sha256:b2424365ea07b5592e78da38b9065019ff917386fd40b2bfa34fa260b2c6dcd4:eyJzZWxlY3RlZExpbmVDb3VudCI6NTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhMGUzZWFiOTcwZTNiODk5MGYxNjljNzBmYzhlYjVmYmEyYzY1NzA1NzVmODkwN2FiM2RmM2VlNWUwMGE4MTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ4ZWFkOGI1MGJiZjhiZGY1YjBkYjc3MmQ2OTUyMWY3YTNhN2VkYjcxNTRhYWUyM2NhZjYzYzZkYWFhNDI2ZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0ZDU5MjMzMDcxZGZkMmZhZmY4YzYyM2JlYTNkYTFmNDEwMDg0YWJmMDVkZGQ1YmEzYWM4NzQ0YzQxODFlZDcifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/integration.test.ts#L501-L601",
+          "version": "repo-lines-v1:sha256:31bee7a1073789f9bf2110969d6c4e7fdee3f906ae5bc5439e3695b8d839393c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwNDkxMTI2NDlmMzU4ZjYxODljM2RkNDI3MDhjMGViZTQzYzA3NmQ3ZDE4ODg1NDg2NzY1ZjNiMGU0ZDg1NmFhIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJhY2NjZjA3ZTg1ODgxZTNlYzgwYThhYjc3NDg0OGMwZjg3ODZlYmZlYWMyMWNlMTQ5ZTFiNDVlMzg0MWMwMWZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlYjQ3MTNlZTVmNTBkZjA0Njc1OTk5MmY0YTczZDg0Yzg1MjA0YWYyNDNlYzc5ZTQxMzFlNWMxNGMzM2IyNjJlIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiZDE5MGY4NTMwY2YzZTcxMGMwOWNlMjA4OTAwNDQyMDM0MzI4YzBjODM3N2YxN2Y3YTE2MzcyNzg0ZmQ4MzM5In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_f1b1aed488dd451e866f3ceb1c33787c",
+      "statement": "AGENTS.md mandates TDD for behavior changes and running the smallest verification set per package: shared (pnpm --filter @brijio/shared test/check), websocket, mcp, chrome-extension, safari-extension, or cross-package pnpm test/check; before PR match CI with pnpm lint, pnpm build, pnpm test.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L62-L88",
+          "version": "repo-lines-v1:sha256:d4aee82088ba5a71d3873072d7c8df611a45ab991e22cf9c31a1c7758c807d5a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZmNjJiYTUyM2ZkOTZlMDAzOTYwZTUyNGU2NzEwMzRiYTYyMTdkOTg5MDJiMGRmN2IwYzM2MjQ4ZTU0NTA0NzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4Yjc2MjM2OWRmMmRkYjZmYTA2MWZjOGMxYTM4MmQ4YjJkYzc3M2ExZTIwMjI3OTFhNjIwYzJmZmY1OWFhMjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc0MmUyOWQ5MmQ2Y2Y5YjA3MmNiNTU0ZTRjYjNlOTE1YzFhOGRhZGNhNDc2YThlMGJjMDRhZjdmZDI5YWY5YjUifQ"
+        },
+        {
+          "resource": "repo://AGENTS.md#L93-L110",
+          "version": "repo-lines-v1:sha256:991ce8c8be37bc4b890897e84c1cab204de3d0d5341f76fa2a21250b389b5fa2:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhODRhODQ3ZGRjYzFkNGRiMmEyZGQ5ZjU1NTEwYTAyMzc1YWU3OTQ4NDMyZTZiNDBjYWUxMjM2ZWU3MTY0ZGYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3MTMxOWY5MGMyODFiY2Q5ZjBjMTRkYWQ3OGQxZjdjMmNhODQ1Yzc2MGFkZDY1NDYyMzFjMDRmMzkxNzE3YTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjE0NGI0ZTQwNzc4MDMyZDI1Y2M4ZjRhZmY2NjUyNTkyMTE5YTk0ZjgyOGZhMjk0YzdiZmJmYjBjNzkyYzQ4ZTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI4MzE2OTg3YTQzNzY2N2IzNjAzYThmNjdlNmQ2YjFhOWJjMzcyZjUwYTg1YjY0MGVkMjkyMTgxMGFkYTRhOTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_316913dbae75434f9160d23ceb4bf9bf",
+      "statement": "packages/shared/src/protocol.test.ts tests envelope creation and parsing for every Brijio message type (auth, presence, get_page_context, get_page_content, perform_action variants, navigate_to_url, open_tab, capture_screenshot, list_tabs, perform_batch) plus error envelopes and parseBrijioEnvelope JSON validation as pure-data tests with no I/O.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:74ed8cb17709305e87b68d11bd46444fcfc9721de3bdf3c1f0c5b8cbbda6f5ec:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY4YWUzMWFmNjYzZDY4NzQzMGFkNmU3NjRiYTgxMzllOWYyMTg2NmJkNmZjM2I5NjYzMzRkYmU0ZDdiN2NkNmUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4ca8f484dfcf4e02b08dcf305e9fb327",
+      "statement": "packages/shared/src/background-controller.test.ts uses a createHarness pattern with mock adapters (StorageAdapter, SetupAdapter, ApprovalAdapter, PageReaderAdapter, PageActionAdapter, PageNavigationAdapter, PageBatchAdapter, DownloadAdapter, TabListerAdapter) to exercise action click, socket lifecycle, message routing, approval flow, and batch handler integration.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:11ca902ff913e6f219d7fb629a43546e1d9c47c7e203af5d9255e0e4fb4434bb:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijc2MTlmYTNmOWQ5YzAzNGVmM2NmYjVlNGU3ODc3N2EzYzQ4NWJhNzE2ZmNjNGM5N2U3NDNjOTQxYzhlNzU0NTIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.test.ts#L80-L120",
+          "version": "repo-lines-v1:sha256:ecca419b7a82d67b040e83b75cee01215f623d7806b6dd1169d66ecb95508135:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2YmViOTkzYjNiOWZhZTlkNjcwMmZkYzVjYTA1Y2Q2M2M1YWYzZjY5NTQ1MzI1MjQ0MDkzYWI1MjAwNTVkYTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2YmViOTkzYjNiOWZhZTlkNjcwMmZkYzVjYTA1Y2Q2M2M1YWYzZjY5NTQ1MzI1MjQ0MDkzYWI1MjAwNTVkYTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI4YzFkMWRjNTU0ZDIzNjEwNTFhMjg3ZmIyMjBmMWZhZjhhYWMzN2IxMDQyYzgxNmIwZWI4MjBiNWJkMGQ3NzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZlMWE5YTIyMzNhNzY1YjUzMjk3MjRhOGU3NGE4MmI0NTRmZWExYWFjNDZkNTliYTU4ZTM4OTQ5Zjk2ZmEwM2YifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_db141330c49840209e503509d6c63179",
+      "statement": "packages/shared/src/content-handler.test.ts uses linkedom parseHTML to provide a real DOM and tests extract_page_context (headings, landmarks, links, forms, preview) and extract_page_content (chunked content, invalid_index for unavailable chunks, payload byte limits).",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/content-handler.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:95906f1920fe9642b53beb73492ed9c0ecd73bbeefcced2aadc003b19d4a99d6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjMmUyMTNhNjU4ZTI2NGNjYTkzNTE3ZGFlMmRlNDBjY2IwNjRjOWQzZmQ3YTEwYjk2NDYyMWVmOGI0NWM3YjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_39327f40c58d4f2ebe7ccf1d0bce651e",
+      "statement": "servers/websocket/src/server.test.ts starts a real createWebSocketServer() on port 0 and tests /health enriched status, auth_required before messages, auth_failed on invalid tokens, presence request after extension auth, presence-driven getStatus(), and disconnected-extension exclusion using raw WebSocket clients.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:fa982aa238a642e6797fd53ac7d9399b8af7de9c56bf92dcba291cc0b0057750:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyMzUyNTg5YzM0ZDNjNjA2ODU5MzFiNmVjYzRkNTA5OTFhN2M1NmM4ZmJhMjg5NDExNDY1NzY5MDI3MmNhYzMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY2MTk4NWE3ZmExOWJjMjdlNzI5N2FkNjYwNTExMDA2ZDgzZDBjMTBhNjQ0Yzk1MzYyYjJkYmFiZjY0NWEyZWEifQ"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.test.ts#L60-L120",
+          "version": "repo-lines-v1:sha256:3e6e748c8b10efbb7c91738ea6027c1c7051f48d346b1279bfa9c8993bca7399:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY2YTU2MmMyOGJmZTYzNjI5OTM0YmM3MDIxMTBkNTI3YmI4ZjdlZDRmOTFlOWRlODBkOWFkNDZiZjdlNjdmM2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU4NzMwMmFkOTIxNjdkM2NhY2NjMmJhZmQ3NmM2NmI5M2YzNjU0ZDJhYTgzMDUwNDg5ZmRlOWZkOGM1YjJmOGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNjNDkyMjlmYzliNjQ2MmRlNTVlN2QwODU3YjU0NDk0MjVhM2M4ODAyMzI5MzY3ZWM1NjFhZWE0YmQxOTljMmMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_332482f356b64755a97abc4c8081b792",
+      "statement": "servers/mcp/src/index.test.ts uses the real MCP SDK client + StreamableHTTPClientTransport against a mocked WebSocket layer and tests health, unauthenticated 401, forbidden origin 403, the official MCP lifecycle (initialize, resources/list, ping), tool registration, and tool-call routing.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/index.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:ef65cc93f4e45a3087fac5757162a11b313fe3532604d53fa3296b6e4c5ce099:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU4Njk0ZWYzNTAyNWQyZjFkMWU3NTIxMmM4MmNjNDMwZGE0M2ZkNjQ2MmNiMTk4ODQ1ZmIxMGUxNmZjNDc1NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0ZjdhOWYxMGViYjE1YzQ3MWI1M2QyNjg2NGEyMTM3MmJmODk2MzlkMzY2NTg5MjFjOWI4ODNlZGU5NGVjYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQyNjg5ZjkzODJkNzMwNzhjYjY3ZjA4ZTIxZjI1ZTI4YTkxMmRiOGI4MzgwZTQwNjQyMDRmODMxOWFlM2JkZTcifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/index.test.ts#L60-L120",
+          "version": "repo-lines-v1:sha256:1f5076468580dbcf9d03ccd03f312a3c8b4a15a339086cdec2c892bfdfb2e95e:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMzNWQ2ZGUyOTNlYWNlYjk2ZWE5MjFjOGU3ZDA5OTMyYTZiYjFjOThhNzcwNTc1NmM4OGQ5MmI4Mjg3NDMzYjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiNWUyOTdkOWMxOWY1NDhmZmI3NzUwNDk2MmVjMDJiZGNhZWJlZjE3NjY3MjVhNTZjNmRmMmExZTMxYmJhOTEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5NzUyMWMwYzkxYjNjMWNhNGNjMWQxZjM4NWZhOGVkOTUzNTdmZDVjNGQ1NjgwNTQ4YTk3YzVmYmNhMmRiMTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ba9b983fab484becbab119e84eb0c930",
+      "statement": "servers/mcp/src/protocol-batch.test.ts tests createPerformBatchEnvelope and parseBatchResultEnvelope for action arrays, pageContextId/continueOnError/readAfterActions options, partial-failure parsing with aborted flags, and trailing read-after-actions page context.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/protocol-batch.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:9b244d221c4ef96f69afabcd7ec20b7031892dad1ee84704aa68497c480cfdf6:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBhMGYxZGEwNjhhMTVlOTUzYzM3OWU2MmU5ZDE3OWU2NDdhMTI5ZDA2OTJiNTM3YzYxYjg1Y2JhZTgyY2YxMmEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3MGFjYzhiY2VlMzZkMWQwYmIyMDEzMGMzNTg5ZTNmZDg1N2U3MzY3OWMyYTc4MDc1NTA1ZWI0MzNhZDY0MmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b6630acd335a4894a3c50422f262855b",
+      "statement": "servers/mcp/src/websocket-client.test.ts uses a raw WebSocketServer to verify the client-side request functions authenticate before sending, match responses by request ID, and handle error envelopes.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:f52dd2a0d0c4a931d2303c1c470d49b4bad6c849d80e67e778456caeb6830496:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI5MDk4MDM2NzhhMDA5NzZmZGU5Nzk0NzM4NmNlZjg2YzdlMzdjYzhiZjIzZjQyMjZmZWFhZWI5YjBhM2RjZmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjOWNkNTY2NjY2ZjQwNmI5ZWE3ZWU3MTI2OGI0OThhOGY3MDkwYzQ5NjQ0ODhlZTU5ZmY3YTEzZGI0NjhhZGYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_338a953f4112469392de4dd90fc71247",
+      "statement": "daemon.test.ts parses install/start/stop/restart/logs subcommands and --ws-port/--mcp-port/--print-config/--dev/--doctor flags; print-config.test.ts resolves agent aliases (claude->claude-desktop, cur->cursor) for 12 agents; doctor.test.ts formats pass/fail/warn check reports.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/daemon.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:e5f2e0dfb923b85ebcc9d3ffb466885e098b8c8017973ce95f0fe0f2236efee1:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlmYWJkN2NkYmNmMTFlYzJlNzEyM2I4ODFkZjUwNzIwZDg2ZTkzZjRiMDY4ODk5YWRmOGYyNjk5MjMwNjdkNzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUwZjVlZDMyMzViN2E3NTNjMTQwNWRiNGVlMTA4YzJjODU5ODA3ZDk1ODgyNGM4Yzk2MjZjYTFlYzZiODFhNjgifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/doctor.test.ts#L1-L49",
+          "version": "repo-lines-v1:sha256:863a306d26c1da431442093d9ec47e868e084b9592dcdd29e163a384cfe8e3af:eyJzZWxlY3RlZExpbmVDb3VudCI6NDksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwYWRjMzc1YTJmYWNjOWRkMmE2OGU3ZjczNWIzMzViNDk4NDFkODMxZWM4M2I3ZTUyZjhlYjlkZmRjNGI1NzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg1ODBiNzY1MThkYWU5NzlmYWViZDAyMzY3YTI5MjkyYTUwZDk3NjA5MjI1MWEzOGE2Y2UzMDg4MGJhNDI4MjUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/print-config.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:2e0877aaea668618373fc2e82823abf395487077f4b0a192d48dbf0116ed69f2:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwYWRjMzc1YTJmYWNjOWRkMmE2OGU3ZjczNWIzMzViNDk4NDFkODMxZWM4M2I3ZTUyZjhlYjlkZmRjNGI1NzQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjczZmM3NDBmMGU2YTQwZGI2M2RmNDYxM2MyMDE4MTY5NDdjMzhhYWJmYWRkOGQyNzY4MGQzY2RhMGQwNjc5YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjllZDhiNWI2NzEzZGNiODhlMmE2ZDg5OWM0MGM5Mjc3MzY5ODkxMTI1N2ZjOTFmYzc5MDZmNDBjNjQ3M2IyM2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7bb13c70ab8c4e96bdab0c433a5b931c",
+      "statement": "Each MCP tool test injects a request function and asserts input validation and response parsing: form-action-tools.test.ts rejects non-boolean checked; batch-tool.test.ts rejects non-array, empty, >20, and invalid-type actions; click-element-tool.test.ts covers target shape and target_not_found/page_navigated errors.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/batch-tool.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:92888922b78073020878f729b1d58763c75312e84be0dd37bdf719a2a6b29f8c:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ4OTNmNDBlMzc4MWViODk2YzgyZDA0NmEwODA2N2ExMWUzNWNkZjJmMWRmYWYyNmZlYTkwYjhkYjY2NzY0MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEzNjI5MWMyZGRiYTA5NjRmMTJhZjc1N2I0NDgxOTcwZWJjYmQwYjUyYmM3OTk4MmQyYWRkNjM2ZjYzOWI3MTQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/click-element-tool.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:90b70a4ea5d5bd35e5538d249a5257afcbfa80861252367edd780de35092a252:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc0OWFhOGJlZDU5MTViZDc2YTNmZWI3NjJlNmY1ZjJjMDYxZjFlNGI5NzVjODUxZGFlYzEwMTM1ODU4YjNlMTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI5ZTQ4YzAzNWRiMmQ5ZTMxZjcyZmI4OTRmMWFhYzMxYzY5NDZkYTM3OWUzNGE4MTljNTU3ODc2YWM4YzJjOTEifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/form-action-tools.test.ts#L1-L40",
+          "version": "repo-lines-v1:sha256:9b9c60eff3ed732511d74129088ac95abbd77650e3365cb05b5fdacd11cbfc57:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwOGEzOTgzZTg4ZjJjMjQyMGRlOWY0MzQ1Y2UwMmEzMTE5Y2JmYWUxZjEzMmViNGMzZjRiNTNkYzYyZDVlODMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJiMGViMWY4MjM0NDI2YzA0N2I4NTUyMjVlZWE0YzdkMjlhMmQ5MzRiYWI5NWVmMDQ2NDAxNzgxMmI5OTI1NTEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7f4c13a651f04039bb095c2da6c7d530",
+      "statement": "servers/mcp/src/skills.test.ts tests loadSkills (empty array for missing dir, SKILL.md frontmatter parsing), extractTitle/extractDescription, resolveSkillsDir, and skillResourceUri with temp directories.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/skills.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:4fbf75dd41f12b7d561a1d9e8ccd9c62347dc94cfc61185872345a62f40334b8:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllYmNmOTAyNGE2ZTZhZjJjMjZjY2I3ZWJmYTk1NmMyZWQ2ODkwMzI4ZWQ1ZjI1YjM3MDViMzMyNGUyYzIyZWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ0ZTdmOWI2ZDE2ZTExMmE0N2E3MjI1MzY3OWQwNmIyNTViMDUxYTJkMjJkODAwMjAyYTkyM2U5YzliZDA2YzYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_86a0b02196b9415799087e7f0d5fcc0f",
+      "statement": "Chrome and Safari background.test.ts mock the platform API and a BrijioBackgroundController to verify action click, socket lifecycle, navigateActiveTabToUrl (tabs.update/create fallback), tabLister, and approval adapter; Safari-specific adapters (SafariStorageAdapter, SafariPageReaderAdapter, SafariPageNavigationAdapter, SafariWebSocketConnection, SafariActionBadge) are tested against a browser.* mock.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:2f0c3c1ba70f950a7317241a323b5a374998b41bb8eeecfa103dc4e8a5f475c3:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRjMjEzZTAwMjZhNjk4ZWEwMTgxZDY3YzVmZjM2ZDYwNjRlYzU5OWJkZTMzYTA0NjUzMzgwNjc5ODEwNTMzNjQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkM2RhZDRmMGMwYWQ5NjcyOGMwZDIyYTcyZDE4NjhkYWFmMjE2Mzc4YTU5MzJiOGM0NmIxYzIwMDNmZDU5OTkifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/safari/src/background.test.ts#L1-L60",
+          "version": "repo-lines-v1:sha256:c32dfa91764981b1f50dcded6e0bd29897d3366a853e44ad0c20f8b327d4b959:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkNDA2YjU4NWVkZmQwYWNmNGMxMGM3Mzc5Mzc0OWM0OTA0M2Q1NWNmODA3NzYwYzU3YWM4NmRhMjE3NDdkNGIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI2OWE3YjdlMDU5ZjJlMDZhNGE1NTNlNTU0ZWViMGZmNmY2NjA0MmU2MmQyY2ZhYTM0N2NjMThlOTQxMDdiNDcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_df1e4fa3f1a94eb29cc7eb2676451404",
+      "statement": "Repo-level scripts/*.test.mjs read fixture HTML/CSS and assert with regex that the shared demo shell is consistent across clients/test-page and servers/mcp/demo roots: read-respond-layout, demo-shared-layout, navigation-layout, parse-download-layout, mobile-demo-layout, and marketing-site tests guard against regressions when demo HTML or shared CSS is edited.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/demo-shared-layout.test.mjs#L1-L40",
+          "version": "repo-lines-v1:sha256:50659318d59919f319b65325899594d5f8a42f502fee1764d093c2501fbae8d7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg3YmRmMTUxYzY0MjU2N2UyZDhmMjllZjk2MTY5MGI2ODRlZGE4NTVmZjJkMDA4MTRlZTFhNmNmOGIzNGU3YzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYwYjM0NDgwOGJkNDcwNmIyYzQzODMzYzAzM2RlMmQxYTY3NTJhZTdjZjM2MmYyZTM0MTUwYjhhZmE2NTlkYmQifQ"
+        },
+        {
+          "resource": "repo://scripts/marketing-site.test.mjs#L1-L40",
+          "version": "repo-lines-v1:sha256:5423cac2be592ce94f63db060070d42d1176e2b5b41517aa6e12916c7cbc279d:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM2YzdjY2UwYTcwYjM0ZWZhM2FlMzgwZWExMjA2ZTRmZjAwMzNmZjJmNzZlN2M2ZGZlNGNlM2Y3ZGNkMDg2MjMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM3MmNhMDNiYWNhMWE1ZjRkNjYyOGU4NDI3MzZlNTVkMDVjOTM0NzI2MjAxZDNhZWZhNDlmNTY3ZTQ5MTZiMTAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE4YWJlYjg4Yjc0YWI5YWFkMzBjYTA0Yzc1MThlN2JhODlmMjU3OGRkN2RiN2E5ZjlkMjQ0NTdhNDJmYTczOWQifQ"
+        },
+        {
+          "resource": "repo://scripts/navigation-layout.test.mjs#L1-L40",
+          "version": "repo-lines-v1:sha256:1443e81cb68f9734cb76394549b358aa946adc5b4dff517a1ce49e38662daa49:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjYTdhZGJiNmQ5MjU2N2E4ODcwMGUxM2VmN2I4MGNiZTEyMzEwZDUwMDlhZTNlNjM1OTdhOTczNWZkMjNiZWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjEwOTVlZDgxZGJkM2RiMTZiYjE1MTk5YmE0ZTk3MTY4MWZlNjhlMWJhN2VjZmEwNmFiM2QzOTliZGYwYTMyNWEifQ"
+        },
+        {
+          "resource": "repo://scripts/parse-download-layout.test.mjs#L1-L40",
+          "version": "repo-lines-v1:sha256:1579bec95cc57fe33cbc6f1bbc04b965360c1d6547e42673a562c0293cb68431:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI2YjYzMzc2MmZiZGYyZWRkZDJiZDhhOWI4NjYxNDY2MmYzYzA1NmUwNjJmNWU1NTU0MTg0M2U1OGUyZmQ2ODUifQ"
+        },
+        {
+          "resource": "repo://scripts/read-respond-layout.test.mjs#L1-L40",
+          "version": "repo-lines-v1:sha256:67188532b56884319749a06cef79af619a64cd561ca2bb73c52c08ed169074c6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlNzA1OGI4NmEzMDhiOWQ4YWI2Y2QwNTc2YmQyMDMwYWRjODVjYjk2YWI0NjcyMjA5ZGEyMjcxZjllNzE4NGMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ1Y2Q1MWM4Mzc0ZGNlOGM1NmExMDAwN2RmOTAzMDFmMjdiZDc0ODYzOGEwMDI0ZTczOTQ1YzIwMGViYzMwYTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_11531a2c72b04a1795f8ba648057e511",
+      "statement": "scripts/tooling.test.mjs validates repo tooling: root lint and precommit scripts, ts-standard project, .gitignore cache, pre-commit hook alignment with lint+test ordering, and PR validation workflow (install, build, test).",
+      "evidence": [
+        {
+          "resource": "repo://scripts/tooling.test.mjs#L1-L60",
+          "version": "repo-lines-v1:sha256:2a576a390c6b5a8a186fe19741a647b8a6fb600610c92eab812a97a010a0cdf6:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjMDJkMWUwZjI1Nzk3ZTgzOTYyYWQxNGU0M2JhZTRiNDcxMjg0ODZmZDY4NjlkNjZmNmZhNmM4NzU5YjM1YjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUxNjM3Mzc3OGZiNDk4MjgzNmEzMTUwYjZhMTI3M2Q1N2I0YTEwZjFlNjg4ZjAwODNhNjdhYjIzYjE2NGMxNDMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_4e755dc46f4649919015c510718543a9",
+      "statement": "scripts/dev.test.mjs tests dev.mjs helpers: createEnvFromTemplate (copies .env.example, no overwrite), readEnv/writeEnv, isPlaceholderToken, classifyEnv, generateConfig, healthCheck, printBanner, parseArgs, promptUser with temp directories.",
+      "evidence": [
+        {
+          "resource": "repo://scripts/dev.test.mjs#L1-L60",
+          "version": "repo-lines-v1:sha256:81e77297c8dfaf07df66c0d739fbdf423783972a69073ec5b6153439f00781b7:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdiYmU2YWFhZjIxN2ZmMmIwNmViMjdjMTkwYjY5NzQ2ZTY5M2U1ZjhkNTVmODY1MzA4NTUxOTUyMzg2ZTEwNWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIzNTRhNTA1YjQ4ODdmYTBhYTU2ZTZkMzcxZDBiZWIzOTIxMjdkMDE5YWRjMjMxNjJlZjIyYTE0YWQxYzViODIifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-20T16:42:52.757Z"
+  }
+}
