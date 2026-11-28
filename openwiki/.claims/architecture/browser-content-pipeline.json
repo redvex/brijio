@@ -1,0 +1,212 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:8a6eaa8bffb7693dfdefe2de63f6cfd8ae64de4c1640554b252cf7f5f5061150",
+  "claims": [
+    {
+      "id": "claim_84b46a971c6d4c809e1fac71535a334f",
+      "statement": "Page content extraction and page actions run in the browser tab context inside an injected content script, not in the extension background service worker; the background adapter (page-reader.ts) only targets a tab, injects the script, and relays messages.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L346-L418",
+          "version": "repo-lines-v1:sha256:d9ce259ebef529cf8a2954f0deaca225814c169dcb77b920c4e6582569cdf2f7:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiYmQxMWMwYmYyYTk5YzJmZmQ4ZWJkMjEzN2Y0ODI0MGU1ZDgyNzNjNWI0OTBkOTUzNGU0YjE2ODUyMWM5MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmZDEyZWU3NzlhOWI1ODc2Y2I5YjA4YjY0MGMwZjkyMTc5NGM0YzNkYzYwZGQwN2RmMjhmNDViZGM4NTdmMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L155-L185",
+          "version": "repo-lines-v1:sha256:07f7581d7dd015cf1a56ae2f019bc083c6c75fa7e6c31f025123d5e1990c3c4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwMGIxMzY2MGYzYjk2ZTFmYmVhNGJkODQ0MGIyZDQ4ODg5ODNkYzBhZTBmYzgxN2FmZDM4ODIzMDY1ZWIxNDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlYWJkODhkOWEzNmY0YmIzZTA0YWM4YjZhMTBkNmIzNTU1YTliOTZjZTE2YzU3NzRiZDY2YzQyMGZmMWNhYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1OTI4ZWMxNDdiMWVjOWM1NjRkYzQ4YzI1NjQwNzI5ZDcyMjliNzZkN2I4OTZjNDBmMWMyMGUwYzdhZDQzMzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_567091f03992444bba4472fbbf7f8847",
+      "statement": "Content extraction is layered across four @brijio/shared modules: content-handler.ts dispatches ContentRequest to operations, page-context.ts builds the PageContext (accessibility structure, visible-context id, preview), page-content.ts byte-bounds content into chunks, and page-reader.ts is the background-side adapter that injects and messages the content script.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L152-L242",
+          "version": "repo-lines-v1:sha256:6a70756751b68c3147ff791897a3a2c606367785363fd2991383685b9c0247b7:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkM2RlN2U3MGZhY2RmYzYyYzZjMTM4NDMyYzNlN2IxNGUzYTIxNzg1ODdhM2I0NzAyMWI3YjBlODkxZTk4MGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MjIwZDFjOTgyNmFiYTNiYzc2MTRjOWQ4MDMyZDY3MDU1M2ZhZmI1ZmE5ZWQyZmU0MzZhMGRlZDQ3YjgzYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDkyOTQyNjFhZDlkOWEwMjgxYTBkNzEzNGE1YzgwZGEwMTJmOWU5NmVmM2QxMTcxOTg0NDY1ZTI2NWVhMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkMWMxZDhjYzNiYWI0MjcxNDkyM2U4OTAyZGVmNjI0NTkxODA0ZDY2YzNhZDI0NTIxMDY1YjNhM2Q3Nzg0YTQifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-content.ts#L27-L49",
+          "version": "repo-lines-v1:sha256:364ea3bf54efd0c90c72e4a2139442a56c00853c4a174fdfa0a7302ba0c42621:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4MDNiYWEzZGY1NjliNzdmMzlhN2EwMzBjODA2ZjM3NGYxZTQwMWViM2ZlMWFiYjIzNDI2YjYzNzE1Yzg0YTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjY2VlNGVmZDFhNGZlODQ3Yzk1ZjI2ZTcwMjgwM2MzNzliZWYzZGU3ZmUzZGNkNGJhYjk0MDBjNzQwOTM1MTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0ZTBmNzExNmNiOWRmYzRkOWI3NzY1OWRlYTAxMmVlNDA1NDViZDViZTY2YTIyOGUyZjNlNzhkMDU0NTE3NGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYyYTMzNTljZWIzYjdlZjE3YmJmOTIxZTE1MzcwMjBlZGQ2ZDdmOTljZDNhNzcyNzA1ZjMzOGQxODZmNWM1MGUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-context.ts#L28-L70",
+          "version": "repo-lines-v1:sha256:852a342fc19574bf78f894917cfa8cf21ede45b1b8690bf897934d7844be34e0:eyJzZWxlY3RlZExpbmVDb3VudCI6NDMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MmQwODBiOTMxNzAyNzgzYjUyMjI0ZmQzYTJkNDVhN2IwMDFiOGQ3NmQ4NGFkYWY0YjNiMjdhZjFlNDc5OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiMTQ5OTQ1MTJlMDRmOTZlNWEyZmNjMzcxMTMxZWZhZDE0OGRmZTIyZTQzNGYwMzc2ZmJmMmU1YWYzYjU0M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzZDJhNGZjYTkzNjdkYjhlNjgxMDljMTg1NjlmZWVlNTNiMTgyOWMzNzVjNjhmN2JjYzZhNDVlMzc5MDM5NWIifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L155-L185",
+          "version": "repo-lines-v1:sha256:07f7581d7dd015cf1a56ae2f019bc083c6c75fa7e6c31f025123d5e1990c3c4e:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI3ZTU3ODhkNWQ5ZDczZDI0YTgxZGJjMGE1YTc0YmZhODJjOWMzYjNhZjk5ZTUyYWY3OTZlOTBiNDY4YThhM2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwMGIxMzY2MGYzYjk2ZTFmYmVhNGJkODQ0MGIyZDQ4ODg5ODNkYzBhZTBmYzgxN2FmZDM4ODIzMDY1ZWIxNDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNlYWJkODhkOWEzNmY0YmIzZTA0YWM4YjZhMTBkNmIzNTU1YTliOTZjZTE2YzU3NzRiZDY2YzQyMGZmMWNhYzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1OTI4ZWMxNDdiMWVjOWM1NjRkYzQ4YzI1NjQwNzI5ZDcyMjliNzZkN2I4OTZjNDBmMWMyMGUwYzdhZDQzMzUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5f5cf3f8aabf458794fcfaf30f1f553b",
+      "statement": "The content-script entrypoint registers a chrome.runtime.onMessage listener whose callback builds a ContentEnvironment from the live page and delegates all extraction/action requests to the shared handleContentRequest (and batch requests to executeBatch), performing no extraction logic itself.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L346-L418",
+          "version": "repo-lines-v1:sha256:d9ce259ebef529cf8a2954f0deaca225814c169dcb77b920c4e6582569cdf2f7:eyJzZWxlY3RlZExpbmVDb3VudCI6NzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJiYmQxMWMwYmYyYTk5YzJmZmQ4ZWJkMjEzN2Y0ODI0MGU1ZDgyNzNjNWI0OTBkOTUzNGU0YjE2ODUyMWM5MTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRmZDEyZWU3NzlhOWI1ODc2Y2I5YjA4YjY0MGMwZjkyMTc5NGM0YzNkYzYwZGQwN2RmMjhmNDViZGM4NTdmMzEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d1b317d57b7e430aa284c51139803916",
+      "statement": "To make re-injection safe (ADR 0043), the content script stores its onMessage callback on globalThis.__brijioOnMessageListener and removes any previous injection's listener before adding its own, keeping at most one active listener per page whose pageContextVersion matches the current module scope.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/content-script-entry.ts#L408-L418",
+          "version": "repo-lines-v1:sha256:34be1433650835acdd37f5c11d87187e41ca52c4200ed024c15c832428bea6bc:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjY2NmMDdlODU4ODFlM2VjODBhOGFiNzc0ODQ4YzBmODc4NmViZmVhYzIxY2UxNDllMWI0NWUzODQxYzAxZmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImNjZTk4MzNjZjIxNjI1YjdmMGIxNjMxMTJlMGJjMTRjZDY0ZWY2ZmVmM2EzZDIxYzFiMDM3YTgzNTcyZTMzMGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0043-idempotent-content-script-injection.md#L40-L60",
+          "version": "repo-lines-v1:sha256:96eb210f1a53fc848f688d19963a8b37b8f8a2062e2914d371f36f01ce9f0efb:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkM2RiYzRlN2U3Y2JlNWRkYzg5MWIwODA3MTJmNjM1MWM5NGI3MjhlYzhiZDg1NTZmNDYxMmIwNzBkMjdiNDAiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyMTgxMTdjMzU1ZGYyM2EyYzZkZDExMzhhNWIxNmQzMjFiMjE3OTIxODI5Y2U2OTk1OTY4ZTIxZjhjOGNiOWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImVjM2NiZjQ1NDMxYjg5YTYwYzc3YWRkNDEzYjdmOGMwNmE0Zjc3YWRhNTRmMDM1NTJlOTJiNTU0YjY0YTY2OTQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk0NTIxYzg0MTNkNzg4ZTE0MjYwMDcwYzA3YzViYWRlODFlNzQ3ZWJiYWE2MjEyYzYxMTNiMGNiMWQ5OTQ2ZDkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5ec7d870d69e44d6b8e9d59ad6a3c7a9",
+      "statement": "The background adapter calls scripting.executeScript with content.js before every tabs.sendMessage (for both reads and actions) to ensure the latest content-script code is loaded, relying on the content script's listener replacement to avoid duplicate listeners.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0043-idempotent-content-script-injection.md#L28-L40",
+          "version": "repo-lines-v1:sha256:4111fb34abaa916f46be92ca1308a1b0e26a2f0c44c445de7c99cb41ea8b3079:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzODk3M2YxNjBjZGUwYTdiZmIzNWFlZjUxYjgyYWQxN2NiZTEyYTE3NmUyYjVhZjM5MTI2MGZlMGQ2YjlhMzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdkM2RiYzRlN2U3Y2JlNWRkYzg5MWIwODA3MTJmNjM1MWM5NGI3MjhlYzhiZDg1NTZmNDYxMmIwNzBkMjdiNDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM0YjVkMDhhOTkxZGE0ODZiYjU4MWUyMmQ4N2I4ZjJlMTU1NTU2MjgwZDAxODdiOWMwOWE5ZGMxZDM3NDJjZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjNTMxNjhhNDJjNWY4MmNjMjNiMTNlNDhiNTM1MTNmNmQ3MjhkYjVhNTI1Y2EwMDhjOWY1OWVkNzQ2ZWNhZWEifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L158-L170",
+          "version": "repo-lines-v1:sha256:8b0f311a379e1aefb10aa0f88e2c277d7ca9214336685d418e37080a8a6c40f3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5YTc0NDliZjJkOWQwMzg4ZTEwNDNjNTA4YjgzODc3OGVkNjlhMjFiYzA3MjZkNDIyMDQ4ZjgxYWE4Njk5ZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAzMDY3M2ZhMDYzYjhhM2M1ZTM1YjU3MmRmYmVmOThhYzc1NDkzMzU5YjMxYjdiMThmOWIxZGYyZjM4MWIzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2MTMzMWNiZTEzNjc5ZDA0NmE5NDFlODRmOTIzMjk0ZDcxYjM4ZTNjOGEzYTE5NDY4Yzc2MDExYTBhNjFjNzMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L245-L255",
+          "version": "repo-lines-v1:sha256:dd4226a77d24ee5fd20aa424e5e4fac8a02e6cd791c0b2f08f37f2e46fe6c63a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5YTc0NDliZjJkOWQwMzg4ZTEwNDNjNTA4YjgzODc3OGVkNjlhMjFiYzA3MjZkNDIyMDQ4ZjgxYWE4Njk5ZTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIyYTZhYmQwZjM3YWUyOWM1ODRmYTgyNzk5Yjg5NjZiNzYwYTYxNTRjMTkwNDc4NGQ5OWRiNTZjYmI4YzMwMDMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjAzMDY3M2ZhMDYzYjhhM2M1ZTM1YjU3MmRmYmVmOThhYzc1NDkzMzU5YjMxYjdiMThmOWIxZGYyZjM4MWIzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlkOTc4MWQzZDA4YzQwMTY0NGYxYTYxYzhlNDhhOGRmN2RhNDkwZGMxM2YzZWEzM2I3NzI4MzZhMDFkZWQ1ZjgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a761ccaaa965446dbed3cacf4997746e",
+      "statement": "registerPageNavigationListener increments a module-scoped pageContextVersion on every pageshow event (navigation/bfcache restore) and replaces the previous injection's pageshow listener via globalThis.__brijioPageShowListener so the counter increments once per navigation rather than once per re-injection.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0043-idempotent-content-script-injection.md#L18-L26",
+          "version": "repo-lines-v1:sha256:77076995079ade851d93dfe250907b56599722e3efc5f9c9f70c23084e06b1db:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzhjMWNkMjBmMjg3YzI3OThhZmI0NmFkNWI2Yzg5ZjcyMmRmMmRlMTYxNjc5YzJkYmFmOWJiNDRlNGE5MzNjMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDQyNWZhMGE4MzY4Yzg5Njk5M2YyNjJhNmM4ZTRjNGM4ZTgwNjZlNDI3OWQ2ODcwMTU0MjM5YWI5MmVlNzY0MiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDZlMmMyODY2YjNhNzQ3NWQ4YzVhZGYwODA1MjFlM2Q0NWM5Y2ZjNmZhZWUyZTllNmJjOGMxYjhjNDRjMzg1YSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYTcyMzg3MTdjNGI4OGM1OTliNjYyMjNmZDdmODE2OTlhNWI0YThkYTZiYjQ2ZDYzYjJiM2JmODJmMzQ3NjU0NCJ9"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L24-L53",
+          "version": "repo-lines-v1:sha256:da95d6fb6198bf8efcd65b53385d10d38cb0a1dcc8cfb1aedfcc0bf8ee7b43de:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzNWU5ZWU1MzE2ZjAzZjJjMWExZWU1NDY2ZDVjZDRkMzExZGJhNzU0ZDlmY2E2YTRlZTQzOWRlZDQ1YzA4NjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZlZGM0MzAwNzMyY2ZiYjhhN2YwNzMyOTFkYjFhNWIxY2IxNTdjNTk2YjcyYjRiMzdiY2ZiNWNhZmVjMjlhMWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjZhNDg1M2JkZDk1NDQwMDVlMzllYjNjZDE2MjQ0YjUzZDcwZmIyNzFkOGZlNWY2YzIyMzJmNTMwMDg4MjRiYzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjlhYWQxNWY1NDYyMjA4ZTEyZTkzYzNiNGE3MTUwMjY0YWI0MjRmZjU0NmJiZWM5ZGM1MzQ4NjA0MzM3NjFiYWMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_36aafc7f31764292aef4fc129098d479",
+      "statement": "A page read is two-stage: extract_page_context returns a PageContext with the accessibility structure (headings, landmarks, links, images, forms, editables, actions with positional bb-N ids), a byte-bounded preview chunk, and a content capability advertisement (requestType get_page_content, firstIndex 1); the agent then fetches full content via extract_page_content using a 1-based index.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L152-L180",
+          "version": "repo-lines-v1:sha256:2088d8105f5a90c0a1f0d104a089fbdb33d557871ad7a17592996ce457a40409:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkM2RlN2U3MGZhY2RmYzYyYzZjMTM4NDMyYzNlN2IxNGUzYTIxNzg1ODdhM2I0NzAyMWI3YjBlODkxZTk4MGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRiZDkyOTQyNjFhZDlkOWEwMjgxYTBkNzEzNGE1YzgwZGEwMTJmOWU5NmVmM2QxMTcxOTg0NDY1ZTI2NWVhMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImU2MTg3YWY5NTY5ODZkNzQ3NTk2NjhkNTdiY2M2NGU5MTM4NzUxYmViNjYwODFmZDYyYTlkOGM0YmUxMjJkOTMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-context.ts#L28-L80",
+          "version": "repo-lines-v1:sha256:59750c6f848497e6f55598e3ed7220249fe9a302b64944b8a1ea67e9630aa359:eyJzZWxlY3RlZExpbmVDb3VudCI6NTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU3MmQwODBiOTMxNzAyNzgzYjUyMjI0ZmQzYTJkNDVhN2IwMDFiOGQ3NmQ4NGFkYWY0YjNiMjdhZjFlNDc5OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiMTQ5OTQ1MTJlMDRmOTZlNWEyZmNjMzcxMTMxZWZhZDE0OGRmZTIyZTQzNGYwMzc2ZmJmMmU1YWYzYjU0M2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFkOTFjNTVjZTBjMDJhNDdmM2Q3NGVhNWZkYWM2MTljM2NlN2IxNjk2YTZjYzQwZmM0ZjNmZDQ0ODNlN2NmYjkifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L630-L666",
+          "version": "repo-lines-v1:sha256:b712f006042a0a04da42fec398d212b1a3730f5a8bfc04580e12963e973f47e1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzMDdhZmQ1ZjU4N2EyODgyODkwM2UzM2I2NTY2ZDQyMzcyMDVhODVhNDYxYTliZjY2OGRhNmUwMWJiNjJiYmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImIzNjkyZTc2NGMxZDJkM2Q5NDUzYzM1MmZlNzRlMGVkZmFiOGJjNGVkZTEwYjc5NjIyNzY2NzJiM2I1YTIxMjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU4ZWQyMDhkYTVlYzA3ZmFhMGMxZWUzNmYxY2FhYjAxOWViZTNiYmZjZTQxMjdmM2RiNTQ0YWVjZTJmNTBkYjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_bcd947aaffde488b9d40622b7c8843e5",
+      "statement": "chunkReadableContent paginates readable content by byte budget (measured with TextEncoder), splitting on blank-line block boundaries first and falling back to character-by-character splitting for oversized blocks; it throws invalid_index for an out-of-range 1-based index, and returns truncated true when more chunks follow.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L220-L240",
+          "version": "repo-lines-v1:sha256:9dcdc2e75ce2102f213e63d6775cff473f7c4de6cde6a734d3b3885d3d96ed31:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU5NzRhMjU2YWUzNTgwMDM5NDdlOWIxNGE5ZTNhZWE3ZTQ3ZmYzMzA0YmFkYzkwMzk3MTBkZjFmOGQ2YWE2NDAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc1OWVjMzlmNDBkOTZkN2I5MTg0NmRiOTFhMTk2MzExMGEwMDQ4OTMzODI4OTVmYjc5YWVmYjgyNzgzNWZiM2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJkMTRiNTE0ZDdiODE0MzA3MDI0ZTVhMzViYWRiMTgyYzJjZmQ5YzcxYTRlY2M5M2RlOGRmMzU2ZjUzY2U0MDMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-content.ts#L27-L96",
+          "version": "repo-lines-v1:sha256:ff96a85503ea59e32b3c9de0d72eca07e1cba812822bb4804327b81f9fded810:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4MDNiYWEzZGY1NjliNzdmMzlhN2EwMzBjODA2ZjM3NGYxZTQwMWViM2ZlMWFiYjIzNDI2YjYzNzE1Yzg0YTYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0ZTBmNzExNmNiOWRmYzRkOWI3NzY1OWRlYTAxMmVlNDA1NDViZDViZTY2YTIyOGUyZjNlNzhkMDU0NTE3NGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY4YTdiMmRlMzliZDc1NWUwYjU2NTFlZTlkNTBlNjNhMjAyMzI2YjkyNWRmNTljNGUwY2QxYzQ0NTgxNTkxNGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_607bec5f5c9f411e81c9186b835c9be4",
+      "statement": "Action requests may carry a pageContextId echoed from the last read; if it does not match the current pageContextVersion, handleContentRequest returns a page_navigated error with previousContextId/currentContextId telling the agent to re-read.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0036-stale-context-validation.md#L1-L20",
+          "version": "repo-lines-v1:sha256:74d13f5b50d6123073d22990b36f9e6da3bd8def2ac045449c6f51c2b31a0516:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMzdiYWVhMzQ2NTY3MmE0YjgzZWFkZDc4Njk2ZTU2MjVhODJhY2IxNzE2OGUwYWY5MGE5ZWExZTg1MzM3ZWUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFmNTc1NTdlOTM3NzE1YTlkZTIzNDBkMjliZDk2OTc0ODViMjc4MmJjY2YzMDkyYzFjODYyODNmZTRhMTRhZjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0ZDBhZmVhNGI1NmExNWMyOTQ3MTZmODZjMWI5ZmY3NWE1NDRlYjEwMzNhOTA1YTc3M2NmOWZiOTFiMmYyZDkifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L183-L208",
+          "version": "repo-lines-v1:sha256:34ee5fd2647be5f5760cf0e709985bd2686a51c750c9ef3a36103f7935455a14:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYwODhkOTI2MTA1Y2VkOWIxM2FjYTkwNWRiMzhlNDQ2MjQ1MGJhYjZiYTk2YmM2ZmQ1MzExZDUzYzQwZWFlYzYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM4NjU0MWI4NmQ1OWJlMjcxNTE2YTIxZDRkNTUxNzQyNzEzNDc3OGEwNjAxZTVmMTMzOTc0NjhkODRkNTFhZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA0YjlhMGIxNmI5OTEwYmFhNWQwYTRkY2FmZjhhNjBjNDI5NjMzYmYyYWUzY2JhY2M4MjAyOTA3NTgwZDEwY2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1ZmJmNjFkMjg0YTNlMjY2OTJkMzA5NTUwZjFmNzQ5ZjgxODE3YjBkYzkxMWYyMzIxOGMzN2JhYmI0ZTZlNmIifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b07e87922eb04974957a95e31e3a2180",
+      "statement": "computeVisibleContextId hashes the visible form-control signature into a ctx_ id; if an action request's visibleContextId differs from the current page's id, handleContentRequest returns a stale_context error with reason visible_controls_changed, and form actions annotate results with contextStale when computeVisibleFormStructureId shifts after acting.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L210-L226",
+          "version": "repo-lines-v1:sha256:e1192483d5f2e9840f1b6cdeed8fe9aa48a8e55439d0a3cf22226be179d78ced:eyJzZWxlY3RlZExpbmVDb3VudCI6MTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjliNjJmNjBkODU5MGE1NzljZjQ2ZjhkNjczNzhjNGM1NzJiOTYyY2VjY2RiOTBjN2E1ZjdiNDJiOTYwNzgyYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ2MjIwZDFjOTgyNmFiYTNiYzc2MTRjOWQ4MDMyZDY3MDU1M2ZhZmI1ZmE5ZWQyZmU0MzZhMGRlZDQ3YjgzYjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFmYWViYWRlNmU5MmY3NjYxZmZmNTk4NTgzYzBhYjYyNTIwYjBhYzQ0ZmEyZmRkNzE5YTgxNTkxNmNjNTYxY2UiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIyOWI0MTNkMjQwNmExZGZlYjc4MzFmYjk0Njg2MThjNDczMDMwYjI1NjliZmRlMTZkYzI5YjU3MDY4OWI1MGUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L312-L335",
+          "version": "repo-lines-v1:sha256:1b6c16a405d46228fbba3af9d2ab65708a1e449e00c989299c8f1b888128dc5b:eyJzZWxlY3RlZExpbmVDb3VudCI6MjQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEzMmM5OWJhZTUwYTUzOGZkOWE3ZTZlZjJlNzJmYTI5N2Q2YjJjNWI3YzFlZjA2ODg5ZDI3M2RjN2FkZTAzZjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlMGY3MjkzZDE1NmE2ZDEyNTI4ZGIxMjkzMzc5ZTUyYTVmODM2NzA0NDI5N2IyMjgyYjk3ZmYyYzg2MDQzOGQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-context.ts#L173-L205",
+          "version": "repo-lines-v1:sha256:0b76b07af9e9bf358573c75883203d6e0dce8b304f56d80186cb2cc2a6e56533:eyJzZWxlY3RlZExpbmVDb3VudCI6MzMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxNjg4MWMwMTRjNmE2MjhmNjAyZTY4YjUyZmU4MDk3YzlhOTcxZmY0YWJhM2Q2ZDBhNGUwY2Y0ZjgxYTc1ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0NDYzZTM3NDM3ODk5NzE2N2VkNjQ5MTY3ZTkxOWYzNTYyMTNhYzY2NjE5ZTA0MTQxZGUyYjlhMzBmODA0N2IiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3M2M2ZWNhYzUxYTM3YjA3NjQ2YWExNjIzZjNlODU1NDQ3NjEzYTgyMTVlNWM0N2RiYjNmZWY3NmI3MGU0NDQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b6d7f8685b414a8dac2557d7399cc157",
+      "statement": "Action targets carry optional validation fields (expectedText, expectedHref for links, expectedRole for actions, expectedLabel for form controls); performClick resolves the positional element then runs validateClickTarget checking case-insensitive substring text, pathname-only href, and role, returning a stale_context error with expected-vs-found detail on mismatch; omitting the fields preserves legacy find-by-position behavior.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0036-stale-context-validation.md#L40-L100",
+          "version": "repo-lines-v1:sha256:bb0212f43025d98fe7927b525b7893e9f3443c5fbd5024126382babf105c6dc0:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUyZGJmYmM3OGRlZTMwMzE5NmEwYjhmMTRmNjU1ODBhNjQzYzA0NTk3YWNkNjg0YWRiZDRiZjhkN2EwZTI3NmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ2MzkyZjM0Y2JiY2VkMjBlMmU1MzVkZjU5YTVkOTMwMDFkMTE3ZTA2NzE3ZjMwNGRhMDRiZjQyMDcyNDBhMDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU0NzdjOWE5ZGQxNmVjNThjMGE3NmJlNzJlMzZhYzk4M2VjNzM3YzEzNDc1Yzk3ZjIyZGZmMThhZDcyOGY5NjUifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L1069-L1095",
+          "version": "repo-lines-v1:sha256:c6b41dbdda7561ec2143b348109db0879a6e1b2352a471fc2a4dd8d0c4cca96f:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjY2YzhhYjFlODMwYTQzMTYxOWNhMzdjODg2MmUyNWRjMDU5YjMwYmQ4YTEwYmVkNDZmYTU5YjcyMTkyNTNlYjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQ5Nzc3MGFlYWRlMDkxYjk4NDYyM2VlOWYwZjljN2EyNGQ1ZGFmNDAwOTQyMTRlNmNlZGUyZGJiMTM3MDRkMTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVkM2EzYWRmMzg5M2EyYjMwYWYzZWM3N2M5YmRhY2RlNDNkMTFlMzc1MGVlNDQxMjU3Y2M0MWY4YzRmYzAxMTAifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L1290-L1340",
+          "version": "repo-lines-v1:sha256:0a352caf4cd8c66e4157c43891ac9b3c2860d83ca7b61df10855ab74ee454560:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExNDBiNWY2YTFmMTZlNWNlMzFlMTMxZmVmNTRiNjRkMTFiNzg4OWEyNWI2ODUyM2FjZDkyOGJlNzg1ZTI1YmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MDlhNTNhNjE4ZDAyOGUxZDMwMDBjMGE3YWJjZWVjYmU1ZmIzN2Y0ZTUxMWVmZTQ2NjQzZmFkNmU2Njg3MmYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI2NTVmMjUzYjEyNjhhZDZmOGUzZjI1Y2VlODNhMDY5YmRmMWU5MTQxMzc1ODBkYmZhMzVlMDgwMGJiNTFhMmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjMDhjYjdiODU0OTI2NGYxNWIyNGMyM2EzOTJiOTQ2YjM0ODM1ZTMyMDg1NGUwYWM1YTA1MzNjNTZjOWMzNmQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f40c15a36b8348998888a5df6423ccfc",
+      "statement": "handleContentRequest maps failures to structured error codes: invalid_index for an out-of-range chunk index, extraction_failed for unexpected extraction errors, page_navigated and stale_context for context guards, and target_not_found/target_disabled/action_failed for action-level failures.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L1077-L1160",
+          "version": "repo-lines-v1:sha256:a35328480e687ce17e48f3219669b0037afe7393fda510b98e81c76f37017051:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc2NzdmZTFmMWNkMWJhMmNmY2M3MGE2NjFlZWIxYWI4YTljMmY0ZTJkMTJhOWVmMjRkNTE5ODY2NDJjMDE3OWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE3OGY4YWU4NGI0NjYyZmQ2NDcwZTkwNDUyODg5YmVmOGNlYzJhZmI5MzYwMTNjYWUwMDgyYzY5NmIyYmY0YzYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0NGI5ZmQzMWUwN2I3ZGNkMWE1NjdmODVlMzc3OWFlOTI0MTNhYjY5NzU2MmM4OWZiODdhMDY0OTE5N2E1MTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM0NzZmZTczNzhmODI1ZDY3OWMwNWM1OTAyMzFjYWU5Y2RiNjUzYTc2ODRmMzY4NTY4ZTlkMjU3OWU4MzlhODMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/content-handler.ts#L152-L260",
+          "version": "repo-lines-v1:sha256:50afd105e2d4d283171069ac5a65fbb80c0ed4ff2c64bacc718c5a6ef34757ea:eyJzZWxlY3RlZExpbmVDb3VudCI6MTA5LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkZDNkZTdlNzBmYWNkZmM2MmM2YzEzODQzMmMzZTdiMTRlM2EyMTc4NTg3YTNiNDcwMjFiN2IwZTg5MWU5ODBlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI3Njc3ZmUxZjFjZDFiYTJjZmNjNzBhNjYxZWViMWFiOGE5YzJmNGUyZDEyYTllZjI0ZDUxOTg2NjQyYzAxNzlhIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0YmQ5Mjk0MjYxYWQ5ZDlhMDI4MWEwZDcxMzRhNWM4MGRhMDEyZjllOTZlZjNkMTE3MTk4NDQ2NWUyNjVlYTFhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI4MTg2YTdjMzg3ZWJhMTczOTExZmE5Njg1NzA1ZGZkMWRkNWUzMjg1Y2RiOWM4ZTc3Y2I4ZDJjZjIxYzdiNmFiIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_6bf3791fa89545a0a8437b6781310a77",
+      "statement": "On the background side, readActiveTabPage and performActiveTabAction normalize content-script responses into PageReadResult/PageActionResult envelopes; a missing response or a timeout (default 4000ms via contentScriptMessageTimeoutMs) becomes content_script_unavailable, and a failed permission check becomes regular_page_permission_required.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L171-L225",
+          "version": "repo-lines-v1:sha256:586e25799e6cdc2f3a331eb99b534ebe231fe82fdeda3b02c56b799f743884ca:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3MmQyNThjZTY3Yzc5ZTlhZjQ1ZDY4ZmU5M2ExNGI1MDRmNzc0NjEzMTFhZTg1MTliOTQwYmQ2OGY0ZTQ2MzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4MWJmMjljZTUxYjExY2QzNmU3NzdkMDgyZDgzNjEzZTE4ZDQ5NGQ2M2Y3YWFjMmQyZGU4YTExN2Q0YmY1ODUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU4YzNmMTRjYjFiOGJkMjE2ZTgyZDc2MGYxZjU0YzU4MTMwZTE1MTNmMjg1OTJiODEwZmQ5N2Q0ODM1NjkzNjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0YmVjMWZjNzlhNzI4ZjFmODU4N2E0NmRlYTg0ZmVkMzcxYzBlZTcwYmU5OTlkN2FlMjE5NDYwOTlhMjMyNjgifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/page-reader.ts#L37-L78",
+          "version": "repo-lines-v1:sha256:5b0571b7b0615035e24cf1f89c7e6bced12c80ff37d5160529466a1fa217d5a7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJmYjVlMzRkZmVmY2QzYTNlNDQ0MTgwZDFjNDI1YzA3N2JlNjJiOGUwZDgzMmViNWJiNDAyZWI4Nzc5MDdlMGUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImExMzM2MjNhNjUxNGYxZjZkMmMxM2QxM2Y5MGUwN2Y1MzRiZDNhMmE0ODdkNjhmZjk1MjA4Nzk2ZTFjNmM3NjIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdhN2QzZWI1YmQwNzEzMWEwMTBkMWI2ZWExOGM1OTY5OWNlNjg2NmE2ZTgyMjJlMGJhYjc5OGI0OWZjYjA5MzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5NmU2NzEzZTdlNGM5MGQ0ZDEzM2YwNThmMmEwMTNhZjRkYzMyMDMxNGUyZmE3MTYxZmExZDU2MTI3NjBlNDYifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-28T16:38:16.677Z"
+  }
+}
