@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:94168781d418c12d711cee8e8deb9d7b71f93ea77362df9c0b8eeadd6da1554e",
+  "claims": [
+    {
+      "id": "claim_5f564484a9c446309e73644571138070",
+      "statement": "packages/shared owns the canonical data model and browser-agnostic logic consumed by both servers and extensions; packages/shared/src/index.ts re-exports protocol, page-content, page-context, background controller, content handler, popup helpers, bridge settings, page reader, logger, and batch handler so clients depend on one canonical schema rather than duplicating client/server types.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/index.ts",
+          "version": "repo-file-v1:sha256:d77b9a3749a19ded81f80482377b5b0bba2345a7350c90d61c357b00ef42ee6e"
+        }
+      ]
+    },
+    {
+      "id": "claim_3435bc1007c24ca5aa6a75042085c4c6",
+      "statement": "packages/shared/src/protocol.ts defines the WebSocket envelope, auth and presence messages, browser capability names, browser presence metadata, tab-listing shapes, staged file upload messages, and download and fetch status shapes.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/protocol.ts",
+          "version": "repo-file-v1:sha256:317ae9eab9874132cf13f138c38f1a7d2957da3ca3127c8e6824b9d6110cc0ba"
+        }
+      ]
+    },
+    {
+      "id": "claim_82ebc1b9d0d847f0989b0f777e0aa029",
+      "statement": "servers/websocket/src/server.ts authenticates clients with the pairing token, scopes presence by a token-derived scope key, tracks browser presence in an in-memory map, and routes messages between the MCP server and extensions; it is intentionally state-light, holds no page content, and presence disappears when the socket closes.",
+      "evidence": [
+        {
+          "resource": "repo://servers/websocket/src/server.ts",
+          "version": "repo-file-v1:sha256:9885af31b32811f6ec7297b1f98ed6d10c2c7d6015b056e9890830591bb78337"
+        }
+      ]
+    },
+    {
+      "id": "claim_7f3765457b5f4bcb945ea26a53cb622b",
+      "statement": "servers/mcp/src/mcp-server.ts is the agent-facing surface that registers read/navigation, write/form action, batch, download, fetch, and screenshot tools plus resources and translates MCP calls into relay messages returning structured results to the agent.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts",
+          "version": "repo-file-v1:sha256:21c772698ff263dad4bfdabb0a52096b5a8d749a6010dfe66fd6d0326ab5b758"
+        }
+      ]
+    },
+    {
+      "id": "claim_03d396cab94c4883bb7bacfc69a18da3",
+      "statement": "Chrome and Safari are the implemented browser adapters in clients/extensions; Chrome is the first implementation and Safari reaches Chrome feature parity using shared logic plus Safari-specific adapters with platform-specific manifests and MV2/MV3 differences.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/README.md",
+          "version": "repo-file-v1:sha256:923f5c8705846884acadc6d676ed140f682d12937a303dfeaba066b6686343cc"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md",
+          "version": "repo-file-v1:sha256:c64326414b87af620985e8df9bb94e1825d9fbb09790dc0459e069953c1c9b24"
+        }
+      ]
+    },
+    {
+      "id": "claim_a4f5e9e672d74e7b9e12c69b87bf1666",
+      "statement": "Firefox is a planned stub, not an implemented adapter: clients/extensions/firefox exists only to reserve the client boundary and its README states support is planned but not implemented and must be designed in a separate ADR before implementation.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        },
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md",
+          "version": "repo-file-v1:sha256:c64326414b87af620985e8df9bb94e1825d9fbb09790dc0459e069953c1c9b24"
+        }
+      ]
+    },
+    {
+      "id": "claim_260ea599b8b449d29bcae530548912d7",
+      "statement": "The daemon/CLI operational domain lives in servers/mcp/src/daemon.ts, doctor.ts, print-config.ts, network.ts, and startup-banner.ts; the brijio binary at servers/mcp/bin/brijio.mjs auto-generates pairing/auth tokens when unset, starts the WebSocket relay and MCP HTTP server, manages graceful shutdown, and owns lifecycle and diagnostic commands install, uninstall, start, stop, restart, status, logs, doctor, and print-config.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L17-L53",
+          "version": "repo-lines-v1:sha256:7d338689238167ae457d8cc22edcf8addea8c8ce92f966573560ffd8d3618a49:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwNDQ1ZmRlMWYyYjEwNWMzMjQ4NmUyN2EyMzA2YjllYzQyMmJmNzk4MmYwM2RlZDRiNmI2N2I0YmQ4MDYxYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0NmM4ZDBiYjcwYzM4ZjM5NTFmY2ZlYmU4YWY5N2NlZTkyOTA2YTAxYTcyZmVmZjE2NjRhMzFlYTY1M2ZhMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5NzBmOTIyZDU3Y2E3ZjYxMjhiYTM5M2JiYWRmMjkwNTNiMTY4MjdlYTZlYzViNGJjNjA5MzdiYjI2YWQxNTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_baa72669800f450a88b628d828202b71",
+      "statement": "daemon install provisions a LaunchAgent on macOS or systemd user unit on Linux with persisted tokens in ~/.brijio/.env, and status probes both /health endpoints of the relay and MCP server.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts",
+          "version": "repo-file-v1:sha256:a3da8473eb0c25c2ae7ec0bfd5f165b444eaaba4ad50337949eb2b5807dada47"
+        }
+      ]
+    },
+    {
+      "id": "claim_8c9a202d382b496b8b446e1458c63879",
+      "statement": "doctor (ADR-0038) runs preflight checks covering config file presence, MCP and WebSocket port availability, network detection, and Node.js version, returning pass/fail/warn results.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/doctor.ts",
+          "version": "repo-file-v1:sha256:8b2edb9699066e56409d949d44227c54076be03d2be0a384189ba811a15fb01f"
+        }
+      ]
+    },
+    {
+      "id": "claim_86dffc64b7434c30b465dc8ffcda3bd1",
+      "statement": "print-config emits ready-to-copy config blocks for specific agents (Claude Desktop, Cursor, VS Code, Cline, Codex, Hermes, Claude Code, Gemini, Windsurf, Zed, Continue, Goose) with stdout content and stderr hints.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/print-config.ts",
+          "version": "repo-file-v1:sha256:f0b92b672fd79b2e78eff0c32306070bb9731041eea5749b771991f889b7304a"
+        }
+      ]
+    },
+    {
+      "id": "claim_d97f8b8abf0949b58d9482b619523b80",
+      "statement": "network.ts detects Tailscale (CGNAT 100.64.0.0/10), mDNS, and localhost paths to choose reachable URLs, and startup-banner.ts formats the startup banner with all output to stderr so stdout stays clean for piping.",
+      "evidence": [
+        {
+          "resource": "repo://servers/mcp/src/network.ts",
+          "version": "repo-file-v1:sha256:2b158ffdf4f9c539e0bb3babc6db1e72a7afbf1e06b9f132650086f3aed247b2"
+        },
+        {
+          "resource": "repo://servers/mcp/src/startup-banner.ts",
+          "version": "repo-file-v1:sha256:d34f887a7cbcbc1666b71d952ab1dd2c0034e00a42d83751abc834b9914bbf29"
+        }
+      ]
+    },
+    {
+      "id": "claim_cd046b73d6a941dc857ca99cf8da0e12",
+      "statement": "docs/project/CAPABILITY_MATRIX.md is the canonical product contract listing every capability, its status (implemented, experimental, planned, intentionally unsupported), and per-browser support with Chrome and Safari implemented and Firefox planned.",
+      "evidence": [
+        {
+          "resource": "repo://docs/project/CAPABILITY_MATRIX.md",
+          "version": "repo-file-v1:sha256:c64326414b87af620985e8df9bb94e1825d9fbb09790dc0459e069953c1c9b24"
+        }
+      ]
+    },
+    {
+      "id": "claim_076a0f209fcd40488471ded0371b46fc",
+      "statement": "When a change crosses domains, the shared protocol or ADR should be updated first, then the relay/server, then the browser adapters; operational/lifecycle changes are the exception and belong to the daemon/CLI domain in daemon.ts and the brijio binary rather than the agent-facing MCP surface.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/index.ts",
+          "version": "repo-file-v1:sha256:d77b9a3749a19ded81f80482377b5b0bba2345a7350c90d61c357b00ef42ee6e"
+        },
+        {
+          "resource": "repo://servers/mcp/src/daemon.ts#L17-L53",
+          "version": "repo-lines-v1:sha256:7d338689238167ae457d8cc22edcf8addea8c8ce92f966573560ffd8d3618a49:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMwNDQ1ZmRlMWYyYjEwNWMzMjQ4NmUyN2EyMzA2YjllYzQyMmJmNzk4MmYwM2RlZDRiNmI2N2I0YmQ4MDYxYTQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0NmM4ZDBiYjcwYzM4ZjM5NTFmY2ZlYmU4YWY5N2NlZTkyOTA2YTAxYTcyZmVmZjE2NjRhMzFlYTY1M2ZhMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY5NzBmOTIyZDU3Y2E3ZjYxMjhiYTM5M2JiYWRmMjkwNTNiMTY4MjdlYTZlYzViNGJjNjA5MzdiYjI2YWQxNTAifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-28T16:38:16.677Z"
+  }
+}

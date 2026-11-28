@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:1adad07b519bc2fdef65d7f3e752e29198c7fe7423218475ce4cc0ad8ce63931",
+  "claims": [
+    {
+      "id": "claim_a1e799c875c54dd68bd36e68e970b409",
+      "statement": "A tool call flows from the MCP server through page-actions and the WebSocket client to the WebSocket server, which relays it to the connected extension session; the extension background controller dispatches to a browser adapter and the structured result or error returns the same path back to the agent as JSON content.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L500-L700",
+          "version": "repo-lines-v1:sha256:72e56c88bc824c23075cfeb2c7a1898e1442d308054d23788f0329354fcab2c4:eyJzZWxlY3RlZExpbmVDb3VudCI6MjAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJjM2Y5MmUzMTgzOTkzYmRhOTJiN2I5MWZlYWNmNDkwYWY2M2FlNGZmMDlmN2UzMDBlNTBiNTdkNzhjNjBiYWU1IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJjM2NmMzcwZGNlMjRkYTNmZThiZGNhNTZmOGExN2EzMzE5MWNlOTI5M2ZiYWEzOTlmMmU2NzE0YWRkYzBjMWQ4IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJjMjExZDNiZTk1Y2JlODJlZDY2YTM4OGI1NTdiNzY4OWNhNzE1OTBiY2VhOWVlMTU5ZWQ3YzhlMjQ1MmEzY2RhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiM2MwNTFiMTRhMzgzODk0MDM0MDI2ZDk2NjM2N2U3Mjc4YTYyMjg2N2ViMmQyZTY4ZTE1MGE1ZjdhMzhhZjBiIn0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L57-L92",
+          "version": "repo-lines-v1:sha256:274afe8697f080b3a19d03b3c676f502f132b303f2b4aa22df2560876e787f4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MzYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJhYWU4YTBjYTc2Zjk4ZjdiN2RjNzk4NDk1MWQ2M2U1N2RiM2M2NDU1NzljYTUxYmFkNmE1MzlkNjE0ZWRiYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ0YzM1OGE5OTk2Y2ZlYzkxNDkxZmIzYWJlZWM0OTZhNGRkYWJlYWFlNjIyNDE5MWFhNmE1MzQyNzgyZGE5Y2MiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjNDMyYmRjMzAzNDNiM2RmNWFiY2QwNmJlYWYwYzU3MGE1ZjQ3MDJmZDQzYTY3NWJiZGEwZDY2MWVjNmNlNDcifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L700-L800",
+          "version": "repo-lines-v1:sha256:fb3c4b9d44dac73aa80bde6ca2a8466b50bbc6579cbe46e310ebdd5b4e6ee5c6:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIzYWMwZmNkY2RjOTA1MDA3NDg4YzA1MTcyNGFmMjlkMTViNjE0NmJmNzc4ZmQ5OWJlMTYxNjQ2ZDQxOTUzNTJlIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI2YjVmMDhlZGM0OTk2YzVlODU2ZmYzM2Y4YmUxMTNlODM2YjQ1MmE1ODVhZGJkNjY4MDdhMDk3OTEzMTg0NjdkIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiJmOTY1MzQ0ZWM4YzBiMjBjNzEyNjgzNDQ2YjZjZDNkNGQ5ZDNmYzQyNzJjNGZhMzU5ZTI4ZDRjMmRmOWFmNWZjIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJiZWU3ZDdjMWQ2YTJmNTZlMDc3ZDRhM2VmYTQwOTBmMzBjMmY4NDY0NzJhNzliNTk1NjBhMzUzMWJhOThmZmVjIn0"
+        },
+        {
+          "resource": "repo://servers/websocket/src/server.ts#L200-L310",
+          "version": "repo-lines-v1:sha256:d78100c9ca02f818202c5c3548ad178c5bd5568167d69a2d4272e66531e72ddd:eyJzZWxlY3RlZExpbmVDb3VudCI6MTExLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIyN2U1Nzg4ZDVkOWQ3M2QyNGE4MWRiYzBhNWE3NGJmYTgyYzljM2IzYWY5OWU1MmFmNzk2ZTkwYjQ2OGE4YTNkIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI2ZDgwM2MwMGJmODNiYWNmNTM3ODZjMzBjZWI5NjAyOTIwMWIzMmJjYzY0OWE4MTYzN2U4Y2VhZmY0Zjk2ZjJjIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIxMmY0ZTVmOWQ5YWM3N2QyODc1MjUxMjVlOTc0OTQzM2U5NDVkMjhhNWY4MzY2MmYzYzBiZjM4MTdhOGM2MjJkIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIxZWJlMDRhMzkwMDQ1ZGUwYzZmNTQ2M2U1M2Y0NmEzMDNhNDM2MmMyY2YwODQwYTQxYjEzYmYzOWY1MTg0ZmI3In0"
+        }
+      ]
+    },
+    {
+      "id": "claim_70d955309a8b488c9666887bd9d362c0",
+      "statement": "Tools accept an optional tabId (string) that the MCP server threads into the envelope target.tabId; the background controller extracts it via extractTabId and passes it to page-reader, action, and navigation handlers, preferring the provided tabId over an active-tab lookup when present and falling back to the active tab when omitted.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1720-L1750",
+          "version": "repo-lines-v1:sha256:db99285aaf4ca1ab1a66765072e5a3a0863a1474f6adc4a2bd1de2113461ba66:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY4N2IwZDBlNmU2YWI4OTJiYzM3NmI0YjAzMDNjZjM1Mzg2MWVlZWIwMThjY2Q3Y2FjODJhZGU4YWNmYjIxZGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA5NWZhMGYxMTE3YjVlYTQwNDM0MTQwZGRlMWEzNDBjNzIwZGRiZjMyNjIxMmUxOTE4MzhkNGIxNTZkMzE2YmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImY4MWJmYTA2MzNmMjBmOTE2ZDRmOGNjYTk4NzQ4YTk5ZjNlOWU2ZWEzNTQwNjY2NjU4MGRiNmZmYzZlMWRkM2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYzZGQ0OGI5Mzg5NDJiZjU0ODk5M2VjNzgxZDYzMThmNWIyYjk5MmYxNTAyYjUxM2VhMTQxODRjNGI1MGVhOGYifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L8-L16",
+          "version": "repo-lines-v1:sha256:52590d3eb30dca0aedbd186beb4aa014b03cd02598c7843b25e97b4d89d468f4:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTdhMzgyMDAyZDEyMzE2MWU5NDU2OTRjM2RmMWI3ZTkxMmViNmI0ZmQyN2Y2ZjI1NTBjNzZhNDM5N2Y2MTFmZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMmJhODJhNjliZjNhMTM3NGMyNGNmYjlhYWQ2OTY0ZWI1ZGZhMzA3MTAxYTFmMWI5ODA4ZWI4YzY5OGNmMGZhNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTJmMGFkMGRhZDA1MDlmY2JkMzA5OWMxYTBjZjEzNzkwZTAxYzkzMjJiYmM1YTljMDZmZjE4ZTRjNzI5YWY5NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDUwYzI4YzdmZmViN2IxOWZjODk3OGFjZjBiMTgxZGI1YzBkYzgyMTYyZDFmYTJjNjM2MTgzMzc5OTJjYjI2OSJ9"
+        },
+        {
+          "resource": "repo://servers/mcp/src/websocket-client.ts#L818-L848",
+          "version": "repo-lines-v1:sha256:334ebe164a261c7ea7a00bf6e494ac217fff65f222a48911cf5a602fcf2ee0ff:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk2ZmQ1NmI0MzlmN2IwMTU1NTEzYjk1OWIxMGY1NjQwNTkwMDRhMTA3ZjFlMWIwOWQzNDllZjJkNTA0ODcxYWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzODFmYjcyMzAxMDQzYWMyNWQyNmM3MzI5NzJjNmY3MTI3M2FhMDUyMzE2ZWY0MGQxYmQwNTVhNjliNGQwZWQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjBlMmFmMjA5ZjgzMmQxZTFmNzY0ZGQwNDZjOTY5ODRmY2Q1ODY3ZDUxMTI0NGMxMTEyOTg0YjhiZmI1Nzg4OWIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQwMmU2YTZiZWMwMTVkNmQ3NjU2ZGJmZGJjMTgwNzI4NTk0NmM5NTBhMzllY2YxM2QwNWIxYmY0YTliYjFjMzQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d60063042ae34da39c2f99f6e35c5548",
+      "statement": "capture_screenshot captures a viewport-only JPEG (quality 80) of the active tab via chrome.tabs.captureVisibleTab; the tool wrapper normalizes browserInstanceId and tabId, the extension strips the data URL prefix, and the MCP server returns MCP image content (type image, mimeType image/jpeg) plus a JSON metadata text block on success, or an isError text result on failure.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L527-L560",
+          "version": "repo-lines-v1:sha256:4a8b8a28cf842d1f6c1f3e037c0f5410023afb868949faae71defab6d00f274a:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkOWJmZThiYTNlNjgyMGE2M2E1ZjNlMjY1MzlhNWEyODM3ZmZlYWQ3YzAzODA3Zjg2M2U5M2JjYjkxODlkZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRkNWNkMmZiNGYzZGY4ODQ1MTUyNTViMzk1MjNmMmY4YjU0NzJiZWVhOWY1NjZmZmNhMjA0ZGI4MDI1NjEwNDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjYTllNGUxODg1MWE5ZjczZmMxM2IwNjA4OGQ2NTMzNTEwOTBmZDI5MDJjZjQ5Nzk0NWM2ZTFkOGNkMDAxODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU3MjJjYTk2OWYwMmJlM2MxNDE3ZTkyYWE5Mjc0NmM0ZjQzZjNlNGQ2YzQ1MTMzOWM2ZjQwOWIwNjEwMDY4MzYifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1080-L1130",
+          "version": "repo-lines-v1:sha256:2b720ed730705512e73463de2dd85f5dcdc0b4cb9810cd66132caebbe057f3aa:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjExYjBjNGI5Y2EzNjFiYjQyNGQ3Y2ZjNDEyNGUyNmE5MTBlMTljMjY5MzBmZDU4MWFmMjRlNDE3MWY0NTMyOTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNmYjBiMTk1MjNmNGUzOWU1M2M1YjVhZTZhNTNmYzY5ZjYwN2JlODFiOWNmM2Y0NDlmNDI2YmYwMDQyN2ViNTYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyM2ZhN2I2MTE2ZWZlY2MzMTRhOTY0MDY1MjFhN2RlZDAzMGM4YmY1NDc0ODM4NDliM2IyNDE1YzExN2NmYTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIwYWMxZDViOWY5N2MyNDM1NmE2ZjdkNDkwMjYyZDAzM2RmMTMwNTBiOWFlNWE3OTZkZDBmMDU1MGEyNzljZmQifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/capture-screenshot-tool.ts#L1-L128",
+          "version": "repo-lines-v1:sha256:980fb8006c55afc39b5a1240f23778dc831080d65697d29c201a69a48d477bb3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI4LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlODIwMDk2NGE5Nzg2MzU1MjJiMmFiMDkwYzY1MDY1ZDhlZjhlODVjNDczMGJiMmViMDQ2MGQzNGM2NzdkZGJiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI0MTJjYTM0NWNjZjc1YmY5YzA4MDZiY2U2OTViZThkZTgwOGI3OTk4NDI1MWE3YTU0ZDIwMmNmNjEwMWRkNDUxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MCwiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1In0"
+        },
+        {
+          "resource": "repo://servers/mcp/src/mcp-server.ts#L770-L810",
+          "version": "repo-lines-v1:sha256:ccedf889aab9507448a85deaaeccee6e91efcff3b1e65bc0f4d472c562cf48cb:eyJzZWxlY3RlZExpbmVDb3VudCI6NDEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRmMWIzMzk0MmEwOTA4NWJlMmU2MjY3MGZhMTQ3NTI5NmQ5MmU5NjFlMDQ1NzRkODVhZTJlMThlZjNjOGQxMWIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRiY2MxY2UwNjNiMTk0Yjk3ODAzNTVhMTk4MzEwMGRhZDkxYTI5ZTIxMzcxODI5NGNlZjhkMzE5NmZhZjFiYmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc2Zjg2NzQ1NWVkODI3MWU4MjNkNTk2NWJjOTVmMDQwYWFjMWZmYjJlZDMxN2JhYjEzZjU4MjI5Y2YzN2I5NzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM1NTkzZmI3NDE2YzMwMmRiY2Y2YzA1MmM5NWEyZWY4ZWE2MjIzNDlkZjAzZjYwYTU5MWI0YTU2NjhlNzRjNWQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_7a1538e3795b4b54bd62a4bb27fc404a",
+      "statement": "capture_screenshot is active-tab only by design because captureVisibleTab can only capture the visible tab in a window; agents that need a screenshot of a specific page should use open_tab to create a dedicated tab.",
+      "evidence": [
+        {
+          "resource": "repo://clients/extensions/chrome/src/background.ts#L527-L540",
+          "version": "repo-lines-v1:sha256:69b00a6b3ab904f7e838d9d5657a857cc99f023d9034ca93f3f81f2e93c29986:eyJzZWxlY3RlZExpbmVDb3VudCI6MTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBkOWJmZThiYTNlNjgyMGE2M2E1ZjNlMjY1MzlhNWEyODM3ZmZlYWQ3YzAzODA3Zjg2M2U5M2JjYjkxODlkZGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjA1M2E2NWMzMjU5YTlhM2E3MjFlNzIzNzlmYTE5MmJmYjQyMjBmMGM1ZTI3NDJmYTRhMDA1OWY0ODQ2M2ZmOTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjYTllNGUxODg1MWE5ZjczZmMxM2IwNjA4OGQ2NTMzNTEwOTBmZDI5MDJjZjQ5Nzk0NWM2ZTFkOGNkMDAxODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIzN2I0ZmViNmI2YTg4NzZlZTRlZTc3NWI3MWY0NzNlZjRlMTQ1ZDRiODlhMzU2NjZjYjNjY2VjYWE3NDI5YjMifQ"
+        },
+        {
+          "resource": "repo://docs/architecture/decisions/0064-visual-action-verification.md#L40-L60",
+          "version": "repo-lines-v1:sha256:2eca8efb04032d48c3d995da2d8e9b01fcb6a2f6faf1d57861879c9eff771c77:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkwYzE1ZTA5M2JiNDA5YjRiNjVkMmZjY2I3NDg0NWVmYzA1ZGQ2ZjE4OTNmM2M2MmZmOGVmNGY0YjM1NTgwMmEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyYjQyOTYyNDk2YjIzNGI3NTIxMjJiYTg2MDI4NmJmMmNiNzgxYjJlYWUyODU1NDRmYWYxYWQ0ZWU3OWYwNmQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRiYTU4NTVhNTAxMmRiZmY5M2ExZDU0NGVkNjViMTMwZmY1MDdmYTMxMjdkYTM1MTNkNmU1NjhmY2JmZTliMzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIxNTMxNGM1YWM0ZWNjYTkzYTkzMmIzMWMzNjJiNTA3YTYyOWNkZDMyNTQzM2FiM2Q5ODljMTYyNTNkMTc1ZTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_d923f16e98c542929f647981675c471b",
+      "statement": "parseRouterErrorEnvelope forwards any string error code from the WebSocket server as-is rather than rejecting unrecognized codes, falling back to invalid_response only when the envelope structure itself is malformed; this lets the agent see real WS server codes like invalid_message and invalid_json.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0061-forward-error-codes-through-mcp.md#L30-L80",
+          "version": "repo-lines-v1:sha256:a95bd3d79da8ee49ede8604a36ac0750782e8e10b5d5bb3f08cd536eacb8ce51:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MDRhZGI5N2YxNTdhZjZmZDU0YTExMzVhZDhhMzNiMzAxNTMyNjBjNmExMWI2OTY1YmM1YjVmZmQ0YzkzMWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0YWM0MjNkM2U3NzY0Yzc5NTEwMDY2ZWMzYzEyZjIyNzNlZDBmZjM3YmNhYjRkNDMzMGFiNjZmYWIyZmRiNzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE1ODI3NmE1ZjgzYjM5Nzc1OTlkZTgwNGMwYmVkZmQ1YjJjNTI0NjBiODBjOGM0NTIxZWNmMjcyZDMyOTQ3YzkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM0YTkyODcyZDdlMDNkYmYwYTY5MDEwNDk2OTVlMWM4OWQ5YWNkYmViNWRjZWMzODI0NGRiMTdjZWQyYjI5ZGMifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1620-L1650",
+          "version": "repo-lines-v1:sha256:647594d849c6f1124353f4ae0fa385c49f5d7883eeef51b69980bc06014969e8:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ1ZTcyODYyNzBjNjU4MjgxNzJlZWIzNjgxOWU4ZGI1ZDY2M2U4OWM1YTg2MjNhODgxNDFmZjQzNTg5MmFhOTEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ5Nzc2OWI0MWQ2MzE0ZmI0NjNjMTliYmIxZmY4ZWI4MTlmMjdiNDFlNDE1MjNkYjlmZGYyYjJkYWEwYjI3YjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNkNDIxOWNkM2IyOWMzYjYwZDMyMGQ3ZDM1YTJkYTZiNzJmMTQwZDdhYmQwNzEzY2JiYTllNmRmYTk3MWEzOTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_296e4a991819485d808509b6c9460e21",
+      "statement": "parseErrorPayload preserves the original extension error code string (not_supported, cors_blocked, http_error, size_exceeded, etc.) instead of wrapping it as browser_error, while stale_context and page_navigated are preserved with their structured detail as before.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0061-forward-error-codes-through-mcp.md#L80-L110",
+          "version": "repo-lines-v1:sha256:1c44b0c87f3159e6c8986d8def91ebc45e9b2824205c71b5243b81055b233c02:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI0YWM0MjNkM2U3NzY0Yzc5NTEwMDY2ZWMzYzEyZjIyNzNlZDBmZjM3YmNhYjRkNDMzMGFiNjZmYWIyZmRiNzgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiNDJlNDkyNTI3YTFlNWU2ZTc0MjVmMWZkODAxYTU2NjZhNGMzMDM2NjM4MTY0YmE2NDg1NTljMzIyYzE4ZDkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdjZGFmMzU5NTVjNzQwZDcyYWQzMDQzODE1Yjg5NDNlZDBjMDczNjU3YmIzOGZlZjc5MjYyZDk3NWU0NzY3ZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBmMmM3MGVmNmI3OTYzOWViY2U3OTE5M2MwY2U5M2M1YWIyYzU5NTYwMWUxMWI2NDhkYmYzNjFhYTMyMDdhNzcifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L1650-L1700",
+          "version": "repo-lines-v1:sha256:86b215c71d46ea1e968981909e26ce25c48abf663c5b90270ea6cdbbb7ca87f9:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3YWU4N2Y5ZTM1OWIxMzdmMjAxOWI1ODEzZWVlZjFmN2EwZTYwNmY1NjhkN2QyZjMxNDg1MTM4ODJlNmM3ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJmZDdlOGYyMWJjY2YxMTQzZmJmZjFhNjkzZTdiYTE3ZmU2MjU5NDQwNzBkMjdiYjcwMzE3M2QxMGEyNzMzY2IifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5608c840f45c4f7692058e288e8a7877",
+      "statement": "BrijioResourceResult and BrijioToolResult error types use code: string (not the MCP server's local BrijioErrorCode union) so they accept arbitrary codes the WS server or extension may emit; the shared package's BrijioErrorCode union is the authoritative list used by the WS server and extension, and the MCP server must not assume its local union rejects forwarded codes.",
+      "evidence": [
+        {
+          "resource": "repo://docs/architecture/decisions/0061-forward-error-codes-through-mcp.md#L110-L140",
+          "version": "repo-lines-v1:sha256:90139ee2e3139e54ef2f51b327c0eea7b2361af28c6833d0ac07d606e5565352:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBiNDJlNDkyNTI3YTFlNWU2ZTc0MjVmMWZkODAxYTU2NjZhNGMzMDM2NjM4MTY0YmE2NDg1NTljMzIyYzE4ZDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjN2E2YzM2NDRlMDYxYjJkYTg3MTZkZjFiZDFlZTY5NmIwOTQ2NWQ4NDAwYzNkYjliMjg3OTk2MDgyZTA2ZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE3MDg1NGEyOTg2MmM1ZDEwOGE4NDc1NTM3ZjNjYjI5MjU2MThjODExN2M0MzliMDM0MGM5ZGUyMjNkMmFiMzgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ4ZDAzMGExZDg1NTc2Mzk4MTEwOTkxNTE0N2QzYWFhOTVkYjkwYjc4MzBlNDNiNmM4ZmU4ZDgyYjdhOTNiNzMifQ"
+        },
+        {
+          "resource": "repo://packages/shared/src/protocol.ts#L340-L367",
+          "version": "repo-lines-v1:sha256:efc1108ceaf4282c3ad525269f9988b9270e85bcdcad347437b0c5b48ae2c16c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzMTU5MGRkNTliMWI3MTJhYzIwOTVlYTRjMDA5Y2Y4OTUxYTk0ZDcxNjk5NzY2YTA3ZmUyOGRiM2FhZDk2NjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQzZmFhMTM4NDIwZDIxYjJiNWQ1MzNlY2NjMmM5YWJhYzVjOWE2YTljMzkxZDgyYWM2ZTEyNTM0YjZjYmUyNDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImFmMTAyZTI2NTExNzFiOWVhNzI4MWVkMzMwN2RiMDA4NTgxZGY3ZjVmNzQ4OTA4YTNiYjQ1NzBlZWM5ZjRlNDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjYwOTAzNWIxYmE2NGQ4ZWY3MDY4ZjkwMDViNWJmNDIzNDdjMzE2NzJkZjJmN2M5NDNiNWY2M2U0ZTI4NGJmNzcifQ"
+        },
+        {
+          "resource": "repo://servers/mcp/src/protocol.ts#L270-L290",
+          "version": "repo-lines-v1:sha256:b715a8729f446adc7b2aa4e7ea834807443f39e136bc70d01dca5c56f72d8a40:eyJzZWxlY3RlZExpbmVDb3VudCI6MjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjllYWJhODI2ZTE3YTQwNDAyMTkxZjNmYTI5NjRmNGViMmE1ZDI5ZTk1MzQ2YzVlNmVmZDcwNWU4NmQ5MTFmODMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjlhMzRiOWQ5ODJiNmFiMDU0ZWNmZDhlZGFmYmExMGFhNjdiNzM4YzQ5OTE3YjUwOGM2MDc2MGJjNzg3Mjk1MTMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQxYzkzMjY1MTQ3ODJiYmI1N2Q0OTgyYzEwMDJkNTlmZGQ5MWQ5YWFiOTI3NmFlZTc4NWIwYTU5MjIwYzhkNWMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjljNmRiODgwMTc5N2M2MzI3YWQ4MWIwNTQyOWVmMDhiMGQwZDY4YmI3ZTBlY2E4ZTc4ZDZhY2ZlYTQ4OTQ4OGUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-28T16:38:16.677Z"
+  }
+}

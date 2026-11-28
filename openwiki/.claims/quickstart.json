@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:4700a8a3ad0e5487d447b4a6af790adf3453faec5e418ec3887771ee0aa37127",
+  "claims": [
+    {
+      "id": "claim_91ab80737afd4715aa24897c7132131c",
+      "statement": "Brijio is a pnpm TypeScript monorepo (packageManager pnpm@10.32.1, engines.node >=22.0.0) whose pieces are servers/mcp (MCP server and the single brijio binary that starts the WebSocket server and MCP server together), servers/websocket (the relay that authenticates and routes between MCP and extensions), packages/shared (shared protocol and page-reading logic), clients/extensions/chrome and clients/extensions/safari (browser bridge using @brijio/shared), and clients/extensions/firefox (a planned, not implemented stub).",
+      "evidence": [
+        {
+          "resource": "repo://README.md#L201-L260",
+          "version": "repo-lines-v1:sha256:569a3df75871a73b936f7c372a0f162768ad8c9af7cca0c7307fe5a0e14b2d02:eyJzZWxlY3RlZExpbmVDb3VudCI6NjAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImQzOGIxN2E2ODI4NzViNDhkOWM4ZjcxMGU4ODQ0ZWVlZjM4MWQ0MWE0MTY0NTgzNGQ5YTQ5Y2FmZDJkOGY3MmMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVkYWQzMDJjMjI2Nzg5NWU1ZTNlZGI0OGMzOGI1YjM5ZWY3ZGUwZGE1OTZhM2IyZjI1Mzk3MjhkZjA5N2Y3ZTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFkNGJmMGZhZDYxZTMyZDJkN2UxOGJmODNiNmVkMjRiNmJlNDhlNzhlMzExY2MwODg1NDQ4NDEyZWViMThhN2EiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQxYmI5NTJkNmJjMTUxYWQ4NmMwZmY3MTEwZjRhYjgwNTA3ZTJjM2ZjOGYyMTY3MGYwYzJkMDYyMzI1MDYyOWEifQ"
+        },
+        {
+          "resource": "repo://clients/extensions/firefox/README.md",
+          "version": "repo-file-v1:sha256:65e3e3edcf91af5aaea5cf54c92515cf4105807fa85218baeaf5662e50bc0eda"
+        },
+        {
+          "resource": "repo://package.json",
+          "version": "repo-file-v1:sha256:7504154c7e56d2117d5479c1785a05d41dde7319b2a8efff0ceeb938ddc4ae6a"
+        }
+      ]
+    },
+    {
+      "id": "claim_223272330d6a4fdabdae15eadd507f72",
+      "statement": "The reactive runtime path is: the user manually connects the extension, the MCP server receives an agent tool call, forwards it to the WebSocket relay, the relay delivers it to the connected extension, and the extension reads or acts on the tab and returns a structured result; the extension does not publish ambient browser state.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L40-L58",
+          "version": "repo-lines-v1:sha256:3c2fe4bb6d5ee5fb684e2a0bafaa3c783784fc893d9529498382bf103756f909:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY0MmRlMDNjZDM2NDkwOGY0NzM2ODU1YzQ4ODA5MDAzOThiMjA2YTY0ZWFkZjJiNjNiOGQ5ODRjM2U2MGEwMjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzYzRlZGQwYjE2ZmE3YjQ5MGI4MzgzMmU2YjE1NzU2MTEzZDJhZjE4MGJiMmE4YTE1NDgxYjA2YTdiZjRmZGEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg3MTk4ZDE1YWQ3M2JjY2NhOGFjMmFlYzk5NzA2MGE3OTc1YTAyZTZkZTUwYmFlMTE2MTJkMWU0MjgyYTA1ZDgiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4Yjc2MjM2OWRmMmRkYjZmYTA2MWZjOGMxYTM4MmQ4YjJkYzc3M2ExZTIwMjI3OTFhNjIwYzJmZmY1OWFhMjYifQ"
+        },
+        {
+          "resource": "repo://README.md#L131-L200",
+          "version": "repo-lines-v1:sha256:f658b74810c9dd11274349c7ed7911a7fc459566b8b33558ba9625f83f5fb69b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBmMjkyY2QwNTE5MzVhZjk0ZWEyY2ZmOWE4N2VkZDFjNDU2MDI2MWYwMWI2NTZlNjVmMzJhMzY3MDIzMjU2MTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImRlYWJhOGUwN2MyODk5OTBiOWRmYjMwYTYxMDU5MjViODc2ZDY4NmU2ZWQ3MTA1N2FkMzA3N2UyZTgyMDg4NjkiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1OGFlMjhlOGY5YmYxYTQxNjFlYTYwNjA1ZDAzYTk1ZDI4YTRiNjdjNzZhM2MyZTk0ZGFlOTYzYzYzNWM0ZTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fcf88fb0c7764616b321a7814cf64465",
+      "statement": "Reads and actions are targeted through explicit per-call tabId threaded through the MCP tool wrappers, relay protocol, background controller, and browser adapters; when tabId is omitted the system falls back to the active tab.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L133-L162",
+          "version": "repo-lines-v1:sha256:c7001981ba2cbdd1396a00529e5ad0f733fdcf5c9b7c2c235d2e35a62b56e805:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxMWQwYzkyMmQ4ZTlhMTZiYmVkYzAzYjFlMGZlNTJiNDBmMDFiMTQ0NTJlMjM3YzdmMTIxMWQ5MzViYjcyN2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijk1M2YzNTg4NzE3YTA2Mjg3NDg0MWJhYTM3YWNhNThkMDZiOTk4NWQ1YTE1MzczZmIzZGFjYWNkMDBjY2FhNjgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZkMTUwMjJiMTY4NjRiNGY2YWVjNGZmM2Y0OTY1ZGUxN2JmNjNhZmE5OTI1MWYwZGFhZDkxNTM4ZGEzZjAxNzAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjI0ZGU4ZWMzZGY4OWVmZDg3ZDJhNThhZmUxZGJhYjE5MWE5YWUxYjlkOGM3MzRkYmM0NzY0ZGI4NTVkMTFiZTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f16fe93f27b249be81dfddba57bed2e8",
+      "statement": "Only submit_form, fetch_resource, and download_file require client-side user approval before execution; getApprovalActionType returns the type only for those three and ensureApprovedAction treats any action with approvalRequest !== true or a type outside the gated set as immediately approved.",
+      "evidence": [
+        {
+          "resource": "repo://packages/shared/src/background-controller.ts#L1690-L1704",
+          "version": "repo-lines-v1:sha256:6a289b363d634e75460c4814c7fb1073101e4b48ff727d6abda6e6e5f2e8e5a5:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZjYmQ0OGI5Mzc1NDI1OWEwNTI4ZjI0M2M3YWU3ZTRkZWNiN2NhY2Q3ODk1Mzk5NDczYWU0MGMyNjZlMjZmOTciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVhY2IzYjRlYTJmNWFjYjI5YTBkNGMwNWZhNjg5ZjZhYzc4ZjkyYmNhOTI0NDZmMTQzNmViNzUzNjQzODIwODAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3YTY4ZTAyNWNiZDRjYzFlYTczMzNmM2EyYmQzMGU2OTYxZDEzZjZlZGFiMjI2Y2Q0ZjI3ZmYxOTVmNWIyZTgifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_81ea34206f084530873dc9522511b08a",
+      "statement": "AGENTS.md is the agent-instruction authority with non-negotiable product invariants, and docs/project/CAPABILITY_MATRIX.md is the product-contract authority for what is implemented, planned, or intentionally unsupported; when sources disagree the discrepancy should be resolved or reported rather than silently chosen.",
+      "evidence": [
+        {
+          "resource": "repo://AGENTS.md#L1-L39",
+          "version": "repo-lines-v1:sha256:488f081d0f156191ae20b6aef6606dcf538a47c951f1da1c2f33e89600b621c1:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjE3NDQxZDEyMjA1OWE5NDJiYWQzZWQyZjhlMDQzODM1NzAwNjY1YzY1YzkwYjdkYmQ2MGNiYTk0MWU3OGE2NDkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5OTQwOTUyZmMzNTdlZDYxYTU4M2E3OGFkYWE3Y2ZiOTUxZjg3ZmMyZTk0YzRjYjFhZjc4YzQ2YzRhN2RiMjAifQ"
+        },
+        {
+          "resource": "repo://README.md#L112-L130",
+          "version": "repo-lines-v1:sha256:2d5c15f344c0049dc2dafc5819d24448b1f9c8b8f287caf85f4f741d190b550a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzODhkNGY3M2QzZWYyOTkyYThhYjllYTVhY2VhNjE5NGFhYmRlODNkNmI5NjUzZDY3MDIzYjAwZmFkZWZkY2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdlZmNlODY2N2E1MGJiNzMyZjNlMWE1OGViZjkyZGE0ZjQ1ZDVlMDRjMDRjOTE0ZGI1Mjc3YWEyNzBmNzAzZjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ1NzIwODA4MmE0YWFmYmY5MDdhOWU1ZDg3NDc3NDM3YzBiMzZjOTJkMTdhNzRhMzg1ZWRlNGZjMjA1MjU3MGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3YTFkYzk4ZWU2NzcwNzU1NTc4MTE2ZTVlMDQ2MDQyNTQ2OWIxYTg2NjUwMzRmYzFiNTYyMjkwZjg3MDgxNWUifQ"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-28T16:38:16.677Z"
+  }
+}
